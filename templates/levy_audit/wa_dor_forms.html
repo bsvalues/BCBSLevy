@@ -274,9 +274,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let districtData = {};
     
     // Load Form Button Click Handler
-    document.getElementById('loadFormBtn').addEventListener('click', function() {
-        const districtId = document.getElementById('districtSelect').value;
-        const year = document.getElementById('yearSelect').value;
+    document.getElementById("loadFormBtn").addEventListener("click", function() {
+        console.log("Load Form button clicked");
+        const districtId = document.getElementById("districtSelect").value;
+        const year = document.getElementById("yearSelect").value;
+        const formType = document.getElementById("formTypeSelect").value;
+        
+        console.log("Selected values:", { districtId, year, formType });
+
+        const districtId = document.getElementById("districtSelect").value;
+        const year = document.getElementById("yearSelect").value;
+        const formType = document.getElementById("formTypeSelect").value;
+        
+        console.log("Selected values:", { districtId, year, formType });
+
         const formType = document.getElementById('formTypeSelect').value;
         
         if (!districtId || !year) {
