@@ -69,9 +69,9 @@ def create_app(config_name=None):
     
     # Configure login manager with auto-login functionality
     login_manager.init_app(app)
-    # login_manager.login_view = 'auth.login'  # Disabled to bypass login
-    # login_manager.login_message = 'Please log in to access this page.'
-    # login_manager.login_message_category = 'info'
+    login_manager.login_view = None  # Disable redirect to login page
+    login_manager.login_message = None  # No login message
+    login_manager.login_message_category = None
     
     @login_manager.user_loader
     def load_user(user_id):

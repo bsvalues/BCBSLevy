@@ -216,8 +216,8 @@ class Property(AuditMixin, YearMixin, db.Model):
     
     id = Column(Integer, primary_key=True)
     property_id = Column(String(64), nullable=False, index=True)
-    tax_code = Column(String(64), nullable=False, index=True)
-    tax_code_id = Column(Integer, ForeignKey('tax_code.id'), nullable=True, index=True)
+    tax_code = Column(String(64), nullable=False, index=True)  # Original tax_code field
+    tax_code_id = Column(Integer, ForeignKey('tax_code.id'), nullable=True, index=True)  # Reference to tax_code table
     owner_name = Column(String(128))
     property_address = Column(String(256))
     city = Column(String(64))
@@ -236,7 +236,7 @@ class Property(AuditMixin, YearMixin, db.Model):
     latitude = Column(Float)
     
     # Relationships
-    tax_code_rel = relationship('TaxCode', foreign_keys=[tax_code_id], back_populates='properties')
+    tax_code_rel = relationship('TaxCode', back_populates='properties')
     
     # Ensure property_id is unique per year
     __table_args__ = (
