@@ -171,7 +171,7 @@ class TaxCode(AuditMixin, YearMixin, db.Model):
     
     # Relationships
     tax_district = relationship('TaxDistrict', back_populates='tax_codes')
-    properties = relationship('Property', back_populates='tax_code_rel')
+    properties = relationship('Property', back_populates='tax_code')
     historical_rates = relationship('TaxCodeHistoricalRate', back_populates='tax_code')
     
     # Ensure tax_code is unique per tax_district_id and year
@@ -216,8 +216,7 @@ class Property(AuditMixin, YearMixin, db.Model):
     
     id = Column(Integer, primary_key=True)
     property_id = Column(String(64), nullable=False, index=True)
-    tax_code = Column(String(64), nullable=False, index=True)  # Original tax_code field
-    tax_code_id = Column(Integer, ForeignKey('tax_code.id'), nullable=True, index=True)  # Reference to tax_code table
+    tax_code_id = Column(Integer, ForeignKey('tax_code.id'), nullable=False, index=True)
     owner_name = Column(String(128))
     property_address = Column(String(256))
     city = Column(String(64))
@@ -236,7 +235,7 @@ class Property(AuditMixin, YearMixin, db.Model):
     latitude = Column(Float)
     
     # Relationships
-    tax_code_rel = relationship('TaxCode', back_populates='properties')
+    tax_code = relationship('TaxCode', back_populates='properties')
     
     # Ensure property_id is unique per year
     __table_args__ = (
@@ -304,50 +303,28 @@ class ImportLog(AuditMixin, db.Model):
         return f'<ImportLog {self.filename} {self.status}>'
 
 
-class ExportLog(db.Model):
+class ExportLog(AuditMixin, db.Model):
     """
     Log of data exports for tracking and auditing.
     """
     __tablename__ = 'export_log'
     
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
     filename = Column(String(256), nullable=False)
-    rows_exported = Column(Integer, nullable=False)
-    export_date = Column(DateTime)
-    export_type = Column(String(50))
-    status = Column(String(50), default='completed')
-    notes = Column(Text)
+    export_type = Column(SQLEnum(ExportType), nullable=False)
+    record_count = Column(Integer, default=0)
+    status = Column(String(32), default='PENDING')
+    error_details = Column(Text)
+    processing_time = Column(Float)  # Time in seconds
+    year = Column(Integer, nullable=False, index=True)
+    export_metadata = Column(JSON)  # Renamed from metadata (reserved name)
+    
+    # Relationship
+    user = relationship('User', foreign_keys=[user_id], backref=backref('exports', lazy='dynamic'))
     
     def __repr__(self):
         return f'<ExportLog {self.filename} {self.status}>'
-        
-    @property
-    def notes_json(self):
-        """
-        Get the notes as a JSON object if it's valid JSON,
-        otherwise return the notes as text.
-        """
-        import json
-        
-        if not self.notes:
-            return {}
-            
-        try:
-            return json.loads(self.notes)
-        except (json.JSONDecodeError, TypeError):
-            return {'text': self.notes}
-            
-    @notes_json.setter
-    def notes_json(self, value):
-        """
-        Set the notes from a JSON object.
-        """
-        import json
-        
-        if isinstance(value, dict) or isinstance(value, list):
-            self.notes = json.dumps(value)
-        else:
-            self.notes = str(value)
 
 
 class AuditLog(db.Model):

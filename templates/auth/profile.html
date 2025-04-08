@@ -71,14 +71,14 @@
                         <div class="row mb-3">
                             <label for="created_at" class="col-sm-3 col-form-label">Created</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control-plaintext" id="created_at" value="{{ user.created_at|format_date }}" readonly>
+                                <input type="text" class="form-control-plaintext" id="created_at" value="{{ user.created_at|datetime }}" readonly>
                             </div>
                         </div>
                         
                         <div class="row mb-3">
                             <label for="last_login" class="col-sm-3 col-form-label">Last Login</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control-plaintext" id="last_login" value="{{ user.last_login|format_date if user.last_login else 'Never' }}" readonly>
+                                <input type="text" class="form-control-plaintext" id="last_login" value="{{ user.last_login|datetime if user.last_login else 'Never' }}" readonly>
                             </div>
                         </div>
                         

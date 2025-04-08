@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 @dashboard_bp.route('/')
-# @login_required  # Disabled to bypass authentication
+@login_required
 def index():
     """
     Main dashboard view.
@@ -38,50 +38,25 @@ def index():
     # Get statistics
     try:
         # Count entities
-        try:
-            district_count = TaxDistrict.query.filter_by(year=current_year).count()
-        except Exception as e:
-            logger.error(f"Error counting districts: {str(e)}")
-            district_count = 0
-            
-        try:
-            tax_code_count = TaxCode.query.filter_by(year=current_year).count()
-        except Exception as e:
-            logger.error(f"Error counting tax codes: {str(e)}")
-            tax_code_count = 0
-            
-        try:
-            property_count = 0  # Disable property count for now due to schema issues
-        except Exception as e:
-            logger.error(f"Error counting properties: {str(e)}")
-            property_count = 0
+        district_count = TaxDistrict.query.filter_by(year=current_year).count()
+        tax_code_count = TaxCode.query.filter_by(year=current_year).count()
+        property_count = Property.query.filter_by(year=current_year).count()
         
         # Calculate aggregates
-        try:
-            levy_stats = db.session.query(
-                func.sum(TaxCode.total_assessed_value).label('total_assessed_value'),
-                func.sum(TaxCode.total_levy_amount).label('total_levy_amount'),
-                func.avg(TaxCode.effective_tax_rate).label('avg_levy_rate')
-            ).filter_by(year=current_year).first()
-        except Exception as e:
-            logger.error(f"Error calculating levy statistics: {str(e)}")
-            # Create an empty result object with None values
-            from collections import namedtuple
-            LevyStats = namedtuple('LevyStats', ['total_assessed_value', 'total_levy_amount', 'avg_levy_rate'])
-            levy_stats = LevyStats(None, None, None)
+        levy_stats = db.session.query(
+            func.sum(TaxCode.total_assessed_value).label('total_assessed_value'),
+            func.sum(TaxCode.total_levy_amount).label('total_levy_amount'),
+            func.avg(TaxCode.effective_tax_rate).label('avg_levy_rate')
+        ).filter_by(year=current_year).first()
         
         total_assessed_value = levy_stats.total_assessed_value or 0
         total_levy_amount = levy_stats.total_levy_amount or 0
         avg_levy_rate = levy_stats.avg_levy_rate or 0
         
         # Get recent imports (last 5)
-        try:
-            recent_imports = ImportLog.query.order_by(
-                ImportLog.id.desc()
-            ).limit(5).all()
-        except Exception as e:
-            logger.error(f"Error fetching recent imports: {str(e)}")
-            recent_imports = []
+        recent_imports = ImportLog.query.order_by(
+            ImportLog.created_at.desc()
+        ).limit(5).all()
         
     except Exception as e:
         logger.error(f"Error fetching dashboard data: {str(e)}")
@@ -107,7 +82,7 @@ def index():
 
 
 @dashboard_bp.route('/metrics')
-# @login_required  # Disabled to bypass authentication
+@login_required
 def dashboard_metrics():
     """
     API endpoint for dashboard metrics.
@@ -172,7 +147,7 @@ def dashboard_metrics():
 
 
 @dashboard_bp.route('/stats')
-# @login_required  # Disabled to bypass authentication
+@login_required
 def dashboard_stats():
     """
     API endpoint for dashboard statistics.

@@ -5,56 +5,10 @@
  * throughout the Levy Calculation System.
  */
 
-// Global variable to track active loading instances
-window.activeLoadingInstances = [];
-
 // Initialize the loading animations when the document is loaded
 document.addEventListener('DOMContentLoaded', function() {
   initializeLoadingAnimations();
-  
-  // Force hide any stuck loading overlays after 30 seconds (failsafe)
-  setInterval(function() {
-    const stuckOverlays = document.querySelectorAll('.levy-loading-overlay');
-    if (stuckOverlays.length > 0) {
-      console.log('Found stuck loading overlays, forcing removal');
-      hideLevyLoadingAll();
-    }
-  }, 30000);
 });
-
-// Listen for page changes (even in single-page app contexts)
-window.addEventListener('beforeunload', function() {
-  // Clean up any loading overlays before leaving the page
-  hideLevyLoadingAll();
-});
-
-// Watch for AJAX completions using vanilla JS
-(function() {
-  const originalXHR = window.XMLHttpRequest;
-  window.XMLHttpRequest = function() {
-    const xhr = new originalXHR();
-    xhr.addEventListener('load', function() {
-      // Wait a bit to allow the content to process
-      setTimeout(function() {
-        // Re-initialize loading animations for any new content
-        setupFormSubmitLoading();
-        setupAjaxLoadingHandlers();
-        
-        // Check if we should remove any loading overlays
-        if (this.status >= 200 && this.status < 300) {
-          // Wait a moment to allow handlers to process
-          setTimeout(function() {
-            const activeOverlays = document.querySelectorAll('.levy-loading-overlay');
-            if (activeOverlays.length > 0) {
-              hideLevyLoadingAll();
-            }
-          }, 500);
-        }
-      }, 100);
-    });
-    return xhr;
-  };
-})();
 
 /**
  * Initialize all loading animation functionality
@@ -304,62 +258,28 @@ window.showLevyLoadingOverlay = function(type, text) {
 };
 
 // Hide all loading animations
-window.hideLevyLoadingAll = function(forceImmediate = false) {
-  console.log('Hiding all levy loading elements');
-  
+window.hideLevyLoadingAll = function() {
   // Remove any full-screen overlays
   const overlays = document.querySelectorAll('.levy-loading-overlay');
   overlays.forEach(overlay => {
     document.body.style.overflow = '';
-    
-    if (forceImmediate) {
-      // Skip animation and remove immediately
+    overlay.style.opacity = '0';
+    setTimeout(() => {
       if (document.body.contains(overlay)) {
         document.body.removeChild(overlay);
       }
-    } else {
-      // Use animation
-      overlay.style.opacity = '0';
-      setTimeout(() => {
-        if (document.body.contains(overlay)) {
-          document.body.removeChild(overlay);
-        }
-      }, 300);
-    }
-  });
-  
-  // Look for stuck overlay elements that might not have the proper class
-  const possibleStuckOverlays = Array.from(document.body.children).filter(el => {
-    // Look for elements with loading-related styling
-    const style = window.getComputedStyle(el);
-    return (
-      (style.position === 'fixed' || style.position === 'absolute') && 
-      style.zIndex > 1000 &&
-      (el.innerHTML.includes('loading') || el.classList.contains('levy-loading-container'))
-    );
-  });
-  
-  // Remove any potentially stuck overlay elements
-  possibleStuckOverlays.forEach(el => {
-    console.log('Removing possible stuck overlay element', el);
-    if (document.body.contains(el)) {
-      document.body.removeChild(el);
-    }
+    }, 300);
   });
   
   // Restore original content to any elements with loading
   const loadingElements = document.querySelectorAll('.levy-is-loading');
   loadingElements.forEach(element => {
-    try {
-      const originalContent = element.getAttribute('data-original-content');
-      if (originalContent) {
-        element.innerHTML = originalContent;
-        element.removeAttribute('data-original-content');
-      }
-      element.classList.remove('levy-is-loading');
-    } catch (err) {
-      console.error('Error restoring original content', err);
+    const originalContent = element.getAttribute('data-original-content');
+    if (originalContent) {
+      element.innerHTML = originalContent;
+      element.removeAttribute('data-original-content');
     }
+    element.classList.remove('levy-is-loading');
   });
   
   // Re-enable any disabled form elements
@@ -370,11 +290,4 @@ window.hideLevyLoadingAll = function(forceImmediate = false) {
       input.disabled = false;
     });
   });
-  
-  // Extra cleanup on HTML element in case overflow was stuck
-  document.documentElement.style.overflow = '';
-  document.body.style.overflow = '';
-  
-  // Clear any loadingInstance tracking
-  window.activeLoadingInstances = [];
 };

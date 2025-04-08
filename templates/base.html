@@ -230,8 +230,8 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('data_management.export_history') }}">
-                                    <i class="bi bi-archive me-2"></i>Export Archives
+                                <a class="dropdown-item" href="{{ url_for('data_management.archives') }}">
+                                    <i class="bi bi-archive me-2"></i>Archives
                                 </a>
                             </li>
                         </ul>
@@ -290,16 +290,31 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.reports_dashboard') }}">
-                                    <i class="bi bi-file-earmark-bar-graph me-2"></i>Reports Dashboard
+                                <a class="dropdown-item" href="{{ url_for('reports.district_summary') }}">
+                                    <i class="bi bi-file-earmark-bar-graph me-2"></i>District Summary
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.generate_report') }}">
-                                    <i class="bi bi-file-earmark-text me-2"></i>Generate Report
+                                <a class="dropdown-item" href="{{ url_for('reports.tax_code_analysis') }}">
+                                    <i class="bi bi-file-earmark-text me-2"></i>Tax Code Analysis
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('reports.trend_report') }}">
+                                    <i class="bi bi-arrow-up-right me-2"></i>Trend Report
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('reports.comparative_analysis') }}">
+                                    <i class="bi bi-bar-chart me-2"></i>Comparative Analysis
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('reports.user_activity') }}">
+                                    <i class="bi bi-person-lines-fill me-2"></i>User Activity
+                                </a>
+                            </li>
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('user_audit.index') }}">
                                     <i class="bi bi-clipboard-check me-2"></i>User Audit Log
