@@ -36,7 +36,7 @@ def reports_dashboard():
     templates = report_utils.list_templates()
     
     # Get recent exports
-    recent_exports = ExportLog.query.order_by(ExportLog.created_at.desc()).limit(10).all()
+    recent_exports = ExportLog.query.order_by(ExportLog.export_date.desc()).limit(10).all()
     
     # Count properties and tax codes for context
     property_count = Property.query.count()
@@ -461,14 +461,12 @@ def generate_report():
                 
                 # Log export
                 export_log = ExportLog(
-                    user_id=1,  # Default to admin user (to be updated with current_user.id)
                     filename=filename,
-                    export_type=ExportType.REPORT,
-                    record_count=result.get('record_count', 0),
-                    status='COMPLETED',
-                    processing_time=result.get('processing_time', 0),
-                    year=datetime.now().year,
-                    export_metadata={
+                    rows_exported=result.get('record_count', 0),
+                    export_date=datetime.now(),
+                    export_type='REPORT',
+                    status='completed',
+                    notes={
                         'template_id': template_id,
                         'template_name': template['name'],
                         'export_format': export_format
