@@ -14,9 +14,9 @@
                 </ol>
             </nav>
             <h1 class="h2 mb-3">Washington DOR Levy Forms</h1>
-            <!-- Back link relocated below the header -->
-            <div class="back-link-container mb-3">
-                <a href="{{ url_for('levy_audit.index') }}" class="back-arrow">
+            <!-- Completely new back button approach using Bootstrap button -->
+            <div class="mb-3">
+                <a href="{{ url_for('levy_audit.index') }}" class="btn btn-outline-secondary btn-sm">
                     <i class="bi bi-arrow-left"></i> Back to Levy Audit
                 </a>
             </div>
