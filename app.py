@@ -67,16 +67,41 @@ def create_app(config_name=None):
     csrf.init_app(app)
     migrate.init_app(app, db)
     
-    # Configure login manager
+    # Configure login manager with auto-login functionality
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Please log in to access this page.'
-    login_manager.login_message_category = 'info'
+    # login_manager.login_view = 'auth.login'  # Disabled to bypass login
+    # login_manager.login_message = 'Please log in to access this page.'
+    # login_manager.login_message_category = 'info'
     
     @login_manager.user_loader
     def load_user(user_id):
         from models import User
-        return User.query.get(int(user_id))
+        
+        # Auto-create and return admin user if needed
+        admin_user = User.query.filter_by(username='admin').first()
+        if not admin_user:
+            # Create admin user
+            from werkzeug.security import generate_password_hash
+            admin_user = User(
+                username='admin',
+                email='admin@example.com',
+                password_hash=generate_password_hash('admin')
+            )
+            db.session.add(admin_user)
+            db.session.commit()
+            
+        # Always return admin user regardless of user_id
+        return admin_user
+        
+    # Auto-login middleware for all requests
+    @app.before_request
+    def auto_login():
+        from flask_login import current_user, login_user
+        if not current_user.is_authenticated:
+            from models import User
+            admin_user = User.query.filter_by(username='admin').first()
+            if admin_user:
+                login_user(admin_user)
     
     # Register CLI commands
     try:
@@ -199,11 +224,11 @@ def configure_logging(app):
 # Create the Flask application instance
 app = create_app()
 
-# Root route with welcome page
+# Root route redirects directly to dashboard
 @app.route('/')
 def index():
-    """Render welcome page with stunning landing page design"""
-    return render_template('index.html')
+    """Skip welcome page, redirect directly to dashboard"""
+    return redirect(url_for('dashboard.index'))
 
 
 # Register blueprints

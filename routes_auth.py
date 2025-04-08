@@ -32,43 +32,12 @@ logger = logging.getLogger(__name__)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    User login route.
+    User login route (bypassed - automatically redirects to dashboard).
     
-    GET: Render login form
-    POST: Process login request
+    All login functionality is bypassed - redirects to dashboard.
     """
-    # Redirect if already logged in
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    if request.method == 'POST':
-        username_or_email = request.form.get('username_or_email')
-        password = request.form.get('password')
-        remember_me = 'remember_me' in request.form
-        
-        if not username_or_email or not password:
-            flash('Please provide both username/email and password', 'error')
-            return render_template('auth/login.html')
-        
-        # Authenticate user
-        success, result = authenticate_user(username_or_email, password)
-        
-        if success:
-            # Log in user
-            login_user(result, remember=remember_me)
-            logger.info(f"User logged in: {result.username} (admin: {result.is_admin})")
-            
-            # Get the next page to redirect to
-            next_page = request.args.get('next')
-            if not next_page or not next_page.startswith('/'):
-                next_page = url_for('index')
-            
-            flash(f'Welcome back, {result.first_name or result.username}!', 'success')
-            return redirect(next_page)
-        else:
-            flash(f'Login failed: {result}', 'error')
-    
-    return render_template('auth/login.html')
+    # Always redirect to dashboard
+    return redirect(url_for('dashboard.index'))
 
 
 @auth_bp.route('/logout')
