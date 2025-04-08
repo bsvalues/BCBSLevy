@@ -46,10 +46,12 @@
 /* Back arrow styles */
 .back-arrow {
     display: inline-block;
-    margin-right: 0.5rem;
+    margin-right: 0.75rem;
     font-size: 1.25rem;
     color: var(--primary-color);
     transition: transform 0.2s ease;
+    position: relative;
+    z-index: 5; /* Lower z-index than breadcrumb */
 }
 
 .back-arrow:hover {

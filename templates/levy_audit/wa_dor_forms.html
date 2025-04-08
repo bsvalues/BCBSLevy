@@ -13,9 +13,9 @@
                     <li class="breadcrumb-item active" aria-current="page">WA DOR Forms</li>
                 </ol>
             </nav>
-            <div class="d-flex align-items-center mb-3">
-                <a href="{{ url_for('levy_audit.index') }}" class="back-arrow"><i class="bi bi-arrow-left"></i></a>
-                <h1 class="h2 mb-0">Washington DOR Levy Forms</h1>
+            <div class="d-flex align-items-center mb-3 position-relative">
+                <a href="{{ url_for('levy_audit.index') }}" class="back-arrow position-absolute" style="left: -30px;"><i class="bi bi-arrow-left"></i></a>
+                <h1 class="h2 mb-0 ms-2">Washington DOR Levy Forms</h1>
             </div>
             <p class="lead text-muted">
                 Complete standard Washington Department of Revenue levy forms with auto-populated data.
@@ -281,14 +281,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const formType = document.getElementById("formTypeSelect").value;
         
         console.log("Selected values:", { districtId, year, formType });
-
-        const districtId = document.getElementById("districtSelect").value;
-        const year = document.getElementById("yearSelect").value;
-        const formType = document.getElementById("formTypeSelect").value;
-        
-        console.log("Selected values:", { districtId, year, formType });
-
-        const formType = document.getElementById('formTypeSelect').value;
         
         if (!districtId || !year) {
             alert('Please select both district and year');
@@ -296,13 +288,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Fetch district data for the selected year
-        fetch(`/levy-audit/district-data/${districtId}/${year}`).then(response => { console.log("Response status:", response.status); return response.json(); })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
+        fetch(`/levy-audit/district-data/${districtId}/${year}`)
+            .then(response => { 
+                console.log("Response status:", response.status); 
+                return response.json(); 
             })
-            .then(data => { console.log("Received data:", data);
-                console.log('Received data:', data);
+            .then(data => { 
+                console.log("Received data:", data);
                 if (data.status === 'success') {
                     districtData = data;
                     displayForm(formType);
