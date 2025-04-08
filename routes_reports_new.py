@@ -465,13 +465,15 @@ def generate_report():
                     rows_exported=result.get('record_count', 0),
                     export_date=datetime.now(),
                     export_type='REPORT',
-                    status='completed',
-                    notes={
-                        'template_id': template_id,
-                        'template_name': template['name'],
-                        'export_format': export_format
-                    }
+                    status='completed'
                 )
+                
+                # Use the notes_json property for proper JSON handling
+                export_log.notes_json = {
+                    'template_id': template_id,
+                    'template_name': template['name'],
+                    'export_format': export_format
+                }
                 db.session.add(export_log)
                 db.session.commit()
                 
