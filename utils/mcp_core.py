@@ -175,6 +175,18 @@ class MCPRegistry:
             raise ValueError(f"MCP function '{name}' not found")
         return function.execute(parameters)
     
+    def has_function(self, name: str) -> bool:
+        """
+        Check if a function with the given name exists in the registry.
+        
+        Args:
+            name: Function name to check
+            
+        Returns:
+            True if the function exists, False otherwise
+        """
+        return name in self.functions
+    
     def list_functions(self) -> List[Dict[str, Any]]:
         """
         List all registered functions.
@@ -317,6 +329,18 @@ class MCPWorkflowRegistry:
         if not workflow:
             raise ValueError(f"MCP workflow '{name}' not found")
         return workflow.execute(parameters)
+    
+    def has_workflow(self, name: str) -> bool:
+        """
+        Check if a workflow with the given name exists in the registry.
+        
+        Args:
+            name: Workflow name to check
+            
+        Returns:
+            True if the workflow exists, False otherwise
+        """
+        return name in self.workflows
     
     def list_workflows(self) -> List[Dict[str, Any]]:
         """

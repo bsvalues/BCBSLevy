@@ -273,22 +273,47 @@ register_tax_strategy_routes(app)
 
 # Import models after db is defined to avoid circular imports
 with app.app_context():
-    # Initialize MCP API endpoints within application context
+    # Import dependencies for MCP and AI functionalities
+    from utils.mcp_integration import init_mcp_api_routes, init_mcp
+    from utils.advanced_ai_agent import init_advanced_agent
+    from utils.anthropic_utils import check_api_key_status
+    
+    # Check Anthropic API key status before attempting to initialize AI components
+    api_status = check_api_key_status()
+    if api_status['status'] != 'valid':
+        app.logger.warning(f"Anthropic API key issue: {api_status['message']}")
+        app.logger.warning("AI-powered features will be limited or unavailable")
+    
+    # Initialize MCP framework with improved error handling
     try:
-        from utils.mcp_integration import init_mcp_api_routes, init_mcp
         init_mcp()
-        init_mcp_api_routes(app)
         app.logger.info("MCP framework initialized")
-        
-        # Initialize Advanced AI Agent
-        try:
-            from utils.advanced_ai_agent import init_advanced_agent
-            init_advanced_agent()
-            app.logger.info("Advanced Analysis Agent initialized")
-        except Exception as e:
-            app.logger.error(f"Error initializing Advanced Analysis Agent: {str(e)}")
+    except ImportError as e:
+        app.logger.error(f"Error importing MCP dependencies: {str(e)}")
+        app.logger.error("MCP framework initialization failed - module import error")
     except Exception as e:
         app.logger.error(f"Error initializing MCP framework: {str(e)}")
+        app.logger.error("MCP framework initialization failed - basic features will still be available")
+    
+    # Register MCP API routes even if initialization failed (endpoints will handle errors)
+    try:
+        init_mcp_api_routes(app)
+    except Exception as e:
+        app.logger.error(f"Error registering MCP API routes: {str(e)}")
+    
+    # Initialize Advanced AI Agent with dedicated error handling
+    try:
+        if api_status['status'] == 'valid':
+            init_advanced_agent()
+            app.logger.info("Advanced Analysis Agent initialized and registered")
+        else:
+            app.logger.warning("Skipping Advanced Analysis Agent initialization due to API key issues")
+    except ImportError as e:
+        app.logger.error(f"Error importing Advanced AI Agent dependencies: {str(e)}")
+    except Exception as e:
+        app.logger.error(f"Error initializing Advanced Analysis Agent: {str(e)}")
+        app.logger.error("Advanced AI features will be unavailable")
+    
     # Create tables if they don't exist
     try:
         from models import User, TaxDistrict, TaxCode, Property, ImportLog, ExportLog

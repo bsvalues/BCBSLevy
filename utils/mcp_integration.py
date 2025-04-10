@@ -7,6 +7,7 @@ including route enhancement and API endpoints.
 
 import json
 import logging
+from datetime import datetime
 from typing import Dict, List, Any, Callable, Optional
 
 from flask import Blueprint, request, jsonify, current_app, render_template
@@ -122,61 +123,218 @@ def init_mcp_api_routes(app):
         """API endpoint to execute an MCP function."""
         data = request.json
         if not data or 'function' not in data:
-            return jsonify({"error": "Invalid request", "message": "Missing function name"}), 400
+            logger.warning("Invalid MCP function request: missing function name")
+            return jsonify({
+                "error": "Invalid request", 
+                "message": "Missing function name",
+                "code": "MISSING_FUNCTION_NAME"
+            }), 400
         
         function_name = data['function']
         parameters = data.get('parameters', {})
         
+        # Check if function exists in registry
+        if not registry.has_function(function_name):
+            logger.warning(f"Attempt to execute unknown function: {function_name}")
+            return jsonify({
+                "error": "Unknown function", 
+                "message": f"Function '{function_name}' is not registered",
+                "code": "UNKNOWN_FUNCTION",
+                "available_functions": registry.list_functions()
+            }), 404
+        
         try:
+            logger.info(f"Executing MCP function: {function_name} with params: {parameters}")
             result = registry.execute_function(function_name, parameters)
-            return jsonify({"result": result})
+            return jsonify({
+                "result": result, 
+                "status": "success",
+                "function": function_name
+            })
+        except ValueError as e:
+            # Parameter validation errors
+            logger.error(f"Parameter validation error in function {function_name}: {str(e)}")
+            return jsonify({
+                "error": "Parameter validation failed", 
+                "message": str(e),
+                "code": "INVALID_PARAMETERS",
+                "function": function_name
+            }), 400
+        except KeyError as e:
+            # Missing required parameter
+            logger.error(f"Missing required parameter in function {function_name}: {str(e)}")
+            return jsonify({
+                "error": "Missing required parameter", 
+                "message": f"Missing required parameter: {str(e)}",
+                "code": "MISSING_PARAMETER",
+                "function": function_name
+            }), 400
         except Exception as e:
+            # General execution errors
             logger.error(f"Error executing function {function_name}: {str(e)}")
-            return jsonify({"error": "Function execution failed", "message": str(e)}), 500
+            return jsonify({
+                "error": "Function execution failed", 
+                "message": str(e),
+                "code": "EXECUTION_ERROR",
+                "function": function_name
+            }), 500
     
     @mcp_api.route('/api/mcp/workflow/execute', methods=['POST'])
     def execute_workflow():
         """API endpoint to execute an MCP workflow."""
         data = request.json
         if not data or 'workflow' not in data:
-            return jsonify({"error": "Invalid request", "message": "Missing workflow name"}), 400
+            logger.warning("Invalid MCP workflow request: missing workflow name")
+            return jsonify({
+                "error": "Invalid request", 
+                "message": "Missing workflow name",
+                "code": "MISSING_WORKFLOW_NAME"
+            }), 400
         
         workflow_name = data['workflow']
         parameters = data.get('parameters', {})
         
+        # Check if workflow exists in registry
+        if not workflow_registry.has_workflow(workflow_name):
+            logger.warning(f"Attempt to execute unknown workflow: {workflow_name}")
+            return jsonify({
+                "error": "Unknown workflow", 
+                "message": f"Workflow '{workflow_name}' is not registered",
+                "code": "UNKNOWN_WORKFLOW",
+                "available_workflows": workflow_registry.list_workflows()
+            }), 404
+            
         try:
+            logger.info(f"Executing MCP workflow: {workflow_name} with params: {parameters}")
+            start_time = datetime.now()
             results = workflow_registry.execute_workflow(workflow_name, parameters)
-            return jsonify({"result": {"status": "completed", "steps": len(results), "outputs": results}})
+            execution_time = (datetime.now() - start_time).total_seconds()
+            
+            logger.info(f"Workflow {workflow_name} completed in {execution_time:.2f}s with {len(results)} steps")
+            return jsonify({
+                "result": {
+                    "status": "completed", 
+                    "steps": len(results), 
+                    "outputs": results,
+                    "execution_time_seconds": round(execution_time, 2)
+                },
+                "workflow": workflow_name
+            })
+        except ValueError as e:
+            # Parameter validation errors
+            logger.error(f"Parameter validation error in workflow {workflow_name}: {str(e)}")
+            return jsonify({
+                "error": "Parameter validation failed", 
+                "message": str(e),
+                "code": "INVALID_PARAMETERS",
+                "workflow": workflow_name
+            }), 400 
+        except KeyError as e:
+            # Missing required parameter
+            logger.error(f"Missing required parameter in workflow {workflow_name}: {str(e)}")
+            return jsonify({
+                "error": "Missing required parameter", 
+                "message": f"Missing required parameter: {str(e)}",
+                "code": "MISSING_PARAMETER",
+                "workflow": workflow_name
+            }), 400
         except Exception as e:
+            # General execution errors
             logger.error(f"Error executing workflow {workflow_name}: {str(e)}")
-            return jsonify({"error": "Workflow execution failed", "message": str(e)}), 500
+            return jsonify({
+                "error": "Workflow execution failed", 
+                "message": str(e),
+                "code": "EXECUTION_ERROR",
+                "workflow": workflow_name
+            }), 500
     
     @mcp_api.route('/api/mcp/agent/request', methods=['POST'])
     def agent_request():
         """API endpoint to send a request to an MCP agent."""
         data = request.json
-        if not data or 'agent' not in data or 'request' not in data:
-            return jsonify({"error": "Invalid request", "message": "Missing agent or request"}), 400
+        if not data or 'agent' not in data:
+            logger.warning("Invalid MCP agent request: missing agent name")
+            return jsonify({
+                "error": "Invalid request", 
+                "message": "Missing agent name",
+                "code": "MISSING_AGENT_NAME"
+            }), 400
+            
+        if 'request' not in data:
+            logger.warning("Invalid MCP agent request: missing request name")
+            return jsonify({
+                "error": "Invalid request", 
+                "message": "Missing request name",
+                "code": "MISSING_REQUEST_NAME"
+            }), 400
         
         agent_name = data['agent']
         request_name = data['request']
         parameters = data.get('parameters', {})
         
         # Get the appropriate agent
-        if agent_name == "LevyAnalysisAgent":
-            agent = levy_analysis_agent
-        elif agent_name == "LevyPredictionAgent":
-            agent = levy_prediction_agent
-        elif agent_name == "WorkflowCoordinatorAgent":
-            agent = workflow_coordinator_agent
-        else:
-            return jsonify({"error": "Invalid agent", "message": f"Agent '{agent_name}' not found"}), 400
+        available_agents = {
+            "LevyAnalysisAgent": levy_analysis_agent,
+            "LevyPredictionAgent": levy_prediction_agent,
+            "WorkflowCoordinatorAgent": workflow_coordinator_agent
+        }
         
+        if agent_name not in available_agents:
+            logger.warning(f"Attempt to access unknown agent: {agent_name}")
+            return jsonify({
+                "error": "Unknown agent", 
+                "message": f"Agent '{agent_name}' is not registered",
+                "code": "UNKNOWN_AGENT",
+                "available_agents": list(available_agents.keys())
+            }), 404
+            
+        agent = available_agents[agent_name]
+            
         try:
+            logger.info(f"Executing agent request: {agent_name}/{request_name} with params: {parameters}")
+            start_time = datetime.now()
             result = agent.handle_request(request_name, parameters)
-            return jsonify({"result": {"response": f"{request_name} completed", "data": result}})
+            execution_time = (datetime.now() - start_time).total_seconds()
+            
+            logger.info(f"Agent request {agent_name}/{request_name} completed in {execution_time:.2f}s")
+            return jsonify({
+                "result": {
+                    "response": f"{request_name} completed", 
+                    "data": result,
+                    "execution_time_seconds": round(execution_time, 2)
+                },
+                "agent": agent_name,
+                "request": request_name
+            })
+        except ValueError as e:
+            # Parameter validation errors
+            logger.error(f"Parameter validation error in agent request {agent_name}/{request_name}: {str(e)}")
+            return jsonify({
+                "error": "Parameter validation failed", 
+                "message": str(e),
+                "code": "INVALID_PARAMETERS",
+                "agent": agent_name,
+                "request": request_name
+            }), 400
+        except KeyError as e:
+            # Missing required parameter
+            logger.error(f"Missing required parameter in agent request {agent_name}/{request_name}: {str(e)}")
+            return jsonify({
+                "error": "Missing required parameter", 
+                "message": f"Missing required parameter: {str(e)}",
+                "code": "MISSING_PARAMETER",
+                "agent": agent_name,
+                "request": request_name
+            }), 400
         except Exception as e:
-            logger.error(f"Error handling agent request {agent_name}/{request_name}: {str(e)}")
-            return jsonify({"error": "Agent request failed", "message": str(e)}), 500
+            # General execution errors
+            logger.error(f"Error executing agent request {agent_name}/{request_name}: {str(e)}")
+            return jsonify({
+                "error": "Agent request failed", 
+                "message": str(e),
+                "code": "EXECUTION_ERROR",
+                "agent": agent_name,
+                "request": request_name
+            }), 500
     
     app.register_blueprint(mcp_api)
