@@ -537,18 +537,12 @@ function safeAddEventListener(selector, event, callback) {
     }
 }
 
-// Tour system initialization is now opt-in only
-// Tours will only start when explicitly requested by the user
-// No automatic initialization or checks on page load
-
-// Reference the global flag for disabling automatic popups
-if (typeof window.AUTO_POPUPS_DISABLED === 'undefined') {
-    window.AUTO_POPUPS_DISABLED = true;
-}
-
-// Only initialize the click handlers for the tour buttons
+// Initialize when the DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Guided Tour System initialized (automatic tours disabled)');
+    console.log('Levy Calculation System JS initialized successfully');
+    
+    // Don't automatically start tours on page load
+    // checkForAutomaticTour();
     
     // Add event listeners to tour trigger buttons (safely)
     safeAddEventListener('[data-tour]', 'click', function() {

@@ -5,15 +5,17 @@
  * context-sensitive help and documentation to users.
  */
 
-// Help menu system initialization is now opt-in only
-// Users must click a help button to trigger the menu
-// No automatic initialization on page load
-
-// Set a global flag to indicate automatic popups are disabled
-window.AUTO_POPUPS_DISABLED = true;
-
-// Help menu will only be initialized when explicitly called
-console.log("Help Menu System ready (automatic popups disabled)");
+// Initialize the help menu system when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Initializing help menu...");
+    
+    // Initialize the menu elements but don't show the popup automatically
+    createHelpMenuElements();
+    setupHelpMenuListeners();
+    
+    // Don't load content or display the menu automatically
+    console.log("Help Menu System initialized");
+});
 
 /**
  * Initialize the help menu system
