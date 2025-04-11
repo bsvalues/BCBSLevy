@@ -60,13 +60,31 @@ class AdvancedAnalysisAgent(MCPAgent):
         """
         Analyze patterns across multiple datasets to find correlations and insights.
         
+        This method uses the Claude AI to examine relationships between different
+        tax-related datasets, identifying patterns, correlations, anomalies,
+        and actionable insights that might not be apparent when analyzing each
+        dataset in isolation.
+        
         Args:
-            tax_codes: Current tax code data
-            historical_rates: Historical tax rate data
-            property_records: Property assessment records (optional)
+            tax_codes: Current tax code data containing information about tax districts,
+                       rates, and associated metadata.
+            historical_rates: Historical tax rate data showing how rates have changed
+                              over time for different tax codes.
+            property_records: Optional property assessment records with information
+                              about individual properties, their assessed values,
+                              and tax payments.
             
         Returns:
-            Cross-dataset analysis results with identified patterns and correlations
+            Dict containing:
+                - correlations: List of identified relationships between datasets
+                - patterns: List of recurring patterns across the datasets
+                - anomalies: List of unusual data points or outliers
+                - insights: List of actionable insights derived from the analysis
+                - error: Error message if analysis failed (only present on error)
+        
+        Raises:
+            JSONDecodeError: If the AI response cannot be parsed as valid JSON
+            Exception: For other errors during analysis
         """
         if not self.claude:
             return {
@@ -157,13 +175,30 @@ class AdvancedAnalysisAgent(MCPAgent):
         """
         Generate contextual recommendations based on a specific tax code and user role.
         
+        This method analyzes tax code and historical data to generate tailored 
+        recommendations for users based on their role and area of focus. It customizes
+        the insights and actions based on whether the user is an administrator, analyst,
+        or public user, emphasizing different aspects of the data accordingly.
+        
         Args:
             tax_code_id: Identifier for the tax code
             user_role: Role of the user (administrator, analyst, public)
             focus_area: Specific area of focus for recommendations (optional)
             
         Returns:
-            Personalized recommendations for the specific context
+            Dict containing:
+                - user_role: The role of the user
+                - focus_areas: List of focus areas for the recommendations
+                - recommendations: List of recommendation objects, each containing:
+                    - title: Brief title of the recommendation
+                    - description: Detailed description of the recommendation
+                    - justification: Data-driven justification for the recommendation
+                    - priority: Priority level (high, medium, low)
+                - error: Error message if recommendations generation failed (only present on error)
+                
+        Raises:
+            JSONDecodeError: If the AI response cannot be parsed as valid JSON
+            Exception: For other errors during recommendation generation
         """
         if not self.claude:
             return {
@@ -257,13 +292,29 @@ class AdvancedAnalysisAgent(MCPAgent):
         """
         Process a natural language query about tax data.
         
+        This method provides a conversational interface for users to ask questions
+        about tax data in plain language. It maintains a conversation history
+        to provide context-aware responses across multiple interactions and can
+        incorporate additional contextual information provided with the query.
+        
         Args:
-            query: Natural language query
-            context: Additional context for the query (optional)
-            add_to_history: Whether to add this interaction to conversation history
+            query: Natural language query from the user
+            context: Additional context for the query such as selected tax codes,
+                     districts, or specific data points (optional)
+            add_to_history: Whether to add this interaction to the conversation
+                           history for context in future queries
             
         Returns:
-            Response to the natural language query with relevant data and insights
+            Dict containing:
+                - answer: The direct response to the user's query
+                - relevant_data: Key data points relevant to the query
+                - visualization_suggestions: List of suggested visualizations to present the data
+                - follow_up_questions: List of potential follow-up questions the user might ask
+                - error: Error message if query processing failed (only present on error)
+                
+        Raises:
+            JSONDecodeError: If the AI response cannot be parsed as valid JSON
+            Exception: For other errors during natural language processing
         """
         if not self.claude:
             return {
@@ -358,13 +409,37 @@ class AdvancedAnalysisAgent(MCPAgent):
         """
         Perform a multi-step analysis workflow for a tax district.
         
+        This method orchestrates a complex analytical workflow that combines data
+        retrieval, statistical calculations, and AI-powered insights generation.
+        It executes multiple steps in sequence, passing data between steps and
+        ultimately generating a comprehensive analysis report that combines
+        statistical metrics with interpretive insights.
+        
         Args:
-            tax_district_id: Identifier for the tax district
-            analysis_type: Type of analysis to perform (comprehensive, trend, compliance)
-            years: Number of years to include in the analysis
+            tax_district_id: Identifier for the tax district to analyze
+            analysis_type: Type of analysis to perform, one of:
+                          - "comprehensive": Full analysis including all metrics
+                          - "trend": Focus on trends and changes over time
+                          - "compliance": Focus on regulatory compliance issues
+            years: Number of historical years to include in the analysis
             
         Returns:
-            Results of the multi-step analysis workflow
+            Dict containing:
+                - district_info: Basic information about the analyzed district
+                - analysis_type: The type of analysis performed
+                - years_analyzed: Number of years included in the analysis
+                - tax_code_count: Number of tax codes in the district
+                - insights: AI-generated insights based on the analysis, including:
+                    - key_insights: List of main findings
+                    - trends: List of identified trends
+                    - anomalies: List of detected anomalies
+                    - recommendations: List of strategic recommendations
+                    - visualization_suggestions: List of visualization ideas
+                - statistical_data: Raw statistical metrics calculated for the district
+                - error: Error message if analysis failed (only present on error)
+                
+        Raises:
+            Exception: For errors during any step of the analysis process
         """
         if not self.claude:
             return {
@@ -515,8 +590,18 @@ class AdvancedAnalysisAgent(MCPAgent):
                 "district_id": tax_district_id
             }
     
-    def clear_conversation_history(self):
-        """Clear the conversation history."""
+    def clear_conversation_history(self) -> None:
+        """
+        Clear the conversation history.
+        
+        This method resets the conversation history to an empty list,
+        effectively starting a new conversation thread. This is useful when
+        switching contexts or users, or when a conversation has reached its
+        natural conclusion and a new topic is being discussed.
+        
+        Returns:
+            None
+        """
         self.conversation_history = []
         logger.info("Conversation history cleared")
     
@@ -524,8 +609,16 @@ class AdvancedAnalysisAgent(MCPAgent):
         """
         Get the conversation history.
         
+        This method retrieves the current conversation history, which contains
+        all previous interactions between the user and the AI agent. Each entry
+        in the history includes the role (user or assistant), the content of the
+        message, and a timestamp.
+        
         Returns:
-            List of conversation entries with role, content, and timestamp
+            List of conversation entries, each containing:
+                - role: The speaker role ("user" or "assistant")
+                - content: The message content
+                - timestamp: ISO 8601 formatted timestamp of when the message was added
         """
         return self.conversation_history
 
@@ -534,9 +627,23 @@ class AdvancedAnalysisAgent(MCPAgent):
 advanced_analysis_agent = None
 
 def init_advanced_agent():
-    """Initialize the advanced analysis agent and register its functions.
+    """
+    Initialize the advanced analysis agent and register its functions.
     
-    This should be called within an application context to avoid Flask errors.
+    This function creates a singleton instance of the AdvancedAnalysisAgent class
+    and registers all of its methods with the MCP registry, making them available
+    for API access. Each method is registered with detailed parameter schemas
+    that define the expected input formats.
+    
+    Note:
+        This should be called within an application context to avoid Flask errors.
+        Typically called during application startup from app.py.
+    
+    Returns:
+        AdvancedAnalysisAgent: The initialized agent instance
+    
+    Raises:
+        RuntimeError: If called outside of a Flask application context
     """
     global advanced_analysis_agent
     
@@ -666,7 +773,20 @@ def init_advanced_agent():
     return advanced_analysis_agent
 
 def get_advanced_analysis_agent():
-    """Get the advanced analysis agent instance, initializing it if necessary."""
+    """
+    Get the advanced analysis agent instance, initializing it if necessary.
+    
+    This function provides access to the singleton AdvancedAnalysisAgent instance,
+    creating and initializing it if it doesn't already exist. It implements
+    robust error handling to ensure that an agent instance is always returned,
+    even if the initialization process encounters errors.
+    
+    This is the preferred way to access the agent throughout the application,
+    as it guarantees a valid instance and handles initialization transparently.
+    
+    Returns:
+        AdvancedAnalysisAgent: The singleton agent instance
+    """
     global advanced_analysis_agent
     if advanced_analysis_agent is None:
         try:

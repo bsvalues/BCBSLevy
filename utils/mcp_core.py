@@ -9,27 +9,36 @@ This module provides the foundation for the MCP framework, including:
 
 import json
 import logging
-from typing import Dict, List, Any, Callable, Optional, Union, TypeVar, Generic
+from typing import Dict, List, Any, Callable, Optional, Union, TypeVar, Generic, cast, Protocol, runtime_checkable
 
 logger = logging.getLogger(__name__)
 
 # Type definitions
 T = TypeVar('T')
 FunctionType = Callable[..., Any]
-ParameterType = Dict[str, Any]
+ParameterType = Optional[Dict[str, Any]]
 ResultType = Dict[str, Any]
+
+# Parameter schemas
+JSONSchemaType = Optional[Dict[str, Any]]
+SchemaPropertyType = Dict[str, Union[str, List[str], Dict[str, Any]]]
 
 
 class MCPFunction:
-    """Represents a registered MCP function."""
+    """
+    Represents a registered MCP function.
+    
+    An MCPFunction wraps a regular Python function with additional metadata and
+    validation capabilities, making it available through the MCP framework.
+    """
     
     def __init__(
         self,
         name: str,
         description: str,
         func: FunctionType,
-        parameter_schema: Dict[str, Any] = None,
-        return_schema: Dict[str, Any] = None
+        parameter_schema: JSONSchemaType = None,
+        return_schema: JSONSchemaType = None
     ):
         """
         Initialize an MCP function.
@@ -38,9 +47,17 @@ class MCPFunction:
             name: Unique function identifier
             description: Human-readable function description
             func: The actual function implementation
-            parameter_schema: JSON Schema for function parameters
-            return_schema: JSON Schema for function return value
+            parameter_schema: JSON Schema describing valid parameters
+            return_schema: JSON Schema describing the expected return value
+            
+        Raises:
+            ValueError: If name is empty or function is None
         """
+        if not name:
+            raise ValueError("Function name cannot be empty")
+        if func is None:
+            raise ValueError("Function implementation is required")
+            
         self.name = name
         self.description = description
         self.func = func
@@ -90,21 +107,47 @@ class MCPRegistry:
         self,
         name: str,
         description: str,
-        parameter_schema: Dict[str, Any] = None,
-        return_schema: Dict[str, Any] = None
+        parameter_schema: JSONSchemaType = None,
+        return_schema: JSONSchemaType = None
     ) -> Callable[[FunctionType], FunctionType]:
         """
         Decorator to register a function with the MCP registry.
         
+        This decorator wraps a regular Python function and makes it available
+        through the MCP framework with additional metadata and validation.
+        
+        Example:
+            @registry.register(
+                name="calculate_tax",
+                description="Calculate tax for a property",
+                parameter_schema={
+                    "type": "object",
+                    "properties": {
+                        "property_id": {"type": "string"},
+                        "year": {"type": "integer"}
+                    },
+                    "required": ["property_id"]
+                }
+            )
+            def calculate_tax(property_id: str, year: int = 2025) -> Dict[str, Any]:
+                # Implementation
+                ...
+        
         Args:
             name: Unique function identifier
             description: Human-readable function description
-            parameter_schema: JSON Schema for function parameters
-            return_schema: JSON Schema for function return value
+            parameter_schema: JSON Schema defining valid parameters
+            return_schema: JSON Schema defining expected return value
             
         Returns:
-            Decorator function
+            Decorator function that registers the decorated function
+            
+        Raises:
+            ValueError: If a function with the same name is already registered
         """
+        if name in self.functions:
+            raise ValueError(f"Function '{name}' is already registered")
+            
         def decorator(func: FunctionType) -> FunctionType:
             self.functions[name] = MCPFunction(
                 name=name,
@@ -113,29 +156,60 @@ class MCPRegistry:
                 parameter_schema=parameter_schema,
                 return_schema=return_schema
             )
+            logger.info(f"Registered MCP function: {name}")
             return func
         return decorator
     
     def register_function(
         self,
         func: FunctionType,
-        name: str = None,
-        description: str = None,
-        parameter_schema: Dict[str, Any] = None,
-        return_schema: Dict[str, Any] = None
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        parameter_schema: JSONSchemaType = None,
+        return_schema: JSONSchemaType = None
     ) -> None:
         """
         Register an existing function with the MCP registry.
         
+        This method is similar to the `register` decorator but allows
+        registering an existing function without using the decorator syntax.
+        Useful for dynamically registering functions at runtime.
+        
+        Example:
+            def calculate_tax(property_id: str, year: int = 2025) -> Dict[str, Any]:
+                # Implementation
+                ...
+                
+            registry.register_function(
+                func=calculate_tax,
+                name="calculate_tax",
+                description="Calculate tax for a property",
+                parameter_schema={
+                    "type": "object",
+                    "properties": {
+                        "property_id": {"type": "string"},
+                        "year": {"type": "integer"}
+                    },
+                    "required": ["property_id"]
+                }
+            )
+        
         Args:
             func: The function to register
             name: Unique function identifier (defaults to function name)
-            description: Human-readable function description
-            parameter_schema: JSON Schema for function parameters
-            return_schema: JSON Schema for function return value
+            description: Human-readable function description (defaults to function docstring)
+            parameter_schema: JSON Schema defining valid parameters
+            return_schema: JSON Schema defining expected return value
+            
+        Raises:
+            ValueError: If a function with the same name is already registered
         """
         name = name or func.__name__
         description = description or (func.__doc__ or "").strip()
+        
+        if name in self.functions:
+            raise ValueError(f"Function '{name}' is already registered")
+            
         self.functions[name] = MCPFunction(
             name=name,
             description=description,
@@ -143,6 +217,7 @@ class MCPRegistry:
             parameter_schema=parameter_schema,
             return_schema=return_schema
         )
+        logger.info(f"Registered MCP function: {name}")
     
     def get_function(self, name: str) -> Optional[MCPFunction]:
         """
@@ -265,6 +340,9 @@ class MCPWorkflow:
         }
 
 
+# Type definition for a workflow step
+WorkflowStepType = Dict[str, Any]
+
 class MCPWorkflowRegistry:
     """Registry for MCP workflows."""
     
@@ -277,27 +355,70 @@ class MCPWorkflowRegistry:
         """
         self.workflows: Dict[str, MCPWorkflow] = {}
         self.function_registry = function_registry
-    
+
     def register(
         self,
         name: str,
         description: str,
-        steps: List[Dict[str, Any]]
+        steps: List[WorkflowStepType]
     ) -> None:
         """
         Register a workflow.
+        
+        A workflow is a sequence of MCP function calls that can be executed
+        as a single unit. Each step in the workflow consists of a function name
+        and optional parameters.
+        
+        Example:
+            workflow_registry.register(
+                name="property_tax_analysis",
+                description="Analyze property tax data and make predictions",
+                steps=[
+                    {
+                        "function": "load_property_data",
+                        "parameters": {"district_id": "D123"}
+                    },
+                    {
+                        "function": "analyze_tax_distribution",
+                        "parameters": {}
+                    },
+                    {
+                        "function": "predict_levy_rates",
+                        "parameters": {"years": 3}
+                    }
+                ]
+            )
         
         Args:
             name: Unique workflow identifier
             description: Human-readable workflow description
             steps: List of workflow steps, each with a function name and parameters
+            
+        Raises:
+            ValueError: If a workflow with the same name is already registered
+            ValueError: If any step references a function that doesn't exist
         """
+        if name in self.workflows:
+            raise ValueError(f"Workflow '{name}' is already registered")
+            
+        # Validate that all referenced functions exist
+        for i, step in enumerate(steps):
+            if "function" not in step:
+                raise ValueError(f"Step {i} in workflow '{name}' is missing a function name")
+                
+            function_name = step["function"]
+            if not self.function_registry.has_function(function_name):
+                raise ValueError(
+                    f"Step {i} in workflow '{name}' references unknown function '{function_name}'"
+                )
+                
         self.workflows[name] = MCPWorkflow(
             name=name,
             description=description,
             steps=steps,
             registry=self.function_registry
         )
+        logger.info(f"Registered MCP workflow: {name} with {len(steps)} steps")
     
     def get_workflow(self, name: str) -> Optional[MCPWorkflow]:
         """
@@ -368,7 +489,7 @@ workflow_registry = MCPWorkflowRegistry(registry)
         }
     }
 )
-def analyze_tax_distribution(tax_code: str = None) -> Dict[str, Any]:
+def analyze_tax_distribution(tax_code: Optional[str] = None) -> Dict[str, Any]:
     """
     Analyze distribution of tax burden across properties.
     
@@ -405,7 +526,7 @@ def analyze_tax_distribution(tax_code: str = None) -> Dict[str, Any]:
         }
     }
 )
-def predict_levy_rates(tax_code: str, years: int = 1) -> Dict[str, Any]:
+def predict_levy_rates(tax_code: Optional[str], years: int = 1) -> Dict[str, Any]:
     """
     Predict future levy rates based on historical data.
     
