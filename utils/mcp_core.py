@@ -97,7 +97,23 @@ class MCPFunction:
 
 
 class MCPRegistry:
-    """Registry for MCP functions and capabilities."""
+    """
+    Central registry for MCP functions and capabilities.
+    
+    The MCPRegistry serves as the core component of the Model Content Protocol
+    framework, providing services for function registration, discovery, and
+    execution. It maintains a catalog of all available functions that can be
+    invoked through the MCP API or used within workflows.
+    
+    Key responsibilities:
+    - Function registration through decorator and direct method interfaces
+    - Function lookup and metadata access
+    - Function execution with parameter validation
+    - Function discoverability and introspection
+    
+    The registry is designed to be used as a singleton instance shared across
+    the application, providing a unified interface for all MCP functionality.
+    """
     
     def __init__(self):
         """Initialize an empty registry."""
@@ -273,7 +289,18 @@ class MCPRegistry:
 
 
 class MCPWorkflow:
-    """Represents a sequence of MCP function calls."""
+    """
+    Represents a sequence of MCP function calls that execute as a coordinated workflow.
+    
+    An MCPWorkflow provides a way to define and execute a series of related operations
+    that should be performed together to accomplish a more complex task. Each workflow
+    consists of ordered steps, where each step invokes a specific MCP function with
+    parameters.
+    
+    Workflows support parameter passing between steps, where the output of previous
+    steps can be used as input to later steps, enabling complex data transformation
+    pipelines and multi-stage processing operations.
+    """
     
     def __init__(
         self,
@@ -298,13 +325,26 @@ class MCPWorkflow:
     
     def execute(self, initial_parameters: ParameterType = None) -> List[ResultType]:
         """
-        Execute the workflow.
+        Execute the workflow by sequentially running each step in the defined order.
+        
+        This method processes each step of the workflow in sequence, passing parameters
+        between steps. Results from each step are accumulated in the returned list.
+        
+        The parameter passing mechanism allows data to flow between steps:
+        1. Initial parameters are provided to the first step
+        2. Each step's output is merged into the parameter dictionary
+        3. Subsequent steps receive parameters that include outputs from previous steps
+        
+        This enables workflows to build complex data transformations across multiple
+        functions, with each step building on the results of previous steps.
         
         Args:
-            initial_parameters: Initial parameters for the workflow
+            initial_parameters: Dictionary of parameters to provide to the workflow.
+                               These parameters are available to all steps, but can
+                               be overridden by step-specific parameters.
             
         Returns:
-            List of step results
+            List of result dictionaries, one for each workflow step in execution order
         """
         parameters = initial_parameters or {}
         results = []
@@ -344,7 +384,18 @@ class MCPWorkflow:
 WorkflowStepType = Dict[str, Any]
 
 class MCPWorkflowRegistry:
-    """Registry for MCP workflows."""
+    """
+    Registry for MCP workflows that manages workflow storage, retrieval, and execution.
+    
+    The MCPWorkflowRegistry maintains a central repository of all registered workflows
+    in the system, providing services for workflow registration, validation, discovery,
+    and execution. It works in coordination with the MCPRegistry to validate function
+    references within workflow steps.
+    
+    This registry is responsible for ensuring that all workflows are properly defined
+    and that their referenced functions exist before allowing registration. It also
+    provides a standardized execution interface for running workflows by name.
+    """
     
     def __init__(self, function_registry: MCPRegistry):
         """
@@ -434,17 +485,30 @@ class MCPWorkflowRegistry:
     
     def execute_workflow(self, name: str, parameters: ParameterType = None) -> List[ResultType]:
         """
-        Execute a workflow by name.
+        Execute a complete workflow by name with the provided parameters.
+        
+        This method serves as the primary entry point for triggering workflow execution
+        through the registry. It handles the workflow lookup and delegates execution
+        to the workflow instance, providing a consistent interface for running any
+        registered workflow.
+        
+        The execution follows these steps:
+        1. Lookup the workflow by name
+        2. Validate workflow existence
+        3. Delegate execution to the workflow's execute method
+        4. Return the complete set of results from all workflow steps
         
         Args:
-            name: Workflow name
-            parameters: Initial parameters for the workflow
+            name: Unique identifier of the workflow to execute
+            parameters: Initial parameters to provide to the workflow execution.
+                       These will be available to all steps and can be extended by
+                       the results of each executed step.
             
         Returns:
-            List of step results
+            Ordered list of result dictionaries, one from each step of the workflow
             
         Raises:
-            ValueError: If the workflow is not found
+            ValueError: If no workflow with the specified name is registered
         """
         workflow = self.get_workflow(name)
         if not workflow:

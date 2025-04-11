@@ -15,7 +15,18 @@ logger = logging.getLogger(__name__)
 
 
 class MCPAgent:
-    """Base class for all MCP agents."""
+    """
+    Base class for all Model Content Protocol (MCP) agents.
+    
+    This abstract class serves as the foundation for specialized AI agents within 
+    the system. It provides core functionality for capability registration, request
+    handling, and agent metadata exposure. MCPAgent is designed to be extended by
+    concrete agent implementations that focus on specific domains or tasks.
+    
+    An MCPAgent integrates with the MCP registry to expose capabilities as API-accessible
+    functions. It acts as a controller that delegates requests to the appropriate
+    registered functions based on capability names.
+    """
     
     def __init__(self, name: str, description: str):
         """
@@ -38,25 +49,34 @@ class MCPAgent:
         """
         self.capabilities.append(function_name)
     
-    def handle_request(self, request: str, parameters: Dict[str, Any] = None) -> Dict[str, Any]:
+    def handle_request(self, request: str, parameters: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
-        Handle a request.
+        Handle a request by delegating to the appropriate registered function.
+        
+        This method serves as the primary entry point for interacting with agents
+        through the API. It validates that the requested capability is registered
+        with this agent, then executes the corresponding function from the MCP registry.
+        
+        The handle_request method allows for a consistent interface across all agent
+        types, enabling polymorphic usage where any agent can be accessed through
+        the same mechanism regardless of its specific implementation details.
         
         Args:
-            request: Request to handle (typically a function name)
-            parameters: Parameters for the request
+            request: Request identifier matching a registered capability name
+            parameters: Dictionary of parameters to pass to the function, with
+                        parameter names as keys and their values as values
             
         Returns:
-            Response to the request
+            Dictionary containing the response data from the executed function
             
         Raises:
-            ValueError: If the request is not supported
+            ValueError: If the requested capability is not supported by this agent
         """
         if request not in self.capabilities:
             raise ValueError(f"Agent '{self.name}' does not support '{request}'")
         
-        # Execute the function
-        return registry.execute_function(request, parameters)
+        # Execute the function with default empty dict if parameters is None
+        return registry.execute_function(request, parameters or {})
     
     def to_dict(self) -> Dict[str, Any]:
         """
