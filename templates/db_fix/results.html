@@ -1,0 +1,84 @@
+{% extends "simple_base.html" %}
+
+{% block title %}Database Fix Results{% endblock %}
+
+{% block page_header %}
+<div class="container py-4">
+    <h1 class="display-5 fw-bold">Database Fix Results</h1>
+    <p class="lead">Results of database maintenance operation</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header {% if success %}bg-success{% else %}bg-danger{% endif %} text-white">
+                    <h4 class="mb-0">
+                        {% if success %}
+                            <i class="bi bi-check-circle-fill me-2"></i>Fix Applied Successfully
+                        {% else %}
+                            <i class="bi bi-exclamation-circle-fill me-2"></i>Error Applying Fix
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if success %}
+                        <div class="alert alert-success">
+                            <p><strong>Success!</strong> The database fix was applied successfully.</p>
+                        </div>
+                        
+                        <h5 class="card-title">Fix Summary</h5>
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Invalid values found
+                                <span class="badge bg-primary rounded-pill">{{ invalid_values_found }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Fixes applied
+                                <span class="badge bg-success rounded-pill">{{ fixes_applied|length }}</span>
+                            </li>
+                        </ul>
+                        
+                        {% if fixes_applied %}
+                            <h5 class="card-title">Details</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Original Value</th>
+                                            <th>New Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for fix in fixes_applied %}
+                                            <tr>
+                                                <td>{{ fix.old_value }}</td>
+                                                <td>{{ fix.new_value }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <p><strong>Error!</strong> The database fix could not be applied.</p>
+                            <p>{{ error }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('db_fix.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Database Tools
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-primary ms-2">
+                        <i class="bi bi-house me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
