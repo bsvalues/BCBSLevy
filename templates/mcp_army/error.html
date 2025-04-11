@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}MCP Army System Error{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+  .error-container {
+    text-align: center;
+    margin-top: 100px;
+  }
+  
+  .error-icon {
+    font-size: 5rem;
+    color: #dc3545;
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .retry-button {
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="error-container">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    
+    <h1 class="display-4">MCP Army System Error</h1>
+    
+    <div class="error-message">
+      <p>{{ error }}</p>
+    </div>
+    
+    <div class="action-buttons">
+      <a href="/" class="btn btn-primary">Return to Dashboard</a>
+      <button id="retry-button" class="btn btn-outline-primary retry-button">Retry Initialization</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  $(document).ready(function() {
+    $('#retry-button').click(function() {
+      $(this).prop('disabled', true);
+      $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Initializing...');
+      
+      $.ajax({
+        url: '/mcp-army/api/initialize',
+        method: 'POST',
+        success: function() {
+          window.location.href = '/mcp-army/dashboard';
+        },
+        error: function(err) {
+          alert('Initialization failed: ' + (err.responseJSON?.error || 'Unknown error'));
+          $('#retry-button').prop('disabled', false).text('Retry Initialization');
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

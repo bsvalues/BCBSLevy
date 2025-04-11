@@ -340,7 +340,6 @@ with app.app_context():
     # Import dependencies for MCP and AI functionalities
     from utils.mcp_integration import init_mcp_api_routes, init_mcp
     from utils.advanced_ai_agent import init_advanced_agent
-    from utils.mcp_army_init import init_mcp_army
     from utils.anthropic_utils import check_api_key_status
     
     # Check Anthropic API key status before attempting to initialize AI components
@@ -366,23 +365,6 @@ with app.app_context():
     except Exception as e:
         app.logger.error(f"Error registering MCP API routes: {str(e)}")
     
-    
-    # Initialize MCP Army system with dedicated error handling
-    try:
-        if api_status['status'] == 'valid':
-            mcp_army_initialized = init_mcp_army(app)
-            if mcp_army_initialized:
-                app.logger.info("MCP Army system initialized successfully")
-            else:
-                app.logger.warning("MCP Army system initialization failed")
-        else:
-            app.logger.warning("Skipping MCP Army initialization due to API key issues")
-    except ImportError as e:
-        app.logger.error(f"Error importing MCP Army dependencies: {str(e)}")
-    except Exception as e:
-        app.logger.error(f"Error initializing MCP Army system: {str(e)}")
-        app.logger.error("MCP Army features will be unavailable")
-        
     # Initialize Advanced AI Agent with dedicated error handling
     try:
         if api_status['status'] == 'valid':
