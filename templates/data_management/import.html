@@ -89,12 +89,14 @@
                     <p>Upload property assessment data including property IDs, assessed values, and tax codes.</p>
                     <p class="text-muted">Supported formats: CSV, Excel, XML, TXT</p>
                     
-                    <form action="{{ url_for('data_management.import_property') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ url_for('data_management.import_data') }}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="propertyFile" class="form-label">Select Property File</label>
                             <input class="form-control" type="file" id="propertyFile" name="file" required>
                             <div class="form-text">Required columns: property_id, assessed_value, tax_code</div>
                         </div>
+                        <input type="hidden" name="import_type" value="property">
+                        <input type="hidden" name="year" value="{{ current_year }}">
                         <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i> Import</button>
                     </form>
                 </div>
@@ -133,12 +135,14 @@
                     <p>Upload tax district information including district IDs, names, and levy rates.</p>
                     <p class="text-muted">Supported formats: CSV, Excel, XML, TXT</p>
                     
-                    <form action="{{ url_for('data_management.import_district') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ url_for('data_management.import_data') }}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="districtFile" class="form-label">Select District File</label>
                             <input class="form-control" type="file" id="districtFile" name="file" required>
                             <div class="form-text">Required columns: district_id, name, levy_rate</div>
                         </div>
+                        <input type="hidden" name="import_type" value="tax_district">
+                        <input type="hidden" name="year" value="{{ current_year }}">
                         <button type="submit" class="btn btn-success"><i class="bi bi-upload"></i> Import</button>
                     </form>
                 </div>
