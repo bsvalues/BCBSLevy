@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+
+{% block title %}Intelligent Search - Levy Calculation System{% endblock %}
+
+{% block styles %}
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .search-box {
+        background-color: #f8f9fa;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .search-input {
+        position: relative;
+    }
+    
+    .search-input input {
+        padding-left: 40px;
+    }
+    
+    .search-input .fa-search {
+        position: absolute;
+        left: 15px;
+        top: 14px;
+        color: #6c757d;
+    }
+    
+    .filter-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .result-card {
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 15px;
+        margin-bottom: 15px;
+        transition: transform 0.15s ease-in-out;
+    }
+    
+    .result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .result-type {
+        display: inline-block;
+        padding: 3px 8px;
+        font-size: 12px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+    
+    .type-user { background-color: #cff4fc; color: #055160; }
+    .type-tax-district { background-color: #d1e7dd; color: #0f5132; }
+    .type-tax-code { background-color: #f8d7da; color: #842029; }
+    .type-property { background-color: #fff3cd; color: #664d03; }
+    .type-levy-scenario { background-color: #e2e3e5; color: #41464b; }
+    .type-forecast { background-color: #d3d3fe; color: #3a3a98; }
+    
+    .result-score {
+        float: right;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        padding: 2px 8px;
+        font-size: 12px;
+        color: #6c757d;
+    }
+    
+    .result-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .result-details {
+        color: #6c757d;
+        font-size: 14px;
+    }
+    
+    .result-metadata {
+        margin-top: 10px;
+        padding-top: 10px;
+        font-size: 13px;
+        border-top: 1px dashed #e9ecef;
+    }
+    
+    .autocomplete-results {
+        position: absolute;
+        z-index: 1000;
+        background: white;
+        width: 100%;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 0 0 5px 5px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .autocomplete-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .autocomplete-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .highlight {
+        background-color: #ffffb3;
+        padding: 0 2px;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-box">
+        <h2 class="mb-4">Intelligent Search</h2>
+        <form id="searchForm" action="{{ url_for('search.search_page') }}" method="GET">
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <div class="search-input">
+                        <i class="fas fa-search"></i>
+                        <input 
+                            type="text" 
+                            class="form-control form-control-lg" 
+                            name="q" 
+                            id="searchQuery" 
+                            placeholder="Search tax districts, codes, properties, and more..." 
+                            value="{{ query }}" 
+                            autocomplete="off">
+                        <div id="autocompleteResults" class="autocomplete-results" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="entityTypes">Entity Types</label>
+                        <select class="form-select" name="types" id="entityTypes" multiple>
+                            <option value="user" {% if selected_types and 'user' in selected_types %}selected{% endif %}>Users</option>
+                            <option value="tax_district" {% if selected_types and 'tax_district' in selected_types %}selected{% endif %}>Tax Districts</option>
+                            <option value="tax_code" {% if selected_types and 'tax_code' in selected_types %}selected{% endif %}>Tax Codes</option>
+                            <option value="property" {% if selected_types and 'property' in selected_types %}selected{% endif %}>Properties</option>
+                            <option value="levy_scenario" {% if selected_types and 'levy_scenario' in selected_types %}selected{% endif %}>Levy Scenarios</option>
+                            <option value="forecast" {% if selected_types and 'forecast' in selected_types %}selected{% endif %}>Forecasts</option>
+                        </select>
+                        <small class="form-text text-muted">Leave empty to search all types</small>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <label for="yearFilter">Year</label>
+                        <select class="form-select" name="year" id="yearFilter">
+                            <option value="">All Years</option>
+                            {% for year in available_years %}
+                            <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="results-container">
+        {% if query %}
+            <h3 class="mb-4">Search Results for "{{ query }}"</h3>
+            
+            {% if results|length > 0 %}
+                <p>Found {{ results|length }} results</p>
+                
+                <div class="row">
+                {% for result in results %}
+                    <div class="col-md-6">
+                        <div class="result-card">
+                            <span class="result-score">{{ result.score }}%</span>
+                            <span class="result-type type-{{ result.type|lower|replace(' ', '-') }}">{{ result.type }}</span>
+                            
+                            <div class="result-title">
+                                {% if result.type == 'Tax District' %}
+                                <a href="{{ url_for('data_management.view_district', district_id=result.id) }}">{{ result.label }}</a>
+                                {% elif result.type == 'Tax Code' %}
+                                <a href="{{ url_for('data_management.view_tax_code', tax_code_id=result.id) }}">{{ result.label }}</a>
+                                {% elif result.type == 'Property' %}
+                                <a href="{{ url_for('data_management.view_property', property_id=result.id) }}">{{ result.label }}</a>
+                                {% elif result.type == 'Levy Scenario' %}
+                                <a href="{{ url_for('levy_calculator.view_scenario', scenario_id=result.id) }}">{{ result.label }}</a>
+                                {% elif result.type == 'Forecast' %}
+                                <a href="{{ url_for('forecasting.view_forecast', forecast_id=result.id) }}">{{ result.label }}</a>
+                                {% elif result.type == 'User' %}
+                                <a href="{{ url_for('admin.view_user', user_id=result.id) }}">{{ result.label }}</a>
+                                {% else %}
+                                {{ result.label }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="result-details">
+                                {% if result.type == 'Tax District' %}
+                                    {% if result.district_code %}Code: {{ result.district_code }}{% endif %}
+                                    {% if result.district_type %} | Type: {{ result.district_type }}{% endif %}
+                                    {% if result.county %} | {{ result.county }}, {{ result.state }}{% endif %}
+                                {% elif result.type == 'Tax Code' %}
+                                    {% if result.description %}{{ result.description|truncate(100) }}{% endif %}
+                                {% elif result.type == 'Property' %}
+                                    {% if result.property_address %}{{ result.property_address }}{% endif %}
+                                    {% if result.city %} | {{ result.city }}, {{ result.state }}{% endif %}
+                                {% elif result.type == 'User' %}
+                                    {% if result.email %}{{ result.email }}{% endif %}
+                                    {% if result.full_name %} | {{ result.full_name }}{% endif %}
+                                {% elif result.type == 'Levy Scenario' %}
+                                    {% if result.description %}{{ result.description|truncate(100) }}{% endif %}
+                                {% elif result.type == 'Forecast' %}
+                                    {% if result.model_type %}Model: {{ result.model_type }}{% endif %}
+                                    {% if result.description %} | {{ result.description|truncate(80) }}{% endif %}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="result-metadata">
+                                <small>
+                                    Matched on: {{ result.matched_field|replace('_', ' ')|title }}
+                                    {% if result.entity_type %}
+                                    | Entity: {{ result.entity_type }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-results">
+                    <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                    <h4>No results found</h4>
+                    <p>Try adjusting your search terms or filters.</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchQuery');
+        const autocompleteResults = document.getElementById('autocompleteResults');
+        const entityTypesSelect = document.getElementById('entityTypes');
+        const yearFilter = document.getElementById('yearFilter');
+        let currentFocus = -1;
+        let debounceTimer;
+        
+        // Initialize Select2 for multiple select
+        $('#entityTypes').select2({
+            placeholder: "Select entity types to search",
+            allowClear: true
+        });
+        
+        // Function to handle autocomplete
+        function handleAutocomplete() {
+            const query = searchInput.value.trim();
+            if (query.length < 2) {
+                autocompleteResults.style.display = 'none';
+                return;
+            }
+            
+            // Get selected entity type or default to tax_district
+            let entityType = 'tax_district';
+            if (entityTypesSelect.options.length && entityTypesSelect.selectedIndex >= 0) {
+                const selectedOptions = Array.from(entityTypesSelect.selectedOptions);
+                if (selectedOptions.length === 1) {
+                    entityType = selectedOptions[0].value;
+                }
+            }
+            
+            // Get year filter if set
+            const year = yearFilter.value;
+            
+            // Fetch autocomplete suggestions
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetch(`/api/autocomplete?q=${encodeURIComponent(query)}&type=${entityType}${year ? '&year=' + year : ''}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            displayAutocompleteResults(data, query);
+                        } else {
+                            autocompleteResults.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching autocomplete suggestions:', error);
+                        autocompleteResults.style.display = 'none';
+                    });
+            }, 300); // 300ms debounce
+        }
+        
+        // Function to display autocomplete results
+        function displayAutocompleteResults(results, query) {
+            autocompleteResults.innerHTML = '';
+            
+            results.forEach((result, index) => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                item.dataset.value = result.value;
+                
+                // Highlight the matching text
+                const highlightedText = highlightMatch(result.label, query);
+                
+                let itemContent = `<strong>${highlightedText}</strong>`;
+                
+                // Add additional information if available
+                if (result.entity_type) {
+                    itemContent += ` <span class="text-muted">(${result.entity_type.replace('_', ' ')})</span>`;
+                }
+                
+                item.innerHTML = itemContent;
+                
+                // Add click event to select this item
+                item.addEventListener('click', function() {
+                    searchInput.value = result.value;
+                    autocompleteResults.style.display = 'none';
+                    searchInput.focus();
+                });
+                
+                autocompleteResults.appendChild(item);
+            });
+            
+            autocompleteResults.style.display = 'block';
+        }
+        
+        // Function to highlight matched text
+        function highlightMatch(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp('(' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'i');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+        
+        // Keyboard navigation for autocomplete
+        searchInput.addEventListener('keydown', function(e) {
+            const items = autocompleteResults.getElementsByClassName('autocomplete-item');
+            
+            // Down arrow
+            if (e.keyCode === 40) {
+                currentFocus++;
+                addActive(items);
+                e.preventDefault();
+            } 
+            // Up arrow
+            else if (e.keyCode === 38) {
+                currentFocus--;
+                addActive(items);
+                e.preventDefault();
+            } 
+            // Enter
+            else if (e.keyCode === 13 && currentFocus > -1) {
+                if (items[currentFocus]) {
+                    items[currentFocus].click();
+                    e.preventDefault();
+                }
+            }
+        });
+        
+        // Function to add 'active' class to autocomplete item
+        function addActive(items) {
+            if (!items) return;
+            
+            // Remove active from all items
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.remove('active');
+            }
+            
+            // Adjust focus if out of bounds
+            if (currentFocus >= items.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = items.length - 1;
+            
+            // Add active class to focused item
+            if (items[currentFocus]) {
+                items[currentFocus].classList.add('active');
+            }
+        }
+        
+        // Listen for input on search box
+        searchInput.addEventListener('input', handleAutocomplete);
+        
+        // Hide autocomplete when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== searchInput) {
+                autocompleteResults.style.display = 'none';
+            }
+        });
+        
+        // Show autocomplete when focusing on input if it has content
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                handleAutocomplete();
+            }
+        });
+        
+        // Form submission processing - convert selected types to comma-separated value
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            const selectedTypes = Array.from(entityTypesSelect.selectedOptions).map(opt => opt.value);
+            
+            if (selectedTypes.length > 0) {
+                // Remove the multiple select and create a hidden input with comma-separated values
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'types';
+                hiddenInput.value = selectedTypes.join(',');
+                this.appendChild(hiddenInput);
+                
+                // Disable the original select to prevent it from being submitted
+                entityTypesSelect.disabled = true;
+            }
+        });
+    });
+</script>
+{% endblock %}
