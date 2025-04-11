@@ -333,23 +333,23 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.user_management') }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.index') if 'admin' in blueprints else '#' }}">
                                     <i class="bi bi-people me-2"></i>User Management
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.settings') }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.index') if 'admin' in blueprints else '#' }}">
                                     <i class="bi bi-sliders me-2"></i>Settings
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.logs') }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.index') if 'admin' in blueprints else '#' }}">
                                     <i class="bi bi-journal-text me-2"></i>System Logs
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.backup') }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.index') if 'admin' in blueprints else '#' }}">
                                     <i class="bi bi-cloud-arrow-up me-2"></i>Database Backup
                                 </a>
                             </li>
@@ -368,12 +368,12 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="resourcesDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('glossary.glossary') }}">
+                                <a class="dropdown-item" href="{{ url_for('glossary.glossary') if 'glossary' in blueprints else '#' }}">
                                     <i class="bi bi-journal-bookmark me-2"></i>Glossary
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('tours.tour_index') }}">
+                                <a class="dropdown-item" href="{{ url_for('tours.tour_index') if 'tours' in blueprints else '#' }}">
                                     <i class="bi bi-info-circle me-2"></i>Guided Tours
                                 </a>
                             </li>
@@ -472,9 +472,9 @@
                     <h5>Quick Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('index') }}">Home</a></li>
-                        <li><a href="{{ url_for('glossary.glossary') }}">Glossary</a></li>
-                        <li><a href="{{ url_for('tours.tour_index') }}">Guided Tours</a></li>
-                        <li><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
+                        <li><a href="{{ url_for('glossary.glossary') if 'glossary' in blueprints else '#' }}">Glossary</a></li>
+                        <li><a href="{{ url_for('tours.tour_index') if 'tours' in blueprints else '#' }}">Guided Tours</a></li>
+                        <li><a href="{{ url_for('dashboard.index') if 'dashboard' in blueprints else '#' }}">Dashboard</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
