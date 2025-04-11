@@ -227,6 +227,7 @@ from routes_levy_audit import levy_audit_bp, register_levy_audit_routes
 from routes_user_audit import user_audit_bp, register_user_audit_routes
 from routes_tax_strategy import tax_strategy_bp, register_tax_strategy_routes
 from routes_search import init_search_routes
+from routes_db_fix import db_fix_bp
 
 app.register_blueprint(data_management_bp)
 app.register_blueprint(forecasting_bp)
@@ -235,6 +236,7 @@ app.register_blueprint(public_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(glossary_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(db_fix_bp)
 # Note: levy_calculator_bp is registered via register_levy_calculator_routes
 app.register_blueprint(tours_bp)
 # Note: historical_analysis_bp is registered via init_historical_analysis_routes
