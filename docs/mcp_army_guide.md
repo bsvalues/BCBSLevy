@@ -1,308 +1,350 @@
-# MCP Army System: Implementation Guide
+# MCP Army System Technical Documentation
 
 ## Overview
 
-The MCP Army System extends the existing Model Content Protocol (MCP) framework with a collaborative agent architecture that enables agents to share experiences, learn from each other, and request assistance when needed. This guide provides information on the system's architecture, components, and how to use and extend it.
+The MCP Army is an advanced collaborative AI agent framework built on top of the existing Model Content Protocol (MCP) architecture. It enables multiple specialized AI agents to work together, share experiences, and collectively improve the system's capabilities over time.
+
+This technical documentation provides a comprehensive guide to the MCP Army architecture, components, communication protocols, and integration paths.
 
 ## Architecture
 
-The MCP Army System is built around the following key components:
+The MCP Army system follows a modular architecture composed of these key components:
 
-### 1. Experience Replay Buffer
-
-A shared memory store where agents record their experiences, including:
-- Actions taken
-- Results obtained
-- Errors encountered
-- Assistance received
-
-This buffer enables collaborative learning across agents, allowing successful patterns to be recognized and reused.
-
-### 2. Agent Communication Bus
-
-A standardized messaging system that facilitates inter-agent communication with:
-- Structured message format
-- Event-based publish/subscribe model
-- Message history tracking
-- Event type filtering
-
-### 3. Agent Manager
-
-Centralized coordination system responsible for:
-- Agent registration and lifecycle management
-- Task delegation and monitoring
-- Performance tracking and evaluation
-- Assistance request routing
-
-### 4. MCP Integration Layer
-
-Connects the Agent Army with the existing MCP framework by:
-- Exposing Agent Army capabilities as MCP functions
-- Routing MCP function calls to appropriate agents
-- Standardizing data exchange between systems
-- Providing fault tolerance and error handling
-
-## Core Components
-
-### Experience Replay Buffer (`utils/mcp_experience.py`)
-
-```python
-# Creating an experience
-collaboration_manager.replay_buffer.add({
-    "agentId": "levy_analysis",
-    "eventType": "action",
-    "payload": {
-        "action": "analyze_tax_distribution",
-        "parameters": {"district_id": 123}
-    }
-})
-
-# Sampling experiences for training
-experiences = collaboration_manager.replay_buffer.sample(batch_size=32)
+```
+┌──────────────────────────────────────────────────────────────┐
+│                       Flask Application                       │
+├──────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌────────────────┐              ┌─────────────────────────┐ │
+│  │                │              │                         │ │
+│  │   MCP Army     │◄────────────►│  Original MCP System    │ │
+│  │                │              │                         │ │
+│  └────────┬───────┘              └─────────────────────────┘ │
+│           │                                                  │
+│           ▼                                                  │
+│  ┌────────────────┐    ┌─────────────────┐    ┌───────────────┐  │
+│  │                │    │                 │    │               │  │
+│  │ Agent Manager  │◄──►│ Agent Types     │◄──►│ Experience    │  │
+│  │                │    │                 │    │ Replay Buffer │  │
+│  └────────────────┘    └─────────────────┘    └───────────────┘  │
+│           │                   ▲                   ▲           │
+│           ▼                   │                   │           │
+│  ┌────────────────┐           │                   │           │
+│  │                │           │                   │           │
+│  │ Communication  │◄──────────┘                   │           │
+│  │ Bus            │                               │           │
+│  │                │◄──────────────────────────────┘           │
+│  └────────────────┘                                           │
+│                                                              │
+├──────────────────────────────────────────────────────────────┤
+│                       Database Layer                          │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-### Agent Communication Bus (`utils/mcp_experience.py`)
+### Key Components
 
-```python
-# Publishing a message
-collaboration_manager.comms_bus.publish({
-    "agentId": "levy_analysis",
-    "eventType": "result",
-    "payload": {
-        "task_id": "abc123",
-        "result": {"distribution": {...}}
-    }
-})
+1. **Agent Manager**
+   - Central orchestration system for agent registration and monitoring
+   - Handles task delegation and performance tracking
+   - Coordinates collaborative workflows between agents
 
-# Subscribing to events
-def handle_error_event(message):
-    print(f"Error from {message['agentId']}: {message['payload'].get('error')}")
-    
-collaboration_manager.comms_bus.subscribe("error", handle_error_event)
+2. **Agent Types**
+   - **LevyAnalysisAgent**: Specializes in tax distribution and levy rate analysis
+   - **LevyPredictionAgent**: Focuses on forecasting and predictive modeling
+   - **WorkflowCoordinatorAgent**: Orchestrates multi-agent complex workflows
+   - Additional specialized agents as needed
+
+3. **Communication Bus**
+   - Message-based communication system for agent interaction
+   - Event publishing and subscription mechanism
+   - Standardized message format per protocol specification
+
+4. **Experience Replay Buffer**
+   - Central repository for agent experiences and learning
+   - Enables knowledge sharing between agents
+   - Supports prioritized replay for focused learning
+
+5. **MCP Integration Layer**
+   - Connects the Army architecture to the existing MCP system
+   - Provides function registration and capability mapping
+   - Ensures backward compatibility with existing MCP implementations
+
+## Communication Protocol
+
+The MCP Army uses a standardized message-based communication protocol defined in `utils/mcp_army_protocol.py`. All agent interactions follow this protocol to ensure consistency and reliability.
+
+### Message Format
+
+```json
+{
+  "messageId": "unique_uuid_for_this_message",
+  "correlationId": "uuid_to_track_a_specific_task_or_workflow",
+  "sourceAgentId": "agent_sending_message",
+  "targetAgentId": "intended_recipient_or_topic",
+  "timestamp": "ISO_8601_date_time_utc",
+  "eventType": "COMMAND | EVENT | QUERY | RESPONSE | ERROR | STATUS_UPDATE | ASSISTANCE_REQUESTED",
+  "payload": {
+    // Event-specific data structure
+  },
+  "metadata": {
+    "priority": "low | medium | high",
+    "ttl": "seconds_to_live"
+  }
+}
 ```
 
-### Agent Manager (`utils/mcp_agent_manager.py`)
+### Event Types
 
-```python
-# Initialize agent army
-agent_manager.initialize_agent_army()
+- **COMMAND**: Direct instruction to an agent
+- **EVENT**: Notification of something that happened
+- **QUERY**: Request for information
+- **RESPONSE**: Reply to a query or command
+- **ERROR**: Error notification
+- **STATUS_UPDATE**: Agent reporting its status
+- **ASSISTANCE_REQUESTED**: Agent requesting help
 
-# Delegate task to agent
-agent_manager.delegate_task("levy_analysis", {
-    "task_type": "capability_execution",
-    "capability": "analyze_tax_distribution",
-    "parameters": {"district_id": 123}
-})
+## Experience Replay System
 
-# Request assistance
-agent_manager.request_assistance(
-    "workflow_coordinator",  # Helping agent
-    "levy_analysis",         # Agent needing help
-    "optimization"           # Type of assistance
-)
+The Experience Replay Buffer allows agents to share and learn from each other's experiences. This collaborative learning mechanism is a core feature of the MCP Army design.
+
+### Experience Format
+
+```json
+{
+  "experienceId": "unique_uuid",
+  "agentId": "agent_logging_experience",
+  "timestamp": "ISO_8601_date_time_utc",
+  "state": { /* Representation of state before action */ },
+  "action": { /* Representation of action taken */ },
+  "result": { /* Outcome of the action */ },
+  "nextState": { /* Representation of state after action */ },
+  "rewardSignal": "optional_numeric_reward_if_using_RL",
+  "metadata": { "priority": "calculated_or_assigned_priority" }
+}
 ```
 
-## Web Dashboard
+### Priority Calculation
 
-The MCP Army Dashboard provides a comprehensive interface for monitoring and managing the agent army:
+The system uses a prioritized experience replay mechanism, where experiences are prioritized based on:
 
-- **Agent Status**: View all registered agents, their status, and performance metrics
-- **Experience Replay**: Explore recorded experiences and analyze learning patterns
-- **Collaboration Network**: Visualize agent interactions and assistance patterns
-- **Training Control**: Trigger training cycles and monitor learning progress
+1. Error events (highest priority)
+2. Novel or unusual situations
+3. Significant state changes
+4. Recency (more recent experiences have higher priority)
 
-Access the dashboard at: `/mcp-army/dashboard`
+### Training Process
 
-## API Endpoints
+The training process is triggered:
+- On reaching a buffer size threshold (configurable)
+- At regular time intervals (default: hourly)
+- Manually via the MCP Army dashboard
 
-The MCP Army System exposes the following API endpoints:
+## Agent Types
 
-- **GET /mcp-army/api/agents**: List all registered agents
-- **GET /mcp-army/api/agents/{agent_id}**: Get details for a specific agent
-- **POST /mcp-army/api/agents/{agent_id}/capabilities/{capability}**: Execute a capability on an agent
-- **POST /mcp-army/api/agents/{agent_id}/assistance/{target_agent}**: Request assistance between agents
-- **GET /mcp-army/api/experiences/stats**: Get statistics about the experience replay buffer
-- **GET /mcp-army/api/agents/{agent_id}/experiences**: Get experiences for a specific agent
-- **POST /mcp-army/api/training/start**: Start a collaborative training cycle
+### LevyAnalysisAgent
 
-## How to Use
+**Purpose**: Specializes in analyzing tax distributions and levy rates
 
-### 1. Agent Extensions
+**Capabilities**:
+- `analyze_levy_rates`: Analyze historical levy rates for patterns and anomalies
+- `analyze_tax_distribution`: Evaluate tax burden distribution across districts
+- `compare_assessed_values`: Compare property assessments across similar properties
 
-To create a new agent type:
+### LevyPredictionAgent
 
-1. Create a new class that extends `MCPAgent` in `utils/mcp_agents.py`
-2. Register capabilities with `self.register_capability()`
-3. Add the agent to the initialization in `utils/mcp_agent_manager.py`
+**Purpose**: Focuses on forecasting and predictive modeling
+
+**Capabilities**:
+- `predict_levy_rates`: Forecast future levy rates based on historical data
+- `predict_levy_rates_with_scenario`: Forecast rates under specific conditions
+- `calculate_budget_impact`: Estimate budget impact of levy rate changes
+
+### WorkflowCoordinatorAgent
+
+**Purpose**: Orchestrates multi-agent workflows for complex tasks
+
+**Capabilities**:
+- `execute_workflow_levy_compliance_audit`: Coordinated levy compliance check
+- `execute_workflow_cross_district_analysis`: Analysis across multiple districts
+- `execute_workflow_historical_trend_forecasting`: Historical trend analysis
+- `execute_workflow_regulatory_compliance_check`: Regulatory compliance verification
+
+## Integrating with MCP Army
+
+### Adding a New Agent
+
+1. Create a new agent class derived from `MCPAgent`
+2. Implement required capabilities and interfaces
+3. Register with the AgentManager via configuration
 
 Example:
 
 ```python
-class ComplianceAgent(MCPAgent):
-    """Agent for verifying tax compliance."""
-    
+from utils.mcp_agents import MCPAgent
+
+class ComplianceAuditAgent(MCPAgent):
     def __init__(self):
-        """Initialize the Compliance Agent."""
-        super().__init__(
-            name="ComplianceAgent",
-            description="Verifies tax compliance against regulatory requirements"
-        )
-        
-        # Register capabilities
-        self.register_capability("verify_compliance")
-        self.register_capability("generate_compliance_report")
-        
-        # Claude service for AI capabilities
-        self.claude = get_claude_service()
+        super().__init__()
+        self.capabilities = {
+            'audit_compliance': self.audit_compliance,
+            'verify_regulatory_requirements': self.verify_regulatory_requirements
+        }
     
-    def verify_district_compliance(self, district_id: int, year: int) -> Dict[str, Any]:
-        """
-        Verify compliance for a tax district.
-        
-        Args:
-            district_id: ID of the tax district
-            year: Tax year to verify
-            
-        Returns:
-            Compliance verification results
-        """
+    def audit_compliance(self, parameters):
+        # Implementation
+        pass
+    
+    def verify_regulatory_requirements(self, parameters):
         # Implementation
         pass
 ```
 
-### 2. Experience Recording
-
-To record experiences in an agent:
+### Executing Agent Capabilities
 
 ```python
-def my_agent_function(self, params):
-    # Record action
-    collaboration_manager.comms_bus.publish({
-        "agentId": self.name,
-        "eventType": "action",
-        "payload": {
-            "function": "my_agent_function",
-            "parameters": params
-        }
-    })
+from utils.mcp_army_init import get_agent_manager
+
+# Get the agent manager
+agent_manager = get_agent_manager()
+
+# Execute a capability
+result = agent_manager.execute_capability(
+    'levy_analysis',
+    'analyze_tax_distribution',
+    {
+        'district_id': 123,
+        'year': 2025
+    }
+)
+```
+
+### Creating a Collaborative Workflow
+
+1. Define a workflow in the WorkflowCoordinatorAgent
+2. Register the workflow with a unique name
+3. Implement the workflow execution logic
+
+Example:
+
+```python
+def execute_workflow_compliance_audit(self, parameters):
+    """Execute a compliance audit workflow."""
+    district_id = parameters.get('district_id')
+    year = parameters.get('year')
     
-    try:
-        # Perform action
-        result = self._perform_calculation(params)
-        
-        # Record success
-        collaboration_manager.comms_bus.publish({
-            "agentId": self.name,
-            "eventType": "result",
-            "payload": {
-                "function": "my_agent_function",
-                "result": result
-            }
-        })
-        
-        return result
-        
-    except Exception as e:
-        # Record error
-        collaboration_manager.comms_bus.publish({
-            "agentId": self.name,
-            "eventType": "error",
-            "payload": {
-                "function": "my_agent_function",
-                "error": str(e)
-            }
-        })
-        raise
+    # Step 1: Get district details
+    district = self.execute_capability(
+        'levy_analysis',
+        'get_district_details',
+        {'district_id': district_id}
+    )
+    
+    # Step 2: Analyze historical rates
+    historical_analysis = self.execute_capability(
+        'levy_analysis',
+        'analyze_levy_rates',
+        {'district_id': district_id, 'year': year}
+    )
+    
+    # Step 3: Predict future rates
+    predictions = self.execute_capability(
+        'levy_prediction',
+        'predict_levy_rates',
+        {'district_id': district_id, 'base_year': year}
+    )
+    
+    # Compile results
+    return {
+        'district': district,
+        'historical_analysis': historical_analysis,
+        'predictions': predictions,
+        'workflow_completed': True
+    }
 ```
 
-### 3. Help Requests
+## Monitoring and Dashboard
 
-To request help in an agent:
+The MCP Army Dashboard provides real-time visualization and control of the agent system. Key features include:
 
-```python
-def complex_analysis(self, data):
-    try:
-        # Try to perform analysis
-        result = self._perform_analysis(data)
-        return result
-    except Exception as e:
-        # Request help
-        collaboration_manager.request_help(
-            self.name,
-            f"Failed to analyze data: {str(e)}",
-            priority=0.8
-        )
-        
-        # Return partial or fallback result
-        return {"error": str(e), "partial_results": self._get_fallback_analysis(data)}
-```
+1. **Agent Status Monitoring**
+   - Current status of all agents
+   - Performance metrics and error rates
+   - Activity logs
 
-## Extending the System
+2. **Experience Replay Metrics**
+   - Total experiences collected
+   - Experience distribution by agent
+   - Training cycle statistics
 
-### 1. New Agent Types
+3. **Workflow Execution**
+   - Execute collaborative workflows
+   - Monitor workflow progress
+   - View workflow results
 
-To implement a new agent type:
+4. **Assistance Requests**
+   - View and manage agent assistance requests
+   - Manually trigger agent assistance
+   - Monitor help resolution status
 
-1. Create a new class in `utils/mcp_agents.py` extending `MCPAgent`
-2. Add the agent to the initialization in `agent_manager.initialize_agent_army()`
-3. Register the agent's functions with the MCP registry
-4. Add UI components to the dashboard if needed
+## Error Handling
 
-### 2. New Training Methods
+The MCP Army system implements a robust error handling strategy:
 
-To implement a new training approach:
+1. **Error Classification**
+   - API/External Service Errors: Issues with external services
+   - Agent Internal Errors: Issues within agent logic
+   - Communication Errors: Issues with message delivery
+   - Configuration Errors: Issues with system configuration
 
-1. Extend the `start_training_cycle` method in `MCPCollaborationManager`
-2. Implement the training logic using sampled experiences
-3. Add an API endpoint to trigger the training
-4. Add UI components to visualize training results
+2. **Recovery Mechanisms**
+   - Automatic retry for transient errors
+   - Agent fallback for critical failures
+   - Graceful degradation when components fail
+   - Comprehensive error logging for post-mortem analysis
 
-### 3. Custom Workflows
+3. **Help Request System**
+   - Automatic assistance requests when performance degrades
+   - Manual assistance requests through the dashboard
+   - Agent collaboration to resolve issues
 
-To implement custom agent workflows:
+## Security Considerations
 
-1. Create functions in `workflow_coordinator_agent` that orchestrate multi-agent interactions
-2. Register these functions with the MCP registry
-3. Add API endpoints to trigger the workflows
-4. Add UI components to visualize workflow execution
+The MCP Army implementation includes several security measures:
 
-## Best Practices
+1. **Message Validation**
+   - Strict validation of all inter-agent messages
+   - Input sanitization to prevent injection attacks
+   - Message source verification
 
-1. **Structured Messages**: Follow the standard message format with `agentId`, `eventType`, and `payload`
-2. **Error Handling**: Always catch and log errors, ensuring they're properly recorded in the experience buffer
-3. **Performance Monitoring**: Regularly check agent performance metrics and look for opportunities to improve
-4. **Training Frequency**: Run training cycles at appropriate intervals based on experience accumulation
-5. **Documentation**: Document new agent capabilities, parameters, and expected responses
-6. **Validation**: Always validate inputs and handle edge cases gracefully
-7. **Testing**: Add comprehensive tests for new agent types and capabilities
+2. **Access Control**
+   - Role-based access to agent capabilities
+   - Authentication for dashboard access
+   - Audit logging of all agent actions
 
-## Troubleshooting
+3. **Data Protection**
+   - Sensitive data masking in experiences and logs
+   - Secure handling of API credentials
+   - Compliance with data protection regulations
 
-### MCP Army System Not Initializing
+## Performance Optimization
 
-1. Check the application logs for specific error messages
-2. Ensure the Anthropic API key is valid and functioning
-3. Verify that all required modules are imported correctly
-4. Check for any syntax errors in the agent implementations
+The system is designed for optimal performance:
 
-### Agents Not Communicating
+1. **Resource Management**
+   - Dynamic agent allocation based on workload
+   - Resource throttling for busy agents
+   - Performance monitoring and automatic optimization
 
-1. Verify that the communication bus is properly initialized
-2. Check that events are being published with the correct format
-3. Ensure subscribers are properly registered for relevant event types
-4. Look for any exceptions during message processing
+2. **Caching**
+   - Experience caching for frequent patterns
+   - Result caching for common queries
+   - Configuration caching for optimal startup
 
-### Training Not Improving Performance
+3. **Asynchronous Processing**
+   - Non-blocking message processing
+   - Background training cycles
+   - Parallel workflow execution where possible
 
-1. Check that experiences are being properly recorded
-2. Verify that the sampling mechanism is selecting relevant experiences
-3. Ensure the training logic is properly updating agent behavior
-4. Consider adjusting the training parameters (batch size, learning rate, etc.)
+## Conclusion
 
-## References
-
-- MCP Core Documentation (`utils/mcp_core.py`)
-- Agent Army Integration Guide (`utils/mcp_army_integration.py`)
-- Experience Replay Buffer Documentation (`utils/mcp_experience.py`)
-- Agent Manager Reference (`utils/mcp_agent_manager.py`)
-- Dashboard User Guide (`templates/mcp_army/dashboard.html`)
+The MCP Army system provides a powerful, extensible framework for collaborative AI agents. By following this documentation, developers can leverage the system's capabilities, extend it with new agent types, and create sophisticated multi-agent workflows for the Levy Calculation System.
