@@ -1,440 +1,557 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Intelligent Search - Levy Calculation System{% endblock %}
+{% block title %}Intelligent Search - Benton County Levy Calculation System{% endblock %}
 
-{% block styles %}
+{% block extra_css %}
 <style>
     .search-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
     }
     
     .search-box {
-        background-color: #f8f9fa;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-    }
-    
-    .search-input {
         position: relative;
     }
     
-    .search-input input {
-        padding-left: 40px;
-    }
-    
-    .search-input .fa-search {
+    .search-icon {
         position: absolute;
         left: 15px;
-        top: 14px;
+        top: 13px;
         color: #6c757d;
+        font-size: 1.2rem;
     }
     
-    .filter-section {
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px solid #dee2e6;
+    .search-input {
+        padding-left: 45px;
+        border-radius: 30px;
+        height: 50px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
     }
     
-    .result-card {
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        padding: 15px;
-        margin-bottom: 15px;
-        transition: transform 0.15s ease-in-out;
+    .search-input:focus {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
     
-    .result-card:hover {
+    .search-filters {
+        margin-top: 1.5rem;
+        padding: 1.25rem;
+        border-radius: 8px;
+        background-color: var(--bg-light);
+    }
+    
+    .entity-category {
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: var(--card-bg);
+    }
+    
+    .entity-header {
+        padding: 1rem;
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 600;
+    }
+    
+    .entity-results {
+        padding: 1rem;
+    }
+    
+    .result-item {
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        border: 1px solid var(--border-color);
+    }
+    
+    .result-item:hover {
+        background-color: var(--hover-bg);
         transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    
-    .result-type {
-        display: inline-block;
-        padding: 3px 8px;
-        font-size: 12px;
-        border-radius: 4px;
-        margin-bottom: 8px;
-    }
-    
-    .type-user { background-color: #cff4fc; color: #055160; }
-    .type-tax-district { background-color: #d1e7dd; color: #0f5132; }
-    .type-tax-code { background-color: #f8d7da; color: #842029; }
-    .type-property { background-color: #fff3cd; color: #664d03; }
-    .type-levy-scenario { background-color: #e2e3e5; color: #41464b; }
-    .type-forecast { background-color: #d3d3fe; color: #3a3a98; }
-    
-    .result-score {
-        float: right;
-        background-color: #f8f9fa;
-        border-radius: 4px;
-        padding: 2px 8px;
-        font-size: 12px;
-        color: #6c757d;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.07);
     }
     
     .result-title {
-        font-size: 18px;
         font-weight: 600;
-        margin-bottom: 8px;
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
     }
     
-    .result-details {
+    .result-subtitle {
+        font-size: 0.9rem;
         color: #6c757d;
-        font-size: 14px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .result-description {
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
     }
     
     .result-metadata {
-        margin-top: 10px;
-        padding-top: 10px;
-        font-size: 13px;
-        border-top: 1px dashed #e9ecef;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .empty-results {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .autocomplete-container {
+        position: relative;
     }
     
     .autocomplete-results {
         position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
         z-index: 1000;
-        background: white;
-        width: 100%;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        border-radius: 0 0 5px 5px;
         max-height: 300px;
         overflow-y: auto;
+        background-color: white;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     
     .autocomplete-item {
-        padding: 10px 15px;
+        padding: 0.75rem 1rem;
         cursor: pointer;
         border-bottom: 1px solid #f0f0f0;
     }
     
     .autocomplete-item:hover {
-        background-color: #f8f9fa;
+        background-color: var(--hover-bg);
     }
     
     .highlight {
-        background-color: #ffffb3;
-        padding: 0 2px;
+        background-color: rgba(255, 255, 0, 0.3);
+        padding: 2px;
+        border-radius: 2px;
     }
     
-    .no-results {
-        text-align: center;
-        padding: 40px 20px;
-        color: #6c757d;
+    .search-badge {
+        background-color: var(--accent-color);
+        color: white;
+        font-weight: 500;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+        display: inline-block;
+    }
+    
+    .selected-filter {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .filter-label {
+        cursor: pointer;
+        user-select: none;
+    }
+    
+    .filter-checkbox {
+        margin-right: 0.5rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="search-container">
-    <div class="search-box">
-        <h2 class="mb-4">Intelligent Search</h2>
-        <form id="searchForm" action="{{ url_for('search.search_page') }}" method="GET">
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <div class="search-input">
-                        <i class="fas fa-search"></i>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="search-container">
+                <h1 class="mb-4">Intelligent Search</h1>
+                <p class="lead mb-4">Search across tax districts, codes, properties, and more with fuzzy matching and intelligent results.</p>
+                
+                <form action="{{ url_for('search.search_page') }}" method="GET" id="searchForm">
+                    <div class="search-box autocomplete-container mb-3">
+                        <i class="bi bi-search search-icon"></i>
                         <input 
                             type="text" 
-                            class="form-control form-control-lg" 
-                            name="q" 
+                            class="form-control search-input" 
                             id="searchQuery" 
-                            placeholder="Search tax districts, codes, properties, and more..." 
-                            value="{{ query }}" 
-                            autocomplete="off">
-                        <div id="autocompleteResults" class="autocomplete-results" style="display:none;"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="filter-section">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="entityTypes">Entity Types</label>
-                        <select class="form-select" name="types" id="entityTypes" multiple>
-                            <option value="user" {% if selected_types and 'user' in selected_types %}selected{% endif %}>Users</option>
-                            <option value="tax_district" {% if selected_types and 'tax_district' in selected_types %}selected{% endif %}>Tax Districts</option>
-                            <option value="tax_code" {% if selected_types and 'tax_code' in selected_types %}selected{% endif %}>Tax Codes</option>
-                            <option value="property" {% if selected_types and 'property' in selected_types %}selected{% endif %}>Properties</option>
-                            <option value="levy_scenario" {% if selected_types and 'levy_scenario' in selected_types %}selected{% endif %}>Levy Scenarios</option>
-                            <option value="forecast" {% if selected_types and 'forecast' in selected_types %}selected{% endif %}>Forecasts</option>
-                        </select>
-                        <small class="form-text text-muted">Leave empty to search all types</small>
+                            name="q" 
+                            placeholder="Search by name, ID, description, or any relevant information..." 
+                            value="{{ query }}"
+                            autocomplete="off"
+                        >
+                        <div class="autocomplete-results d-none" id="autocompleteResults"></div>
                     </div>
                     
-                    <div class="col-md-4 mb-3">
-                        <label for="yearFilter">Year</label>
-                        <select class="form-select" name="year" id="yearFilter">
-                            <option value="">All Years</option>
-                            {% for year in available_years %}
-                            <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="search-filters">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Filter by Entity Type</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input filter-checkbox" type="checkbox" id="typeTaxDistrict" name="types" value="tax_district" 
+                                                {% if selected_types and 'tax_district' in selected_types %}checked{% endif %}>
+                                            <label class="form-check-label filter-label" for="typeTaxDistrict">Tax Districts</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input filter-checkbox" type="checkbox" id="typeTaxCode" name="types" value="tax_code"
+                                                {% if selected_types and 'tax_code' in selected_types %}checked{% endif %}>
+                                            <label class="form-check-label filter-label" for="typeTaxCode">Tax Codes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input filter-checkbox" type="checkbox" id="typeProperty" name="types" value="property"
+                                                {% if selected_types and 'property' in selected_types %}checked{% endif %}>
+                                            <label class="form-check-label filter-label" for="typeProperty">Properties</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input filter-checkbox" type="checkbox" id="typeImportLog" name="types" value="import_log"
+                                                {% if selected_types and 'import_log' in selected_types %}checked{% endif %}>
+                                            <label class="form-check-label filter-label" for="typeImportLog">Imports</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input filter-checkbox" type="checkbox" id="typeExportLog" name="types" value="export_log"
+                                                {% if selected_types and 'export_log' in selected_types %}checked{% endif %}>
+                                            <label class="form-check-label filter-label" for="typeExportLog">Exports</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="yearFilter" class="form-label">Filter by Year</label>
+                                    <select class="form-select" id="yearFilter" name="year">
+                                        <option value="">All Years</option>
+                                        {% for year_option in years %}
+                                        <option value="{{ year_option }}" {% if year == year_option %}selected{% endif %}>{{ year_option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search me-2"></i>Search
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="col-md-2 mb-3 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Search</button>
-                    </div>
-                </div>
+                </form>
             </div>
-        </form>
-    </div>
-    
-    <div class="results-container">
-        {% if query %}
-            <h3 class="mb-4">Search Results for "{{ query }}"</h3>
             
-            {% if results|length > 0 %}
-                <p>Found {{ results|length }} results</p>
+            {% if query %}
+            <div class="search-results">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Search Results <small class="text-muted">({{ result_count }} found)</small></h3>
+                    
+                    {% if result_count > 0 %}
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-sort-down me-1"></i>Sort
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                            <li><a class="dropdown-item sort-option" data-sort="relevance" href="#">Most Relevant</a></li>
+                            <li><a class="dropdown-item sort-option" data-sort="name-asc" href="#">Name (A-Z)</a></li>
+                            <li><a class="dropdown-item sort-option" data-sort="name-desc" href="#">Name (Z-A)</a></li>
+                            <li><a class="dropdown-item sort-option" data-sort="recent" href="#">Most Recent</a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
                 
-                <div class="row">
-                {% for result in results %}
-                    <div class="col-md-6">
-                        <div class="result-card">
-                            <span class="result-score">{{ result.score }}%</span>
-                            <span class="result-type type-{{ result.type|lower|replace(' ', '-') }}">{{ result.type }}</span>
-                            
-                            <div class="result-title">
-                                {% if result.type == 'Tax District' %}
-                                <a href="{{ url_for('data_management.view_district', district_id=result.id) }}">{{ result.label }}</a>
-                                {% elif result.type == 'Tax Code' %}
-                                <a href="{{ url_for('data_management.view_tax_code', tax_code_id=result.id) }}">{{ result.label }}</a>
-                                {% elif result.type == 'Property' %}
-                                <a href="{{ url_for('data_management.view_property', property_id=result.id) }}">{{ result.label }}</a>
-                                {% elif result.type == 'Levy Scenario' %}
-                                <a href="{{ url_for('levy_calculator.view_scenario', scenario_id=result.id) }}">{{ result.label }}</a>
-                                {% elif result.type == 'Forecast' %}
-                                <a href="{{ url_for('forecasting.view_forecast', forecast_id=result.id) }}">{{ result.label }}</a>
-                                {% elif result.type == 'User' %}
-                                <a href="{{ url_for('admin.view_user', user_id=result.id) }}">{{ result.label }}</a>
+                {% if result_count > 0 %}
+                    {% for entity_type, entity_results in results.items() %}
+                    <div class="entity-category mb-4">
+                        <div class="entity-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                {% if entity_type == 'tax_district' %}
+                                <i class="bi bi-geo-alt me-2"></i>Tax Districts
+                                {% elif entity_type == 'tax_code' %}
+                                <i class="bi bi-house me-2"></i>Tax Codes
+                                {% elif entity_type == 'property' %}
+                                <i class="bi bi-building me-2"></i>Properties
+                                {% elif entity_type == 'user' %}
+                                <i class="bi bi-person me-2"></i>Users
+                                {% elif entity_type == 'import_log' %}
+                                <i class="bi bi-cloud-upload me-2"></i>Imports
+                                {% elif entity_type == 'export_log' %}
+                                <i class="bi bi-cloud-download me-2"></i>Exports
                                 {% else %}
-                                {{ result.label }}
+                                <i class="bi bi-file-earmark me-2"></i>{{ entity_type|replace('_', ' ')|title }}
                                 {% endif %}
+                            </h5>
+                            <span class="badge bg-light text-dark">{{ entity_results|length }}</span>
+                        </div>
+                        <div class="entity-results">
+                            {% for result in entity_results %}
+                            <div class="result-item">
+                                <a href="{{ result.url }}" class="text-decoration-none">
+                                    <div class="result-title">{{ result.title }}</div>
+                                    <div class="result-subtitle">{{ result.subtitle }}</div>
+                                    <div class="result-description">{{ result.description }}</div>
+                                </a>
                             </div>
-                            
-                            <div class="result-details">
-                                {% if result.type == 'Tax District' %}
-                                    {% if result.district_code %}Code: {{ result.district_code }}{% endif %}
-                                    {% if result.district_type %} | Type: {{ result.district_type }}{% endif %}
-                                    {% if result.county %} | {{ result.county }}, {{ result.state }}{% endif %}
-                                {% elif result.type == 'Tax Code' %}
-                                    {% if result.description %}{{ result.description|truncate(100) }}{% endif %}
-                                {% elif result.type == 'Property' %}
-                                    {% if result.property_address %}{{ result.property_address }}{% endif %}
-                                    {% if result.city %} | {{ result.city }}, {{ result.state }}{% endif %}
-                                {% elif result.type == 'User' %}
-                                    {% if result.email %}{{ result.email }}{% endif %}
-                                    {% if result.full_name %} | {{ result.full_name }}{% endif %}
-                                {% elif result.type == 'Levy Scenario' %}
-                                    {% if result.description %}{{ result.description|truncate(100) }}{% endif %}
-                                {% elif result.type == 'Forecast' %}
-                                    {% if result.model_type %}Model: {{ result.model_type }}{% endif %}
-                                    {% if result.description %} | {{ result.description|truncate(80) }}{% endif %}
-                                {% endif %}
-                            </div>
-                            
-                            <div class="result-metadata">
-                                <small>
-                                    Matched on: {{ result.matched_field|replace('_', ' ')|title }}
-                                    {% if result.entity_type %}
-                                    | Entity: {{ result.entity_type }}
-                                    {% endif %}
-                                </small>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-results">
+                    <div class="mb-4">
+                        <i class="bi bi-search fs-1 text-muted"></i>
+                    </div>
+                    <h4>No results found for "{{ query }}"</h4>
+                    <p class="text-muted">Try different keywords or filters</p>
+                    <div class="mt-4">
+                        <h5>Suggestions:</h5>
+                        <ul class="text-start">
+                            <li>Check your spelling</li>
+                            <li>Try more general keywords</li>
+                            <li>Try different keywords</li>
+                            <li>Try searching by ID or specific codes</li>
+                            <li>Remove some filters</li>
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="search-intro mt-5 text-center">
+                <div class="mb-4">
+                    <i class="bi bi-search fs-1 text-primary"></i>
+                </div>
+                <h3>Start searching!</h3>
+                <p class="text-muted mb-4">Enter a search term above to find tax districts, codes, properties, and more.</p>
+                
+                <div class="row mt-5">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-arrow-counterclockwise fs-2 text-primary mb-3"></i>
+                                <h5>Fuzzy Matching</h5>
+                                <p class="card-text">Our search understands typos and spelling variations for better results.</p>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-filter fs-2 text-primary mb-3"></i>
+                                <h5>Smart Filtering</h5>
+                                <p class="card-text">Filter by entity type and year to narrow down results.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightning fs-2 text-primary mb-3"></i>
+                                <h5>Quick Access</h5>
+                                <p class="card-text">Find and access important data faster than ever before.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            {% else %}
-                <div class="no-results">
-                    <i class="fas fa-search fa-3x mb-3 text-muted"></i>
-                    <h4>No results found</h4>
-                    <p>Try adjusting your search terms or filters.</p>
-                </div>
+            </div>
             {% endif %}
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchQuery');
-        const autocompleteResults = document.getElementById('autocompleteResults');
-        const entityTypesSelect = document.getElementById('entityTypes');
-        const yearFilter = document.getElementById('yearFilter');
-        let currentFocus = -1;
-        let debounceTimer;
-        
-        // Initialize Select2 for multiple select
-        $('#entityTypes').select2({
-            placeholder: "Select entity types to search",
-            allowClear: true
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchQuery');
+    const autocompleteResults = document.getElementById('autocompleteResults');
+    const searchForm = document.getElementById('searchForm');
+    let currentAutocompleteType = null;
+    let debounceTimer;
+    
+    // Initialize autocomplete
+    if (searchInput) {
+        // Show autocomplete results when input is focused
+        searchInput.addEventListener('focus', function() {
+            if (this.value.length >= 2 && autocompleteResults.children.length > 0) {
+                autocompleteResults.classList.remove('d-none');
+            }
         });
         
-        // Function to handle autocomplete
-        function handleAutocomplete() {
-            const query = searchInput.value.trim();
-            if (query.length < 2) {
-                autocompleteResults.style.display = 'none';
+        // Hide autocomplete results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
+                autocompleteResults.classList.add('d-none');
+            }
+        });
+        
+        // Handle input for autocomplete
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            
+            if (this.value.length < 2) {
+                autocompleteResults.classList.add('d-none');
                 return;
             }
             
-            // Get selected entity type or default to tax_district
-            let entityType = 'tax_district';
-            if (entityTypesSelect.options.length && entityTypesSelect.selectedIndex >= 0) {
-                const selectedOptions = Array.from(entityTypesSelect.selectedOptions);
-                if (selectedOptions.length === 1) {
-                    entityType = selectedOptions[0].value;
-                }
+            // Debounce to prevent too many requests
+            debounceTimer = setTimeout(() => {
+                fetchAutocompleteSuggestions(this.value);
+            }, 300);
+        });
+        
+        // Handle keyboard navigation in autocomplete dropdown
+        searchInput.addEventListener('keydown', function(e) {
+            if (autocompleteResults.classList.contains('d-none')) return;
+            
+            const items = autocompleteResults.querySelectorAll('.autocomplete-item');
+            let focusedItem = autocompleteResults.querySelector('.autocomplete-item.focused');
+            let focusedIndex = -1;
+            
+            if (focusedItem) {
+                focusedIndex = Array.from(items).indexOf(focusedItem);
             }
             
-            // Get year filter if set
-            const year = yearFilter.value;
-            
-            // Fetch autocomplete suggestions
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                fetch(`/api/autocomplete?q=${encodeURIComponent(query)}&type=${entityType}${year ? '&year=' + year : ''}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            displayAutocompleteResults(data, query);
-                        } else {
-                            autocompleteResults.style.display = 'none';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching autocomplete suggestions:', error);
-                        autocompleteResults.style.display = 'none';
-                    });
-            }, 300); // 300ms debounce
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    if (focusedIndex < items.length - 1) {
+                        if (focusedItem) focusedItem.classList.remove('focused');
+                        items[focusedIndex + 1].classList.add('focused');
+                        items[focusedIndex + 1].scrollIntoView({ block: 'nearest' });
+                    }
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    if (focusedIndex > 0) {
+                        if (focusedItem) focusedItem.classList.remove('focused');
+                        items[focusedIndex - 1].classList.add('focused');
+                        items[focusedIndex - 1].scrollIntoView({ block: 'nearest' });
+                    }
+                    break;
+                case 'Enter':
+                    if (focusedItem) {
+                        e.preventDefault();
+                        focusedItem.click();
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    autocompleteResults.classList.add('d-none');
+                    break;
+            }
+        });
+    }
+    
+    // Fetch autocomplete suggestions from API
+    function fetchAutocompleteSuggestions(query) {
+        // Determine which entity types are selected
+        const selectedTypes = [];
+        document.querySelectorAll('.filter-checkbox:checked').forEach(checkbox => {
+            selectedTypes.push(checkbox.value);
+        });
+        
+        // If no types are selected or we're searching all types, default to tax_district
+        currentAutocompleteType = selectedTypes.length > 0 ? selectedTypes[0] : 'tax_district';
+        
+        // Get the year filter value
+        const yearFilter = document.getElementById('yearFilter').value;
+        
+        fetch(`/search/api/autocomplete?q=${encodeURIComponent(query)}&type=${currentAutocompleteType}&limit=10${yearFilter ? '&year=' + yearFilter : ''}`)
+            .then(response => response.json())
+            .then(data => {
+                displayAutocompleteSuggestions(data.suggestions, query);
+            })
+            .catch(error => {
+                console.error('Error fetching autocomplete suggestions:', error);
+            });
+    }
+    
+    // Display autocomplete suggestions
+    function displayAutocompleteSuggestions(suggestions, query) {
+        autocompleteResults.innerHTML = '';
+        
+        if (suggestions.length === 0) {
+            autocompleteResults.classList.add('d-none');
+            return;
         }
         
-        // Function to display autocomplete results
-        function displayAutocompleteResults(results, query) {
-            autocompleteResults.innerHTML = '';
+        suggestions.forEach(suggestion => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
             
-            results.forEach((result, index) => {
-                const item = document.createElement('div');
-                item.className = 'autocomplete-item';
-                item.dataset.value = result.value;
-                
-                // Highlight the matching text
-                const highlightedText = highlightMatch(result.label, query);
-                
-                let itemContent = `<strong>${highlightedText}</strong>`;
-                
-                // Add additional information if available
-                if (result.entity_type) {
-                    itemContent += ` <span class="text-muted">(${result.entity_type.replace('_', ' ')})</span>`;
-                }
-                
-                item.innerHTML = itemContent;
-                
-                // Add click event to select this item
-                item.addEventListener('click', function() {
-                    searchInput.value = result.value;
-                    autocompleteResults.style.display = 'none';
-                    searchInput.focus();
-                });
-                
-                autocompleteResults.appendChild(item);
+            // Display the value with the matched portion highlighted
+            const value = suggestion.value;
+            const display = suggestion.display;
+            
+            // Create HTML for the item using display information
+            item.innerHTML = `
+                <div class="fw-bold">${display.title}</div>
+                <div class="small text-muted">${display.subtitle}</div>
+            `;
+            
+            // Add click event to fill the search input
+            item.addEventListener('click', function() {
+                searchInput.value = value;
+                autocompleteResults.classList.add('d-none');
+                searchForm.submit();
             });
             
-            autocompleteResults.style.display = 'block';
-        }
-        
-        // Function to highlight matched text
-        function highlightMatch(text, query) {
-            if (!query) return text;
-            
-            const regex = new RegExp('(' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + ')', 'i');
-            return text.replace(regex, '<span class="highlight">$1</span>');
-        }
-        
-        // Keyboard navigation for autocomplete
-        searchInput.addEventListener('keydown', function(e) {
-            const items = autocompleteResults.getElementsByClassName('autocomplete-item');
-            
-            // Down arrow
-            if (e.keyCode === 40) {
-                currentFocus++;
-                addActive(items);
-                e.preventDefault();
-            } 
-            // Up arrow
-            else if (e.keyCode === 38) {
-                currentFocus--;
-                addActive(items);
-                e.preventDefault();
-            } 
-            // Enter
-            else if (e.keyCode === 13 && currentFocus > -1) {
-                if (items[currentFocus]) {
-                    items[currentFocus].click();
-                    e.preventDefault();
-                }
-            }
+            autocompleteResults.appendChild(item);
         });
         
-        // Function to add 'active' class to autocomplete item
-        function addActive(items) {
-            if (!items) return;
-            
-            // Remove active from all items
-            for (let i = 0; i < items.length; i++) {
-                items[i].classList.remove('active');
-            }
-            
-            // Adjust focus if out of bounds
-            if (currentFocus >= items.length) currentFocus = 0;
-            if (currentFocus < 0) currentFocus = items.length - 1;
-            
-            // Add active class to focused item
-            if (items[currentFocus]) {
-                items[currentFocus].classList.add('active');
-            }
-        }
-        
-        // Listen for input on search box
-        searchInput.addEventListener('input', handleAutocomplete);
-        
-        // Hide autocomplete when clicking outside
-        document.addEventListener('click', function(e) {
-            if (e.target !== searchInput) {
-                autocompleteResults.style.display = 'none';
-            }
-        });
-        
-        // Show autocomplete when focusing on input if it has content
-        searchInput.addEventListener('focus', function() {
-            if (this.value.trim().length >= 2) {
-                handleAutocomplete();
-            }
-        });
-        
-        // Form submission processing - convert selected types to comma-separated value
-        document.getElementById('searchForm').addEventListener('submit', function(e) {
-            const selectedTypes = Array.from(entityTypesSelect.selectedOptions).map(opt => opt.value);
-            
-            if (selectedTypes.length > 0) {
-                // Remove the multiple select and create a hidden input with comma-separated values
-                const hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'types';
-                hiddenInput.value = selectedTypes.join(',');
-                this.appendChild(hiddenInput);
-                
-                // Disable the original select to prevent it from being submitted
-                entityTypesSelect.disabled = true;
+        autocompleteResults.classList.remove('d-none');
+    }
+    
+    // Handle entity type filter changes
+    document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            // If search input has content, update autocomplete results
+            if (searchInput.value.length >= 2) {
+                fetchAutocompleteSuggestions(searchInput.value);
             }
         });
     });
+    
+    // Handle sorting options
+    document.querySelectorAll('.sort-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sortType = this.getAttribute('data-sort');
+            sortResults(sortType);
+        });
+    });
+    
+    // Sort results based on selected option
+    function sortResults(sortType) {
+        const entityCategories = document.querySelectorAll('.entity-category');
+        
+        entityCategories.forEach(category => {
+            const resultItems = Array.from(category.querySelectorAll('.result-item'));
+            
+            resultItems.sort((a, b) => {
+                const titleA = a.querySelector('.result-title').textContent;
+                const titleB = b.querySelector('.result-title').textContent;
+                
+                if (sortType === 'name-asc') {
+                    return titleA.localeCompare(titleB);
+                } else if (sortType === 'name-desc') {
+                    return titleB.localeCompare(titleA);
+                }
+                
+                // Default back to original order (relevance)
+                return 0;
+            });
+            
+            // Remove existing items
+            resultItems.forEach(item => item.remove());
+            
+            // Re-add sorted items
+            const resultsContainer = category.querySelector('.entity-results');
+            resultItems.forEach(item => {
+                resultsContainer.appendChild(item);
+            });
+        });
+    }
+});
 </script>
 {% endblock %}
