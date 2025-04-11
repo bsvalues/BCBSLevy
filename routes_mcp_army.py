@@ -10,6 +10,71 @@ from typing import Dict, Any, List
 
 from flask import Blueprint, render_template, request, jsonify, current_app
 
+def generate_command_structure_diagram(command_structure, agent_relationships):
+    """
+    Generate a mermaid diagram representing the command structure.
+    
+    Args:
+        command_structure: The command structure dictionary
+        agent_relationships: Dictionary of agent relationship information
+        
+    Returns:
+        Mermaid diagram string
+    """
+    mermaid = ["graph TD;", "    %% Command Structure Diagram"]
+    
+    # Define node styles
+    mermaid.append("    classDef architect fill:#f9d71c,stroke:#333,stroke-width:2px;")
+    mermaid.append("    classDef coordinator fill:#66b2ff,stroke:#333,stroke-width:2px;")
+    mermaid.append("    classDef lead fill:#ff9966,stroke:#333,stroke-width:1px;")
+    mermaid.append("    classDef specialist fill:#99cc99,stroke:#333,stroke-width:1px;")
+    
+    # Add nodes for each command level
+    architect_id = command_structure.get('architect_prime')
+    if architect_id:
+        mermaid.append(f"    ARCHITECT[\"{architect_id}<br>Architect Prime\"]:::architect;")
+    
+    coordinator_id = command_structure.get('integration_coordinator')
+    if coordinator_id:
+        mermaid.append(f"    COORDINATOR[\"{coordinator_id}<br>Integration Coordinator\"]:::coordinator;")
+    
+    # Add component leads
+    for component, lead_id in command_structure.get('component_leads', {}).items():
+        mermaid.append(f"    LEAD_{lead_id}[\"{lead_id}<br>Component Lead: {component}\"]:::lead;")
+    
+    # Add specialist agents
+    for domain, agents in command_structure.get('specialist_agents', {}).items():
+        for agent_id in agents:
+            mermaid.append(f"    AGENT_{agent_id}[\"{agent_id}<br>Specialist: {domain}\"]:::specialist;")
+    
+    # Add connections based on reporting relationships
+    for agent_id, relationship in agent_relationships.items():
+        reports_to = relationship.get('reports_to')
+        if reports_to:
+            node1 = f"AGENT_{agent_id}" if relationship.get('role') == 'specialist_agent' else f"LEAD_{agent_id}" if relationship.get('role') == 'component_lead' else "COORDINATOR" if relationship.get('role') == 'integration_coordinator' else "ARCHITECT"
+            node2 = f"AGENT_{reports_to}" if agent_relationships.get(reports_to, {}).get('role') == 'specialist_agent' else f"LEAD_{reports_to}" if agent_relationships.get(reports_to, {}).get('role') == 'component_lead' else "COORDINATOR" if agent_relationships.get(reports_to, {}).get('role') == 'integration_coordinator' else "ARCHITECT"
+            mermaid.append(f"    {node1} --> {node2};")
+    
+    # Add top-level connections if not already covered by relationships
+    if architect_id and coordinator_id:
+        mermaid.append(f"    COORDINATOR --> ARCHITECT;")
+    
+    for component, lead_id in command_structure.get('component_leads', {}).items():
+        if agent_relationships.get(lead_id, {}).get('reports_to') is None and coordinator_id:
+            mermaid.append(f"    LEAD_{lead_id} --> COORDINATOR;")
+    
+    for domain, agents in command_structure.get('specialist_agents', {}).items():
+        for agent_id in agents:
+            if agent_relationships.get(agent_id, {}).get('reports_to') is None:
+                component = agent_relationships.get(agent_id, {}).get('component')
+                lead_id = command_structure.get('component_leads', {}).get(component)
+                if lead_id:
+                    mermaid.append(f"    AGENT_{agent_id} --> LEAD_{lead_id};")
+                elif coordinator_id:
+                    mermaid.append(f"    AGENT_{agent_id} --> COORDINATOR;")
+    
+    return "\n".join(mermaid)
+
 from utils.mcp_army_init import (
     get_agent_manager, get_collaboration_manager, 
     get_master_prompt_manager_instance, init_mcp_army
@@ -31,14 +96,41 @@ def dashboard():
                                  error="MCP Army system not initialized")
         
         agents = agent_manager.list_agents()
+        
+        # Get command structure for hierarchical display
+        command_structure = agent_manager.command_structure
+        agent_relationships = agent_manager.agent_relationships
+        
+        # Generate mermaid diagram for command structure
+        mermaid_diagram = generate_command_structure_diagram(command_structure, agent_relationships)
+        
         return render_template('mcp_army/dashboard.html', 
-                             agents=agents)
+                             agents=agents,
+                             command_structure=command_structure,
+                             agent_relationships=agent_relationships,
+                             mermaid_diagram=mermaid_diagram)
     except Exception as e:
         logger.error(f"Error rendering MCP Army dashboard: {str(e)}")
         return render_template('simple_404.html', 
                              error_code=500,
                              error_title="System Error",
                              error_message=f"Error loading MCP Army dashboard: {str(e)}")
+
+@mcp_army_bp.route('/api/command-structure')
+def get_command_structure():
+    """API endpoint to get the current command structure."""
+    try:
+        agent_manager = get_agent_manager()
+        if not agent_manager:
+            return jsonify({"error": "MCP Army system not initialized"}), 503
+        
+        return jsonify({
+            "command_structure": agent_manager.command_structure,
+            "agent_relationships": agent_manager.agent_relationships
+        })
+    except Exception as e:
+        logger.error(f"Error getting command structure: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 @mcp_army_bp.route('/api/agents')
 def list_agents():

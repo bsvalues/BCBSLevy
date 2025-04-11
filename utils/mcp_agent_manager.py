@@ -22,11 +22,12 @@ logger = logging.getLogger(__name__)
 
 class AgentManager:
     """
-    Manager for coordinating AI agents in the system.
+    Manager for coordinating AI agents in the BCBS GeoAssessment system.
     
     The AgentManager serves as the central coordinator for the Agent Army,
-    handling agent registration, task delegation, performance monitoring,
-    and system-wide coordination.
+    implementing the hierarchical command structure from the strategic guide.
+    It handles agent registration, task delegation, performance monitoring,
+    and system-wide coordination across all command levels.
     """
     
     def __init__(self, collab_manager=None):
@@ -38,6 +39,18 @@ class AgentManager:
         """
         self.agents = {}  # agent_id -> agent instance
         self.agent_configs = {}  # agent_id -> configuration
+        
+        # Command structure hierarchy
+        self.command_structure = {
+            "architect_prime": None,  # Will store the agent instance
+            "integration_coordinator": None,
+            "component_leads": {},  # component_name -> agent_id
+            "specialist_agents": {}  # domain -> [agent_ids]
+        }
+        
+        # Track hierarchical relationships between agents
+        self.agent_relationships = {}  # agent_id -> {"role": role, "reports_to": agent_id, "supervises": [agent_ids]}
+        
         self.agent_statuses = {}  # agent_id -> status
         self.task_queue = []  # List of pending tasks
         self.comm_bus = AgentCommunicationBus()
@@ -134,7 +147,8 @@ class AgentManager:
                 
     def initialize_agent_army(self, config: Dict[str, Any] = None) -> bool:
         """
-        Initialize the entire agent army based on configuration.
+        Initialize the entire agent army based on configuration, following the hierarchical
+        command structure from the strategic guide.
         
         Args:
             config: Army configuration (optional, uses default if None)
@@ -143,33 +157,45 @@ class AgentManager:
             True if all agents were successfully initialized, False otherwise
         """
         if config is None:
-            # Default configuration for the agent army
+            # Default configuration for the agent army with command structure roles
             config = {
                 'agents': [
                     {
                         'id': 'MCP',
                         'type': 'MCP',
-                        'config': {}
-                    },
-                    {
-                        'id': 'levy_analysis',
-                        'type': 'LevyAnalysisAgent',
-                        'config': {}
-                    },
-                    {
-                        'id': 'levy_prediction',
-                        'type': 'LevyPredictionAgent',
+                        'role': 'integration_coordinator',
+                        'component': 'core',
                         'config': {}
                     },
                     {
                         'id': 'workflow_coordinator',
                         'type': 'WorkflowCoordinatorAgent',
+                        'role': 'architect_prime',
+                        'component': 'core',
+                        'config': {}
+                    },
+                    {
+                        'id': 'levy_analysis',
+                        'type': 'LevyAnalysisAgent',
+                        'role': 'component_lead',
+                        'component': 'levy',
+                        'config': {}
+                    },
+                    {
+                        'id': 'levy_prediction',
+                        'type': 'LevyPredictionAgent',
+                        'role': 'specialist_agent',
+                        'component': 'levy',
+                        'domain': 'prediction',
+                        'reports_to': 'levy_analysis',
                         'config': {}
                     }
                 ]
             }
             
         success = True
+        
+        # First pass: Initialize all agents
         for agent_config in config.get('agents', []):
             agent_id = agent_config.get('id')
             if not agent_id:
@@ -181,13 +207,69 @@ class AgentManager:
                 agent_id,
                 {
                     'type': agent_config.get('type'),
+                    'role': agent_config.get('role', 'specialist_agent'),
+                    'component': agent_config.get('component', 'general'),
+                    'domain': agent_config.get('domain', 'general'),
+                    'reports_to': agent_config.get('reports_to'),
                     **(agent_config.get('config', {}))
                 }
             )
             
             if not agent_success:
                 success = False
+                continue
                 
+            # Update command structure based on agent role
+            role = agent_config.get('role')
+            if role == 'architect_prime':
+                self.command_structure['architect_prime'] = agent_id
+            elif role == 'integration_coordinator':
+                self.command_structure['integration_coordinator'] = agent_id
+            elif role == 'component_lead':
+                component = agent_config.get('component', 'general')
+                self.command_structure['component_leads'][component] = agent_id
+            elif role == 'specialist_agent':
+                domain = agent_config.get('domain', 'general')
+                if domain not in self.command_structure['specialist_agents']:
+                    self.command_structure['specialist_agents'][domain] = []
+                self.command_structure['specialist_agents'][domain].append(agent_id)
+                
+        # Second pass: Establish hierarchical relationships
+        for agent_config in config.get('agents', []):
+            agent_id = agent_config.get('id')
+            if not agent_id or agent_id not in self.agents:
+                continue
+                
+            role = agent_config.get('role', 'specialist_agent')
+            reports_to = agent_config.get('reports_to')
+            
+            # If reports_to is not specified, determine based on role
+            if not reports_to:
+                if role == 'architect_prime':
+                    reports_to = None  # Reports to no one
+                elif role == 'integration_coordinator':
+                    reports_to = self.command_structure['architect_prime']
+                elif role == 'component_lead':
+                    reports_to = self.command_structure['integration_coordinator']
+                elif role == 'specialist_agent':
+                    component = agent_config.get('component', 'general')
+                    reports_to = self.command_structure['component_leads'].get(component)
+                    
+            # Initialize relationship data
+            self.agent_relationships[agent_id] = {
+                'role': role,
+                'reports_to': reports_to,
+                'supervises': []
+            }
+            
+            # Update supervisor's relationship data
+            if reports_to and reports_to in self.agent_relationships:
+                if 'supervises' not in self.agent_relationships[reports_to]:
+                    self.agent_relationships[reports_to]['supervises'] = []
+                self.agent_relationships[reports_to]['supervises'].append(agent_id)
+                
+        # Log command structure
+        logger.info(f"Agent Army initialized with command structure: {self.command_structure}")
         return success
         
     def delegate_task(self, agent_id: str, task: Dict[str, Any]) -> str:

@@ -43,22 +43,45 @@ class MasterPromptManager:
         self.current_prompt = {
             "version": self.prompt_version,
             "timestamp": self.last_updated,
-            "title": "System Integration and Collaboration Directive",
+            "title": "BCBS GeoAssessment System Orchestration Directive",
             "content": """
-Attention all agents: As part of our integrated system, each agent is responsible for executing its domain-specific tasks while maintaining communication using our standard JSON messaging format. The Core serves as the master hub, ensuring configuration consistency and orchestrating cross-module activities. The Replit AI Agent is your real-time coordinator, while the MCP monitors overall performance and directs task assignments when issues occur.
+ATTENTION ALL AGENTS: This Master Prompt establishes the command hierarchy and operational protocols for the Benton County GeoAssessment System. All agents must adhere to this directive while performing their designated functions.
 
-Every action you perform must be logged in the shared replay buffer. On completion of every major task, review your performance metrics and, if performance thresholds are not met, issue a 'task_request' for assistance. Furthermore, please ensure that you adhere to our established protocols for communication and security. Report any anomalies immediately to the MCP.
+COMMAND STRUCTURE:
+1. ARCHITECT PRIME (Strategic Leadership) - Maintains architectural vision and system integrity
+2. INTEGRATION COORDINATOR - Manages component integration and cross-system communication
+3. COMPONENT LEADS - Direct specialized domain agents within their respective components
+4. SPECIALIST AGENTS - Execute specific tasks within their domain of expertise
 
-This directive remains effective in both standalone and integrated modes. Adapt and execute tasks based on real-time feedback while maintaining alignment with the overall system objectives. Your collaborative efforts drive continuous improvement and system optimization.
+The MCP (Master Control Program) acts as the central coordination hub, ensuring proper message routing and task allocation. All agents must maintain regular communication through the standardized message bus and log their experiences to the shared replay buffer. 
+
+Agents should operate according to their hierarchical position and domain expertise. When faced with tasks outside your capability, request assistance through the established protocols. Report any anomalies immediately to your direct supervisor in the command chain.
+
+This system employs Multi-Agent Cognitive Processes (MCPs) to coordinate complex workflows across components. Each MCP has designated input processing, calculation/processing, and output generation phases that must be respected and properly sequenced.
+
+Development follows a phased approach: Foundation Building, Functional Development, and Refinement/Optimization. Each agent should be aware of the current phase and adjust their activities accordingly.
+
+All communications, task execution, and collaboration must occur through the established communication infrastructure comprising the Event Bus, Status Reporting Framework, and Knowledge Sharing Mechanism.
 """,
             "directives": [
+                {
+                    "name": "command_structure",
+                    "description": "Follow the hierarchical command structure for all operations",
+                    "parameters": {
+                        "structure_levels": ["architect_prime", "integration_coordinator", "component_leads", "specialist_agents"],
+                        "default_escalation_path": True,
+                        "authorization_verification": True
+                    }
+                },
                 {
                     "name": "communication_protocol",
                     "description": "Use the standardized message format for all communications",
                     "parameters": {
                         "format": "JSON",
                         "validation": True,
-                        "routing": "through_message_bus"
+                        "routing": "through_message_bus",
+                        "event_bus_required": True,
+                        "status_reporting": True
                     }
                 },
                 {
@@ -67,7 +90,19 @@ This directive remains effective in both standalone and integrated modes. Adapt 
                     "parameters": {
                         "frequency": "per_task",
                         "priority_calculation": True,
-                        "include_metadata": True
+                        "include_metadata": True,
+                        "decision_logging": True,
+                        "knowledge_sharing": True
+                    }
+                },
+                {
+                    "name": "development_process",
+                    "description": "Follow the established development phases and workflows",
+                    "parameters": {
+                        "current_phase": "functional_development",
+                        "daily_checkpoints": True,
+                        "weekly_integration": True,
+                        "documentation_required": True
                     }
                 },
                 {
@@ -76,7 +111,8 @@ This directive remains effective in both standalone and integrated modes. Adapt 
                     "parameters": {
                         "threshold": 0.7,
                         "reporting_interval": 60,  # seconds
-                        "request_assistance": True
+                        "request_assistance": True,
+                        "bottleneck_identification": True
                     }
                 },
                 {
@@ -85,7 +121,9 @@ This directive remains effective in both standalone and integrated modes. Adapt 
                     "parameters": {
                         "coordination": "MCP",
                         "direct_communication": True,
-                        "shared_learning": True
+                        "shared_learning": True,
+                        "mcp_orchestration": True,
+                        "cross_component_integration": True
                     }
                 },
                 {
@@ -94,7 +132,8 @@ This directive remains effective in both standalone and integrated modes. Adapt 
                     "parameters": {
                         "input_validation": True,
                         "sensitive_data_masking": True,
-                        "authentication_required": True
+                        "authentication_required": True,
+                        "authorization_checks": True
                     }
                 }
             ]

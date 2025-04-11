@@ -150,6 +150,21 @@
       
       <div class="card mb-4">
         <div class="card-header">
+          <h5 class="mb-0">Agent Command Structure</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6>Hierarchical Command Structure</h6>
+            <p class="text-muted">Based on the Strategic Orchestration Guide for BCBS GeoAssessment System</p>
+          </div>
+          <div id="command-structure-diagram" class="mermaid">
+            {{ mermaid_diagram | safe }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="card mb-4">
+        <div class="card-header">
           <h5 class="mb-0">Agent Collaboration Network</h5>
         </div>
         <div class="card-body">
@@ -291,9 +306,89 @@
 
 {% block scripts %}
 {{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.3/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis'
+    }
+  });
+</script>
 <script>
   $(document).ready(function() {
     // Load experience statistics
+    // Function to load command structure info for a specific agent
+    function loadAgentCommandInfo(agentId) {
+      $.ajax({
+        url: '/mcp-army/api/command-structure',
+        method: 'GET',
+        success: function(data) {
+          let role = "Unknown";
+          let reports_to = "None";
+          let supervises = [];
+          
+          // Find role in command structure
+          if (data.command_structure.architect_prime === agentId) {
+            role = "Architect Prime";
+          } else if (data.command_structure.integration_coordinator === agentId) {
+            role = "Integration Coordinator";
+          } else {
+            // Check component leads
+            for (const [component, leadId] of Object.entries(data.command_structure.component_leads)) {
+              if (leadId === agentId) {
+                role = `Component Lead (${component})`;
+                break;
+              }
+            }
+            
+            // Check specialist agents
+            if (role === "Unknown") {
+              for (const [domain, agents] of Object.entries(data.command_structure.specialist_agents)) {
+                if (agents.includes(agentId)) {
+                  role = `Specialist Agent (${domain})`;
+                  break;
+                }
+              }
+            }
+          }
+          
+          // Get relationship info
+          if (data.agent_relationships[agentId]) {
+            const relationship = data.agent_relationships[agentId];
+            if (relationship.reports_to) {
+              reports_to = relationship.reports_to;
+            }
+            supervises = relationship.supervises || [];
+          }
+          
+          // Build HTML
+          let commandHtml = `
+            <div class="card mb-3">
+              <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Command Structure Role</h5>
+              </div>
+              <div class="card-body">
+                <p><strong>Role:</strong> ${role}</p>
+                <p><strong>Reports to:</strong> ${reports_to === "None" ? "None (Top Level)" : reports_to}</p>
+                <p><strong>Supervises:</strong> ${supervises.length === 0 ? "None" : supervises.join(", ")}</p>
+              </div>
+            </div>
+          `;
+          
+          $('#agent-command-info').html(commandHtml);
+        },
+        error: function(err) {
+          $('#agent-command-info').html('<p class="text-danger">Error loading command structure information</p>');
+          console.error('Error loading command info:', err);
+        }
+      });
+    }
+    
     function loadExperienceStats() {
       $.ajax({
         url: '/mcp-army/api/experiences/stats',
@@ -401,6 +496,10 @@
               </div>
             </div>
             
+            <div id="agent-command-info">
+              <p>Loading command structure information...</p>
+            </div>
+            
             <h5 class="mt-3">Capabilities</h5>
             <div id="agent-capabilities">
               <p>Loading capabilities...</p>
@@ -414,6 +513,9 @@
           
           $('#agentDetailsContent').html(html);
           $('#agentDetailsModal').modal('show');
+          
+          // Load command structure information for this agent
+          loadAgentCommandInfo(agentId);
           
           // In a full implementation, we would load capabilities and activities here
         },
