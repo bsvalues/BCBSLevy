@@ -35,24 +35,25 @@ class PropertyType(Enum):
 
 class ImportType(Enum):
     """Types of data imports."""
-    TAX_DISTRICT = auto()
-    TAX_CODE = auto()
-    PROPERTY = auto()
-    RATE = auto()
-    LEVY = auto()
-    OTHER = auto()
+    TAX_DISTRICT = "TAX_DISTRICT"
+    TAX_CODE = "TAX_CODE"
+    PROPERTY = "PROPERTY"
+    RATE = "RATE"
+    LEVY = "LEVY"
+    OTHER = "OTHER"
 
 
 class ExportType(Enum):
     """Types of data exports."""
-    TAX_DISTRICT = auto()
-    TAX_CODE = auto()
-    PROPERTY = auto()
-    RATE = auto()
-    LEVY = auto()
-    REPORT = auto()
-    ANALYSIS = auto()
-    OTHER = auto()
+    TAX_DISTRICT = "TAX_DISTRICT"
+    TAX_CODE = "TAX_CODE"
+    PROPERTY = "PROPERTY"
+    RATE = "RATE"
+    LEVY = "LEVY"
+    REPORT = "REPORT"
+    LEVY_REPORT = "LEVY_REPORT"
+    ANALYSIS = "ANALYSIS"
+    OTHER = "OTHER"
 
 
 class AuditMixin:
