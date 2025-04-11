@@ -6,25 +6,93 @@ with fuzzy matching and autocomplete capabilities.
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import List, Dict, Any, Optional
 
-from flask import Blueprint, request, jsonify, render_template, current_app, g
+from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import login_required, current_user
-from fuzzywuzzy import fuzz, process
 from sqlalchemy import or_, and_, func
 
-from app import db
-from models import (
-    User, TaxDistrict, TaxCode, Property, TaxCodeHistoricalRate, 
-    LevyRate, LevyScenario, Forecast
+from utils.search_utils import (
+    search_entities,
+    get_autocomplete_suggestions,
+    log_search_activity
 )
-from utils.search_utils import search_entities, autocomplete
 
+# Configure logger
 logger = logging.getLogger(__name__)
 
-# Create search blueprint
-search_bp = Blueprint('search', __name__)
+# Create blueprint
+search_bp = Blueprint('search', __name__, url_prefix='/search')
 
+@search_bp.route('/', methods=['GET'])
+@login_required
+def search_page():
+    """
+    Render the search page with optional pre-executed search.
+    
+    Query Parameters:
+        q: The search query text
+        types: Comma-separated list of entity types to search
+        year: Year filter for entities with year attribute
+    
+    Returns:
+        Rendered search page with any search results
+    """
+    query = request.args.get('q', '')
+    entity_types_param = request.args.get('types', '')
+    year_param = request.args.get('year')
+    
+    # Parse entity types from comma-separated string
+    entity_types = [t.strip() for t in entity_types_param.split(',')] if entity_types_param else None
+    
+    # Parse year parameter if present
+    year = None
+    if year_param:
+        try:
+            year = int(year_param)
+        except ValueError:
+            year = None
+    
+    # Get current year as default for year dropdown if none provided
+    if not year:
+        from datetime import datetime
+        year = datetime.now().year
+    
+    # Initialize results
+    results = {}
+    result_count = 0
+    
+    # Execute search if query is provided
+    if query:
+        results = search_entities(
+            query=query,
+            entity_types=entity_types,
+            year=year,
+            limit=5,
+            min_score=60
+        )
+        
+        # Calculate total result count
+        result_count = sum(len(results[entity_type]) for entity_type in results)
+        
+        # Log search activity for analytics
+        log_search_activity(
+            query=query,
+            entity_types=entity_types if entity_types else list(results.keys()),
+            result_count=result_count,
+            year=year
+        )
+    
+    return render_template(
+        'search/search.html',
+        query=query,
+        results=results,
+        result_count=result_count,
+        selected_types=entity_types,
+        year=year,
+        # Years for dropdown (last 10 years)
+        years=list(range(datetime.now().year, datetime.now().year - 10, -1))
+    )
 
 @search_bp.route('/api/search', methods=['GET'])
 @login_required
@@ -42,41 +110,59 @@ def api_search():
     Returns:
         JSON response with search results
     """
-    query_text = request.args.get('q', '')
-    entity_types = request.args.get('types', None)
-    year = request.args.get('year', None)
-    limit = request.args.get('limit', 10, type=int)
-    min_score = request.args.get('min_score', 60, type=int)
+    query = request.args.get('q', '')
+    entity_types_param = request.args.get('types', '')
+    year_param = request.args.get('year')
+    limit_param = request.args.get('limit', '5')
+    min_score_param = request.args.get('min_score', '60')
     
-    # Parse entity types if provided
-    if entity_types:
-        entity_types = entity_types.split(',')
+    # Parse parameters
+    entity_types = [t.strip() for t in entity_types_param.split(',')] if entity_types_param else None
     
-    # Convert year to int if provided
-    if year:
-        try:
-            year = int(year)
-        except (ValueError, TypeError):
-            year = None
+    # Parse numeric parameters with defaults
+    try:
+        year = int(year_param) if year_param else None
+        limit = int(limit_param)
+        min_score = int(min_score_param)
+    except ValueError:
+        year = None
+        limit = 5
+        min_score = 60
     
-    # Perform search
-    results = search_entities(
-        query_text=query_text,
-        entity_types=entity_types,
-        year=year,
-        limit=limit,
-        min_score=min_score
-    )
+    # Cap limit to prevent excessive queries
+    limit = min(limit, 20)
     
-    # For API responses, include metadata
-    response = {
-        'query': query_text,
-        'count': len(results),
-        'results': results
-    }
+    # Execute search
+    results = {}
+    result_count = 0
     
-    return jsonify(response)
-
+    if query:
+        results = search_entities(
+            query=query,
+            entity_types=entity_types,
+            year=year,
+            limit=limit,
+            min_score=min_score
+        )
+        
+        result_count = sum(len(results[entity_type]) for entity_type in results)
+        
+        # Log search activity
+        log_search_activity(
+            query=query,
+            entity_types=entity_types if entity_types else list(results.keys()),
+            result_count=result_count,
+            year=year
+        )
+    
+    # Return JSON response
+    return jsonify({
+        'query': query,
+        'results': results,
+        'result_count': result_count,
+        'entity_types': entity_types,
+        'year': year
+    })
 
 @search_bp.route('/api/autocomplete', methods=['GET'])
 @login_required
@@ -94,89 +180,41 @@ def api_autocomplete():
     Returns:
         JSON response with autocomplete suggestions
     """
-    query_prefix = request.args.get('q', '')
-    entity_type = request.args.get('type', 'tax_district')
-    field = request.args.get('field', None)
-    year = request.args.get('year', None)
-    limit = request.args.get('limit', 10, type=int)
+    prefix = request.args.get('q', '')
+    entity_type = request.args.get('type')
+    field = request.args.get('field')
+    year_param = request.args.get('year')
+    limit_param = request.args.get('limit', '10')
     
-    # Convert year to int if provided
-    if year:
-        try:
-            year = int(year)
-        except (ValueError, TypeError):
-            year = None
+    # Parse parameters with defaults
+    try:
+        year = int(year_param) if year_param else None
+        limit = int(limit_param)
+    except ValueError:
+        year = None
+        limit = 10
+    
+    # Cap limit to prevent excessive queries
+    limit = min(limit, 20)
     
     # Get autocomplete suggestions
-    suggestions = autocomplete(
-        query_prefix=query_prefix,
-        entity_type=entity_type,
-        field=field,
-        year=year,
-        limit=limit
-    )
+    suggestions = []
     
-    return jsonify(suggestions)
-
-
-@search_bp.route('/search', methods=['GET'])
-@login_required
-def search_page():
-    """
-    Render the search page with optional pre-executed search.
-    
-    Query Parameters:
-        q: The search query text
-        types: Comma-separated list of entity types to search
-        year: Year filter for entities with year attribute
-    
-    Returns:
-        Rendered search page with any search results
-    """
-    query_text = request.args.get('q', '')
-    entity_types = request.args.get('types', None)
-    year = request.args.get('year', None)
-    
-    # Parse entity types if provided
-    if entity_types:
-        entity_types = entity_types.split(',')
-    
-    # Convert year to int if provided
-    if year:
-        try:
-            year = int(year)
-        except (ValueError, TypeError):
-            year = None
-    
-    # Initial results for page load with query parameters
-    results = []
-    if query_text:
-        results = search_entities(
-            query_text=query_text,
-            entity_types=entity_types,
+    if prefix and entity_type:
+        suggestions = get_autocomplete_suggestions(
+            prefix=prefix,
+            entity_type=entity_type,
+            field=field,
             year=year,
-            limit=10,
-            min_score=60
+            limit=limit
         )
     
-    # Get available years for filtering
-    available_years = []
-    try:
-        # Query distinct years from TaxDistrict
-        year_query = db.session.query(TaxDistrict.year).distinct().order_by(TaxDistrict.year.desc())
-        available_years = [year[0] for year in year_query.all()]
-    except Exception as e:
-        logger.error(f"Error fetching available years: {str(e)}")
-    
-    return render_template(
-        'search/search.html',
-        query=query_text,
-        results=results,
-        selected_types=entity_types,
-        selected_year=year,
-        available_years=available_years
-    )
-
+    # Return JSON response
+    return jsonify({
+        'query': prefix,
+        'suggestions': suggestions,
+        'count': len(suggestions)
+    })
 
 def init_search_routes(app):
     """
@@ -186,4 +224,11 @@ def init_search_routes(app):
         app: Flask application instance
     """
     app.register_blueprint(search_bp)
+    
+    # Create templates directory if it doesn't exist
+    import os
+    search_template_dir = os.path.join(app.template_folder, 'search')
+    if not os.path.exists(search_template_dir):
+        os.makedirs(search_template_dir)
+    
     logger.info("Search routes initialized")

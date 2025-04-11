@@ -226,6 +226,7 @@ from routes_reports_new import init_report_routes
 from routes_levy_audit import levy_audit_bp, register_levy_audit_routes
 from routes_user_audit import user_audit_bp, register_user_audit_routes
 from routes_tax_strategy import tax_strategy_bp, register_tax_strategy_routes
+from routes_search import init_search_routes
 
 app.register_blueprint(data_management_bp)
 app.register_blueprint(forecasting_bp)
@@ -270,6 +271,10 @@ register_user_audit_routes(app)
 
 # Initialize tax strategy routes
 register_tax_strategy_routes(app)
+
+# Initialize search routes
+init_search_routes(app)
+app.logger.info("Search routes initialized")
 
 # Import models after db is defined to avoid circular imports
 with app.app_context():
