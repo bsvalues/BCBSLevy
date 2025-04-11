@@ -254,11 +254,7 @@ def configure_logging(app):
 # Create the Flask application instance
 app = create_app()
 
-# Root route with welcome page
-@app.route('/')
-def index():
-    """Render welcome page with stunning landing page design"""
-    return render_template('index.html')
+# Root route is now handled by home_bp
 
 
 # Register blueprints
@@ -278,6 +274,7 @@ from routes_advanced_mcp import advanced_mcp_bp
 from routes_examples import examples_bp
 from routes_budget_impact import budget_impact_bp
 from routes_reports_new import init_report_routes
+from routes_home import home_bp, init_home_routes
 from routes_levy_audit import levy_audit_bp, register_levy_audit_routes
 from routes_user_audit import user_audit_bp, register_user_audit_routes
 from routes_tax_strategy import tax_strategy_bp, register_tax_strategy_routes
@@ -334,6 +331,10 @@ register_tax_strategy_routes(app)
 # Initialize search routes
 init_search_routes(app)
 app.logger.info("Search routes initialized")
+
+# Initialize home routes
+init_home_routes(app)
+app.logger.info("Home routes initialized")
 
 # Import models after db is defined to avoid circular imports
 with app.app_context():

@@ -2,26 +2,16 @@
 WSGI module for the Levy Calculation Application.
 
 This module is used by the WSGI server (e.g., Gunicorn) to run the application.
+It uses the main Flask application instance from app.py which contains
+all the necessary route registrations and configuration.
 """
-from app2 import app
+from app import app
 
-# Configure all route modules
-from routes2 import home_bp
-from routes_data_management import data_management_bp
-from routes_historical_analysis import historical_analysis_bp
-from routes_forecasting import forecasting_bp
-from routes_glossary import glossary_bp
-from routes_public import public_bp
-from routes_reports import reports_bp
+# Import additional blueprints if needed
+# Note: Most blueprints are already registered in app.py
 
-# Register all blueprints
-app.register_blueprint(home_bp)
-app.register_blueprint(data_management_bp)
-app.register_blueprint(historical_analysis_bp)
-app.register_blueprint(forecasting_bp)
-app.register_blueprint(glossary_bp)
-app.register_blueprint(public_bp)
-app.register_blueprint(reports_bp)
+# Create a reference to the application for WSGI servers
+# This is standardized to use the main app.py application instance
 
 # WSGI app
 application = app
