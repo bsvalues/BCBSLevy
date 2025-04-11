@@ -1,0 +1,61 @@
+We need to enhance our CountyDataSync project's ETL process by upgrading the data export mechanism and implementing incremental updates. Please follow these steps:
+
+1. Upgrade Data Export Mechanism:
+
+Objective: Instead of exporting aggregated (Stats DB) and working (Working DB) data to CSV files, we want to write this data into SQLite databases for better performance and query capabilities.
+
+Steps:
+
+Modify the load functions in our ETL script to use Pandas’ to_sql() method.
+
+Create two new functions:
+
+create_and_load_stats_db(df_stats): This function should:
+
+Connect to (or create) an SQLite database file named stats_db.sqlite.
+
+Create a table named stats with appropriate columns (e.g., id, use_code, acres, assessed_value).
+
+Insert the DataFrame df_stats into this table using if_exists='replace'.
+
+create_and_load_working_db(df_working): This function should:
+
+Connect to (or create) an SQLite database file named working_db.sqlite.
+
+Create a table named working with relevant columns (e.g., id, owner, use_code).
+
+Insert the DataFrame df_working into this table.
+
+Update the main ETL workflow in sync.py to call these functions instead of exporting CSV files.
+
+Include logging to confirm that each export is successful.
+
+2. Implement Incremental Updates:
+
+Objective: Enhance the ETL process so that it only processes and updates records that have changed since the last run instead of performing a full refresh.
+
+Steps:
+
+Modify the extraction function to include a timestamp column (if not already present) and filter records based on a last updated timestamp.
+
+Add a mechanism to store the timestamp of the last successful sync. This can be done by writing to a file or a small dedicated table in the staging database.
+
+Update the extraction query to use this stored timestamp to fetch only records that have been modified after that time.
+
+Ensure the transformation and load steps handle incremental data appropriately—merging new records with existing data in the SQLite databases.
+
+Include appropriate logging to record the last sync timestamp and any records that were updated.
+
+3. Testing and Validation:
+
+Add unit tests to verify that both the new SQLite export functions work as expected.
+
+Create integration tests to simulate incremental updates by modifying the input DataFrame and verifying that only changed records are processed.
+
+4. Documentation:
+
+Update the README.md and any related documentation to describe the new SQLite export mechanism and incremental update process.
+
+Please produce updated code for these enhancements, including the new functions, modifications to the ETL process, and sample test cases for verification."
+
+"Would you also include comments in the code to explain each key section, so that future developers can understand the changes easily?"

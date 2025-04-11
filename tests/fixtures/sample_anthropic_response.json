@@ -1,0 +1,18 @@
+{
+  "id": "msg_sample123456789",
+  "type": "message",
+  "role": "assistant",
+  "model": "claude-3-5-sonnet-20240620",
+  "content": [
+    {
+      "type": "text",
+      "text": "Here is my analysis of the levy calculation for Benton County School District #123 for the year 2024:\n\n1. The total assessed property value in the district is $1,456,789,000.\n\n2. The base levy rate of 3.25 per $1,000 of assessed value is within the statutory maximum of 3.60.\n\n3. With the voter-approved enrichment levy of 1.50, the total levy rate is 4.75, which is compliant with state law given the voter approval.\n\n4. The calculated levy amount of $6,919,747.75 matches the manual calculation (total assessed value × total rate ÷ 1000).\n\n5. All applicable exemptions have been properly applied.\n\nThis levy calculation appears to be in full compliance with Washington state law."
+    }
+  ],
+  "usage": {
+    "input_tokens": 1562,
+    "output_tokens": 173
+  },
+  "stop_reason": "end_turn",
+  "stop_sequence": null
+}

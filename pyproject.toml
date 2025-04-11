@@ -36,4 +36,5 @@ dependencies = [
     "polartransform>=2.0.0",
     "fuzzywuzzy>=0.18.0",
     "python-levenshtein>=0.27.1",
+    "alembic>=1.15.2",
 ]
