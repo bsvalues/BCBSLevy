@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "simple_base.html" %}
 
 {% block title %}LevyMaster - Intelligent Property Tax Calculation System{% endblock %}
 
@@ -18,17 +18,48 @@
                     <p class="lead mb-4 fs-4 text-light">Benton County's Intelligent Property Tax Platform</p>
                     <p class="lead mb-5 text-light">Transform complex tax calculations into clear, actionable insights with AI-powered analytics</p>
                     
-                    <!-- Main action buttons -->
-                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-5">
+                    <!-- Main navigation buttons -->
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-3">
                         <a href="{{ url_for('levy_calculator.calculator') }}" class="btn btn-primary btn-lg px-4 rounded-pill">
                             <i class="bi bi-calculator me-2"></i>Calculate Levy
                         </a>
-                        <a href="{{ url_for('data_management.import_data') }}" class="btn btn-warning btn-lg px-4 rounded-pill">
-                            <i class="bi bi-database-add me-2"></i>Import Data
+                        <a href="{{ url_for('public.search') }}" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                            <i class="bi bi-search me-2"></i>Property Search
                         </a>
                         <a href="{{ url_for('dashboard.index') }}" class="btn btn-success btn-lg px-4 rounded-pill">
                             <i class="bi bi-speedometer2 me-2"></i>Dashboard
                         </a>
+                    </div>
+                    
+                    <!-- Full Navigation Panel -->
+                    <div class="bg-dark bg-opacity-50 rounded-4 p-4 mb-4 text-start">
+                        <h5 class="border-bottom border-light pb-2 mb-3 text-light">Quick Navigation</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h6 class="text-light mb-2"><i class="bi bi-database me-2"></i>Data Management</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="{{ url_for('data_management.import_data') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Import Data</a></li>
+                                    <li><a href="{{ url_for('data_management.export_data') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Export Data</a></li>
+                                    <li><a href="{{ url_for('db_fix.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Database Maintenance</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-light mb-2"><i class="bi bi-graph-up me-2"></i>Analysis</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="{{ url_for('historical_analysis.historical_analysis') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Historical Analysis</a></li>
+                                    <li><a href="{{ url_for('forecasting.forecast') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Forecasting</a></li>
+                                    <li><a href="{{ url_for('budget_impact.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Budget Impact</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-light mb-2"><i class="bi bi-clipboard-data me-2"></i>Reports</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="{{ url_for('reports.reports_dashboard') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Reports Dashboard</a></li>
+                                    <li><a href="{{ url_for('levy_audit.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Levy Audit</a></li>
+                                    <li><a href="{{ url_for('mcp.insights') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> AI Insights</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

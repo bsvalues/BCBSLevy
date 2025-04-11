@@ -41,6 +41,15 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     
+    # Auto-login for Benton County staff - bypassing login form completely
+    admin_user = User.query.filter_by(is_admin=True).first()
+    if admin_user:
+        login_user(admin_user, remember=True)
+        logger.info(f"Auto-login for staff: {admin_user.username} (admin: {admin_user.is_admin})")
+        flash(f'Welcome to LevyMaster, {admin_user.first_name or admin_user.username}!', 'success')
+        return redirect(url_for('index'))
+    
+    # Regular login functionality (fallback if auto-login fails)
     if request.method == 'POST':
         username_or_email = request.form.get('username_or_email')
         password = request.form.get('password')
