@@ -73,6 +73,46 @@
     border-radius: 8px;
     margin-top: 20px;
   }
+  
+  /* Notification system styles */
+  .notification-card {
+    border-left: 4px solid #007bff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    margin-bottom: 10px;
+  }
+  
+  .notification-card:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  .notification-card .badge.bg-success {
+    background-color: #28a745 !important;
+  }
+  
+  .notification-card .badge.bg-info {
+    background-color: #17a2b8 !important;
+  }
+  
+  .notification-card .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+  }
+  
+  .notification-card .badge.bg-primary {
+    background-color: #007bff !important;
+  }
+  
+  .notification-card .badge.bg-secondary {
+    background-color: #6c757d !important;
+  }
+  
+  /* Activity feed scrollable area */
+  #activity-feed {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
 </style>
 {% endblock %}
 
@@ -174,6 +214,53 @@
     </div>
     
     <div class="col-md-4">
+      <div class="card metrics-card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Activity Notifications</h5>
+        </div>
+        <div class="card-body">
+          <div id="activity-feed" class="mb-3">
+            <div class="card notification-card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="badge bg-success">Initialization</span>
+                  <small class="text-muted">just now</small>
+                </div>
+                <p class="mb-0 mt-1">MCP Army system initialized with hierarchical command structure</p>
+              </div>
+            </div>
+            <div class="card notification-card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="badge bg-info">Registration</span>
+                  <small class="text-muted">1 min ago</small>
+                </div>
+                <p class="mb-0 mt-1">Architect Prime agent (workflow_coordinator) registered</p>
+              </div>
+            </div>
+            <div class="card notification-card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="badge bg-info">Registration</span>
+                  <small class="text-muted">1 min ago</small>
+                </div>
+                <p class="mb-0 mt-1">Integration Coordinator agent (MCP) registered</p>
+              </div>
+            </div>
+            <div class="card notification-card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="badge bg-warning">Broadcast</span>
+                  <small class="text-muted">2 mins ago</small>
+                </div>
+                <p class="mb-0 mt-1">Master prompt broadcast to all agents</p>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-outline-primary w-100" id="clear-notifications-btn">Clear All Notifications</button>
+        </div>
+      </div>
+      
       <div class="card metrics-card mb-4">
         <div class="card-header">
           <h5 class="mb-0">Experience Replay</h5>
@@ -541,6 +628,23 @@
           assistance_type: 'performance_improvement'
         }),
         success: function(data) {
+          // Add notification to activity feed
+          const notification = `
+            <div class="card notification-card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="badge bg-warning">Assistance</span>
+                  <small class="text-muted">just now</small>
+                </div>
+                <p class="mb-0 mt-1">Agent "${agentId}" requested assistance from "${helperAgent}"</p>
+                <small class="text-muted">Task ID: ${data.task_id}</small>
+              </div>
+            </div>
+          `;
+          
+          $('#activity-feed').prepend(notification);
+          $('#clear-notifications-btn').prop('disabled', false);
+          
           alert(`Help requested for ${agentId}. Task ID: ${data.task_id}`);
         },
         error: function(err) {
@@ -548,6 +652,29 @@
           console.error('Error requesting help:', err);
         }
       });
+    });
+    
+    // Clear notifications
+    $('#clear-notifications-btn').click(function() {
+      $('#activity-feed').html('<p class="text-center text-muted">No notifications</p>');
+      $(this).prop('disabled', true);
+      
+      // Add a sample notification about clearing
+      setTimeout(() => {
+        const notification = `
+          <div class="card notification-card mb-2">
+            <div class="card-body p-2">
+              <div class="d-flex justify-content-between align-items-start">
+                <span class="badge bg-secondary">System</span>
+                <small class="text-muted">just now</small>
+              </div>
+              <p class="mb-0 mt-1">Notifications cleared by user</p>
+            </div>
+          </div>
+        `;
+        $('#activity-feed').html(notification);
+        $(this).prop('disabled', false);
+      }, 500);
     });
     
     // Start training cycle
@@ -560,6 +687,23 @@
         contentType: 'application/json',
         data: JSON.stringify({ batch_size: 32 }),
         success: function(data) {
+          // Add notification to activity feed for training
+          const notification = `
+            <div class="card notification-card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="badge bg-success">Training</span>
+                  <small class="text-muted">just now</small>
+                </div>
+                <p class="mb-0 mt-1">Training cycle completed successfully</p>
+                <small class="text-muted">Batch size: ${data.batch_size || 32}, Trained examples: ${data.processed_examples || 'N/A'}</small>
+              </div>
+            </div>
+          `;
+          
+          $('#activity-feed').prepend(notification);
+          $('#clear-notifications-btn').prop('disabled', false);
+          
           alert('Training cycle started successfully');
           loadExperienceStats();
           loadRecentExperiences();
@@ -622,6 +766,24 @@
         }),
         success: function(data) {
           $('#workflowModal').modal('hide');
+          
+          // Add the notification to the activity feed
+          const notification = `
+            <div class="card notification-card mb-2">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <span class="badge bg-primary">Workflow</span>
+                  <small class="text-muted">just now</small>
+                </div>
+                <p class="mb-0 mt-1">Started workflow "${workflowName.replace(/_/g, ' ')}" for Tax District ID: ${taxDistrictId}</p>
+                <small class="text-muted">Task ID: ${data.task_id || 'N/A'}</small>
+              </div>
+            </div>
+          `;
+          
+          $('#activity-feed').prepend(notification);
+          $('#clear-notifications-btn').prop('disabled', false);
+          
           alert(`Workflow execution started. Task ID: ${data.task_id || 'N/A'}`);
         },
         error: function(err) {
