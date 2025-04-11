@@ -744,10 +744,23 @@
           $('#activity-feed').prepend(notification);
           $('#clear-notifications-btn').prop('disabled', false);
           
-          alert(`Help requested for ${agentId}. Task ID: ${data.task_id}`);
+          // Show toast notification instead of alert
+          showToast(
+            'Help Requested', 
+            `Agent ${agentId} requested assistance from ${helperAgent}`,
+            'warning'
+          );
         },
         error: function(err) {
-          alert('Error requesting help: ' + err.responseJSON?.error || 'Unknown error');
+          const errorMessage = err.responseJSON?.error || 'Unknown error';
+          // Show error toast notification
+          showToast(
+            'Help Request Failed', 
+            `Error requesting help: ${errorMessage}`,
+            'error',
+            true,
+            8000
+          );
           console.error('Error requesting help:', err);
         }
       });
@@ -757,6 +770,15 @@
     $('#clear-notifications-btn').click(function() {
       $('#activity-feed').html('<p class="text-center text-muted">No notifications</p>');
       $(this).prop('disabled', true);
+      
+      // Show toast notification
+      showToast(
+        'Notifications Cleared', 
+        'All notifications have been cleared from the activity feed',
+        'secondary',
+        true,
+        3000
+      );
       
       // Add a sample notification about clearing
       setTimeout(() => {
@@ -803,12 +825,25 @@
           $('#activity-feed').prepend(notification);
           $('#clear-notifications-btn').prop('disabled', false);
           
-          alert('Training cycle started successfully');
+          // Show toast notification instead of alert
+          showToast(
+            'Training Complete', 
+            `Trained ${data.processed_examples || 'N/A'} examples successfully`,
+            'info'
+          );
           loadExperienceStats();
           loadRecentExperiences();
         },
         error: function(err) {
-          alert('Error starting training: ' + err.responseJSON?.error || 'Unknown error');
+          const errorMessage = err.responseJSON?.error || 'Unknown error';
+          // Show error toast notification
+          showToast(
+            'Training Error', 
+            `Error starting training cycle: ${errorMessage}`,
+            'error',
+            true,
+            8000
+          );
           console.error('Error starting training:', err);
         },
         complete: function() {
@@ -834,7 +869,7 @@
       const additionalParams = $('#additionalParams').val();
       
       if (!taxDistrictId) {
-        alert('Please select a tax district');
+        showToast('Form Error', 'Please select a tax district', 'warning');
         return;
       }
       
@@ -849,7 +884,7 @@
           const extraParams = JSON.parse(additionalParams);
           Object.assign(params, extraParams);
         } catch (e) {
-          alert('Invalid JSON in additional parameters');
+          showToast('JSON Error', 'Invalid JSON in additional parameters', 'error', true);
           return;
         }
       }
@@ -889,8 +924,6 @@
           
           $('#activity-feed').prepend(notification);
           $('#clear-notifications-btn').prop('disabled', false);
-          
-          alert(`Workflow execution started. Task ID: ${data.task_id || 'N/A'}`);
         },
         error: function(err) {
           const errorMessage = err.responseJSON?.error || 'Unknown error';
