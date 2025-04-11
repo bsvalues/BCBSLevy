@@ -10,7 +10,10 @@ from typing import Dict, Any, List
 
 from flask import Blueprint, render_template, request, jsonify, current_app
 
-from utils.mcp_army_init import get_agent_manager, get_collaboration_manager, init_mcp_army
+from utils.mcp_army_init import (
+    get_agent_manager, get_collaboration_manager, 
+    get_master_prompt_manager_instance, init_mcp_army
+)
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -160,6 +163,72 @@ def initialize_mcp_army():
             return jsonify({"error": "Initialization failed"}), 500
     except Exception as e:
         logger.error(f"Error initializing MCP Army system: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@mcp_army_bp.route('/api/master-prompt')
+def get_master_prompt():
+    """API endpoint to get the current master prompt."""
+    try:
+        master_prompt_manager = get_master_prompt_manager_instance()
+        if not master_prompt_manager:
+            return jsonify({"error": "Master Prompt Manager not initialized"}), 503
+        
+        prompt = master_prompt_manager.get_current_prompt()
+        return jsonify(prompt)
+    except Exception as e:
+        logger.error(f"Error getting master prompt: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@mcp_army_bp.route('/api/master-prompt/directives/<directive_name>')
+def get_master_prompt_directive(directive_name):
+    """API endpoint to get a specific directive from the master prompt."""
+    try:
+        master_prompt_manager = get_master_prompt_manager_instance()
+        if not master_prompt_manager:
+            return jsonify({"error": "Master Prompt Manager not initialized"}), 503
+        
+        directive = master_prompt_manager.get_directive(directive_name)
+        if not directive:
+            return jsonify({"error": f"Directive {directive_name} not found"}), 404
+            
+        return jsonify(directive)
+    except Exception as e:
+        logger.error(f"Error getting directive {directive_name}: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@mcp_army_bp.route('/api/master-prompt', methods=['PUT'])
+def update_master_prompt():
+    """API endpoint to update the master prompt."""
+    try:
+        master_prompt_manager = get_master_prompt_manager_instance()
+        if not master_prompt_manager:
+            return jsonify({"error": "Master Prompt Manager not initialized"}), 503
+        
+        new_prompt = request.json
+        if not new_prompt:
+            return jsonify({"error": "No prompt data provided"}), 400
+            
+        success = master_prompt_manager.update_prompt(new_prompt)
+        if not success:
+            return jsonify({"error": "Failed to update master prompt"}), 500
+            
+        return jsonify({"status": "updated", "version": new_prompt.get("version", "unknown")})
+    except Exception as e:
+        logger.error(f"Error updating master prompt: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@mcp_army_bp.route('/api/master-prompt/broadcast', methods=['POST'])
+def broadcast_master_prompt():
+    """API endpoint to manually broadcast the master prompt to all agents."""
+    try:
+        master_prompt_manager = get_master_prompt_manager_instance()
+        if not master_prompt_manager:
+            return jsonify({"error": "Master Prompt Manager not initialized"}), 503
+            
+        master_prompt_manager.broadcast_prompt()
+        return jsonify({"status": "broadcast_completed"})
+    except Exception as e:
+        logger.error(f"Error broadcasting master prompt: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 @mcp_army_bp.route('/api/workflows/collaborative', methods=['POST'])

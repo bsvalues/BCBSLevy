@@ -12,6 +12,7 @@ from flask import Flask
 
 from utils.mcp_agent_manager import AgentManager
 from utils.mcp_experience import MCPCollaborationManager
+from utils.mcp_master_prompt import MasterPromptManager, get_master_prompt_manager
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 # Global instances
 agent_manager = None
 collaboration_manager = None
+master_prompt_manager = None
 
 def init_mcp_army(app: Optional[Flask] = None) -> bool:
     """
@@ -30,11 +32,14 @@ def init_mcp_army(app: Optional[Flask] = None) -> bool:
     Returns:
         True if initialization was successful, False otherwise
     """
-    global agent_manager, collaboration_manager
+    global agent_manager, collaboration_manager, master_prompt_manager
     
     logger.info("Initializing MCP Army system")
     
     try:
+        # Initialize master prompt manager
+        master_prompt_manager = get_master_prompt_manager()
+        
         # Initialize collaboration manager
         collaboration_manager = MCPCollaborationManager()
         
@@ -50,11 +55,19 @@ def init_mcp_army(app: Optional[Flask] = None) -> bool:
         # Start agent monitoring
         agent_manager.start_monitoring(interval=60.0)
         
+        # Register agents with master prompt manager
+        for agent in agent_manager.list_agents():
+            master_prompt_manager.register_agent(agent['id'])
+        
+        # Start periodic master prompt reaffirmation
+        master_prompt_manager.start_periodic_reaffirmation(interval=3600.0)  # 1 hour
+        
         # Register with Flask app if provided
         if app:
             app.config['MCP_ARMY_INITIALIZED'] = True
             app.config['MCP_ARMY_AGENT_MANAGER'] = agent_manager
             app.config['MCP_ARMY_COLLABORATION_MANAGER'] = collaboration_manager
+            app.config['MCP_ARMY_MASTER_PROMPT_MANAGER'] = master_prompt_manager
         
         logger.info("MCP Army system initialized successfully")
         return True
@@ -85,3 +98,13 @@ def get_collaboration_manager() -> Optional[MCPCollaborationManager]:
     """
     global collaboration_manager
     return collaboration_manager
+
+def get_master_prompt_manager_instance() -> Optional[MasterPromptManager]:
+    """
+    Get the global MasterPromptManager instance.
+    
+    Returns:
+        The global MasterPromptManager instance or None if not initialized
+    """
+    global master_prompt_manager
+    return master_prompt_manager

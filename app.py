@@ -370,9 +370,19 @@ with app.app_context():
     # Initialize MCP Army system with dedicated error handling
     try:
         if api_status['status'] == 'valid':
+            # Import here to avoid circular imports
+            from routes_mcp_army import register_mcp_army_routes
+            
+            # Initialize MCP Army system
             mcp_army_initialized = init_mcp_army(app)
-            if mcp_army_initialized:
-                app.logger.info("MCP Army system initialized successfully")
+            
+            # Register MCP Army routes
+            routes_registered = register_mcp_army_routes(app)
+            
+            if mcp_army_initialized and routes_registered:
+                app.logger.info("MCP Army system initialized and routes registered successfully")
+            elif mcp_army_initialized:
+                app.logger.warning("MCP Army system initialized but routes registration failed")
             else:
                 app.logger.warning("MCP Army system initialization failed")
         else:
