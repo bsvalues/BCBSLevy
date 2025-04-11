@@ -210,6 +210,21 @@ def register_template_filters(app):
     def add_tooltips(value):
         """Add tooltip highlighting to text."""
         return f'<span class="tooltip-text" data-toggle="tooltip" title="{value}">{value}</span>'
+        
+    @app.template_filter('datetime')
+    def format_datetime(value):
+        """Format a datetime value."""
+        if value is None:
+            return ""
+        if isinstance(value, str):
+            try:
+                value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                try:
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
+                except ValueError:
+                    return value
+        return value.strftime("%m/%d/%Y %H:%M")
 
 
 def configure_logging(app):
