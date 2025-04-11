@@ -25,10 +25,32 @@ class ClaudeService:
     
     def __init__(self, api_key: str = None):
         """
-        Initialize the Claude service.
+        Initialize the Claude service with API validation and client configuration.
+        
+        This constructor creates a new ClaudeService instance, configuring it with
+        the provided API key or retrieving one from environment variables. It performs
+        validation on the API key to ensure it meets basic formatting requirements and
+        initializes the Anthropic client with appropriate configuration.
+        
+        The service is designed to provide high-level access to Claude's capabilities
+        while managing common concerns like:
+        - API key validation and management
+        - Error handling and retries
+        - Response formatting and sanitization
+        - API usage tracking and logging
+        
+        All API interactions through this service are automatically tracked and logged
+        through the @track_anthropic_api_call decorator, enabling comprehensive
+        monitoring of API usage patterns, error rates, and performance metrics.
         
         Args:
-            api_key: The Anthropic API key. If not provided, will try to get from environment.
+            api_key: The Anthropic API key used to authenticate API requests.
+                    If not provided, the service will attempt to retrieve the key
+                    from the ANTHROPIC_API_KEY environment variable.
+                    
+        Raises:
+            ValueError: If no API key is provided and none is found in the environment,
+                       or if the provided API key fails basic validation checks.
         """
         self.api_key = api_key or os.environ.get('ANTHROPIC_API_KEY')
         if not self.api_key:
@@ -50,18 +72,49 @@ class ClaudeService:
              max_retries: int = 3,
              retry_delay: float = 1.0) -> Dict[str, Any]:
         """
-        Send a chat request to the Claude API with automatic retries.
+        Send a chat request to the Claude API with comprehensive error handling and automatic retries.
+        
+        This method provides a robust interface for interacting with the Claude API,
+        implementing advanced error handling strategies including:
+        - Automatic retry with exponential backoff for transient errors
+        - Differentiated handling of retriable vs. non-retriable errors
+        - Special handling for credit balance and quota exceeded errors
+        - Detailed logging of all API interactions and error conditions
+        - Performance tracking with timing measurements
+        
+        The method also manages the API tracking system by recording:
+        - Request parameters and endpoint information
+        - Success/failure status and response metadata
+        - Performance metrics including latency and retry counts
+        - Detailed error information when failures occur
         
         Args:
-            messages: List of message dictionaries with 'role' and 'content'
-            system_prompt: System instructions for Claude
-            max_tokens: Maximum tokens to generate
-            temperature: Sampling temperature (0-1)
-            max_retries: Maximum number of retry attempts on temporary errors
-            retry_delay: Delay between retries in seconds (exponential backoff applied)
+            messages: List of message dictionaries, each containing 'role' (either 'user'
+                    or 'assistant') and 'content' (the message text). This forms the
+                    conversation history that Claude will use for context.
+            system_prompt: Optional system instructions that guide Claude's behavior
+                          and response style without being part of the visible conversation.
+            max_tokens: Maximum number of tokens that Claude should generate in its
+                       response. Higher values allow longer responses but consume
+                       more API credits.
+            temperature: Controls the randomness of Claude's responses, from 0.0 (most
+                        deterministic) to 1.0 (most creative). Lower values are recommended
+                        for factual applications, higher for creative ones.
+            max_retries: Maximum number of retry attempts on temporary errors such as
+                        network timeouts or server errors. Does not retry on permanent
+                        errors like invalid API keys or credit issues.
+            retry_delay: Initial delay in seconds before the first retry. Each subsequent
+                        retry uses exponential backoff (delay * 2^attempt).
             
         Returns:
-            The response from Claude API
+            The complete response object from Claude API containing:
+            - Generated content (text or other requested formats)
+            - Model information and response metadata
+            - Usage statistics including token counts
+            
+        Raises:
+            Exception: After all retries are exhausted or on non-retriable errors.
+                     The original exception from the API is propagated.
         """
         attempt = 0
         last_error = None
@@ -166,15 +219,41 @@ class ClaudeService:
     @track_anthropic_api_call
     def generate_text(self, prompt: str, max_tokens: int = 1000, temperature: float = 0.7) -> str:
         """
-        Generate text using the Claude API.
+        Generate text using the Claude API with comprehensive error handling and JSON response formatting.
+        
+        This is a high-level convenience method that simplifies interaction with the Claude API
+        by handling all the complexity of:
+        - Constructing a proper message structure expected by the Claude API
+        - Converting single-string prompts into proper chat format
+        - Extracting the text content from Claude's structured response
+        - Providing consistent error handling with formatted JSON error responses
+        - Categorizing and formatting different types of errors (credit, API, general)
+        
+        The method is designed to gracefully degrade rather than fail completely when
+        errors occur, returning JSON-formatted error messages that can be safely parsed
+        by client code. This approach allows the application to maintain stability and
+        provide useful feedback even when the underlying AI service encounters issues.
+        
+        All API interactions through this method are automatically tracked through
+        the @track_anthropic_api_call decorator for comprehensive monitoring and analytics.
         
         Args:
-            prompt: The prompt to send to Claude
-            max_tokens: Maximum tokens to generate
-            temperature: Sampling temperature (0-1)
+            prompt: The single text prompt to send to Claude. This will be wrapped
+                  in a proper message structure with the 'user' role.
+            max_tokens: Maximum number of tokens that Claude should generate in its
+                       response. Higher values allow longer responses but consume
+                       more API credits.
+            temperature: Controls the randomness of Claude's responses, from 0.0 (most
+                        deterministic) to 1.0 (most creative). Lower values are recommended
+                        for factual applications, higher for creative ones.
             
         Returns:
-            Generated text response
+            For successful requests: The generated text content from Claude's response.
+            For failed requests: A JSON-formatted string containing error information:
+            {
+                "error": "API_CREDIT_ISSUE"|"API_ERROR"|"GENERATION_ERROR",
+                "message": "Human-readable error description"
+            }
         """
         try:
             messages = [{"role": "user", "content": prompt}]
@@ -212,13 +291,40 @@ class ClaudeService:
     @track_anthropic_api_call
     def analyze_property_data(self, property_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Analyze property data using Claude to generate insights.
+        Analyze property assessment data using Claude to generate structured insights with XSS protection.
+        
+        This method applies AI analysis to property assessment records to identify patterns,
+        anomalies, and actionable recommendations for tax assessment strategies. It employs
+        several key mechanisms to ensure reliable and secure results:
+        
+        1. Data limiting to prevent token limit issues with large datasets (samples first 20 records)
+        2. Structured JSON prompt with explicit response format requirements
+        3. JSON response parsing with comprehensive error handling
+        4. HTML sanitization to prevent XSS attacks in web display contexts
+        5. Graceful degradation with empty arrays for failed analysis
+        
+        This approach enables sophisticated AI-powered insights for property assessment
+        data while maintaining application stability and security, even when dealing with
+        potentially untrusted or malformed data or API disruptions.
         
         Args:
-            property_data: List of property dictionaries
+            property_data: List of property assessment dictionaries containing information
+                         about individual properties, their assessed values, locations,
+                         tax classifications, and other relevant assessment metadata.
             
         Returns:
-            Dictionary containing analysis results with sanitized content
+            Dictionary containing analysis results with sanitized content:
+            {
+                "summary": String overview of the property data characteristics,
+                "patterns": List of identified patterns in the assessment data,
+                "anomalies": List of potential outliers or unusual assessments,
+                "recommendations": List of suggested tax assessment strategies
+            }
+            
+            Or error information if analysis fails:
+            {
+                "error": String description of the error that occurred
+            }
         """
         if not property_data:
             return {"error": "No property data provided"}
@@ -271,14 +377,45 @@ class ClaudeService:
                               tax_code_data: List[Dict[str, Any]], 
                               historical_data: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
-        Generate insights about levy rates and property taxes using Claude.
+        Generate comprehensive insights about tax levy rates and trends using Claude AI with XSS protection.
+        
+        This method leverages AI analysis to compare current and historical tax data,
+        identifying meaningful patterns, anomalies, and potential policy implications.
+        It employs several sophisticated mechanisms to ensure robust and secure operation:
+        
+        1. Data sampling to prevent token limit issues (using first 10 records from each dataset)
+        2. Structured JSON prompt with explicit formatting instructions
+        3. Multi-category insight generation (trends, anomalies, recommendations, impacts)
+        4. JSON response validation with error recovery
+        5. Content sanitization to prevent XSS vulnerabilities
+        
+        The insights generated by this method are particularly valuable for:
+        - Tax administrators evaluating rate effectiveness and compliance
+        - Policy makers considering changes to levy structures
+        - Property owners understanding tax burden trends
+        - Researchers analyzing long-term fiscal patterns
         
         Args:
-            tax_code_data: Current tax code data
-            historical_data: Historical tax data for comparison
+            tax_code_data: List of dictionaries containing current tax code information
+                         including district identifiers, rate information, property
+                         categories, and other tax classification metadata.
+            historical_data: List of dictionaries containing historical tax rate data
+                           over multiple assessment periods, enabling identification
+                           of trends and anomalies over time.
             
         Returns:
-            Dictionary containing sanitized insights
+            Dictionary containing sanitized insights in structured format:
+            {
+                "trends": List of identified patterns in levy rates over time,
+                "anomalies": List of unusual data points or outliers,
+                "recommendations": List of suggested policy actions,
+                "impacts": List of potential effects on property owners
+            }
+            
+            Or error information if analysis fails:
+            {
+                "error": String description of the error that occurred
+            }
         """
         if not tax_code_data:
             return {"error": "No tax code data provided"}
@@ -337,17 +474,40 @@ claude_service = None
 
 def check_api_key_status(max_retries: int = 2, retry_delay: float = 0.5) -> Dict[str, str]:
     """
-    Check the status of the Anthropic API key with retry capability.
+    Check the status of the Anthropic API key with comprehensive validation and retry capability.
+    
+    This function performs a multi-stage validation process for the Anthropic API key:
+    1. Checks if the key exists in the environment variables
+    2. Validates the key format (must start with 'sk-ant-')
+    3. Performs a minimal API test to verify the key works and has credits
+    4. Implements retry logic with exponential backoff for transient errors
+    
+    The validation approach is designed to differentiate between different types
+    of key issues (missing, invalid format, authentication failure, credit depletion)
+    to provide specific guidance for resolution. This allows the application to
+    respond appropriately to each condition with targeted error messages and
+    recovery strategies.
+    
+    All validation attempts are logged and tracked through the API tracking system,
+    enabling monitoring of validation patterns, failure rates, and potential
+    API access issues across the application.
     
     Args:
         max_retries: Maximum number of retry attempts for temporary errors
-        retry_delay: Initial delay between retries in seconds (exponential backoff applied)
+                   such as network timeouts or server errors. Does not retry
+                   permanent errors like invalid key format.
+        retry_delay: Initial delay in seconds before the first retry. Each
+                    subsequent retry uses exponential backoff (delay * 2^attempt).
     
     Returns:
         Dictionary with status information:
         {
-            'status': 'missing'|'invalid'|'valid'|'no_credits',
-            'message': 'Description of the status'
+            'status': One of: 
+                     - 'missing': No API key found in environment variables
+                     - 'invalid': API key has invalid format or authentication fails
+                     - 'valid': API key is valid and has available credits
+                     - 'no_credits': API key is valid but has insufficient credits
+            'message': Human-readable description of the status with details
         }
     """
     # Create API call record
@@ -500,10 +660,37 @@ def check_api_key_status(max_retries: int = 2, retry_delay: float = 0.5) -> Dict
 
 def get_claude_service() -> Optional[ClaudeService]:
     """
-    Get or create the Claude service singleton.
+    Get or create the Claude service singleton with comprehensive error handling.
+    
+    This function implements the singleton pattern for the ClaudeService, ensuring
+    that only one instance exists throughout the application lifetime. It provides
+    a centralized access point for Claude API capabilities with robust error handling
+    and validation.
+    
+    The function follows these steps:
+    1. Check if a service instance already exists and return it if available
+    2. Verify API key status through check_api_key_status()
+    3. Create a new service instance if the key is valid
+    4. Handle various error conditions gracefully, returning None when the service is unavailable
+    
+    This approach ensures that client code can safely call this function without
+    needing complex error handling, as it will either return a valid service instance
+    or None, never raising an exception. This is particularly important for maintaining
+    application stability when the underlying AI service might be unavailable.
+    
+    Example:
+        service = get_claude_service()
+        if service:
+            result = service.generate_text("Analyze this tax data...")
+        else:
+            # Handle unavailable service case
     
     Returns:
-        ClaudeService instance or None if initialization fails
+        ClaudeService instance if initialization succeeds, or None if:
+        - The API key is missing or invalid
+        - The API service is unavailable
+        - The account has insufficient credits
+        - Any other initialization error occurs
     """
     global claude_service
     

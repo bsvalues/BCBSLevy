@@ -41,17 +41,43 @@ class MCPFunction:
         return_schema: JSONSchemaType = None
     ):
         """
-        Initialize an MCP function.
+        Initialize an MCP function with metadata and implementation.
+        
+        This constructor creates a new function instance within the MCP framework,
+        encapsulating the underlying Python function with additional metadata,
+        validation capabilities, and a standardized invocation interface.
+        
+        The function wrapper provides several benefits over direct function calls:
+        - Consistent parameter validation using JSON Schema
+        - Standardized error handling and logging
+        - Function discoverability through metadata
+        - Integration with the MCP registry and workflow systems
+        - Abstraction from the underlying implementation details
+        
+        Each function should have a unique name within the registry to avoid conflicts.
+        The description should clearly explain the function's purpose and behavior to
+        assist users in understanding when and how to use it.
         
         Args:
-            name: Unique function identifier
-            description: Human-readable function description
-            func: The actual function implementation
-            parameter_schema: JSON Schema describing valid parameters
-            return_schema: JSON Schema describing the expected return value
+            name: Unique identifier for the function within the MCP registry.
+                 Should be descriptive of the function's purpose and follow
+                 consistent naming conventions (e.g., verb_noun format).
+            description: Human-readable description of what the function does,
+                        its purpose, and any significant behavior details. This
+                        will be exposed in documentation and UIs.
+            func: The actual Python function implementation that will be invoked
+                 when this MCP function is executed. Must be a callable that accepts
+                 the parameters defined in the parameter schema.
+            parameter_schema: JSON Schema defining the valid parameters for this
+                             function, including types, constraints, and required fields.
+                             Used for validation and documentation generation.
+            return_schema: JSON Schema describing the expected return value structure
+                          and types. Used primarily for documentation and client-side
+                          validation expectations.
             
         Raises:
-            ValueError: If name is empty or function is None
+            ValueError: If name is empty or blank
+            ValueError: If function implementation is None
         """
         if not name:
             raise ValueError("Function name cannot be empty")
@@ -68,11 +94,26 @@ class MCPFunction:
         """
         Execute the function with the given parameters.
         
+        This method is the core execution mechanism for MCP functions. It handles:
+        1. Parameter normalization (providing empty dict for None)
+        2. Function invocation with the appropriate parameters
+        3. Error handling and propagation
+        
+        The execution process unpacks the parameters dictionary and passes them as
+        keyword arguments to the underlying function. This allows for a consistent
+        interface while supporting functions with different parameter signatures.
+        
         Args:
-            parameters: Function parameters
+            parameters: Dictionary of parameter names and values to pass to the function.
+                       If None, an empty dictionary will be used.
             
         Returns:
-            Function result
+            The result of the function execution, which could be any valid Python object
+            depending on the function's implementation.
+            
+        Raises:
+            TypeError: If the parameters don't match the function's signature
+            Exception: Any exception raised by the underlying function
         """
         parameters = parameters or {}
         try:
@@ -84,10 +125,26 @@ class MCPFunction:
     
     def to_dict(self) -> Dict[str, Any]:
         """
-        Convert the function to a dictionary representation.
+        Convert the function to a serializable dictionary representation.
+        
+        This method creates a standardized metadata dictionary that describes the function,
+        suitable for API responses, UI rendering, documentation generation, and integration
+        with external systems like LLMs. The dictionary includes the essential information
+        needed to understand and invoke the function.
+        
+        The resulting dictionary contains:
+        - name: The unique identifier for the function
+        - description: Human-readable description of the function's purpose
+        - parameters: JSON Schema describing the valid parameters (if provided)
+        
+        This serialized representation is particularly useful for:
+        - Generating API documentation
+        - Building dynamic UI controls for function execution
+        - Providing function definitions to LLMs for function calling
+        - Displaying available functions in management interfaces
         
         Returns:
-            Dictionary with function metadata
+            Dictionary with standardized function metadata that can be serialized to JSON
         """
         return {
             "name": self.name,
@@ -116,7 +173,23 @@ class MCPRegistry:
     """
     
     def __init__(self):
-        """Initialize an empty registry."""
+        """
+        Initialize an empty MCP function registry.
+        
+        This constructor creates a new function registry instance that serves as the
+        central repository for all available MCP functions in the application. The
+        registry starts empty and is populated through function registration.
+        
+        The registry is a fundamental component of the MCP framework, providing:
+        - A centralized catalog of all available functions
+        - A standardized interface for function discovery
+        - Consistent function execution mechanisms
+        - Support for introspection and validation operations
+        
+        This registry follows the singleton pattern in practice, with a single global
+        instance (created at the module level) that is used throughout the application
+        to provide consistent access to registered functions.
+        """
         self.functions: Dict[str, MCPFunction] = {}
     
     def register(
@@ -237,29 +310,54 @@ class MCPRegistry:
     
     def get_function(self, name: str) -> Optional[MCPFunction]:
         """
-        Get a function by name.
+        Retrieve a function from the registry by its unique name.
+        
+        This method provides a safe way to look up registered functions without
+        raising exceptions when the function doesn't exist. It's useful for cases
+        where you need to check for a function's existence and retrieve it in a
+        single operation, with None indicating that the function wasn't found.
+        
+        This lookup is commonly used for:
+        - Validating function references in workflows
+        - Retrieving functions for execution
+        - Obtaining function metadata for validation or introspection
+        - Checking capabilities before attempting operations
         
         Args:
-            name: Function name
+            name: The unique identifier of the function to retrieve
             
         Returns:
-            The MCPFunction or None if not found
+            The MCPFunction instance if found, or None if no function with the
+            specified name is registered in the registry
         """
         return self.functions.get(name)
     
     def execute_function(self, name: str, parameters: ParameterType = None) -> ResultType:
         """
-        Execute a function by name.
+        Execute a function by name with the provided parameters.
+        
+        This method is the primary entry point for invoking MCP functions through the registry.
+        It handles function lookup, validation, and execution in a consistent manner, providing
+        a unified interface for all registered functions regardless of their implementation.
+        
+        The execution flow follows these steps:
+        1. Look up the function by name in the registry
+        2. Validate that the function exists
+        3. Delegate the execution to the function's execute method
+        4. Return the result to the caller
         
         Args:
-            name: Function name
-            parameters: Function parameters
+            name: The unique identifier of the function to execute
+            parameters: Dictionary of parameter names and values to pass to the function.
+                       If None, an empty dictionary will be used.
             
         Returns:
-            Function result
+            The result of the function execution, which could be any valid Python object
+            depending on the function's implementation.
             
         Raises:
-            ValueError: If the function is not found
+            ValueError: If no function with the specified name is registered
+            Exception: Any exception raised during function execution
         """
         function = self.get_function(name)
         if not function:
@@ -270,20 +368,42 @@ class MCPRegistry:
         """
         Check if a function with the given name exists in the registry.
         
+        This method provides a lightweight existence check for functions without
+        retrieving the full function object. It's particularly useful for validation
+        operations and logical branching based on capability availability.
+        
+        Common use cases include:
+        - Validating function references in workflows during registration
+        - Feature availability checks for UI elements or API endpoints
+        - Conditional execution paths based on available functions
+        - Pre-checking before attempting potentially expensive operations
+        
         Args:
-            name: Function name to check
+            name: The unique identifier of the function to check for
             
         Returns:
-            True if the function exists, False otherwise
+            True if a function with the specified name exists in the registry,
+            False otherwise
         """
         return name in self.functions
     
     def list_functions(self) -> List[Dict[str, Any]]:
         """
-        List all registered functions.
+        List all registered functions with their complete metadata.
+        
+        This method provides access to the full set of registered functions in the
+        registry as a list of metadata dictionaries. It's particularly useful for
+        discovery and introspection use cases, such as generating documentation,
+        presenting available functions to users in a UI, or integrating with external
+        systems that need to understand the available capabilities.
+        
+        The metadata for each function includes essential information like the function
+        name, description, and parameter specifications, which can be used to present
+        the function to users or to validate inputs.
         
         Returns:
-            List of function metadata dictionaries
+            List of function metadata dictionaries, where each dictionary contains
+            information about a single registered function
         """
         return [func.to_dict() for func in self.functions.values()]
 
@@ -310,13 +430,38 @@ class MCPWorkflow:
         registry: MCPRegistry
     ):
         """
-        Initialize an MCP workflow.
+        Initialize an MCP workflow with metadata and execution configuration.
+        
+        This constructor creates a new workflow instance within the MCP framework,
+        encapsulating a sequence of function calls that will be executed in order.
+        The workflow provides a higher-level abstraction over individual function
+        calls, enabling multi-step processes with data passing between steps.
+        
+        A workflow offers several advantages over direct function calls:
+        - Standardized execution of multi-step processes
+        - Parameter passing between related operations
+        - Higher-level business logic encapsulation
+        - Reusable sequences for common operations
+        - Consistent error handling across multiple steps
+        
+        Each workflow should have a unique name within its registry to avoid conflicts.
+        The description should clearly explain the workflow's purpose, the overall
+        process it implements, and the expected outcome when executed.
         
         Args:
-            name: Unique workflow identifier
-            description: Human-readable workflow description
-            steps: List of workflow steps, each with a function name and parameters
-            registry: The MCP registry to use for function lookup
+            name: Unique identifier for the workflow within the MCP workflow registry.
+                 Should be descriptive of the workflow's overall purpose and follow
+                 consistent naming conventions.
+            description: Human-readable description of what the workflow accomplishes,
+                        the process it implements, and any significant details about
+                        its execution. This will be exposed in documentation and UIs.
+            steps: Ordered list of workflow steps, where each step is a dictionary
+                  containing a function name and optional parameters. These steps
+                  define the sequence of operations that will be performed when
+                  the workflow is executed.
+            registry: Reference to the MCPRegistry that will be used to look up
+                     and execute the functions referenced in the workflow steps.
+                     The registry must contain all functions referenced by the steps.
         """
         self.name = name
         self.description = description
@@ -368,10 +513,28 @@ class MCPWorkflow:
     
     def to_dict(self) -> Dict[str, Any]:
         """
-        Convert the workflow to a dictionary representation.
+        Convert the workflow to a serializable dictionary representation.
+        
+        This method creates a standardized metadata dictionary that describes the workflow,
+        suitable for API responses, UI rendering, documentation generation, and workflow
+        visualization. The resulting dictionary includes all the information needed to
+        understand the workflow's purpose and structure.
+        
+        The serialized representation contains:
+        - name: The unique identifier for the workflow
+        - description: Human-readable description of the workflow's purpose
+        - steps: The ordered sequence of function calls that make up the workflow,
+                including their individual parameters
+        
+        This dictionary format is particularly useful for:
+        - Displaying workflow information in management interfaces
+        - Generating workflow visualization diagrams
+        - Supporting workflow execution through APIs
+        - Building dynamic workflow selection UI components
+        - Documenting available workflows for users
         
         Returns:
-            Dictionary with workflow metadata
+            Dictionary with standardized workflow metadata that can be serialized to JSON
         """
         return {
             "name": self.name,
@@ -399,10 +562,29 @@ class MCPWorkflowRegistry:
     
     def __init__(self, function_registry: MCPRegistry):
         """
-        Initialize a workflow registry.
+        Initialize a workflow registry with a reference to the function registry.
+        
+        This constructor creates a new workflow registry that works in coordination
+        with the specified function registry. The relationship between the two registries
+        is essential for validating workflow steps against available functions and for
+        executing workflow steps at runtime.
+        
+        The workflow registry depends on the function registry to:
+        - Validate function references during workflow registration
+        - Look up functions during workflow execution
+        - Verify function availability before workflow operations
+        - Support cross-registry introspection and metadata access
+        
+        This separation of concerns between function and workflow registries creates a
+        clear architectural boundary while enabling tight integration between the two
+        subsystems of the MCP framework.
         
         Args:
-            function_registry: The MCP function registry to use
+            function_registry: The MCP function registry instance that contains all
+                              available functions that can be referenced in workflow
+                              steps. This registry will be used for function validation
+                              during workflow registration and for function lookup
+                              during workflow execution.
         """
         self.workflows: Dict[str, MCPWorkflow] = {}
         self.function_registry = function_registry
@@ -473,13 +655,25 @@ class MCPWorkflowRegistry:
     
     def get_workflow(self, name: str) -> Optional[MCPWorkflow]:
         """
-        Get a workflow by name.
+        Retrieve a workflow from the registry by its unique name.
+        
+        This method provides a safe way to look up registered workflows without
+        raising exceptions when the workflow doesn't exist. It's useful for cases
+        where you need to check for a workflow's existence and retrieve it in a
+        single operation, with None indicating that the workflow wasn't found.
+        
+        Common use cases include:
+        - Retrieving workflows for execution
+        - Verifying workflow existence before operations
+        - Obtaining workflow metadata for UI display
+        - Workflow validation during system integration
         
         Args:
-            name: Workflow name
+            name: The unique identifier of the workflow to retrieve
             
         Returns:
-            The MCPWorkflow or None if not found
+            The MCPWorkflow instance if found, or None if no workflow with the
+            specified name is registered in the registry
         """
         return self.workflows.get(name)
     
@@ -519,20 +713,44 @@ class MCPWorkflowRegistry:
         """
         Check if a workflow with the given name exists in the registry.
         
+        This method provides a lightweight existence check for workflows without
+        retrieving the full workflow object. It's useful when you only need to
+        verify the presence of a workflow but don't need its details or execution
+        capabilities.
+        
+        Common use cases include:
+        - Validation before registration to prevent name conflicts
+        - Feature availability checks in UI or API logic
+        - Conditional execution paths based on workflow availability
+        - Pre-checking before attempting potentially expensive workflow operations
+        
         Args:
-            name: Workflow name to check
+            name: The unique identifier of the workflow to check for
             
         Returns:
-            True if the workflow exists, False otherwise
+            True if a workflow with the specified name exists in the registry,
+            False otherwise
         """
         return name in self.workflows
     
     def list_workflows(self) -> List[Dict[str, Any]]:
         """
-        List all registered workflows.
+        List all registered workflows with their complete metadata.
+        
+        This method provides a comprehensive view of all workflows registered in the
+        system as a list of metadata dictionaries. Each dictionary contains information
+        about a single workflow, including its name, description, and the sequence of
+        steps that make up the workflow.
+        
+        This information is particularly useful for:
+        - Building dynamic user interfaces that allow workflow selection and execution
+        - Generating API documentation for available workflow endpoints
+        - Creating dashboards or monitoring tools that track workflow usage
+        - Supporting workflow discovery in automation systems
         
         Returns:
-            List of workflow metadata dictionaries
+            List of workflow metadata dictionaries, where each dictionary contains
+            complete information about a workflow, including its steps
         """
         return [workflow.to_dict() for workflow in self.workflows.values()]
 

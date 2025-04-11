@@ -35,7 +35,31 @@ class AdvancedAnalysisAgent(MCPAgent):
     """
     
     def __init__(self):
-        """Initialize the Advanced Analysis Agent."""
+        """
+        Initialize the Advanced Analysis Agent with specialized capabilities.
+        
+        This constructor creates a new AdvancedAnalysisAgent instance with extended
+        capabilities beyond the base MCPAgent. It sets up the agent's core components:
+        
+        1. Base agent configuration (name and description)
+        2. Specialized analysis capabilities registration
+        3. Claude service integration for AI-powered features
+        4. Conversation history management for multi-turn dialogue
+        
+        The agent is designed as a singleton, with a single instance shared across
+        the application through the get_advanced_analysis_agent() function. This
+        ensures consistent state and conversation history management.
+        
+        Each capability registered by the agent corresponds to a method of the same
+        name that implements the specific analytical function. These capabilities
+        are integrated with the MCP registry to make them available through the API.
+        
+        Note:
+            This initialization requires access to a valid Claude API key,
+            which is handled by the get_claude_service() function. If the
+            API key is missing or invalid, AI capabilities will be degraded
+            but still accessible (with appropriate error handling).
+        """
         super().__init__(
             name="AdvancedAnalysisAgent",
             description="Advanced AI agent with enhanced tax data analysis capabilities"
@@ -628,22 +652,45 @@ advanced_analysis_agent = None
 
 def init_advanced_agent():
     """
-    Initialize the advanced analysis agent and register its functions.
+    Initialize the advanced analysis agent and register its functions with MCP.
     
-    This function creates a singleton instance of the AdvancedAnalysisAgent class
-    and registers all of its methods with the MCP registry, making them available
-    for API access. Each method is registered with detailed parameter schemas
-    that define the expected input formats.
+    This factory function creates and configures the singleton instance of 
+    the AdvancedAnalysisAgent class, then registers all of its specialized
+    analytical capabilities with the MCP registry. The registration process
+    makes these capabilities available through the API and web interface.
+    
+    The initialization process includes:
+    1. Creating the agent instance if it doesn't already exist
+    2. Registering each agent capability with the MCP registry
+    3. Setting up parameter schemas for each capability
+    4. Configuring proper error handling for AI-dependent functions
+    
+    Each function is registered with a detailed JSON schema that defines
+    the expected input parameters, their types, and validation rules.
+    This enables automatic parameter validation and documentation
+    generation throughout the application.
+    
+    The agent functions serve as an abstraction layer between the web
+    application and the underlying AI services, providing:
+    - Consistent error handling for AI service disruptions
+    - Input validation and sanitization
+    - Result formatting and structure normalization
+    - Conversation state management across multiple requests
     
     Note:
-        This should be called within an application context to avoid Flask errors.
-        Typically called during application startup from app.py.
+        This function should be called within a Flask application context
+        to ensure proper access to configuration and services. It is typically
+        called during application startup from app.py after other core
+        services have been initialized.
     
     Returns:
-        AdvancedAnalysisAgent: The initialized agent instance
+        AdvancedAnalysisAgent: The initialized agent instance, ready for use
+                              throughout the application.
     
     Raises:
         RuntimeError: If called outside of a Flask application context
+        ImportError: If required dependencies for AI services aren't available
+        Exception: For other initialization errors (agent will still be created)
     """
     global advanced_analysis_agent
     
@@ -776,16 +823,38 @@ def get_advanced_analysis_agent():
     """
     Get the advanced analysis agent instance, initializing it if necessary.
     
-    This function provides access to the singleton AdvancedAnalysisAgent instance,
-    creating and initializing it if it doesn't already exist. It implements
-    robust error handling to ensure that an agent instance is always returned,
-    even if the initialization process encounters errors.
+    This function serves as the primary access point for obtaining the singleton
+    AdvancedAnalysisAgent instance throughout the application. It provides a
+    fault-tolerant mechanism for accessing the agent by:
     
-    This is the preferred way to access the agent throughout the application,
-    as it guarantees a valid instance and handles initialization transparently.
+    1. Checking if the agent has already been initialized
+    2. Initializing it through init_advanced_agent() if needed
+    3. Providing comprehensive error handling for initialization failures
+    4. Ensuring a valid agent instance is always returned, even after errors
+    5. Centralizing access to prevent multiple initialization attempts
+    
+    The function implements a defensive approach to agent initialization, catching
+    and logging all possible exceptions during the initialization process, but
+    still ensuring that a usable agent instance is returned. This ensures that
+    AI-dependent features degrade gracefully rather than completely failing if 
+    there are issues with the underlying AI services or initialization process.
+    
+    This is the preferred way to access the agent throughout the application, as it:
+    - Guarantees a valid instance will always be returned
+    - Handles initialization transparently without client code needing to check
+    - Centralizes error handling for initialization issues
+    - Maintains the singleton pattern to ensure consistent conversation state
+    - Provides detailed logging for troubleshooting initialization issues
+    
+    Example:
+        agent = get_advanced_analysis_agent()
+        results = agent.process_natural_language_query("Analyze tax rates for 2024")
     
     Returns:
-        AdvancedAnalysisAgent: The singleton agent instance
+        AdvancedAnalysisAgent: The singleton agent instance, ready for use.
+                              If initialization fails, a basic instance without
+                              registered functions will be returned that handles
+                              errors gracefully in its method implementations.
     """
     global advanced_analysis_agent
     if advanced_analysis_agent is None:
