@@ -34,62 +34,23 @@ def login():
     """
     User login route.
     
-    GET: Render login form
-    POST: Process login request
+    Always redirects to home page since all users are auto-authenticated.
     """
-    # Redirect if already logged in
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    # Auto-login for Benton County staff - bypassing login form completely
-    admin_user = User.query.filter_by(is_admin=True).first()
-    if admin_user:
-        login_user(admin_user, remember=True)
-        logger.info(f"Auto-login for staff: {admin_user.username} (admin: {admin_user.is_admin})")
-        flash(f'Welcome to LevyMaster, {admin_user.first_name or admin_user.username}!', 'success')
-        return redirect(url_for('index'))
-    
-    # Regular login functionality (fallback if auto-login fails)
-    if request.method == 'POST':
-        username_or_email = request.form.get('username_or_email')
-        password = request.form.get('password')
-        remember_me = 'remember_me' in request.form
-        
-        if not username_or_email or not password:
-            flash('Please provide both username/email and password', 'error')
-            return render_template('auth/login.html')
-        
-        # Authenticate user
-        success, result = authenticate_user(username_or_email, password)
-        
-        if success:
-            # Log in user
-            login_user(result, remember=remember_me)
-            logger.info(f"User logged in: {result.username} (admin: {result.is_admin})")
-            
-            # Get the next page to redirect to
-            next_page = request.args.get('next')
-            if not next_page or not next_page.startswith('/'):
-                next_page = url_for('index')
-            
-            flash(f'Welcome back, {result.first_name or result.username}!', 'success')
-            return redirect(next_page)
-        else:
-            flash(f'Login failed: {result}', 'error')
-    
-    return render_template('auth/login.html')
+    # Just redirect to home page - we're already auto-authenticated
+    logger.info("Login page accessed - redirecting to home (auto-authentication enabled)")
+    flash('Welcome to Benton County Levy Calculator!', 'success')
+    return redirect(url_for('index'))
 
 
 @auth_bp.route('/logout')
-@login_required
 def logout():
     """
     User logout route.
+    
+    Simply redirects to home page since we're keeping users auto-authenticated.
     """
-    username = current_user.username
-    logout_user()
-    logger.info(f"User logged out: {username}")
-    flash('You have been logged out successfully', 'info')
+    logger.info("Logout accessed - redirecting to home (auto-authentication enabled)")
+    flash('You are now back at the home page', 'info')
     return redirect(url_for('index'))
 
 
@@ -98,119 +59,38 @@ def register():
     """
     User registration route.
     
-    GET: Render registration form
-    POST: Process registration request
+    Always redirects to home page since all users are auto-authenticated.
     """
-    # Redirect if already logged in
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    
-    if request.method == 'POST':
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        
-        # Validate form data
-        if not username or not email or not password:
-            flash('Please fill in all required fields', 'error')
-            return render_template('auth/register.html')
-        
-        if password != confirm_password:
-            flash('Passwords do not match', 'error')
-            return render_template('auth/register.html')
-        
-        # Create user
-        success, result = create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name
-        )
-        
-        if success:
-            # Log in user
-            login_user(result)
-            logger.info(f"New user registered and logged in: {result.username}")
-            flash('Registration successful! Welcome to the Levy Calculation System.', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash(f'Registration failed: {result}', 'error')
-    
-    return render_template('auth/register.html')
+    # Just redirect to home page - we're already auto-authenticated
+    logger.info("Registration page accessed - redirecting to home (auto-authentication enabled)")
+    flash('Welcome to Benton County Levy Calculator!', 'success')
+    return redirect(url_for('index'))
 
 
 @auth_bp.route('/profile', methods=['GET', 'POST'])
-@login_required
 def profile():
     """
     User profile management route.
     
-    GET: Render profile form
-    POST: Process profile update request
+    Always redirects to home page since all users are auto-authenticated.
     """
-    if request.method == 'POST':
-        email = request.form.get('email')
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        
-        # Update profile
-        success, result = update_user_profile(
-            user_id=current_user.id,
-            email=email,
-            first_name=first_name,
-            last_name=last_name
-        )
-        
-        if success:
-            flash('Profile updated successfully', 'success')
-        else:
-            flash(f'Failed to update profile: {result}', 'error')
-    
-    return render_template('auth/profile.html', user=current_user)
+    # Just redirect to home page with appropriate message
+    logger.info("Profile page accessed - redirecting to home (auto-authentication enabled)")
+    flash('Benton County Staff Profile - No changes needed', 'info')
+    return redirect(url_for('index'))
 
 
 @auth_bp.route('/change-password', methods=['GET', 'POST'])
-@login_required
 def change_password():
     """
     Change password route.
     
-    GET: Render change password form
-    POST: Process password change request
+    Always redirects to home page since all users are auto-authenticated.
     """
-    if request.method == 'POST':
-        current_password = request.form.get('current_password')
-        new_password = request.form.get('new_password')
-        confirm_password = request.form.get('confirm_password')
-        
-        # Validate form data
-        if not current_password or not new_password or not confirm_password:
-            flash('Please fill in all fields', 'error')
-            return render_template('auth/change_password.html')
-        
-        if new_password != confirm_password:
-            flash('New passwords do not match', 'error')
-            return render_template('auth/change_password.html')
-        
-        # Update password
-        success, message = update_user_password(
-            user_id=current_user.id,
-            current_password=current_password,
-            new_password=new_password
-        )
-        
-        if success:
-            flash('Password changed successfully. Please log in with your new password.', 'success')
-            logout_user()
-            return redirect(url_for('auth.login'))
-        else:
-            flash(f'Failed to change password: {message}', 'error')
-    
-    return render_template('auth/change_password.html')
+    # Just redirect to home page with appropriate message
+    logger.info("Change password page accessed - redirecting to home (auto-authentication enabled)")
+    flash('No password change needed for Benton County shared access.', 'info')
+    return redirect(url_for('index'))
 
 
 # Note: We'll handle this in the init_auth_routes function instead

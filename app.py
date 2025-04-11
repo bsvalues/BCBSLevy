@@ -13,7 +13,7 @@ from flask import Flask, render_template, redirect, url_for, jsonify, request, s
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required, current_user
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -67,16 +67,56 @@ def create_app(config_name=None):
     csrf.init_app(app)
     migrate.init_app(app, db)
     
-    # Configure login manager
+    # Set up mock authentication for all users (no login required)
+    # This gives all users automatic admin access without login
+    from flask_login import AnonymousUserMixin
+    
+    class AutoAuthUser(AnonymousUserMixin):
+        """User class that automatically grants admin privileges to everyone."""
+        @property
+        def is_authenticated(self):
+            return True
+            
+        @property
+        def is_active(self):
+            return True
+            
+        @property
+        def is_admin(self):
+            return True
+            
+        @property
+        def id(self):
+            return 1
+            
+        @property
+        def username(self):
+            return "BentonStaff"
+            
+        @property
+        def first_name(self):
+            return "Benton County"
+            
+        @property
+        def last_name(self):
+            return "Staff"
+    
+    # Initialize login manager with auto auth
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Please log in to access this page.'
-    login_manager.login_message_category = 'info'
+    login_manager.anonymous_user = AutoAuthUser
+    
+    # Override login_required decorator to do nothing - this bypasses all @login_required decorators
+    def no_login_required(func):
+        return func
+        
+    # Replace the actual login_required with our no-op version
+    import flask_login
+    flask_login.login_required = no_login_required
     
     @login_manager.user_loader
     def load_user(user_id):
-        from models import User
-        return User.query.get(int(user_id))
+        # Always return our auto-authenticated user
+        return AutoAuthUser()
     
     # Register CLI commands
     try:
