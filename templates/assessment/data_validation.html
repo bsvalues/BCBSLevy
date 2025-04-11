@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Property Data Validation{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-shield-check me-2"></i>Property Data Validation
+            </h1>
+            <p class="lead">
+                Validate property data for accuracy, completeness, and compliance with standards.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Validation Form Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Validation Form</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('property_assessment.data_validation') }}" method="post">
+                        <!-- Property Identifier Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Property Identifier</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="property_id" class="form-label">Property ID / Parcel Number *</label>
+                                    <input type="text" class="form-control" id="property_id" name="property_id" required>
+                                    <div class="form-text">Enter the unique property identifier or parcel number</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="tax_year" class="form-label">Assessment Year</label>
+                                    <select class="form-select" id="tax_year" name="tax_year">
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Validation Options Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Validation Options</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="validation_type" class="form-label">Validation Type</label>
+                                    <select class="form-select" id="validation_type" name="validation_type">
+                                        <option value="comprehensive" selected>Comprehensive Validation</option>
+                                        <option value="basic">Basic Data Check</option>
+                                        <option value="compliance">Compliance Check Only</option>
+                                        <option value="format">Format Validation Only</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="detail_level" class="form-label">Detail Level</label>
+                                    <select class="form-select" id="detail_level" name="detail_level">
+                                        <option value="detailed" selected>Detailed</option>
+                                        <option value="summary">Summary</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Validation Standards Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Validation Standards</h6>
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="iaao" id="iaao_standards" name="standards[]" checked>
+                                        <label class="form-check-label" for="iaao_standards">
+                                            IAAO Standards
+                                        </label>
+                                        <div class="form-text">International Association of Assessing Officers</div>
+                                    </div>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" value="local" id="local_standards" name="standards[]" checked>
+                                        <label class="form-check-label" for="local_standards">
+                                            Local County Standards
+                                        </label>
+                                        <div class="form-text">Benton County Assessment Standards</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="state" id="state_standards" name="standards[]" checked>
+                                        <label class="form-check-label" for="state_standards">
+                                            Washington State Guidelines
+                                        </label>
+                                        <div class="form-text">State-specific assessment guidelines</div>
+                                    </div>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" value="historical" id="historical_comparison" name="standards[]">
+                                        <label class="form-check-label" for="historical_comparison">
+                                            Historical Comparison
+                                        </label>
+                                        <div class="form-text">Compare with previous years' data</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Advanced Options Section (initially collapsed) -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0">Advanced Options</h6>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
+                                    <i class="bi bi-gear me-1"></i>Show Options
+                                </button>
+                            </div>
+                            
+                            <div class="collapse" id="advancedOptions">
+                                <div class="card card-body bg-light">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="threshold" class="form-label">Quality Threshold (%)</label>
+                                            <input type="number" class="form-control" id="threshold" name="threshold" value="90" min="0" max="100">
+                                            <div class="form-text">Minimum quality score to pass validation</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="anomaly_detection" class="form-label">Anomaly Detection</label>
+                                            <select class="form-select" id="anomaly_detection" name="anomaly_detection">
+                                                <option value="standard" selected>Standard</option>
+                                                <option value="strict">Strict</option>
+                                                <option value="lenient">Lenient</option>
+                                                <option value="none">None</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="reset" class="btn btn-outline-secondary">Reset Form</button>
+                            <button type="submit" class="btn btn-primary">Validate Property Data</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- What is Validation Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i>What is Data Validation?</h5>
+                </div>
+                <div class="card-body">
+                    <p>Property data validation helps ensure that all property information is:</p>
+                    <ul>
+                        <li>Complete with all required fields</li>
+                        <li>Accurate and free from errors</li>
+                        <li>Consistent with standards and regulations</li>
+                        <li>Properly formatted for system use</li>
+                    </ul>
+                    <p>Data quality directly impacts assessment accuracy and tax fairness.</p>
+                </div>
+            </div>
+            
+            <!-- Quick Validation Tips Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>Validation Tips</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="validationTipsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="identifierHeading">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#identifierCollapse" aria-expanded="true" aria-controls="identifierCollapse">
+                                    Property Identifiers
+                                </button>
+                            </h2>
+                            <div id="identifierCollapse" class="accordion-collapse collapse show" aria-labelledby="identifierHeading" data-bs-parent="#validationTipsAccordion">
+                                <div class="accordion-body">
+                                    Ensure property IDs follow the county format: two letters followed by 8 digits (e.g., AB12345678).
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="addressHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#addressCollapse" aria-expanded="false" aria-controls="addressCollapse">
+                                    Address Standards
+                                </button>
+                            </h2>
+                            <div id="addressCollapse" class="accordion-collapse collapse" aria-labelledby="addressHeading" data-bs-parent="#validationTipsAccordion">
+                                <div class="accordion-body">
+                                    Use USPS standardized address formats. Avoid abbreviations except for state and standard directionals.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="measurementHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#measurementCollapse" aria-expanded="false" aria-controls="measurementCollapse">
+                                    Measurements
+                                </button>
+                            </h2>
+                            <div id="measurementCollapse" class="accordion-collapse collapse" aria-labelledby="measurementHeading" data-bs-parent="#validationTipsAccordion">
+                                <div class="accordion-body">
+                                    Square footage should be whole numbers. Acreage should be accurate to two decimal places.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="valuationsHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#valuationsCollapse" aria-expanded="false" aria-controls="valuationsCollapse">
+                                    Valuations
+                                </button>
+                            </h2>
+                            <div id="valuationsCollapse" class="accordion-collapse collapse" aria-labelledby="valuationsHeading" data-bs-parent="#validationTipsAccordion">
+                                <div class="accordion-body">
+                                    Property values should be whole dollar amounts without decimals. Land-to-building ratios should be reasonable for the property type.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Tools Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Related Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{{ url_for('property_assessment.property_valuation') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Property Valuation
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.compliance_verification') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Compliance Verification
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_workflow') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Assessment Workflow
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_dashboard') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Return to Dashboard
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

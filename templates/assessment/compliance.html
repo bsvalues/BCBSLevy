@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Compliance Verification{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-shield-check me-2"></i>Compliance Verification
+            </h1>
+            <p class="lead">
+                Verify assessment compliance with local, state, and IAAO standards.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Compliance Form Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Compliance Verification Form</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('property_assessment.compliance_verification') }}" method="post">
+                        <!-- District Selection Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">District Selection</h6>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="district_id" class="form-label">Tax District *</label>
+                                    <select class="form-select" id="district_id" name="district_id" required>
+                                        <option value="" selected disabled>Select a tax district</option>
+                                        {% if districts %}
+                                            {% for district in districts %}
+                                                <option value="{{ district.id }}">{{ district.name }}</option>
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="1">North Kennewick District</option>
+                                            <option value="2">West Richland District</option>
+                                            <option value="3">Prosser District</option>
+                                            <option value="4">East Pasco District</option>
+                                            <option value="5">South Benton District</option>
+                                        {% endif %}
+                                    </select>
+                                    <div class="form-text">Select the tax district to verify for compliance</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Assessment Year Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Assessment Year</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="assessment_year" class="form-label">Year *</label>
+                                    <select class="form-select" id="assessment_year" name="assessment_year" required>
+                                        <option value="{{ current_year }}" selected>{{ current_year }}</option>
+                                        <option value="{{ current_year - 1 }}">{{ current_year - 1 }}</option>
+                                        <option value="{{ current_year - 2 }}">{{ current_year - 2 }}</option>
+                                        <option value="{{ current_year - 3 }}">{{ current_year - 3 }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="compliance_area" class="form-label">Compliance Area</label>
+                                    <select class="form-select" id="compliance_area" name="compliance_area">
+                                        {% for area in compliance_areas %}
+                                            <option value="{{ area.id }}">{{ area.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Verification Options Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Verification Options</h6>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" value="true" id="include_property_sample" name="include_property_sample" checked>
+                                        <label class="form-check-label" for="include_property_sample">
+                                            Include property sample verification
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" value="true" id="include_documentation" name="include_documentation" checked>
+                                        <label class="form-check-label" for="include_documentation">
+                                            Include documentation review
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" value="true" id="include_statistical" name="include_statistical" checked>
+                                        <label class="form-check-label" for="include_statistical">
+                                            Include statistical analysis
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="true" id="include_recommendations" name="include_recommendations" checked>
+                                        <label class="form-check-label" for="include_recommendations">
+                                            Include remediation recommendations
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Advanced Options Section (initially collapsed) -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0">Advanced Options</h6>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false" aria-controls="advancedOptions">
+                                    <i class="bi bi-gear me-1"></i>Show Options
+                                </button>
+                            </div>
+                            
+                            <div class="collapse" id="advancedOptions">
+                                <div class="card card-body bg-light">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="confidence_level" class="form-label">Confidence Level (%)</label>
+                                            <select class="form-select" id="confidence_level" name="confidence_level">
+                                                <option value="95" selected>95% (Standard)</option>
+                                                <option value="99">99% (High)</option>
+                                                <option value="90">90% (Relaxed)</option>
+                                            </select>
+                                            <div class="form-text">Statistical confidence level for sample analysis</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="sample_size" class="form-label">Sample Size</label>
+                                            <select class="form-select" id="sample_size" name="sample_size">
+                                                <option value="standard" selected>Standard (5%)</option>
+                                                <option value="large">Large (10%)</option>
+                                                <option value="comprehensive">Comprehensive (15%)</option>
+                                                <option value="custom">Custom</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="include_historical" class="form-label">Historical Comparison</label>
+                                            <select class="form-select" id="include_historical" name="include_historical">
+                                                <option value="1" selected>1 Year</option>
+                                                <option value="3">3 Years</option>
+                                                <option value="5">5 Years</option>
+                                                <option value="0">None</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="format" class="form-label">Report Format</label>
+                                            <select class="form-select" id="format" name="format">
+                                                <option value="standard" selected>Standard</option>
+                                                <option value="detailed">Detailed</option>
+                                                <option value="executive">Executive Summary</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="reset" class="btn btn-outline-secondary">Reset Form</button>
+                            <button type="submit" class="btn btn-primary">Verify Compliance</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Compliance Standards Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Compliance Standards</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="complianceStandardsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="iaaoHeading">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#iaaoCollapse" aria-expanded="true" aria-controls="iaaoCollapse">
+                                    IAAO Standards
+                                </button>
+                            </h2>
+                            <div id="iaaoCollapse" class="accordion-collapse collapse show" aria-labelledby="iaaoHeading" data-bs-parent="#complianceStandardsAccordion">
+                                <div class="accordion-body">
+                                    <p>International Association of Assessing Officers standards include:</p>
+                                    <ul class="mb-0">
+                                        <li>Coefficient of Dispersion (COD) &lt; 15%</li>
+                                        <li>Price-Related Differential (PRD) between 0.98 and 1.03</li>
+                                        <li>Price-Related Bias (PRB) statistically near 0</li>
+                                        <li>Median Assessment Ratio between 0.90 and 1.10</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="stateHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#stateCollapse" aria-expanded="false" aria-controls="stateCollapse">
+                                    Washington State Requirements
+                                </button>
+                            </h2>
+                            <div id="stateCollapse" class="accordion-collapse collapse" aria-labelledby="stateHeading" data-bs-parent="#complianceStandardsAccordion">
+                                <div class="accordion-body">
+                                    <p>Washington State assessment requirements include:</p>
+                                    <ul class="mb-0">
+                                        <li>All properties revalued at least once every 4 years</li>
+                                        <li>Assessments at 100% of true and fair market value</li>
+                                        <li>Proper notification to property owners of value changes</li>
+                                        <li>Appeal process accessibility and documentation</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="localHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#localCollapse" aria-expanded="false" aria-controls="localCollapse">
+                                    Local County Requirements
+                                </button>
+                            </h2>
+                            <div id="localCollapse" class="accordion-collapse collapse" aria-labelledby="localHeading" data-bs-parent="#complianceStandardsAccordion">
+                                <div class="accordion-body">
+                                    <p>Benton County specific requirements include:</p>
+                                    <ul class="mb-0">
+                                        <li>Annual review of high-value or rapidly changing areas</li>
+                                        <li>Industry-specific valuation methodologies for agricultural land</li>
+                                        <li>Special documentation for exemption properties</li>
+                                        <li>Additional notification requirements for substantial value changes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Compliance Areas Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Compliance Areas</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-primary">
+                                    <i class="bi bi-percent fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Assessment Ratio Standards</h6>
+                                    <p class="text-muted small mb-0">Statistical measures of assessment level and uniformity</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-success">
+                                    <i class="bi bi-envelope fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Property Owner Notification</h6>
+                                    <p class="text-muted small mb-0">Timing, content, and delivery of assessment notices</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-info">
+                                    <i class="bi bi-file-earmark-text fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Appeal Process Administration</h6>
+                                    <p class="text-muted small mb-0">Procedures, timelines, and documentation for appeals</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-warning">
+                                    <i class="bi bi-calendar4-range fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Revaluation Cycle Requirements</h6>
+                                    <p class="text-muted small mb-0">Adherence to statutory revaluation schedules</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Related Tools Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Related Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{{ url_for('property_assessment.data_validation') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Property Data Validation
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.property_valuation') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Property Valuation
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_workflow') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Assessment Workflow
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_dashboard') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Return to Dashboard
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom styles for the form */
+.icon-box {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 24px;
+}
+</style>
+{% endblock %}

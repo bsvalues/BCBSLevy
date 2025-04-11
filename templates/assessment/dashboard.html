@@ -1,0 +1,443 @@
+{% extends "base.html" %}
+
+{% block title %}Property Assessment Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-3">
+                <i class="bi bi-building me-2"></i>Property Assessment Dashboard
+            </h1>
+            <p class="lead">
+                Comprehensive oversight of property assessment activities and metrics.
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body text-center">
+                    <h2 class="display-4 mb-0">{{ assessment_stats.total_properties }}</h2>
+                    <p class="mt-2 mb-0">Total Properties</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <small>County Database</small>
+                    <i class="bi bi-database"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body text-center">
+                    <h2 class="display-4 mb-0">{{ assessment_stats.assessed_this_cycle }}</h2>
+                    <p class="mt-2 mb-0">Assessed This Cycle</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <small>Current Year</small>
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body text-center">
+                    <h2 class="display-4 mb-0">{{ assessment_stats.pending_review }}</h2>
+                    <p class="mt-2 mb-0">Pending Review</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <small>Awaiting Action</small>
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body text-center">
+                    <h2 class="display-4 mb-0">{{ assessment_stats.compliance_score }}%</h2>
+                    <p class="mt-2 mb-0">Compliance Score</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <small>County Average</small>
+                    <i class="bi bi-award"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Assessment Tools -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Assessment Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-primary text-white me-3">
+                                            <i class="bi bi-shield-check"></i>
+                                        </div>
+                                        <h5 class="mb-0">Data Validation</h5>
+                                    </div>
+                                    <p class="card-text">Validate property data for accuracy, completeness, and compliance with standards.</p>
+                                    <a href="{{ url_for('property_assessment.data_validation') }}" class="btn btn-outline-primary mt-auto d-block">
+                                        Access Tool <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-success text-white me-3">
+                                            <i class="bi bi-calculator"></i>
+                                        </div>
+                                        <h5 class="mb-0">Property Valuation</h5>
+                                    </div>
+                                    <p class="card-text">Calculate property values using market comparison, cost, or income approaches.</p>
+                                    <a href="{{ url_for('property_assessment.property_valuation') }}" class="btn btn-outline-success mt-auto d-block">
+                                        Access Tool <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-warning text-dark me-3">
+                                            <i class="bi bi-clipboard-check"></i>
+                                        </div>
+                                        <h5 class="mb-0">Compliance Verification</h5>
+                                    </div>
+                                    <p class="card-text">Verify assessment compliance with local, state, and IAAO standards and regulations.</p>
+                                    <a href="{{ url_for('property_assessment.compliance_verification') }}" class="btn btn-outline-warning mt-auto d-block">
+                                        Access Tool <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="icon-box bg-info text-white me-3">
+                                            <i class="bi bi-diagram-3"></i>
+                                        </div>
+                                        <h5 class="mb-0">Assessment Workflow</h5>
+                                    </div>
+                                    <p class="card-text">Execute multi-step assessment workflows including initial assessments and reassessments.</p>
+                                    <a href="{{ url_for('property_assessment.assessment_workflow') }}" class="btn btn-outline-info mt-auto d-block">
+                                        Access Tool <i class="bi bi-arrow-right ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Assessments -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Assessments</h5>
+                    <button class="btn btn-sm btn-outline-secondary">View All</button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Property ID</th>
+                                    <th>Assessment Type</th>
+                                    <th>Date</th>
+                                    <th>Assessed Value</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_assessments %}
+                                    {% for assessment in recent_assessments %}
+                                        <tr>
+                                            <td>{{ assessment.property_id }}</td>
+                                            <td>{{ assessment.assessment_type }}</td>
+                                            <td>{{ assessment.date }}</td>
+                                            <td>${{ assessment.assessed_value|format_number }}</td>
+                                            <td>
+                                                {% if assessment.status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% elif assessment.status == 'pending' %}
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                {% elif assessment.status == 'review' %}
+                                                    <span class="badge bg-info">Under Review</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ assessment.status|title }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-primary">View</button>
+                                                    <button type="button" class="btn btn-outline-secondary">Edit</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="bi bi-info-circle me-2"></i>No recent assessments found
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Property Type Distribution -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Property Type Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <canvas id="propertyTypeChart" height="220"></canvas>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Property Type</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for type, count in property_types.items() %}
+                                    <tr>
+                                        <td>{{ type|title }}</td>
+                                        <td>{{ count }}</td>
+                                        <td>{{ (count / property_types.values()|sum * 100)|round(1) }}%</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Assessment Cycle Progress -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Assessment Cycle Progress</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-muted mb-3">Current Cycle: 2025</h6>
+                    
+                    <!-- Overall Progress -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Overall Progress</span>
+                            <span>{{ assessment_stats.assessed_this_cycle }} / {{ assessment_stats.total_properties }}</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            {% set progress_percent = (assessment_stats.assessed_this_cycle / assessment_stats.total_properties * 100)|int if assessment_stats.total_properties > 0 else 0 %}
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_percent }}%;" 
+                                 aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ progress_percent }}%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline -->
+                    <div class="timeline-container">
+                        <div class="timeline">
+                            <div class="timeline-item completed">
+                                <div class="timeline-point"></div>
+                                <div class="timeline-content">
+                                    <h6>Planning Phase</h6>
+                                    <p class="text-muted small">Jan - Feb 2025</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item active">
+                                <div class="timeline-point"></div>
+                                <div class="timeline-content">
+                                    <h6>Data Collection</h6>
+                                    <p class="text-muted small">Mar - Jun 2025</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-point"></div>
+                                <div class="timeline-content">
+                                    <h6>Value Analysis</h6>
+                                    <p class="text-muted small">Jul - Sep 2025</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-point"></div>
+                                <div class="timeline-content">
+                                    <h6>Notification</h6>
+                                    <p class="text-muted small">Oct - Nov 2025</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-point"></div>
+                                <div class="timeline-content">
+                                    <h6>Appeals Process</h6>
+                                    <p class="text-muted small">Dec 2025 - Feb 2026</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Related Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{{ url_for('levy_calculator.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Levy Calculator
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('dashboard.index') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            System Dashboard
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('data_management.import_data') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Import Property Data
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Assessment Reports
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom styles for dashboard */
+.icon-box {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 24px;
+}
+
+/* Timeline styling */
+.timeline-container {
+    margin-top: 20px;
+    position: relative;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 15px;
+    height: 100%;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.timeline-point {
+    position: absolute;
+    left: -30px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #dee2e6;
+    border: 3px solid #fff;
+    top: 0;
+}
+
+.timeline-item.completed .timeline-point {
+    background: #198754;  /* Success color */
+}
+
+.timeline-item.active .timeline-point {
+    background: #0d6efd;  /* Primary color */
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.25);
+}
+
+.timeline-content {
+    padding-bottom: 10px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+</style>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Property Type Distribution Chart
+    var propertyTypeChart = new Chart(
+        document.getElementById('propertyTypeChart'),
+        {
+            type: 'pie',
+            data: {
+                labels: [{% for type in property_types.keys() %} '{{ type|title }}', {% endfor %}],
+                datasets: [{
+                    data: [{% for count in property_types.values() %} {{ count }}, {% endfor %}],
+                    backgroundColor: [
+                        '#0d6efd',  // Primary
+                        '#198754',  // Success
+                        '#ffc107',  // Warning
+                        '#6f42c1',  // Purple
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        }
+    );
+});
+</script>
+{% endblock %}
+{% endblock %}

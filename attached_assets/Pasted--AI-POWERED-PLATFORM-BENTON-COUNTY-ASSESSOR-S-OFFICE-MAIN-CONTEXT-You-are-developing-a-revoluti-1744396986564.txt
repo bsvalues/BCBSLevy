@@ -1,0 +1,50 @@
+# AI-POWERED PLATFORM: BENTON COUNTY ASSESSOR'S OFFICE
+## MAIN CONTEXT
+You are developing a revolutionary AI platform for the Benton County Assessor's Office that will transform how property assessments are conducted. This system employs a multi-agent architecture to automate and enhance core operations while ensuring legal compliance with Washington State regulations.
+### CORE SYSTEM PURPOSE
+This platform will:
+1. Validate and enhance property data quality
+2. Generate accurate property valuations
+3. Provide authoritative property tax information
+4. Automate critical workflows for clerical and appraisal staff
+5. Ensure strict compliance with Washington State laws
+### TECHNICAL ARCHITECTURE
+The system utilizes a Master Control Program (MCP) orchestrating specialized AI agents:
+- Data Validation Agent: Ensures property data integrity
+- Valuation Agent: Calculates property values per WA standards
+- Tax Information Agent: Provides accurate tax guidance
+- Workflow Agent: Automates routine assessment tasks
+- Legal Compliance Agent: Monitors regulatory adherence
+### PROJECT STATE
+You are implementing the MVP phase focusing on:
+- Core agent framework and communication protocol
+- Master Control Program orchestration capabilities
+- Three priority agents: Data Validation, Valuation, and User Interaction
+- Essential data pipelines and storage architecture
+- Staff-facing interfaces for system interaction
+### BUSINESS IMPACT
+Once completed, this system will:
+- Reduce property assessment errors by 85%
+- Accelerate valuation workflows by 70%
+- Ensure 100% compliance with state regulations
+- Provide consistent, accurate public information
+- Allow staff to focus on high-value analytical work
+Your implementation will establish the foundation for a system that revolutionizes government assessment operations through applied artificial intelligence.  # DATA AND DOCUMENTATION REQUIREMENTS
+### AUTHORITATIVE DATA SOURCES
+- All property valuation models must reference Washington State Department of Revenue guidelines
+- Tax calculations must comply with Benton County's current mill rates and exemption rules
+- Geographical data should leverage county GIS services for boundary validation
+- Historical property data should be validated against the county's existing database
+### DOCUMENTATION STANDARDS
+- Create comprehensive API documentation using OpenAPI 3.0 specifications
+- Document all agent capabilities with example interactions
+- Provide detailed system architecture diagrams
+- Include thorough data flow documentation highlighting privacy controls
+- Maintain a developer wiki with setup and maintenance procedures
+### CODE RESPONSIBILITY
+- Implement robust error handling with meaningful user-facing messages
+- Create comprehensive logging for all system operations
+- Build extensive unit and integration tests for all components
+- Follow clean code principles with clear naming conventions
+- Design for modularity to allow future agent additions
+- Ensure all code is secure, performant, and maintainable

@@ -283,8 +283,10 @@ from routes_user_audit import user_audit_bp, register_user_audit_routes
 from routes_tax_strategy import tax_strategy_bp, register_tax_strategy_routes
 from routes_search import init_search_routes
 from routes_db_fix import db_fix_bp
+from routes_property_assessment import property_assessment_bp
 
 app.register_blueprint(data_management_bp)
+app.register_blueprint(property_assessment_bp)
 app.register_blueprint(forecasting_bp)
 app.register_blueprint(levy_exports_bp)
 app.register_blueprint(public_bp)

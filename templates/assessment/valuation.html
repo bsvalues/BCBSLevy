@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Property Valuation{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-calculator me-2"></i>Property Valuation
+            </h1>
+            <p class="lead">
+                Calculate property values using various valuation methods.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Valuation Form Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>Valuation Form</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('property_assessment.property_valuation') }}" method="post">
+                        <!-- Property Identifier Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Property Identifier</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="property_id" class="form-label">Property ID / Parcel Number *</label>
+                                    <input type="text" class="form-control" id="property_id" name="property_id" required>
+                                    <div class="form-text">Enter the unique property identifier or parcel number</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="valuation_date" class="form-label">Valuation Date</label>
+                                    <input type="date" class="form-control" id="valuation_date" name="valuation_date" value="{{ today }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Valuation Method Section -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">Valuation Method</h6>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="method" class="form-label">Primary Valuation Method *</label>
+                                    <select class="form-select" id="method" name="method" required>
+                                        {% for method in valuation_methods %}
+                                            <option value="{{ method.id }}">{{ method.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">Select the primary method to use for property valuation</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="true" id="run_all_methods" name="run_all_methods">
+                                    <label class="form-check-label" for="run_all_methods">
+                                        Run all valuation methods for comparison
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="true" id="include_confidence" name="include_confidence" checked>
+                                    <label class="form-check-label" for="include_confidence">
+                                        Include confidence intervals in results
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Parameters Section (initially collapsed) -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold mb-0">Additional Parameters</h6>
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#additionalParams" aria-expanded="false" aria-controls="additionalParams">
+                                    <i class="bi bi-gear me-1"></i>Show Parameters
+                                </button>
+                            </div>
+                            
+                            <div class="collapse" id="additionalParams">
+                                <div class="card card-body bg-light">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="market_adjustment" class="form-label">Market Adjustment Factor (%)</label>
+                                            <input type="number" class="form-control" id="market_adjustment" name="market_adjustment" value="0" min="-50" max="50" step="0.1">
+                                            <div class="form-text">Adjust for current market conditions (-50% to +50%)</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="comparison_radius" class="form-label">Comparison Radius (miles)</label>
+                                            <input type="number" class="form-control" id="comparison_radius" name="comparison_radius" value="1.0" min="0.1" max="10" step="0.1">
+                                            <div class="form-text">Radius for comparable properties search</div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="property_condition" class="form-label">Property Condition</label>
+                                            <select class="form-select" id="property_condition" name="property_condition">
+                                                <option value="excellent">Excellent</option>
+                                                <option value="good" selected>Good</option>
+                                                <option value="average">Average</option>
+                                                <option value="fair">Fair</option>
+                                                <option value="poor">Poor</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="valuation_context" class="form-label">Valuation Context</label>
+                                            <select class="form-select" id="valuation_context" name="valuation_context">
+                                                <option value="assessment" selected>Tax Assessment</option>
+                                                <option value="market">Market Value</option>
+                                                <option value="insurance">Insurance Value</option>
+                                                <option value="investment">Investment Analysis</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="reset" class="btn btn-outline-secondary">Reset Form</button>
+                            <button type="submit" class="btn btn-primary">Calculate Value</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Valuation Methods Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Valuation Methods</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="valuationMethodsAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="marketHeading">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#marketCollapse" aria-expanded="true" aria-controls="marketCollapse">
+                                    Market Comparison Approach
+                                </button>
+                            </h2>
+                            <div id="marketCollapse" class="accordion-collapse collapse show" aria-labelledby="marketHeading" data-bs-parent="#valuationMethodsAccordion">
+                                <div class="accordion-body">
+                                    <p>Compares the subject property with similar properties that have recently sold, making adjustments for differences.</p>
+                                    <p class="text-muted small">Best for: Residential properties in areas with many comparable sales</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="costHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#costCollapse" aria-expanded="false" aria-controls="costCollapse">
+                                    Cost Approach
+                                </button>
+                            </h2>
+                            <div id="costCollapse" class="accordion-collapse collapse" aria-labelledby="costHeading" data-bs-parent="#valuationMethodsAccordion">
+                                <div class="accordion-body">
+                                    <p>Estimates value by calculating the cost to replace the structure, plus the land value, minus depreciation.</p>
+                                    <p class="text-muted small">Best for: New construction, special-use properties, unique properties</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="incomeHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#incomeCollapse" aria-expanded="false" aria-controls="incomeCollapse">
+                                    Income Approach
+                                </button>
+                            </h2>
+                            <div id="incomeCollapse" class="accordion-collapse collapse" aria-labelledby="incomeHeading" data-bs-parent="#valuationMethodsAccordion">
+                                <div class="accordion-body">
+                                    <p>Determines value based on the income that the property is expected to generate, applying capitalization rates.</p>
+                                    <p class="text-muted small">Best for: Income-producing properties like apartments, offices, retail</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Valuation Factors Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Key Valuation Factors</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-primary">
+                                    <i class="bi bi-geo-alt-fill fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Location</h6>
+                                    <p class="text-muted small mb-0">Neighborhood quality, proximity to amenities</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-success">
+                                    <i class="bi bi-rulers fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Size & Dimensions</h6>
+                                    <p class="text-muted small mb-0">Square footage, lot size, room count</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-info">
+                                    <i class="bi bi-calendar-date fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Age & Condition</h6>
+                                    <p class="text-muted small mb-0">Year built, renovations, maintenance</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3 text-warning">
+                                    <i class="bi bi-cash-stack fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">Market Conditions</h6>
+                                    <p class="text-muted small mb-0">Supply/demand, interest rates, economic trends</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Related Tools Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Related Tools</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{{ url_for('property_assessment.data_validation') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Property Data Validation
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.compliance_verification') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Compliance Verification
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_workflow') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Assessment Workflow
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_dashboard') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Return to Dashboard
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom styles for the form */
+.icon-box {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 24px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,427 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-check2-circle me-2"></i>Assessment Workflow Results
+            </h1>
+            <p class="lead">
+                Results for {{ workflow_result.workflow_type|title }} workflow
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Workflow Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>Workflow Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0">{{ workflow_result.properties_processed if workflow_result.properties_processed is defined else workflow_result.properties|length }}</h3>
+                                    <p class="mt-2 mb-0">Properties Processed</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0">{{ workflow_result.successful if workflow_result.successful is defined else (workflow_result.properties|length - 1) }}</h3>
+                                    <p class="mt-2 mb-0">Successful</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-warning text-dark h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0">{{ workflow_result.failed if workflow_result.failed is defined else '1' }}</h3>
+                                    <p class="mt-2 mb-0">Failed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5>Workflow Information</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%">Workflow Type</th>
+                                    <td>{{ workflow_result.workflow_type|title }}</td>
+                                </tr>
+                                <tr>
+                                    <th>District</th>
+                                    <td>{{ workflow_result.district_name if workflow_result.district_name is defined else 'North Kennewick' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Start Time</th>
+                                    <td>{{ workflow_result.start_time if workflow_result.start_time is defined else workflow_result.timestamp }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Duration</th>
+                                    <td>{{ workflow_result.duration if workflow_result.duration is defined else '3m 12s' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status</th>
+                                    <td>
+                                        {% if workflow_result.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif workflow_result.status == 'failed' %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% elif workflow_result.status == 'partial' %}
+                                            <span class="badge bg-warning text-dark">Partially Completed</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Property Results -->
+                    <h5>Property Results</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Property ID</th>
+                                    <th>Status</th>
+                                    <th>Value Change</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if workflow_result.property_results %}
+                                    {% for result in workflow_result.property_results %}
+                                        <tr>
+                                            <td>{{ result.property_id }}</td>
+                                            <td>
+                                                {% if result.status == 'success' %}
+                                                    <span class="badge bg-success">Success</span>
+                                                {% elif result.status == 'failed' %}
+                                                    <span class="badge bg-danger">Failed</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ result.status|title }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if result.value_change > 0 %}
+                                                    <span class="text-success">↑ {{ result.value_change }}%</span>
+                                                {% elif result.value_change < 0 %}
+                                                    <span class="text-danger">↓ {{ result.value_change|abs }}%</span>
+                                                {% else %}
+                                                    <span class="text-muted">No change</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-primary">View</button>
+                                                    <button type="button" class="btn btn-outline-secondary">Details</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <!-- Example property results if not provided -->
+                                    <tr>
+                                        <td>BC12345678</td>
+                                        <td><span class="badge bg-success">Success</span></td>
+                                        <td><span class="text-success">↑ 5.2%</span></td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-primary">View</button>
+                                                <button type="button" class="btn btn-outline-secondary">Details</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>BC87654321</td>
+                                        <td><span class="badge bg-success">Success</span></td>
+                                        <td><span class="text-success">↑ 3.8%</span></td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-primary">View</button>
+                                                <button type="button" class="btn btn-outline-secondary">Details</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>BC24681357</td>
+                                        <td><span class="badge bg-danger">Failed</span></td>
+                                        <td><span class="text-muted">N/A</span></td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-primary">View</button>
+                                                <button type="button" class="btn btn-outline-secondary">Details</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Workflow Steps -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Workflow Steps</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% if workflow_result.steps %}
+                            {% for step in workflow_result.steps %}
+                                <div class="timeline-item {{ 'completed' if step.status == 'completed' else '' }}">
+                                    <div class="timeline-left">
+                                        <div class="timeline-date">{{ step.timestamp }}</div>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="mb-1">{{ step.name }}</h5>
+                                            {% if step.status == 'completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif step.status == 'failed' %}
+                                                <span class="badge bg-danger">Failed</span>
+                                            {% elif step.status == 'skipped' %}
+                                                <span class="badge bg-secondary">Skipped</span>
+                                            {% else %}
+                                                <span class="badge bg-info">In Progress</span>
+                                            {% endif %}
+                                        </div>
+                                        <p>{{ step.description }}</p>
+                                        {% if step.details %}
+                                            <div class="card bg-light">
+                                                <div class="card-body py-2 px-3">
+                                                    <pre class="mb-0"><code>{{ step.details }}</code></pre>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <!-- Example steps if not provided -->
+                            <div class="timeline-item completed">
+                                <div class="timeline-left">
+                                    <div class="timeline-date">10:15 AM</div>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="mb-1">Data Validation</h5>
+                                        <span class="badge bg-success">Completed</span>
+                                    </div>
+                                    <p>Validated property data for accuracy and completeness</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-left">
+                                    <div class="timeline-date">10:17 AM</div>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="mb-1">Property Valuation</h5>
+                                        <span class="badge bg-success">Completed</span>
+                                    </div>
+                                    <p>Calculated property values using multiple methods</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-left">
+                                    <div class="timeline-date">10:18 AM</div>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="mb-1">Compliance Check</h5>
+                                        <span class="badge bg-success">Completed</span>
+                                    </div>
+                                    <p>Verified compliance with state and local regulations</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Statistics Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Assessment Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Assessment Value Change -->
+                    <div class="mb-4">
+                        <h6 class="border-bottom pb-2 mb-3">Value Change Statistics</h6>
+                        
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Average Value Change</span>
+                            <span class="text-success">+4.7%</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 47%;" 
+                                 aria-valuenow="47" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Median Value Change</span>
+                            <span class="text-success">+4.2%</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 42%;" 
+                                 aria-valuenow="42" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Maximum Value Change</span>
+                            <span class="text-success">+8.5%</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 85%;" 
+                                 aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Metrics -->
+                    <div class="mb-4">
+                        <h6 class="border-bottom pb-2 mb-3">Performance Metrics</h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="text-center p-3 rounded bg-light">
+                                    <h3 class="mb-0">{{ workflow_result.processing_time if workflow_result.processing_time is defined else '192' }}</h3>
+                                    <p class="text-muted mb-0">Avg. Time (sec)</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-3 rounded bg-light">
+                                    <h3 class="mb-0">{{ workflow_result.success_rate if workflow_result.success_rate is defined else '95' }}%</h3>
+                                    <p class="text-muted mb-0">Success Rate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comparison to Previous -->
+                    <div class="mb-0">
+                        <h6 class="border-bottom pb-2 mb-3">Comparison to Previous</h6>
+                        
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                Processing Time
+                                <span class="text-success">-12%</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                Success Rate
+                                <span class="text-success">+2%</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                Properties Processed
+                                <span class="text-success">+5</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-arrow-right-circle me-2"></i>Next Steps</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if workflow_result.report_id %}
+                            <a href="{{ url_for('reports.view_report', report_id=workflow_result.report_id) }}" class="btn btn-primary">
+                                <i class="bi bi-file-earmark-text me-2"></i>View Detailed Report
+                            </a>
+                        {% else %}
+                            <button type="button" class="btn btn-primary">
+                                <i class="bi bi-file-earmark-text me-2"></i>Generate Detailed Report
+                            </button>
+                        {% endif %}
+                        <a href="{{ url_for('property_assessment.assessment_workflow') }}" class="btn btn-success">
+                            <i class="bi bi-plus-circle me-2"></i>Run Another Workflow
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary">
+                            <i class="bi bi-download me-2"></i>Export Results
+                        </button>
+                        <a href="{{ url_for('property_assessment.assessment_dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-house me-2"></i>Return to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Timeline styling */
+.timeline {
+    position: relative;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding: 0 0 40px 30px;
+    border-left: 2px solid #dee2e6;
+    margin-left: 20px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item.completed {
+    border-left-color: #198754;
+}
+
+.timeline-left {
+    position: absolute;
+    top: 0;
+    left: -20px;
+    width: 40px;
+    text-align: center;
+}
+
+.timeline-date {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.timeline-content {
+    position: relative;
+    padding-left: 10px;
+}
+
+.timeline-content:before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: -31px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #dee2e6;
+    border: 2px solid #fff;
+}
+
+.timeline-item.completed .timeline-content:before {
+    background: #198754;
+}
+</style>
+{% endblock %}

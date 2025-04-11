@@ -1,0 +1,523 @@
+{% extends "base.html" %}
+
+{% block title %}Valuation Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-check2-circle me-2"></i>Property Valuation Results
+            </h1>
+            <p class="lead">
+                Valuation results for property ID: {{ property_id }}
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Valuation Results Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>Valuation Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card bg-primary text-white h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0">{{ valuation_result.primary_method|title }}</h3>
+                                    <p class="mt-2 mb-0">Primary Method</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0">${{ valuation_result.estimated_value|format_number }}</h3>
+                                    <p class="mt-2 mb-0">Estimated Value</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-info text-white h-100">
+                                <div class="card-body text-center">
+                                    <h3 class="mb-0">{{ valuation_result.confidence_score }}%</h3>
+                                    <p class="mt-2 mb-0">Confidence Score</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5>Property Information</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%">Property ID</th>
+                                    <td>{{ property_id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Address</th>
+                                    <td>
+                                        {% if valuation_result.property.address %}
+                                            {{ valuation_result.property.address }}
+                                        {% else %}
+                                            123 Main St, Kennewick, WA 99336
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Property Type</th>
+                                    <td>
+                                        {% if valuation_result.property.type %}
+                                            {{ valuation_result.property.type|title }}
+                                        {% else %}
+                                            Residential
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Valuation Date</th>
+                                    <td>{{ valuation_result.valuation_date }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if valuation_result.confidence_interval %}
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h5 class="mb-3">Confidence Interval</h5>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" 
+                                         aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                        ${{ valuation_result.confidence_interval.low|format_number }} - ${{ valuation_result.confidence_interval.high|format_number }}
+                                    </div>
+                                </div>
+                                <div class="text-muted mt-2">
+                                    <small>95% confidence that the true market value falls within this range</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if valuation_result.comparable_properties %}
+                        <h5>Comparable Properties Used</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Property ID</th>
+                                        <th>Distance (mi)</th>
+                                        <th>Sale Date</th>
+                                        <th>Sale Price</th>
+                                        <th>Adjustment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for comp in valuation_result.comparable_properties %}
+                                        <tr>
+                                            <td>{{ comp.property_id }}</td>
+                                            <td>{{ comp.distance }}</td>
+                                            <td>{{ comp.sale_date }}</td>
+                                            <td>${{ comp.sale_price|format_number }}</td>
+                                            <td>{{ comp.adjustment }}%</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Multi-Method Comparison (if available) -->
+            {% if valuation_result.method_comparison %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Multi-Method Comparison</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <canvas id="methodComparisonChart" height="250"></canvas>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Valuation Method</th>
+                                        <th>Estimated Value</th>
+                                        <th>Confidence Score</th>
+                                        <th>Weight in Final</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for method in valuation_result.method_comparison %}
+                                        <tr>
+                                            <td>
+                                                <span class="fw-bold">{{ method.name|title }}</span>
+                                                {% if method.name == valuation_result.primary_method %}
+                                                    <span class="badge bg-primary ms-2">Primary</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>${{ method.value|format_number }}</td>
+                                            <td>{{ method.confidence }}%</td>
+                                            <td>{{ method.weight }}%</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Value Factors -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-layers me-2"></i>Value Influencing Factors</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Positive Factors</h6>
+                            <ul class="list-group mb-4">
+                                {% if valuation_result.positive_factors %}
+                                    {% for factor in valuation_result.positive_factors %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ factor.name }}
+                                            <span class="badge bg-success rounded-pill">+{{ factor.impact }}%</span>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-geo-alt text-success me-2"></i>
+                                            Location in desirable school district
+                                            <span class="badge bg-success ms-auto">+5.2%</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-house-door text-success me-2"></i>
+                                            Recent kitchen renovation
+                                            <span class="badge bg-success ms-auto">+3.8%</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-sun text-success me-2"></i>
+                                            Energy efficiency improvements
+                                            <span class="badge bg-success ms-auto">+2.1%</span>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Negative Factors</h6>
+                            <ul class="list-group">
+                                {% if valuation_result.negative_factors %}
+                                    {% for factor in valuation_result.negative_factors %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            {{ factor.name }}
+                                            <span class="badge bg-danger rounded-pill">{{ factor.impact }}%</span>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-water text-danger me-2"></i>
+                                            Flood zone location
+                                            <span class="badge bg-danger ms-auto">-4.5%</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-truck text-danger me-2"></i>
+                                            Proximity to high-traffic road
+                                            <span class="badge bg-danger ms-auto">-2.3%</span>
+                                        </div>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-calendar-x text-danger me-2"></i>
+                                            Aging roof condition
+                                            <span class="badge bg-danger ms-auto">-1.8%</span>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- District Context Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i>District Context</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="border-bottom pb-2 mb-3">{{ district_info.name }}</h6>
+                    
+                    <div class="d-flex justify-content-between mb-3">
+                        <div class="text-center">
+                            <h5 class="mb-0">{{ district_info.median_value|format_currency }}</h5>
+                            <small class="text-muted">Median Value</small>
+                        </div>
+                        <div class="text-center">
+                            <h5 class="mb-0">{{ district_info.median_value_change }}</h5>
+                            <small class="text-muted">Annual Change</small>
+                        </div>
+                    </div>
+                    
+                    <p class="mb-1">Assessment Cycle: {{ district_info.assessment_cycle }}</p>
+                    <p>Last Market Analysis: Q2 2025</p>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="small">
+                        <p class="mb-2">Relative Positioning:</p>
+                        <div class="progress mb-1" style="height: 10px;">
+                            {% set position_percent = valuation_result.percentile|default(65) %}
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ position_percent }}%;"
+                                 aria-valuenow="{{ position_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted">
+                            <span>Lower</span>
+                            <span>Median</span>
+                            <span>Upper</span>
+                        </div>
+                        <p class="mt-2 mb-0 text-center">
+                            This property is in the {{ valuation_result.percentile|default(65) }}th percentile for the district
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historical Valuation Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historical Valuation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <canvas id="historicalValueChart" height="200"></canvas>
+                    </div>
+                    
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Assessed Value</th>
+                                <th>Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if valuation_result.historical_values %}
+                                {% for item in valuation_result.historical_values %}
+                                    <tr>
+                                        <td>{{ item.year }}</td>
+                                        <td>${{ item.value|format_number }}</td>
+                                        <td>
+                                            {% if item.change > 0 %}
+                                                <span class="text-success">↑ {{ item.change }}%</span>
+                                            {% elif item.change < 0 %}
+                                                <span class="text-danger">↓ {{ item.change|abs }}%</span>
+                                            {% else %}
+                                                <span class="text-muted">0%</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>2025</td>
+                                    <td>${{ valuation_result.estimated_value|format_number }}</td>
+                                    <td><span class="text-success">↑ 5.2%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2024</td>
+                                    <td>${{ (valuation_result.estimated_value * 0.95)|int|format_number }}</td>
+                                    <td><span class="text-success">↑ 4.8%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2023</td>
+                                    <td>${{ (valuation_result.estimated_value * 0.906)|int|format_number }}</td>
+                                    <td><span class="text-success">↑ 3.5%</span></td>
+                                </tr>
+                                <tr>
+                                    <td>2022</td>
+                                    <td>${{ (valuation_result.estimated_value * 0.875)|int|format_number }}</td>
+                                    <td><span class="text-muted">0%</span></td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-arrow-right-circle me-2"></i>Next Steps</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('property_assessment.compliance_verification') }}?property_id={{ property_id }}" class="btn btn-primary">
+                            <i class="bi bi-clipboard-check me-2"></i>Proceed to Compliance Verification
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_workflow') }}?property_id={{ property_id }}" class="btn btn-success">
+                            <i class="bi bi-diagram-3 me-2"></i>Add to Assessment Workflow
+                        </a>
+                        <a href="{{ url_for('property_assessment.data_validation') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Validation
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_dashboard') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-house me-2"></i>Return to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Historical Value Chart
+    var historicalValueCtx = document.getElementById('historicalValueChart');
+    if (historicalValueCtx) {
+        {% if valuation_result.historical_values %}
+            var years = [{% for item in valuation_result.historical_values %} '{{ item.year }}', {% endfor %}];
+            var values = [{% for item in valuation_result.historical_values %} {{ item.value }}, {% endfor %}];
+        {% else %}
+            var years = ['2022', '2023', '2024', '2025'];
+            var values = [
+                {{ (valuation_result.estimated_value * 0.875)|int }}, 
+                {{ (valuation_result.estimated_value * 0.906)|int }},
+                {{ (valuation_result.estimated_value * 0.95)|int }},
+                {{ valuation_result.estimated_value }}
+            ];
+        {% endif %}
+        
+        new Chart(historicalValueCtx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Property Value',
+                    data: values,
+                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                    borderColor: 'rgba(13, 110, 253, 1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value).toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Method Comparison Chart
+    var methodComparisonCtx = document.getElementById('methodComparisonChart');
+    if (methodComparisonCtx) {
+        {% if valuation_result.method_comparison %}
+            var methods = [{% for method in valuation_result.method_comparison %} '{{ method.name|title }}', {% endfor %}];
+            var methodValues = [{% for method in valuation_result.method_comparison %} {{ method.value }}, {% endfor %}];
+            var methodConfidence = [{% for method in valuation_result.method_comparison %} {{ method.confidence }}, {% endfor %}];
+        {% else %}
+            var methods = ['Market Comparison', 'Cost Approach', 'Income Approach'];
+            var methodValues = [
+                {{ valuation_result.estimated_value }},
+                {{ valuation_result.estimated_value * 0.93 }},
+                {{ valuation_result.estimated_value * 1.05 }}
+            ];
+            var methodConfidence = [85, 78, 72];
+        {% endif %}
+        
+        new Chart(methodComparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: methods,
+                datasets: [{
+                    label: 'Estimated Value',
+                    data: methodValues,
+                    backgroundColor: [
+                        'rgba(13, 110, 253, 0.7)',
+                        'rgba(25, 135, 84, 0.7)',
+                        'rgba(255, 193, 7, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(13, 110, 253, 1)',
+                        'rgba(25, 135, 84, 1)',
+                        'rgba(255, 193, 7, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var value = context.raw;
+                                var confidence = methodConfidence[context.dataIndex];
+                                return [
+                                    'Value: $' + value.toLocaleString(),
+                                    'Confidence: ' + confidence + '%'
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value).toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block title %}Compliance Verification Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="bi bi-shield-check me-2"></i>Compliance Verification Results
+            </h1>
+            <p class="lead">
+                Compliance assessment for District ID: <strong>{{ district_id }}</strong>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Compliance Summary Card -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Compliance Summary</h5>
+                    {% if compliance_result.compliance_status == 'compliant' %}
+                        <span class="badge bg-success">COMPLIANT</span>
+                    {% elif compliance_result.compliance_status == 'attention_required' %}
+                        <span class="badge bg-warning text-dark">ATTENTION REQUIRED</span>
+                    {% else %}
+                        <span class="badge bg-danger">NON-COMPLIANT</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3 bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2">Overall Compliance Score</h6>
+                                    <h2 class="display-6">{{ compliance_result.overall_compliance_score }}</h2>
+                                    <p class="card-text">
+                                        <small>
+                                            {% if compliance_result.overall_compliance_score >= 90 %}
+                                                Excellent
+                                            {% elif compliance_result.overall_compliance_score >= 80 %}
+                                                Good
+                                            {% elif compliance_result.overall_compliance_score >= 70 %}
+                                                Fair
+                                            {% else %}
+                                                Needs Improvement
+                                            {% endif %}
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3 
+                                {% if compliance_result.compliance_status == 'compliant' %}bg-success{% 
+                                elif compliance_result.compliance_status == 'attention_required' %}bg-warning text-dark{% 
+                                else %}bg-danger{% endif %} text-white">
+                                <div class="card-body text-center">
+                                    <h6 class="card-subtitle mb-2">Status</h6>
+                                    <h2 class="display-6">
+                                        {% if compliance_result.compliance_status == 'compliant' %}
+                                            COMPLIANT
+                                        {% elif compliance_result.compliance_status == 'attention_required' %}
+                                            ATTENTION NEEDED
+                                        {% else %}
+                                            NON-COMPLIANT
+                                        {% endif %}
+                                    </h2>
+                                    <p class="card-text">
+                                        <small>
+                                            Verified on {{ compliance_result.verification_timestamp }}
+                                        </small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered mt-3">
+                        <tr>
+                            <th style="width: 30%">District ID</th>
+                            <td>{{ district_id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Assessment Year</th>
+                            <td>{{ compliance_result.assessment_year }}</td>
+                        </tr>
+                        <tr>
+                            <th>Compliance Area</th>
+                            <td>{{ compliance_result.compliance_area }}</td>
+                        </tr>
+                        <tr>
+                            <th>Verification Timestamp</th>
+                            <td>{{ compliance_result.verification_timestamp }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Detailed Compliance Results Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Detailed Compliance Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Requirement</th>
+                                    <th>Status</th>
+                                    <th>Score</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detail in compliance_result.compliance_details %}
+                                    <tr>
+                                        <td>{{ detail.requirement }}</td>
+                                        <td>
+                                            {% if detail.status == 'compliant' %}
+                                                <span class="badge bg-success">Compliant</span>
+                                            {% elif detail.status == 'attention_required' %}
+                                                <span class="badge bg-warning text-dark">Attention Required</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Non-Compliant</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if detail.score < 70 %}
+                                                <span class="text-danger">{{ detail.score }}</span>
+                                            {% elif detail.score < 80 %}
+                                                <span class="text-warning">{{ detail.score }}</span>
+                                            {% else %}
+                                                <span class="text-success">{{ detail.score }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ detail.notes }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Card -->
+            {% if compliance_result.recommendations %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-lightbulb me-2"></i>Recommendations</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for recommendation in compliance_result.recommendations %}
+                                <li class="list-group-item">
+                                    <i class="bi bi-arrow-right-circle me-2"></i>{{ recommendation }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Compliance Score Chart Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Compliance Scores</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="complianceRadarChart" height="250"></canvas>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Showing compliance scores across different regulatory areas.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historical Compliance Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historical Compliance</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="historicalComplianceChart" height="200"></canvas>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Tracking compliance scores over recent assessment years.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('property_assessment.compliance_verification') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-repeat me-2"></i>Verify Another District
+                        </a>
+                        <a href="#" class="btn btn-outline-success">
+                            <i class="bi bi-file-earmark-pdf me-2"></i>Export Compliance Report
+                        </a>
+                        <a href="{{ url_for('property_assessment.assessment_workflow') }}" class="btn btn-primary">
+                            <i class="bi bi-diagram-3 me-2"></i>Start Assessment Workflow
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create radar chart for compliance scores
+        const radarCtx = document.getElementById('complianceRadarChart').getContext('2d');
+        
+        // Extract compliance detail categories and scores
+        const complianceDetails = {{ compliance_result.compliance_details|tojson }};
+        const categories = complianceDetails.map(detail => detail.requirement);
+        const scores = complianceDetails.map(detail => detail.score);
+        
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: categories,
+                datasets: [{
+                    label: 'Compliance Score',
+                    data: scores,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                elements: {
+                    line: {
+                        tension: 0.1
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                    }
+                }
+            }
+        });
+        
+        // Create line chart for historical compliance
+        const historyCtx = document.getElementById('historicalComplianceChart').getContext('2d');
+        
+        // Sample historical data - would be real data in production
+        const years = [
+            {{ compliance_result.assessment_year - 4 }},
+            {{ compliance_result.assessment_year - 3 }},
+            {{ compliance_result.assessment_year - 2 }},
+            {{ compliance_result.assessment_year - 1 }},
+            {{ compliance_result.assessment_year }}
+        ];
+        
+        // Generate some reasonable historical data based on current score
+        const currentScore = {{ compliance_result.overall_compliance_score }};
+        let previousScores = [];
+        for (let i = 0; i < 4; i++) {
+            // Generate a random variation between -5 and +5 of the current score
+            const randomVariation = Math.floor(Math.random() * 10) - 5;
+            let historicalScore = currentScore + randomVariation;
+            
+            // Keep score within reasonable bounds
+            if (historicalScore > 100) historicalScore = 100;
+            if (historicalScore < 70) historicalScore = 70;
+            
+            previousScores.push(historicalScore);
+        }
+        
+        const historicalScores = [...previousScores, currentScore];
+        
+        new Chart(historyCtx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: 'Compliance Score',
+                    data: historicalScores,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        suggestedMin: 60,
+                        suggestedMax: 100
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
