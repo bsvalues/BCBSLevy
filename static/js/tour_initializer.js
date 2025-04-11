@@ -541,8 +541,8 @@ function safeAddEventListener(selector, event, callback) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Levy Calculation System JS initialized successfully');
     
-    // Check if we need to automatically start a tour
-    checkForAutomaticTour();
+    // Disabled automatic tour display on page load
+    // checkForAutomaticTour();
     
     // Add event listeners to tour trigger buttons (safely)
     safeAddEventListener('[data-tour]', 'click', function() {

@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Create and manage help menu button
-  createHelpMenu();
+  // Help menu button creation is now managed in help_menu.js
+  // createHelpMenu();
 });
 
 /**

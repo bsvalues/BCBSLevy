@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize theme toggler
   initializeThemeToggler();
   
-  // Initialize help menu if available
-  if (document.getElementById('help-button')) {
-    initializeHelpMenu();
-  }
+  // Help menu initialization is disabled to prevent automatic popup
+  // if (document.getElementById('help-button')) {
+  //   initializeHelpMenu();
+  // }
   
-  // Initialize guided tour functionality
-  initializeGuidedTour();
+  // Guided tour initialization is disabled to prevent automatic popup
+  // initializeGuidedTour();
 });
 
 /**

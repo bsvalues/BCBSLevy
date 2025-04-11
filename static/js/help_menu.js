@@ -5,10 +5,13 @@
  * context-sensitive help and documentation to users.
  */
 
-// Initialize the help menu system when the DOM is loaded
+// Initialize the help menu system when the DOM is loaded, 
+// but do not automatically display it
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Initializing help menu...");
-    initHelpMenu();
+    // Only create the DOM elements but don't show automatically
+    createHelpMenuElements();
+    setupHelpMenuListeners();
     console.log("Help Menu System initialized");
 });
 
