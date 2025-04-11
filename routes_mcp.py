@@ -34,10 +34,39 @@ mcp_bp = Blueprint('mcp', __name__, url_prefix='/mcp')
 @mcp_bp.route('/check-api-key', methods=['GET'])
 def check_api_key():
     """
-    Check the status of the configured Anthropic API key.
+    Check the status of the configured Anthropic API key with comprehensive diagnostics.
     
-    This endpoint checks if an API key is configured and if it has the correct format.
-    It returns the status and a message with details.
+    This endpoint performs a detailed validation of the Anthropic API key configuration
+    and returns a structured JSON response containing status information, detailed error
+    messages when applicable, and actionable recommendations for resolving any issues.
+    
+    The endpoint conducts several validation steps:
+    1. Verifies the API key exists in the environment
+    2. Validates the API key format
+    3. Tests connectivity to the Anthropic API
+    4. Verifies the key has proper permissions and sufficient credits
+    
+    This endpoint is primarily used by:
+    - The MCP dashboard to display API connectivity status
+    - System health monitoring services
+    - Automated diagnostics and troubleshooting tools
+    - Administrative interfaces for configuration management
+    
+    Returns:
+        JSON response with the following structure:
+        {
+            "status": "valid" | "invalid" | "missing" | "no_credits" | "error",
+            "message": "Human-readable status description",
+            "details": {
+                "help_link": "URL for assistance (if applicable)",
+                "suggestion": "Actionable recommendation",
+                "action_required": true | false
+            }
+        }
+        
+    Status Codes:
+        200: Request processed successfully (even if key is invalid/missing)
+        500: Server error occurred during validation
     """
     try:
         key_status = check_api_key_status()
@@ -76,10 +105,50 @@ def check_api_key():
 @mcp_bp.route('/api/status', methods=['GET'])
 def api_status_check():
     """
-    API endpoint to check the status of the Anthropic API integration.
+    API endpoint to check the status of the Anthropic API integration with detailed diagnostics.
     
-    This endpoint returns JSON with detailed status information about the API key,
-    including validation, credit status, and response times.
+    This endpoint performs a comprehensive status check of the Anthropic API integration,
+    providing detailed diagnostic information suitable for programmatic consumption by frontend
+    components, monitoring systems, and administrative dashboards. The response includes
+    key status indicators, timestamp information, and detailed diagnostic data tailored to
+    the current API status.
+    
+    The endpoint performs the following checks:
+    1. Verifies API key presence and configuration
+    2. Validates API key format and structure
+    3. Tests connectivity to the Anthropic API with retry logic
+    4. Verifies account credits and usage permissions
+    5. Collects performance metrics (response times, latency)
+    
+    The response is structured to provide both human-readable status information and
+    machine-parsable diagnostic details that can be used for automated monitoring,
+    alerting, and troubleshooting.
+    
+    This endpoint is primarily used by:
+    - Dashboard status indicators and health monitors
+    - System monitoring tools and service checkers
+    - Automated health check services
+    - Administrative diagnostic tools
+    - Frontend components that display API status
+    
+    Returns:
+        JSON response with the following structure:
+        {
+            "status": "valid" | "invalid" | "missing" | "no_credits" | "error",
+            "message": "Human-readable status message",
+            "timestamp": "ISO-8601 formatted timestamp",
+            "details": {
+                "credit_status": "available" | "insufficient",
+                "model": "model identifier string",
+                "billing_url": "URL for billing management (if applicable)",
+                "suggestion": "Actionable recommendation",
+                "action_required": true | false
+            }
+        }
+        
+    Status Codes:
+        200: Request processed successfully (even if key is invalid/missing)
+        500: Server error occurred during validation
     """
     try:
         # Get API key status with retry capability
@@ -137,10 +206,49 @@ def api_status_check():
 @mcp_bp.route('/configure-api-key', methods=['POST'])
 def configure_api_key():
     """
-    Configure the Anthropic API key for MCP insights.
+    Configure and validate the Anthropic API key for MCP insights with comprehensive error handling.
     
-    This endpoint accepts a POST request with the API key to be configured.
-    It sets the key in the environment and validates it, checking for credit issues.
+    This secure endpoint allows authenticated administrators to configure the Anthropic API key
+    used for AI-powered insights throughout the application. It performs a multi-step validation
+    process to ensure the key is properly formatted, has sufficient credits, and can successfully
+    authenticate with the Anthropic API service.
+    
+    The configuration process includes:
+    1. Basic validation of API key format and structure
+    2. Setting the key in the application environment
+    3. Testing connectivity to the Anthropic API
+    4. Verifying account credits and permissions
+    5. Logging the configuration attempt for audit purposes
+    
+    This endpoint implements robust security measures, including:
+    - Authentication requirements
+    - Input sanitization and validation
+    - Secure environment variable handling
+    - Comprehensive error reporting
+    - Audit logging of all configuration attempts
+    
+    Request body:
+        JSON containing the API key to configure
+        {
+            "api_key": "sk-ant-xxxxxxx"  (Required)
+        }
+    
+    Returns:
+        JSON response with the configuration result:
+        {
+            "success": true | false,
+            "message": "Human-readable status message",
+            "status": "valid" | "invalid" | "missing" | "no_credits" | "error"
+        }
+        
+    Status Codes:
+        200: Configuration processed successfully (even if validation failed)
+        400: Bad request (missing or invalid input)
+        500: Server error during configuration
+    
+    Security:
+        This endpoint requires administrative privileges and should only be
+        accessible to authorized users. All configuration attempts are logged.
     """
     try:
         data = request.json

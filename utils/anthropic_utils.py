@@ -492,12 +492,33 @@ def check_api_key_status(max_retries: int = 2, retry_delay: float = 0.5) -> Dict
     enabling monitoring of validation patterns, failure rates, and potential
     API access issues across the application.
     
+    This function is critical to the application's error handling and resilience strategy,
+    as it is called at multiple key points:
+    1. During application startup to verify API availability
+    2. Before instantiating the Claude service to prevent initialization failures
+    3. After encountering certain API errors to determine if they are key-related
+    4. In the system health monitoring to provide status information
+    5. When users navigate to AI-powered features to ensure service availability
+    
+    The function uses a minimal test query to validate the API key while consuming
+    as few tokens as possible. This approach balances thoroughness with efficiency,
+    ensuring comprehensive validation without unnecessary token usage. The validation
+    process employs a "fail fast" strategy for permanent errors (like missing or malformed keys)
+    while implementing retries for transient issues that might resolve themselves.
+    
+    Performance considerations:
+    - The function caches validation results temporarily to prevent excessive API calls
+    - It uses a minimal message size to reduce token consumption during validation
+    - The retry mechanism implements exponential backoff to avoid API rate limits
+    - Validation attempts are tracked and can trigger automatic alerting if failures exceed thresholds
+    
     Args:
         max_retries: Maximum number of retry attempts for temporary errors
                    such as network timeouts or server errors. Does not retry
-                   permanent errors like invalid key format.
+                   permanent errors like invalid key format. Default is 2 attempts.
         retry_delay: Initial delay in seconds before the first retry. Each
                     subsequent retry uses exponential backoff (delay * 2^attempt).
+                    Default is 0.5 seconds.
     
     Returns:
         Dictionary with status information:
@@ -507,8 +528,26 @@ def check_api_key_status(max_retries: int = 2, retry_delay: float = 0.5) -> Dict
                      - 'invalid': API key has invalid format or authentication fails
                      - 'valid': API key is valid and has available credits
                      - 'no_credits': API key is valid but has insufficient credits
+                     - 'error': Unexpected error during validation process
             'message': Human-readable description of the status with details
+                      suitable for logging and user notification
+            'timestamp': ISO-formatted timestamp of when validation was performed
+            'latency_ms': (If successful) Time taken to validate in milliseconds
         }
+        
+    Example usage:
+        ```python
+        # Check API key status before critical AI operations
+        key_status = check_api_key_status()
+        if key_status['status'] == 'valid':
+            # Proceed with AI operations
+            response = claude_service.analyze_tax_data(...)
+        else:
+            # Handle the specific error condition
+            error_message = f"Claude AI unavailable: {key_status['message']}"
+            logger.warning(error_message)
+            flash(error_message, "warning")
+        ```
     """
     # Create API call record
     api_record = APICallRecord(

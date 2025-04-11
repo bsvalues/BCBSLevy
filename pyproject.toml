@@ -34,4 +34,6 @@ dependencies = [
     "polars-ols==0.3.5",
     "polaris==0.1",
     "polartransform>=2.0.0",
+    "fuzzywuzzy>=0.18.0",
+    "python-levenshtein>=0.27.1",
 ]

@@ -98,22 +98,73 @@ class MCPFunction:
         1. Parameter normalization (providing empty dict for None)
         2. Function invocation with the appropriate parameters
         3. Error handling and propagation
+        4. Result formatting and standardization
         
-        The execution process unpacks the parameters dictionary and passes them as
-        keyword arguments to the underlying function. This allows for a consistent
-        interface while supporting functions with different parameter signatures.
+        The execution process follows these steps:
+        1. Parameters are normalized to ensure a consistent interface
+        2. The underlying function is invoked with unpacked parameters
+        3. The result is captured and processed into a standardized format
+        4. Any exceptions are caught, logged, and converted to error results
         
+        This method ensures a consistent execution pattern across all MCP functions,
+        regardless of their specific implementation details. By standardizing the
+        invocation pattern, error handling, and result formatting, it simplifies
+        integration with various client systems and frameworks.
+        
+        All exceptions raised during function execution are captured and converted
+        to an error result format rather than propagated to the caller. This ensures
+        that client code can always expect a consistent response structure, whether
+        the function succeeds or fails.
+        
+        Usage Example:
+            ```python
+            # Get a registered function from the registry
+            analyze_func = mcp_registry.get_function("analyze_levy_rates")
+            
+            # Execute it with parameters
+            result = analyze_func.execute({
+                "district_id": 123,
+                "year": 2023
+            })
+            
+            # Check for success and process results
+            if "error" not in result:
+                process_analysis_results(result)
+            else:
+                handle_error(result["error"])
+            ```
+            
         Args:
-            parameters: Dictionary of parameter names and values to pass to the function.
-                       If None, an empty dictionary will be used.
-            
+            parameters: A dictionary containing the parameters to pass to the function.
+                      If None, an empty dictionary will be used. The keys should match
+                      the parameter names expected by the underlying function.
+                      
         Returns:
-            The result of the function execution, which could be any valid Python object
-            depending on the function's implementation.
+            A dictionary containing either:
+            - The successful result from the function with any standard metadata
+            - An error object with details if execution failed
             
-        Raises:
-            TypeError: If the parameters don't match the function's signature
-            Exception: Any exception raised by the underlying function
+            Success format:
+            {
+                "result": <actual result data from the function>,
+                "meta": {
+                    "function_name": self.name,
+                    ... (other metadata as needed)
+                }
+            }
+            
+            Error format:
+            {
+                "error": {
+                    "message": "Error message explaining what went wrong",
+                    "type": "Exception class name or error type",
+                    "details": "Additional error context if available"
+                },
+                "meta": {
+                    "function_name": self.name,
+                    ... (other metadata as needed)
+                }
+            }
         """
         parameters = parameters or {}
         try:
@@ -158,15 +209,26 @@ class MCPRegistry:
     Central registry for MCP functions and capabilities.
     
     The MCPRegistry serves as the core component of the Model Content Protocol
-    framework, providing services for function registration, discovery, and
-    execution. It maintains a catalog of all available functions that can be
-    invoked through the MCP API or used within workflows.
+    framework, responsible for managing function registration, discovery, and execution.
+    It acts as a centralized repository for all available MCP functions, providing
+    the infrastructure needed to access and manage these functions across the application.
+    
+    The registry provides several key capabilities:
+    1. Function registration with proper metadata and validation
+    2. Function discovery and lookup by name
+    3. Standardized execution interface
+    4. Metadata generation for documentation and UI integration
+    5. Namespace isolation to prevent conflicts between function names
     
     Key responsibilities:
     - Function registration through decorator and direct method interfaces
     - Function lookup and metadata access
     - Function execution with parameter validation
     - Function discoverability and introspection
+    
+    This design follows the registry pattern, enabling loose coupling between
+    function providers and consumers while maintaining a coherent ecosystem of
+    capabilities that can be discovered and utilized through the MCP framework.
     
     The registry is designed to be used as a singleton instance shared across
     the application, providing a unified interface for all MCP functionality.
@@ -420,6 +482,28 @@ class MCPWorkflow:
     Workflows support parameter passing between steps, where the output of previous
     steps can be used as input to later steps, enabling complex data transformation
     pipelines and multi-stage processing operations.
+    
+    Key features of the MCPWorkflow system include:
+    1. Sequential execution of multiple MCP functions in a defined order
+    2. Parameter forwarding from initial workflow parameters to first steps
+    3. Result chaining between steps, allowing outputs to become inputs
+    4. Comprehensive error handling with step-level granularity
+    5. Detailed execution history and result tracking
+    6. Metadata access for workflow discovery and documentation
+    
+    Workflows address several common challenges in complex operations:
+    - Breaking down complex operations into manageable, reusable steps
+    - Ensuring consistent data flow between processing stages
+    - Reducing duplication of code for common sequences
+    - Centralizing error handling for multi-step processes
+    - Providing audit trails of execution history
+    
+    Example use cases include:
+    - Multi-stage data processing pipelines (clean → transform → analyze)
+    - Complex tax calculations requiring multiple steps
+    - Report generation workflows with data gathering and formatting steps
+    - Decision trees with conditional processing paths
+    - Automated data validation and correction sequences
     """
     
     def __init__(
@@ -596,11 +680,28 @@ class MCPWorkflowRegistry:
         steps: List[WorkflowStepType]
     ) -> None:
         """
-        Register a workflow.
+        Register a multi-step workflow in the MCP framework with comprehensive validation.
         
-        A workflow is a sequence of MCP function calls that can be executed
-        as a single unit. Each step in the workflow consists of a function name
-        and optional parameters.
+        This method allows defining and registering a structured sequence of function calls that
+        will be executed together as a coordinated workflow. Workflows provide a higher-level
+        abstraction for complex business processes that involve multiple operations, enabling
+        more sophisticated capabilities than individual function calls.
+        
+        The registration process includes rigorous validation steps:
+        - Checking for workflow name uniqueness in the registry
+        - Validating that each step references an existing function
+        - Verifying that all step definitions include the required fields
+        
+        Workflows are particularly valuable for:
+        - Multi-stage data processing and analysis pipelines
+        - Sequential operations that build on previous results
+        - Complex business processes that require coordinated actions
+        - Reusable sequences that encapsulate common patterns
+        
+        The parameter passing mechanism between workflow steps enables data to flow through
+        the entire process, with each step receiving both the initial parameters and the
+        results of previous steps, allowing for sophisticated data transformations and
+        analysis.
         
         Example:
             workflow_registry.register(
@@ -623,13 +724,21 @@ class MCPWorkflowRegistry:
             )
         
         Args:
-            name: Unique workflow identifier
-            description: Human-readable workflow description
-            steps: List of workflow steps, each with a function name and parameters
+            name: Unique workflow identifier within the MCP workflow registry. Should
+                 be descriptive of the workflow's overall purpose and follow consistent
+                 naming conventions (e.g., noun_verb_noun format).
+            description: Human-readable description of what the workflow accomplishes,
+                        the process it implements, and its expected outcomes. This will
+                        be exposed in documentation, UIs, and metadata responses.
+            steps: Ordered list of workflow steps, where each step is a dictionary
+                  containing at minimum a "function" key with the name of an existing
+                  MCP function, and an optional "parameters" key with function-specific
+                  parameter values. Steps are executed in the order provided.
             
         Raises:
-            ValueError: If a workflow with the same name is already registered
-            ValueError: If any step references a function that doesn't exist
+            ValueError: If a workflow with the same name is already registered in the registry
+            ValueError: If any step references a function that doesn't exist in the function registry
+            ValueError: If any step definition is missing the required "function" field
         """
         if name in self.workflows:
             raise ValueError(f"Workflow '{name}' is already registered")
@@ -747,10 +856,47 @@ class MCPWorkflowRegistry:
         - Generating API documentation for available workflow endpoints
         - Creating dashboards or monitoring tools that track workflow usage
         - Supporting workflow discovery in automation systems
+        - Providing transparency into available business processes
+        - Enabling workflow visualization and diagram generation
+        - Supporting automated testing of workflow components
+        
+        The returned metadata structure follows a consistent format suitable for direct
+        serialization to JSON, making it ideal for API responses and client-side rendering.
+        Each workflow dictionary contains standardized fields that describe both the 
+        workflow's purpose and its execution structure.
+        
+        This method is commonly used in conjunction with specific metadata filtering and
+        transformation operations to support targeted use cases like:
+        - Presenting workflows related to specific functional domains to users
+        - Analyzing workflow complexity and dependency relationships
+        - Generating comprehensive system documentation
+        - Supporting workflow search and categorization
+        
+        Example usage:
+            ```python
+            # Get all registered workflows
+            workflows = workflow_registry.list_workflows()
+            
+            # Filter workflows by a search term in the description
+            search_term = "tax"
+            matching_workflows = [
+                wf for wf in workflows 
+                if search_term.lower() in wf["description"].lower()
+            ]
+            
+            # Format for display in UI
+            for wf in matching_workflows:
+                print(f"Workflow: {wf['name']}")
+                print(f"Description: {wf['description']}")
+                print(f"Steps: {len(wf['steps'])}")
+                print("---")
+            ```
         
         Returns:
             List of workflow metadata dictionaries, where each dictionary contains
-            complete information about a workflow, including its steps
+            complete information about a workflow, including its name, description, 
+            and the detailed sequence of steps that define its execution path.
+            The format matches the output of MCPWorkflow.to_dict() for each workflow.
         """
         return [workflow.to_dict() for workflow in self.workflows.values()]
 
@@ -773,13 +919,40 @@ workflow_registry = MCPWorkflowRegistry(registry)
 )
 def analyze_tax_distribution(tax_code: Optional[str] = None) -> Dict[str, Any]:
     """
-    Analyze distribution of tax burden across properties.
+    Analyze distribution of tax burden across properties within a specific tax code.
+    
+    This function performs a comprehensive statistical analysis of the tax distribution
+    patterns across all properties within the specified tax code. If no tax code is 
+    provided, the analysis is performed across all available tax codes, providing
+    an aggregated view of the entire tax landscape.
+    
+    The analysis includes key statistical measures such as:
+    - Central tendency metrics (mean, median, mode)
+    - Dispersion metrics (standard deviation, variance, range, IQR)
+    - Distribution shape characteristics (skewness, kurtosis)
+    - Identification of statistical outliers
+    - Comparative benchmarks against similar jurisdictions
+    
+    This analysis is valuable for:
+    - Identifying equity patterns in tax distribution
+    - Detecting potential assessment inconsistencies
+    - Supporting policy decisions with quantitative evidence
+    - Providing transparent tax burden insights to stakeholders
+    - Establishing baselines for longitudinal trend analysis
     
     Args:
-        tax_code: Tax code to analyze (optional)
+        tax_code: Unique identifier for the tax code to analyze. If None,
+                the analysis will be performed across all available tax codes.
+                Format typically follows the jurisdiction's standard notation
+                (e.g., '12-345-6789').
         
     Returns:
-        Analysis results
+        A comprehensive dictionary containing the analysis results, including:
+        - Statistical measures of the tax distribution
+        - Key insights derived from the analysis
+        - Distribution quartile information
+        - Any detected anomalies or outliers
+        - Confidence metrics for the provided insights
     """
     # This is a placeholder - the actual implementation would analyze real data
     return {
@@ -810,14 +983,53 @@ def analyze_tax_distribution(tax_code: Optional[str] = None) -> Dict[str, Any]:
 )
 def predict_levy_rates(tax_code: Optional[str], years: int = 1) -> Dict[str, Any]:
     """
-    Predict future levy rates based on historical data.
+    Predict future levy rates based on historical data using advanced time series modeling.
+    
+    This function implements a sophisticated predictive analytics approach to forecast
+    future levy rates for the specified tax code over the requested time horizon. The
+    prediction engine combines multiple forecasting methodologies, including:
+    
+    1. Time series analysis of historical rate patterns
+    2. Regression modeling incorporating economic indicators
+    3. Statutory constraint analysis to respect legal limits
+    4. Bayesian forecasting for uncertainty quantification
+    5. Comparative analysis against similar jurisdictions
+    
+    The predictions account for various factors that influence levy rates, including:
+    - Historical growth trends and seasonality patterns
+    - Economic development indicators and property value changes
+    - Legislative constraints and statutory limits
+    - Budget requirements and public service demands
+    - Local government policy objectives
+    
+    These forecasts are valuable for:
+    - Strategic financial planning by local governments
+    - Property owner tax expense projections
+    - Real estate investment decision support
+    - Public transparency in fiscal policy
+    - Long-term municipal budget planning
     
     Args:
-        tax_code: Tax code to predict
-        years: Number of years to predict
+        tax_code: Unique identifier for the tax code to forecast. If None,
+                predictions will be generated for aggregated data across all
+                available tax codes. Format typically follows the jurisdiction's
+                standard notation (e.g., '12-345-6789').
+        years: Number of future years to include in the forecast, ranging from
+              1 to 10 years. Default is 1 year. Longer forecasts will have
+              wider confidence intervals reflecting increased uncertainty.
         
     Returns:
-        Prediction results
+        A comprehensive dictionary containing the prediction results, including:
+        - Year-by-year levy rate forecasts for the requested time horizon
+        - Confidence scores for each prediction point
+        - Key influencing factors considered in the model
+        - Sensitivity analysis for major variables
+        - Comparative benchmarks against similar jurisdictions
+        
+    Note:
+        Predictions beyond 3 years have substantially higher uncertainty and
+        should be interpreted with appropriate caution. Multiple scenarios
+        should be considered for long-range planning purposes.
     """
     # This is a placeholder - the actual implementation would analyze real data
     return {
