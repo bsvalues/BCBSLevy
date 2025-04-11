@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Status - Levy Calculation System{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.65rem;
+        border-radius: 50rem;
+    }
+    
+    .status-badge-processing {
+        background-color: #f0ad4e;
+        color: #212529;
+    }
+    
+    .status-badge-completed {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .status-badge-failed {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .status-badge-running {
+        background-color: #17a2b8;
+        color: white;
+    }
+    
+    .timeline {
+        list-style-type: none;
+        margin-left: 1.5rem;
+        padding-left: 0;
+        position: relative;
+    }
+    
+    .timeline:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        height: calc(100% - 10px);
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: -8px;
+        top: 5px;
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        background-color: #6c757d;
+    }
+    
+    .timeline-item.success:before {
+        background-color: #28a745;
+    }
+    
+    .timeline-item.warning:before {
+        background-color: #f0ad4e;
+    }
+    
+    .timeline-item.danger:before {
+        background-color: #dc3545;
+    }
+    
+    .timeline-item.info:before {
+        background-color: #17a2b8;
+    }
+    
+    .progress-container {
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+    }
+    
+    /* Add animation for running imports */
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(23, 162, 184, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0); }
+    }
+    
+    .card-pulse {
+        animation: pulse 2s infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section with Gradient Background -->
+<div class="app-header-bg py-4 mb-4 rounded-4 mx-3">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold text-white mb-3">Import Status</h1>
+                <p class="lead text-light opacity-90 mb-0">Track the progress of your data import</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <a href="{{ url_for('data_management.import_form') }}" class="btn btn-light rounded-pill px-4">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Import Form
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <!-- Import Status Card -->
+            <div class="card {% if import_log.status == 'RUNNING' %}card-pulse{% endif %} border-0 shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-arrow-up me-2"></i>
+                        Import: {{ import_log.filename }}
+                    </h5>
+                    <span class="status-badge status-badge-{{ import_log.status.lower() }}">
+                        {{ import_log.status }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Import Details</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th style="width: 35%">Import ID:</th>
+                                    <td>{{ import_log.id }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Import Type:</th>
+                                    <td>{{ import_log.import_type }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Started At:</th>
+                                    <td>{{ import_log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Updated At:</th>
+                                    <td>{{ import_log.updated_at.strftime('%Y-%m-%d %H:%M:%S') if import_log.updated_at else 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Year:</th>
+                                    <td>{{ import_log.year }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>
+                                        <span class="status-badge status-badge-{{ import_log.status.lower() }}">
+                                            {{ import_log.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Import Progress</h6>
+                            
+                            {% if import_log.status == 'RUNNING' %}
+                            <div class="progress-container">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Processing Import...</span>
+                                    <span class="text-muted">Please wait</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 10px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" 
+                                         role="progressbar" 
+                                         style="width: 100%;" 
+                                         aria-valuenow="100" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    This process may take a few minutes to complete. Do not close this page.
+                                </p>
+                                
+                                <!-- Auto-refresh for running imports -->
+                                <script>
+                                    // Refresh the page every 10 seconds if the import is still running
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 10000);
+                                </script>
+                            </div>
+                            {% else %}
+                            <div class="progress-container">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Import {{ import_log.status.title() }}</span>
+                                    <span class="text-muted">{{ import_log.updated_at.strftime('%Y-%m-%d %H:%M:%S') if import_log.updated_at else 'N/A' }}</span>
+                                </div>
+                                
+                                {% if import_log.status == 'COMPLETED' %}
+                                <div class="progress mb-3" style="height: 10px;">
+                                    <div class="progress-bar bg-success" 
+                                         role="progressbar" 
+                                         style="width: 100%;" 
+                                         aria-valuenow="100" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <p class="text-success mb-0">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Import completed successfully.
+                                </p>
+                                {% elif import_log.status == 'FAILED' %}
+                                <div class="progress mb-3" style="height: 10px;">
+                                    <div class="progress-bar bg-danger" 
+                                         role="progressbar" 
+                                         style="width: 100%;" 
+                                         aria-valuenow="100" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <p class="text-danger mb-0">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                    Import failed. See details below.
+                                </p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Import Notes or Error Details -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-muted mb-3">Notes</h6>
+                            {% if import_log.notes %}
+                            <div class="alert {% if import_log.status == 'FAILED' %}alert-danger{% elif import_log.status == 'COMPLETED' %}alert-success{% else %}alert-info{% endif %}">
+                                {{ import_log.notes }}
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No notes available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="row mt-4">
+                        <div class="col-12 text-end">
+                            <a href="{{ url_for('data_management.import_history') }}" class="btn btn-outline-secondary me-2">
+                                <i class="bi bi-clock-history me-1"></i>
+                                View Import History
+                            </a>
+                            <a href="{{ url_for('data_management.import_form') }}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                New Import
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

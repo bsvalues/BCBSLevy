@@ -58,10 +58,33 @@ def data_management_index():
     )
 
 
-@data_management_bp.route("/import", methods=["GET"])
+@data_management_bp.route("/import", methods=["GET", "POST"])
 def import_form():
     """Render the data import form."""
-    # Get available years and import types for the form
+    if request.method == "POST":
+        # Check if this is a special Benton County import request
+        if 'benton_county_import' in request.form:
+            try:
+                # Create import log for Benton County import
+                import_log = ImportLog(
+                    filename="Benton County Data Import",
+                    import_type=ImportType.TAX_DISTRICT,
+                    status="PROCESSING",
+                    year=2025,  # Hard-coded for now, should be configurable
+                    notes="Started Benton County data import process"
+                )
+                db.session.add(import_log)
+                db.session.commit()
+                
+                # Redirect to the Benton County import route
+                flash('Benton County data import initiated', 'success')
+                return redirect(url_for('data_management.import_benton_county', log_id=import_log.id))
+            except Exception as e:
+                logger.error(f"Error scheduling Benton County import: {str(e)}")
+                flash(f'Error scheduling import: {str(e)}', 'error')
+                return redirect(url_for('data_management.import_history'))
+    
+    # For GET requests, display the import form
     current_year = datetime.now().year
     years = list(range(current_year - 5, current_year + 2))
     import_types = [{"id": t.value, "name": t.name.replace("_", " ").title()} 
@@ -75,12 +98,12 @@ def import_form():
     )
 
 
-@data_management_bp.route("/import", methods=["POST"])
+@data_management_bp.route("/import/data", methods=["POST"])
 def import_data():
     """Handle data import from uploaded files."""
     if "file" not in request.files:
         flash("No file part", "error")
-        return redirect(request.url)
+        return redirect(url_for("data_management.import_form"))
     
     file = request.files["file"]
     if file.filename == "":
@@ -434,6 +457,96 @@ def view_tax_code(tax_code_id):
         "data_management/tax_code_detail.html", 
         tax_code=tax_code
     )
+
+
+@data_management_bp.route("/import/benton-county/<int:log_id>", methods=["GET"])
+def import_benton_county(log_id):
+    """Run the Benton County data import process."""
+    import_log = ImportLog.query.get_or_404(log_id)
+    
+    try:
+        # Import the Benton County data import module
+        from import_benton_county_data import (
+            import_districts_from_worksheets,
+            import_tax_codes_from_cert_report,
+            import_levy_rates,
+            import_preliminary_values
+        )
+        
+        # Update the import log status
+        import_log.status = "RUNNING"
+        import_log.notes = "Running Benton County data import process"
+        db.session.commit()
+        
+        # Run the import steps
+        success_messages = []
+        
+        # Step 1: Import tax districts from levy worksheets
+        try:
+            import_districts_from_worksheets()
+            success_messages.append("Successfully imported tax districts")
+        except Exception as e:
+            logger.error(f"Error importing tax districts: {str(e)}")
+            import_log.status = "FAILED"
+            import_log.notes = f"Error importing tax districts: {str(e)}"
+            db.session.commit()
+            flash(f"Error importing tax districts: {str(e)}", "error")
+            return render_template("data_management/import_status.html", import_log=import_log)
+        
+        # Step 2: Import tax codes from certification report
+        try:
+            import_tax_codes_from_cert_report()
+            success_messages.append("Successfully imported tax codes")
+        except Exception as e:
+            logger.error(f"Error importing tax codes: {str(e)}")
+            import_log.status = "FAILED"
+            import_log.notes = f"Error importing tax codes: {str(e)}"
+            db.session.commit()
+            flash(f"Error importing tax codes: {str(e)}", "error")
+            return render_template("data_management/import_status.html", import_log=import_log)
+        
+        # Step 3: Import levy rates
+        try:
+            import_levy_rates()
+            success_messages.append("Successfully imported levy rates")
+        except Exception as e:
+            logger.error(f"Error importing levy rates: {str(e)}")
+            import_log.status = "FAILED"
+            import_log.notes = f"Error importing levy rates: {str(e)}"
+            db.session.commit()
+            flash(f"Error importing levy rates: {str(e)}", "error")
+            return render_template("data_management/import_status.html", import_log=import_log)
+        
+        # Step 4: Import preliminary assessed values
+        try:
+            import_preliminary_values()
+            success_messages.append("Successfully imported preliminary values")
+        except Exception as e:
+            logger.error(f"Error importing preliminary values: {str(e)}")
+            import_log.status = "FAILED"
+            import_log.notes = f"Error importing preliminary values: {str(e)}"
+            db.session.commit()
+            flash(f"Error importing preliminary values: {str(e)}", "error")
+            return render_template("data_management/import_status.html", import_log=import_log)
+        
+        # Update the import log with success status
+        import_log.status = "COMPLETED"
+        import_log.notes = "Benton County data import completed successfully"
+        db.session.commit()
+        
+        # Show success messages
+        for message in success_messages:
+            flash(message, "success")
+        
+        return render_template("data_management/import_status.html", import_log=import_log)
+        
+    except Exception as e:
+        logger.error(f"Error in Benton County import process: {str(e)}")
+        import_log.status = "FAILED"
+        import_log.notes = f"Error in Benton County import process: {str(e)}"
+        db.session.commit()
+        flash(f"Error in Benton County import process: {str(e)}", "error")
+        return render_template("data_management/import_status.html", import_log=import_log)
 
 
 @data_management_bp.route("/import/district", methods=["GET", "POST"])

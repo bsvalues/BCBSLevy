@@ -144,6 +144,26 @@
                 </div>
             </div>
             
+            <!-- Benton County Data Import Card -->
+            <div class="card hover-card card-top-border-primary position-relative mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-database-fill"></i> Benton County Data Import</h5>
+                </div>
+                <div class="card-body">
+                    <p>Import all Benton County, Washington property tax data in a single operation.</p>
+                    <p class="text-muted">This automated process will import districts, tax codes, levy rates, and assessed values from multiple files.</p>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i> This utility imports data from multiple file sources including levy worksheets, certification reports, and preliminary values.
+                    </div>
+                    
+                    <form action="{{ url_for('data_management.import_form') }}" method="post" class="mb-3">
+                        <input type="hidden" name="benton_county_import" value="1">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-lightning-charge"></i> Import Benton County Data</button>
+                    </form>
+                </div>
+            </div>
+
             <!-- Advanced Import Options -->
             <div class="card hover-card card-top-border-yellow position-relative mb-4">
                 <div class="card-header bg-dark text-white">
