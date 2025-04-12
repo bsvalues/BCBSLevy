@@ -288,6 +288,11 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint and 'mcp_army' in request.endpoint %}active{% endif %}" href="{{ url_for('mcp_army.dashboard') }}">
+                            <i class="bi bi-robot me-1"></i>MCP Army
+                        </a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-file-earmark-text me-1"></i>Reports
