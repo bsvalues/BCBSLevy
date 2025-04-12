@@ -1,0 +1,198 @@
+/**
+ * Guided Tour CSS Styles
+ * 
+ * Custom styling for intro.js tours to match LevyMaster design.
+ */
+
+/* Tour tooltip customization */
+.introjs-tooltip {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: none;
+    padding: 1rem;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.introjs-tooltiptext {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #212529;
+}
+
+.introjs-tooltipbuttons {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 1rem;
+}
+
+/* Tour header styling */
+.introjs-tooltiptext h5 {
+    color: #0d6efd;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+/* Tour navigation buttons */
+.introjs-button {
+    text-shadow: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    background-color: #fff;
+    color: #6c757d;
+    transition: all 0.2s ease;
+}
+
+.introjs-button:hover {
+    color: #212529;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.introjs-nextbutton {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.introjs-nextbutton:hover {
+    background-color: #0b5ed7;
+    color: white;
+    border-color: #0a58ca;
+}
+
+.introjs-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.introjs-skipbutton {
+    color: #6c757d;
+}
+
+.introjs-prevbutton {
+    border-right: 1px solid #dee2e6;
+}
+
+/* Highlighted elements */
+.introjs-helperLayer {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.5);
+}
+
+.levy-tour-highlight {
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.5) !important;
+    border-radius: 0.25rem;
+    z-index: 9999 !important;
+}
+
+/* Progress indicator */
+.introjs-progress {
+    height: 5px;
+    background-color: #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.introjs-progressbar {
+    background-color: #0d6efd;
+}
+
+/* Tour bullets */
+.introjs-bullets ul li a {
+    background-color: #dee2e6;
+    width: 8px;
+    height: 8px;
+}
+
+.introjs-bullets ul li a.active {
+    background-color: #0d6efd;
+}
+
+/* Number badges */
+.introjs-tooltip-header .introjs-tooltip-number {
+    font-size: 0.75rem;
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+}
+
+/* Tour arrows */
+.introjs-arrow {
+    border-color: white;
+}
+
+.introjs-arrow.top, .introjs-arrow.top-middle, .introjs-arrow.top-right {
+    border-bottom-color: white;
+}
+
+.introjs-arrow.right, .introjs-arrow.right-middle {
+    border-left-color: white;
+}
+
+.introjs-arrow.bottom, .introjs-arrow.bottom-middle, .introjs-arrow.bottom-right {
+    border-top-color: white;
+}
+
+.introjs-arrow.left, .introjs-arrow.left-middle {
+    border-right-color: white;
+}
+
+/* Floating tooltip hint */
+.introjs-hint {
+    width: 20px;
+    height: 20px;
+}
+
+.introjs-hint:hover > .introjs-hint-pulse {
+    border: 5px solid rgba(13, 110, 253, 0.5);
+}
+
+.introjs-hint-pulse {
+    width: 20px;
+    height: 20px;
+    background-color: rgba(13, 110, 253, 0.7);
+    border: 5px solid rgba(13, 110, 253, 0.4);
+}
+
+.introjs-hint-dot {
+    background: rgba(255, 255, 255, 1);
+    border: 2px solid rgba(13, 110, 253, 0.8);
+}
+
+/* Tooltip close button */
+.introjs-tooltip-header {
+    padding-right: 0;
+}
+
+.introjs-tooltip-header .introjs-tooltip-close {
+    color: #6c757d;
+    opacity: 0.7;
+    font-size: 1.2rem;
+}
+
+.introjs-tooltip-header .introjs-tooltip-close:hover {
+    color: #212529;
+    opacity: 1;
+}
+
+/* Animation for tour elements */
+@keyframes introjs-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(13, 110, 253, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+}
+
+.levy-tour-pulse {
+    animation: introjs-pulse 1.5s infinite;
+}

@@ -1,149 +1,200 @@
 """
 Routes for guided tours in the Levy Calculation System.
 
-This module defines routes for the guided tour functionality of the application.
+This module provides endpoints for guided tours that help users
+learn about different features of the application. Tours are
+structured as interactive walkthroughs that highlight UI elements
+and provide context for their functionality.
 """
 
-from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session, current_app
-from flask_login import login_required
+from flask import Blueprint, jsonify, render_template, request, session
 
-
-# Create blueprint
+# Blueprint configuration
 tours_bp = Blueprint('tours', __name__, url_prefix='/tours')
 
-# Define tour configurations
-TOUR_CONFIGS = {
-    'dashboard': {
-        'id': 'dashboard',
-        'name': 'Dashboard Tour',
-        'description': 'Learn how to use the dashboard and understand key metrics.',
-        'route': 'dashboard.index',
-        'steps': 6
-    },
-    'levy_calculator': {
-        'id': 'levy_calculator',
-        'name': 'Levy Calculator Tour',
-        'description': 'Discover how to calculate property tax levies with our calculator.',
-        'route': 'levy_calculator.calculator',
-        'steps': 5
-    },
-    'data_import': {
-        'id': 'data_import',
-        'name': 'Data Import Tour',
-        'description': 'Learn how to import tax district and property data.',
-        'route': 'data_management.import_data',
-        'steps': 4
-    },
-    'property_search': {
-        'id': 'property_search',
-        'name': 'Property Search Tour',
-        'description': 'Explore how to search for properties and view their details.',
-        'route': 'data_management.property_lookup',
-        'steps': 4
-    },
-    'admin-dashboard': {
-        'id': 'admin-dashboard',
-        'name': 'Admin Dashboard Tour',
-        'description': 'Learn how to manage users, districts, and system settings as an administrator.',
-        'route': 'admin.dashboard',
-        'steps': 5
-    },
-    'public-lookup': {
-        'id': 'public-lookup',
-        'name': 'Public Lookup Tour',
-        'description': 'Discover how to use the public property tax lookup portal.',
-        'route': 'public.lookup',
-        'steps': 4
-    },
-    'reports': {
-        'id': 'reports',
-        'name': 'Reports Tour',
-        'description': 'Learn how to generate and customize reports about tax data.',
-        'route': 'reports.index',
-        'steps': 5
-    },
-    'levy-calculation': {
-        'id': 'levy-calculation',
-        'name': 'Levy Calculation Tour',
-        'description': 'Master the levy calculation process with this guided tour.',
-        'route': 'levy_calculator.calculator',
-        'steps': 6
-    }
-}
-
-
-@tours_bp.route('/')
-@login_required
-def tour_index():
-    """Show available tours in the system."""
-    return render_template('tours/index.html', tours=list(TOUR_CONFIGS.values()))
-
-
-@tours_bp.route('/start/<tour_name>')
-@login_required
-def start_tour(tour_name):
+def register_routes(app):
     """
-    Route to start a specific guided tour.
+    Register the tours blueprint with the Flask application.
     
     Args:
-        tour_name: Name of the tour to start
+        app: The Flask application instance
+    """
+    app.register_blueprint(tours_bp)
+    app.logger.info('Tours blueprint registered')
+
+@tours_bp.route('/')
+def tours_home():
+    """
+    Render the tours homepage showing available guided tours.
+    
+    Returns:
+        Rendered template for the tours homepage
+    """
+    tours = [
+        {
+            'id': 'welcome',
+            'name': 'Welcome Tour',
+            'description': 'Get oriented with the LevyMaster system and navigation.',
+            'duration': '3-5 minutes',
+            'icon': 'bi-info-circle'
+        },
+        {
+            'id': 'dashboard',
+            'name': 'Dashboard Tour',
+            'description': 'Learn about the key metrics and features on your dashboard.',
+            'duration': '2-3 minutes',
+            'icon': 'bi-speedometer2'
+        },
+        {
+            'id': 'calculator',
+            'name': 'Levy Calculator Tour',
+            'description': 'Learn how to calculate property tax levies effectively.',
+            'duration': '4-6 minutes',
+            'icon': 'bi-calculator'
+        },
+        {
+            'id': 'data_import',
+            'name': 'Data Import Tour',
+            'description': 'Understand how to import and manage your data.',
+            'duration': '3-4 minutes',
+            'icon': 'bi-cloud-upload'
+        },
+        {
+            'id': 'analysis',
+            'name': 'Analytics Tools Tour',
+            'description': 'Explore the various analytics and reporting tools.',
+            'duration': '5-7 minutes',
+            'icon': 'bi-graph-up'
+        },
+        {
+            'id': 'mcp_army',
+            'name': 'MCP Army Tour',
+            'description': 'Get acquainted with the AI agent system.',
+            'duration': '4-5 minutes',
+            'icon': 'bi-robot'
+        }
+    ]
+    
+    return render_template('tours/index.html', tours=tours)
+
+@tours_bp.route('/start/<tour_id>')
+def start_tour(tour_id):
+    """
+    Start a guided tour by tour ID.
+    
+    Args:
+        tour_id: The ID of the tour to start
         
     Returns:
-        Redirects to the page for the specified tour with tour param
+        JSON response with tour configuration
     """
-    # Check if the tour exists
-    if tour_name not in TOUR_CONFIGS:
-        return render_template('simple_404.html', 
-                              error_code=404, 
-                              error_title="Tour Not Found",
-                              error_message="The requested tour does not exist."), 404
+    # Store in session that this tour has been started
+    tours_started = session.get('tours_started', [])
+    if tour_id not in tours_started:
+        tours_started.append(tour_id)
+        session['tours_started'] = tours_started
     
-    # Get the tour configuration
-    tour = TOUR_CONFIGS[tour_name]
-    
-    # Set the session variable to indicate the tour should be shown
-    session['current_tour'] = tour_name
-    
-    # Redirect to the page for this tour
-    return redirect(url_for(tour['route'], tour=tour_name))
+    # Redirect to appropriate page based on tour type
+    if tour_id == 'welcome':
+        return jsonify({
+            'redirect': '/',
+            'start_tour': 'welcomeTour',
+            'message': 'Welcome to the guided tour of LevyMaster!'
+        })
+    elif tour_id == 'dashboard':
+        return jsonify({
+            'redirect': '/dashboard',
+            'start_tour': 'dashboardTour',
+            'message': 'Welcome to the Dashboard tour!'
+        })
+    elif tour_id == 'calculator':
+        return jsonify({
+            'redirect': '/levy-calculator',
+            'start_tour': 'calculatorTour',
+            'message': 'Welcome to the Levy Calculator tour!'
+        })
+    elif tour_id == 'data_import':
+        return jsonify({
+            'redirect': '/data/import',
+            'start_tour': 'dataImportTour',
+            'message': 'Welcome to the Data Import tour!'
+        })
+    elif tour_id == 'analysis':
+        return jsonify({
+            'redirect': '/analysis/forecasting',
+            'start_tour': 'analysisTour',
+            'message': 'Welcome to the Analytics Tools tour!'
+        })
+    elif tour_id == 'mcp_army':
+        return jsonify({
+            'redirect': '/mcp-army-dashboard',
+            'start_tour': 'mcpArmyTour',
+            'message': 'Welcome to the MCP Army tour!'
+        })
+    else:
+        return jsonify({
+            'error': 'Tour not found',
+            'redirect': '/tours'
+        }), 404
 
-
-@tours_bp.route('/settings', methods=['GET', 'POST'])
-@login_required
-def tour_settings():
-    """Manage tour settings (enable/disable auto-tours)."""
-    if request.method == 'POST':
-        # Handle setting update
-        enable_auto_tours = request.form.get('enable_auto_tours', 'true') == 'true'
-        
-        # Save to session
-        session['enable_auto_tours'] = enable_auto_tours
-        
-        # Return JSON response if it's an API request
-        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'status': 'success', 'message': 'Tour settings updated'})
-        
-        # Redirect to tours page if it's a form submission
-        return redirect(url_for('tours.tour_index'))
+@tours_bp.route('/progress')
+def tour_progress():
+    """
+    Get the user's tour progress.
     
-    # GET request - show settings page
-    return render_template('tours/settings.html')
+    Returns:
+        JSON response with tour completion status
+    """
+    # Get progress from session
+    tours_started = session.get('tours_started', [])
+    tours_completed = session.get('tours_completed', [])
+    
+    all_tours = ['welcome', 'dashboard', 'calculator', 'data_import', 'analysis', 'mcp_army']
+    progress = {
+        'started': tours_started,
+        'completed': tours_completed,
+        'total': len(all_tours),
+        'completed_count': len(tours_completed),
+        'percentage': round((len(tours_completed) / len(all_tours)) * 100) if all_tours else 0
+    }
+    
+    return jsonify(progress)
 
+@tours_bp.route('/complete/<tour_id>', methods=['POST'])
+def complete_tour(tour_id):
+    """
+    Mark a tour as completed.
+    
+    Args:
+        tour_id: The ID of the tour to mark as completed
+        
+    Returns:
+        JSON response confirming completion
+    """
+    # Store in session that this tour has been completed
+    tours_completed = session.get('tours_completed', [])
+    if tour_id not in tours_completed:
+        tours_completed.append(tour_id)
+        session['tours_completed'] = tours_completed
+    
+    return jsonify({
+        'success': True,
+        'message': f'Tour {tour_id} marked as completed',
+        'completed': tours_completed
+    })
 
 @tours_bp.route('/reset', methods=['POST'])
-@login_required
 def reset_tours():
-    """Reset tour completion status."""
-    # Clear all tour completion status from session
-    for key in list(session.keys()):
-        if key.startswith('tour_') and key.endswith('_completed'):
-            session.pop(key, None)
+    """
+    Reset all tour progress.
     
-    # Return JSON response
-    return jsonify({'status': 'success', 'message': 'Tour completion status has been reset'})
-
-
-def register_routes(app):
-    """Register the tours blueprint with the application."""
-    # The blueprint is registered in app.py, no need to register again here
-    app.logger.info('Tours blueprint registered')
+    Returns:
+        JSON response confirming reset
+    """
+    session.pop('tours_started', None)
+    session.pop('tours_completed', None)
+    
+    return jsonify({
+        'success': True,
+        'message': 'All tour progress has been reset'
+    })

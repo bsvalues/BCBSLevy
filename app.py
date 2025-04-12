@@ -298,7 +298,7 @@ app.register_blueprint(glossary_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(db_fix_bp)
 # Note: levy_calculator_bp is registered via register_levy_calculator_routes
-app.register_blueprint(tours_bp)
+# Note: tours_bp is registered via register_tour_routes
 # Note: historical_analysis_bp is registered via init_historical_analysis_routes
 # Note: mcp_bp is registered via init_mcp_routes
 app.register_blueprint(advanced_mcp_bp)

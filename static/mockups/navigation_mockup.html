@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LevyMaster Navigation Redesign</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --accent-color: #ffc107;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 60px;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            background-color: rgba(13, 110, 253, 0.1);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .dropdown-menu {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            padding: 0.75rem 0;
+            margin-top: 0.5rem;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        .dropdown-item:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        
+        .dropdown-item i {
+            color: var(--primary-color);
+        }
+        
+        .content-area {
+            min-height: 600px;
+            background-color: var(--light-bg);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feedback-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.7rem;
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            transform: translate(50%, -50%);
+        }
+        
+        .mobile-nav-preview {
+            width: 320px;
+            height: 580px;
+            border: 12px solid #333;
+            border-radius: 36px;
+            margin: 0 auto;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .mobile-nav-content {
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        .mobile-nav-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .mobile-nav-item i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            color: var(--primary-color);
+        }
+        
+        /* Animation for feedback */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .feedback-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        /* User onboarding tooltip */
+        .tour-tooltip {
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            top: 60px;
+            left: 20px;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .tour-tooltip::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            border-width: 0 10px 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent #fff transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1 class="mb-5 text-center">LevyMaster Navigation Redesign Mockups</h1>
+        
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2>Desktop Navigation</h2>
+                <p class="lead">Streamlined navigation with 8 main categories and intuitive dropdown organization.</p>
+                
+                <!-- Desktop Navigation Mockup -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="#">
+                            <i class="bi bi-building text-primary me-2"></i>LevyMaster
+                        </a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#">
+                                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="taxDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-calculator me-1"></i>Tax Management
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="taxDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-calculator-fill me-2"></i>Levy Calculator
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-geo-alt me-2"></i>Tax Districts
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-house me-2"></i>Property Lookup
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-cash-coin me-2"></i>Bill Impact Calculator
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-building me-2"></i>Budget Impact
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-check-circle me-2"></i>Compliance Check
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="dataDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-database me-1"></i>Data Hub
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="dataDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-cloud-upload me-2"></i>Import Data
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-cloud-download me-2"></i>Export Data
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-search me-2"></i>Search
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-archive me-2"></i>Import History
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-card-checklist me-2"></i>Data Quality
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown position-relative">
+                                    <a class="nav-link dropdown-toggle" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-graph-up me-1"></i>Analytics
+                                    </a>
+                                    <span class="feedback-badge">NEW</span>
+                                    <ul class="dropdown-menu" aria-labelledby="analyticsDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-graph-up-arrow me-2"></i>Forecasting
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-clock-history me-2"></i>Historical Analysis
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-arrow-up-right me-2"></i>Trends & Patterns
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-bar-chart me-2"></i>Comparative Analysis
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-diagram-3 me-2"></i>Tax Strategy Tree
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-pie-chart me-2"></i>Visualizations
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="aiDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-robot me-1"></i>AI & Agents
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="aiDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-robot me-2"></i>MCP Army Dashboard
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-gear-wide-connected me-2"></i>Agent Configuration
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-diagram-3 me-2"></i>Workflow Orchestration
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-shield-check me-2"></i>Levy Audit Assistant
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-people me-2"></i>Collaborative Workflows
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-file-earmark-text me-1"></i>Reports
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-file-earmark-bar-graph me-2"></i>District Summary
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-file-earmark-text me-2"></i>Tax Code Analysis
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-arrow-up-right me-2"></i>Trend Reports
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-check2-square me-2"></i>Compliance Reports
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-pencil-square me-2"></i>Custom Reports
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-calendar-check me-2"></i>Scheduled Reports
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-gear me-1"></i>Admin
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-people me-2"></i>User Management
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-sliders me-2"></i>Settings
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-journal-text me-2"></i>System Logs
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-clipboard-check me-2"></i>Audit Logs
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-cloud-arrow-up me-2"></i>Database Backup
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-speedometer me-2"></i>Performance
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <ul class="navbar-nav ms-auto">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">
+                                        <i class="bi bi-question-circle me-1"></i>Help
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-book me-1"></i>Resources
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="resourcesDropdown">
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-info-circle me-2"></i>Guided Tours
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-journal-bookmark me-2"></i>Glossary
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-file-earmark-text me-2"></i>Documentation
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-play-circle me-2"></i>Video Tutorials
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-question-circle me-2"></i>FAQ
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#">
+                                                <i class="bi bi-envelope me-2"></i>Contact Support
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#">
+                                        <i class="bi bi-person-circle me-1"></i>Profile
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Tour Tooltip Example -->
+                <div class="tour-tooltip">
+                    <h5><i class="bi bi-info-circle-fill text-primary me-2"></i>Analytics Section</h5>
+                    <p>This section contains powerful tools for forecasting, historical analysis, and data visualization.</p>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-sm btn-outline-secondary">Skip</button>
+                        <button class="btn btn-sm btn-primary">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Content Area Mockup -->
+                <div class="content-area mt-5 shadow-sm">
+                    <h3 class="mb-4">Page Content Goes Here</h3>
+                    <p>This is where the main content of each page will be displayed. The navigation structure has been optimized for:</p>
+                    <ul>
+                        <li>Fewer top-level categories (8 instead of ~10)</li>
+                        <li>Logical grouping of related functionality</li>
+                        <li>Enhanced discoverability through clear categorization</li>
+                        <li>Mobile-friendly design that maintains all functionality</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <h2>Mobile Navigation</h2>
+                <p class="lead">Simplified mobile navigation that maintains all functionality while optimizing for smaller screens.</p>
+                
+                <!-- Mobile Navigation Mockup -->
+                <div class="mobile-nav-preview shadow">
+                    <div class="mobile-nav-content">
+                        <div class="mobile-nav-header d-flex justify-content-between align-items-center">
+                            <span>LevyMaster</span>
+                            <i class="bi bi-x-lg"></i>
+                        </div>
+                        
+                        <div class="p-3">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" placeholder="Search...">
+                            </div>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-speedometer2"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-calculator"></i>
+                            <span>Tax Management</span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-database"></i>
+                            <span>Data Hub</span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Analytics</span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-robot"></i>
+                            <span>AI & Agents</span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Reports</span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-gear"></i>
+                            <span>Admin</span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        
+                        <div class="mobile-nav-item">
+                            <i class="bi bi-question-circle"></i>
+                            <span>Help & Resources</span>
+                            <i class="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                        
+                        <div class="p-3 border-top mt-3">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-person-circle me-3 text-primary" style="font-size: 2rem;"></i>
+                                <div>
+                                    <strong>John Doe</strong>
+                                    <div class="text-muted small">Administrator</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-primary w-100">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h2>Onboarding & Guided Tours</h2>
+                <p class="lead">Interactive onboarding experience to help users navigate the system.</p>
+                
+                <!-- Onboarding Mockup -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title"><i class="bi bi-info-circle-fill text-primary me-2"></i>Welcome to LevyMaster</h4>
+                        <p class="card-text">Would you like a guided tour of the system?</p>
+                        
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tourCheck1" checked>
+                                <label class="form-check-label" for="tourCheck1">
+                                    Navigation Overview
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tourCheck2" checked>
+                                <label class="form-check-label" for="tourCheck2">
+                                    Dashboard Tour
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tourCheck3" checked>
+                                <label class="form-check-label" for="tourCheck3">
+                                    Data Import/Export Basics
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tourCheck4" checked>
+                                <label class="form-check-label" for="tourCheck4">
+                                    Levy Calculator Introduction
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-outline-secondary">Skip Tour</button>
+                            <button class="btn btn-primary">Start Tour</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Tour Progress</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Navigation Overview
+                                <span class="badge bg-success rounded-pill"><i class="bi bi-check"></i></span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Dashboard Tour
+                                <span class="badge bg-primary rounded-pill">Current</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Data Import/Export Basics
+                                <span class="badge bg-secondary rounded-pill">Pending</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Levy Calculator Introduction
+                                <span class="badge bg-secondary rounded-pill">Pending</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

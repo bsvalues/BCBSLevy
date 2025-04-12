@@ -1,248 +1,503 @@
 /**
- * Guided Tour - Tour management and UI integration for the Levy Calculation System
+ * Guided Tour Implementation using intro.js
  * 
- * This script provides additional functionality for the guided tour system,
- * including tour navigation, tour cards, and integration with the application UI.
+ * This module provides interactive onboarding tours for the LevyMaster application.
+ * It includes multiple tour paths based on user role and context.
  */
 
-// Tour navigation helper
-class TourNavigator {
-    constructor() {
-        try {
-            this.initUI();
-            this.initEventListeners();
-            console.log("Guided Tour System initialized");
-        } catch (error) {
-            console.error("Error initializing Guided Tour System:", error);
+// Configuration for different tour paths
+const tourConfig = {
+    // New user welcome tour
+    welcomeTour: [
+        {
+            element: '.navbar-brand',
+            title: 'Welcome to LevyMaster',
+            intro: 'Welcome to the Benton County Levy Calculation System. This guided tour will help you get familiar with the interface and key features.',
+            position: 'bottom'
+        },
+        {
+            element: '#navbarNav',
+            title: 'Navigation Menu',
+            intro: 'The navigation menu is organized into logical sections. We\'ve streamlined it to make finding features easier.',
+            position: 'bottom'
+        },
+        {
+            element: '[href$="dashboard"]',
+            title: 'Dashboard',
+            intro: 'Your central hub shows key metrics, recent activity, and system status.',
+            position: 'right'
+        },
+        {
+            element: '#taxDropdown',
+            title: 'Tax Management',
+            intro: 'Access core tax calculation and analysis tools here, including the Levy Calculator and Tax Districts.',
+            position: 'right'
+        },
+        {
+            element: '#dataDropdown',
+            title: 'Data Hub',
+            intro: 'Import, export, and search for data. This central location manages all your data operations.',
+            position: 'right'
+        },
+        {
+            element: '#analyticsDropdown',
+            title: 'Analytics & Insights',
+            intro: 'Powerful analysis tools including forecasting, historical analysis, and data visualization.',
+            position: 'right'
+        },
+        {
+            element: '#aiDropdown',
+            title: 'AI & Agents',
+            intro: 'Our intelligent assistant system helps with complex calculations and data analysis.',
+            position: 'right'
+        },
+        {
+            element: '#reportsDropdown',
+            title: 'Reports',
+            intro: 'Generate standardized and custom reports for different stakeholders.',
+            position: 'left'
+        },
+        {
+            element: '#helpMenuToggle',
+            title: 'Help Center',
+            intro: 'Click here anytime to access help resources, tutorials, and documentation.',
+            position: 'left'
+        },
+        {
+            element: '#resourcesDropdown',
+            title: 'Resources',
+            intro: 'Access guided tours, glossary, and training materials.',
+            position: 'left'
+        },
+        {
+            // No element - final step
+            title: 'Ready to Start',
+            intro: 'You\'re all set! You can restart this tour anytime from the Help menu. Click "Done" to begin using LevyMaster.',
         }
-    }
+    ],
+
+    // Dashboard specific tour
+    dashboardTour: [
+        {
+            element: '.dashboard-kpi-cards',
+            title: 'Key Performance Indicators',
+            intro: 'These cards show important metrics at a glance.',
+            position: 'bottom'
+        },
+        {
+            element: '.dashboard-recent-activity',
+            title: 'Recent Activity',
+            intro: 'Track recent changes and updates to your data.',
+            position: 'right'
+        },
+        {
+            element: '.dashboard-quick-actions',
+            title: 'Quick Actions',
+            intro: 'Common tasks can be started directly from these buttons.',
+            position: 'left'
+        },
+        {
+            element: '.dashboard-visualization',
+            title: 'Data Visualization',
+            intro: 'Interactive charts show trends and patterns in your data.',
+            position: 'top'
+        },
+        {
+            // No element - final step
+            title: 'Dashboard Tour Complete',
+            intro: 'You now know how to use the dashboard. Explore the other sections of the application when you\'re ready.',
+        }
+    ],
+
+    // Levy Calculator tour
+    calculatorTour: [
+        {
+            element: '.calculator-district-select',
+            title: 'Select Tax District',
+            intro: 'Start by selecting the tax district you want to calculate levy for.',
+            position: 'right'
+        },
+        {
+            element: '.calculator-year-select',
+            title: 'Select Year',
+            intro: 'Choose the year for your levy calculation.',
+            position: 'right'
+        },
+        {
+            element: '.calculator-inputs',
+            title: 'Calculation Inputs',
+            intro: 'Enter or adjust values in these fields to see how they affect the levy calculation.',
+            position: 'left'
+        },
+        {
+            element: '.calculator-results',
+            title: 'Calculation Results',
+            intro: 'The calculated results will appear here in real-time as you update inputs.',
+            position: 'top'
+        },
+        {
+            element: '.calculator-actions',
+            title: 'Save & Export',
+            intro: 'Save your calculations or export them to various formats using these buttons.',
+            position: 'left'
+        },
+        {
+            // No element - final step
+            title: 'Calculator Tour Complete',
+            intro: 'You now know how to use the Levy Calculator. Try making a calculation on your own.',
+        }
+    ],
+
+    // Data Import tour
+    dataImportTour: [
+        {
+            element: '.import-source-select',
+            title: 'Select Data Source',
+            intro: 'Choose where your data is coming from.',
+            position: 'right'
+        },
+        {
+            element: '.import-file-upload',
+            title: 'Upload Files',
+            intro: 'Upload your data files here. We support CSV, Excel, and XML formats.',
+            position: 'bottom'
+        },
+        {
+            element: '.import-mapping',
+            title: 'Field Mapping',
+            intro: 'Map your data columns to our system fields. The system will try to match them automatically.',
+            position: 'left'
+        },
+        {
+            element: '.import-validation',
+            title: 'Data Validation',
+            intro: 'The system checks your data for errors before importing.',
+            position: 'top'
+        },
+        {
+            element: '.import-summary',
+            title: 'Import Summary',
+            intro: 'Review the import summary before finalizing.',
+            position: 'right'
+        },
+        {
+            // No element - final step
+            title: 'Data Import Tour Complete',
+            intro: 'You now know how to import data into the system.',
+        }
+    ],
+};
+
+// User preference storage for tours
+const tourPreferences = {
+    // Save whether user has completed specific tours
+    markTourComplete: function(tourName) {
+        localStorage.setItem(`tour_${tourName}_completed`, 'true');
+    },
     
-    // Initialize tour UI elements
-    initUI() {
-        // Create tour navigation element if it doesn't exist
-        if (!document.getElementById('tourNavigation')) {
-            const tourNav = document.createElement('div');
-            tourNav.id = 'tourNavigation';
-            tourNav.className = 'position-fixed bottom-0 end-0 p-3';
-            tourNav.style.zIndex = '1050';
-            tourNav.innerHTML = `
-                <div class="card shadow-sm border-primary" style="max-width: 300px;">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-info-circle-fill me-2"></i>
-                            Guided Tours
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p>Explore the features of our Levy Calculation System with guided tours.</p>
-                        <div class="d-grid gap-2">
-                            <button id="startDashboardTour" class="btn btn-outline-primary btn-sm" data-tour="dashboard">
-                                <i class="bi bi-easel me-1"></i>Dashboard Tour
-                            </button>
-                            <button id="startCalculatorTour" class="btn btn-outline-primary btn-sm" data-tour="levy_calculator">
-                                <i class="bi bi-calculator me-1"></i>Levy Calculator Tour
-                            </button>
-                            <a href="/tours" class="btn btn-link btn-sm text-decoration-none">
-                                <i class="bi bi-list-check me-1"></i>View All Tours
-                            </a>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white d-flex justify-content-between">
-                        <button id="closeTourNav" class="btn btn-sm btn-link text-muted">
-                            Hide
-                        </button>
-                        <button id="disableTours" class="btn btn-sm btn-link text-muted">
-                            Don't Show Again
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(tourNav);
-        }
-    }
+    // Check if user has completed a tour
+    isTourCompleted: function(tourName) {
+        return localStorage.getItem(`tour_${tourName}_completed`) === 'true';
+    },
     
-    // Initialize event listeners
-    initEventListeners() {
-        // Event listener for closing the tour navigation
-        const closeNavButton = document.getElementById('closeTourNav');
-        if (closeNavButton) {
-            closeNavButton.addEventListener('click', () => {
-                const tourNav = document.getElementById('tourNavigation');
-                if (tourNav) {
-                    tourNav.style.display = 'none';
-                }
-            });
-        }
-        
-        // Event listener for disabling tours
-        const disableToursButton = document.getElementById('disableTours');
-        if (disableToursButton) {
-            disableToursButton.addEventListener('click', () => {
-                localStorage.setItem('enable_auto_tours', 'false');
-                const tourNav = document.getElementById('tourNavigation');
-                if (tourNav) {
-                    tourNav.style.display = 'none';
-                }
-                
-                // Show confirmation toast
-                this.showToast('Automatic tours have been disabled. You can re-enable them in Tour Settings.');
-                
-                // Update server preferences if possible
-                this.updateServerPreferences();
-            });
-        }
-        
-        // Event listeners for tour buttons - using safe method
-        this.safeAddEventListener('[data-tour]', 'click', function() {
-            const tourName = this.getAttribute('data-tour');
-            if (window.tourInitializer) {
-                window.tourInitializer.startTour(tourName);
-            } else {
-                console.error('Tour initializer not found');
-            }
+    // Reset tour completion status
+    resetTourStatus: function(tourName) {
+        localStorage.removeItem(`tour_${tourName}_completed`);
+    },
+    
+    // Reset all tour completion statuses
+    resetAllTours: function() {
+        Object.keys(tourConfig).forEach(tourName => {
+            this.resetTourStatus(tourName);
         });
     }
+};
+
+// Tour controller
+const TourController = {
+    // Current tour instance
+    currentTour: null,
     
-    /**
-     * Safe event listener addition with element existence check
-     * @param {string} selector - The CSS selector for the elements
-     * @param {string} event - The event to listen for
-     * @param {Function} callback - The callback function
-     */
-    safeAddEventListener(selector, event, callback) {
-        const elements = document.querySelectorAll(selector);
-        if (elements && elements.length > 0) {
-            elements.forEach(element => {
-                element.addEventListener(event, callback);
-            });
-        }
-    }
+    // Initialize tour system
+    init: function() {
+        // Add tour buttons to the Help menu
+        this.addTourMenuItems();
+        
+        // Check if first-time user
+        this.checkFirstTimeUser();
+        
+        // Setup event listeners
+        this.setupEventListeners();
+    },
     
-    // Show a toast notification
-    showToast(message, type = 'info') {
-        // Get or create toast container
-        let toastContainer = document.getElementById('toastContainer');
-        if (!toastContainer) {
-            // Create toast container if it doesn't exist
-            toastContainer = document.createElement('div');
-            toastContainer.id = 'toastContainer';
-            toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-            toastContainer.style.zIndex = '1060';
-            document.body.appendChild(toastContainer);
+    // Add tour options to Help menu
+    addTourMenuItems: function() {
+        const helpMenu = document.querySelector('.help-menu-body');
+        if (!helpMenu) return;
+        
+        // Create tours section if doesn't exist
+        let toursSection = helpMenu.querySelector('.help-section:first-child');
+        const tourItems = document.createElement('div');
+        tourItems.classList.add('mt-3');
+        tourItems.innerHTML = `
+            <h6>Guided Tours</h6>
+            <ul class="list-unstyled">
+                <li><a href="#" id="start-welcome-tour"><i class="bi bi-info-circle me-2"></i>Navigation Overview</a></li>
+                <li><a href="#" id="start-dashboard-tour"><i class="bi bi-speedometer2 me-2"></i>Dashboard Tour</a></li>
+                <li><a href="#" id="start-calculator-tour"><i class="bi bi-calculator me-2"></i>Levy Calculator Guide</a></li>
+                <li><a href="#" id="start-import-tour"><i class="bi bi-upload me-2"></i>Data Import Tutorial</a></li>
+                <li class="mt-2"><a href="#" id="reset-all-tours"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset All Tours</a></li>
+            </ul>
+        `;
+        toursSection.appendChild(tourItems);
+    },
+    
+    // Check if first-time user and show welcome dialog
+    checkFirstTimeUser: function() {
+        // First visit if no tour has been completed
+        const isFirstVisit = !Object.keys(tourConfig).some(tourName => 
+            tourPreferences.isTourCompleted(tourName)
+        );
+        
+        if (isFirstVisit) {
+            this.showWelcomeDialog();
         }
+    },
+    
+    // Show welcome dialog for first-time users
+    showWelcomeDialog: function() {
+        // Create modal for welcome dialog
+        const welcomeModal = document.createElement('div');
+        welcomeModal.classList.add('modal', 'fade');
+        welcomeModal.id = 'welcomeTourModal';
+        welcomeModal.setAttribute('tabindex', '-1');
+        welcomeModal.setAttribute('aria-hidden', 'true');
         
-        // Create toast element
-        const toastEl = document.createElement('div');
-        toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
-        toastEl.setAttribute('role', 'alert');
-        toastEl.setAttribute('aria-live', 'assertive');
-        toastEl.setAttribute('aria-atomic', 'true');
-        
-        toastEl.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    ${message}
+        welcomeModal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Welcome to LevyMaster</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Would you like a guided tour of the system?</p>
+                        
+                        <div class="d-flex flex-column gap-2 mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input tour-option" type="checkbox" id="tourCheck1" value="welcomeTour" checked>
+                                <label class="form-check-label" for="tourCheck1">
+                                    Navigation Overview
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input tour-option" type="checkbox" id="tourCheck2" value="dashboardTour" checked>
+                                <label class="form-check-label" for="tourCheck2">
+                                    Dashboard Tour
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input tour-option" type="checkbox" id="tourCheck3" value="dataImportTour">
+                                <label class="form-check-label" for="tourCheck3">
+                                    Data Import/Export Basics
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input tour-option" type="checkbox" id="tourCheck4" value="calculatorTour">
+                                <label class="form-check-label" for="tourCheck4">
+                                    Levy Calculator Introduction
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Skip Tours</button>
+                        <button type="button" class="btn btn-primary" id="startSelectedTours">Start Tours</button>
+                    </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         `;
         
-        toastContainer.appendChild(toastEl);
+        document.body.appendChild(welcomeModal);
         
-        // Check if Bootstrap is available
-        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-            // Initialize and show the toast
-            const toast = new bootstrap.Toast(toastEl, {
-                autohide: true,
-                delay: 5000
-            });
-            toast.show();
+        // Show the modal
+        const modal = new bootstrap.Modal(welcomeModal);
+        modal.show();
+        
+        // Setup event listener for starting tours
+        document.getElementById('startSelectedTours').addEventListener('click', () => {
+            // Get selected tours
+            const selectedTours = Array.from(
+                document.querySelectorAll('.tour-option:checked')
+            ).map(checkbox => checkbox.value);
             
-            // Remove the toast after it's hidden
-            toastEl.addEventListener('hidden.bs.toast', function() {
-                toastEl.remove();
-            });
-        } else {
-            // Fallback if Bootstrap isn't available
-            toastEl.style.display = 'block';
-            setTimeout(() => {
-                toastEl.remove();
-            }, 5000);
-        }
-    }
+            // Hide the modal
+            modal.hide();
+            
+            // Start the first tour if any selected
+            if (selectedTours.length > 0) {
+                this.startTour(selectedTours[0]);
+                
+                // Save the remaining tours for later
+                if (selectedTours.length > 1) {
+                    localStorage.setItem('pendingTours', JSON.stringify(selectedTours.slice(1)));
+                }
+            }
+        });
+    },
     
-    // Update server preferences
-    updateServerPreferences() {
-        // Check if we have a CSRF token
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        if (!csrfToken) {
+    // Setup event listeners for tour buttons
+    setupEventListeners: function() {
+        // Welcome tour button
+        document.getElementById('start-welcome-tour')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.startTour('welcomeTour');
+        });
+        
+        // Dashboard tour button
+        document.getElementById('start-dashboard-tour')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.startTour('dashboardTour');
+        });
+        
+        // Calculator tour button
+        document.getElementById('start-calculator-tour')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.startTour('calculatorTour');
+        });
+        
+        // Data import tour button
+        document.getElementById('start-import-tour')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.startTour('dataImportTour');
+        });
+        
+        // Reset all tours button
+        document.getElementById('reset-all-tours')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            tourPreferences.resetAllTours();
+            alert('All tour progress has been reset. Tours will now appear as new.');
+        });
+    },
+    
+    // Start a specific tour
+    startTour: function(tourName) {
+        // Make sure the requested tour exists
+        if (!tourConfig[tourName]) {
+            console.error(`Tour "${tourName}" not found in configuration`);
             return;
         }
         
-        // Send update to server
-        fetch('/tours/settings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': csrfToken
-            },
-            body: new URLSearchParams({
-                'enable_auto_tours': 'false'
-            })
-        })
-        .catch(error => {
-            console.error('Error updating tour settings:', error);
+        // Create and configure the tour
+        this.currentTour = introJs();
+        
+        // Configure the tour options
+        this.currentTour.setOptions({
+            steps: tourConfig[tourName],
+            showStepNumbers: false,
+            showBullets: true,
+            showProgress: true,
+            hideNext: false,
+            hidePrev: false,
+            nextLabel: 'Next →',
+            prevLabel: '← Back',
+            skipLabel: 'Skip',
+            doneLabel: 'Done',
+            tooltipClass: 'levy-tour-tooltip',
+            highlightClass: 'levy-tour-highlight',
+            exitOnEsc: true,
+            exitOnOverlayClick: false,
+            scrollToElement: true
         });
-    }
+        
+        // Handle tour complete
+        this.currentTour.oncomplete(() => {
+            tourPreferences.markTourComplete(tourName);
+            this.checkPendingTours();
+        });
+        
+        // Handle tour exit
+        this.currentTour.onexit(() => {
+            this.currentTour = null;
+        });
+        
+        // Start the tour
+        this.currentTour.start();
+    },
     
-    // Show the tour helper card
-    showTourHelper() {
-        const tourNav = document.getElementById('tourNavigation');
-        if (tourNav) {
-            tourNav.style.display = 'block';
+    // Check for pending tours to run after current tour completes
+    checkPendingTours: function() {
+        const pendingToursString = localStorage.getItem('pendingTours');
+        
+        if (pendingToursString) {
+            const pendingTours = JSON.parse(pendingToursString);
+            
+            if (pendingTours.length > 0) {
+                // Remove the next tour from the list
+                const nextTour = pendingTours.shift();
+                
+                // Update the pending tours in storage
+                localStorage.setItem('pendingTours', JSON.stringify(pendingTours));
+                
+                // Start the next tour after a short delay
+                setTimeout(() => {
+                    this.startTour(nextTour);
+                }, 500);
+            } else {
+                // No more tours, remove the item
+                localStorage.removeItem('pendingTours');
+            }
+        }
+    },
+    
+    // Get the current page context to determine relevant tours
+    getPageContext: function() {
+        const path = window.location.pathname;
+        
+        if (path.includes('/dashboard')) {
+            return 'dashboard';
+        } else if (path.includes('/levy-calculator')) {
+            return 'calculator';
+        } else if (path.includes('/data/import')) {
+            return 'import';
+        }
+        
+        return 'general';
+    },
+    
+    // Show context-specific tour based on current page
+    showContextTour: function() {
+        const context = this.getPageContext();
+        
+        switch (context) {
+            case 'dashboard':
+                if (!tourPreferences.isTourCompleted('dashboardTour')) {
+                    this.startTour('dashboardTour');
+                }
+                break;
+                
+            case 'calculator':
+                if (!tourPreferences.isTourCompleted('calculatorTour')) {
+                    this.startTour('calculatorTour');
+                }
+                break;
+                
+            case 'import':
+                if (!tourPreferences.isTourCompleted('dataImportTour')) {
+                    this.startTour('dataImportTour');
+                }
+                break;
         }
     }
-    
-    // Hide the tour helper card
-    hideTourHelper() {
-        const tourNav = document.getElementById('tourNavigation');
-        if (tourNav) {
-            tourNav.style.display = 'none';
-        }
-    }
-}
+};
 
-// Initialize tour navigator when DOM is ready
+// Initialize the tour system when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    try {
-        // Check if auto tours are enabled
-        const enableAutoTours = localStorage.getItem('enable_auto_tours') !== 'false';
+    // Wait a moment to ensure all page elements are properly rendered
+    setTimeout(() => {
+        TourController.init();
         
-        // Only show the tour helper if auto tours are enabled and user is on dashboard or main pages
-        if (enableAutoTours && (
-            window.location.pathname === '/dashboard' || 
-            window.location.pathname === '/' ||
-            window.location.pathname === '/levy-calculator'
-        )) {
-            window.tourNavigator = new TourNavigator();
-        }
-        
-        // Add help button to navbar if it doesn't exist
-        const navbar = document.querySelector('.navbar-nav');
-        if (navbar && !document.getElementById('tourHelpButton')) {
-            const helpButton = document.createElement('li');
-            helpButton.className = 'nav-item';
-            helpButton.innerHTML = `
-                <a class="nav-link" href="/tours" id="tourHelpButton">
-                    <i class="bi bi-question-circle-fill"></i>
-                    <span class="ms-1 d-none d-lg-inline">Help & Tours</span>
-                </a>
-            `;
-            navbar.appendChild(helpButton);
-            console.log("Help Menu System initialized");
-        }
-    } catch (error) {
-        console.error("Error initializing tour system:", error);
-    }
+        // Check if we should show a context-specific tour
+        TourController.showContextTour();
+    }, 1000);
 });
