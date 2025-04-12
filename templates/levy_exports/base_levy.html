@@ -75,7 +75,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home.index') }}">
                 <i class="bi bi-database-check me-2"></i>
                 Levy Calculation System
             </a>
@@ -87,7 +87,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('index') }}">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('home.index') }}">
                             <i class="bi bi-house"></i> Dashboard
                         </a>
                     </li>
