@@ -1,8 +1,14 @@
 """
-Flask application initialization and configuration.
+PRIMARY APPLICATION ENTRY POINT: Flask application initialization and configuration.
 
 This module initializes the Flask application, configures extensions,
-and sets up database connections and other necessary components.
+sets up database connections, and registers all blueprints. This is the
+main entry point for the LevyMaster application and the authoritative
+source for all application components.
+
+All blueprints and routes should be registered here to maintain a
+consistent application structure. This file supersedes the older app2.py
+approach in favor of a more standardized architecture.
 """
 
 import os

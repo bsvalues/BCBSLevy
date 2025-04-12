@@ -1,24 +1,12 @@
 """
-Core routes for the Levy Calculation Application (PRIMARY HOME ROUTES).
+Core routes for the Levy Calculation Application.
 
 This module provides the main routes for the application including
-the dashboard, home page, and user settings. This is the standardized
-version that integrates with app.py as the primary application entry point.
-
-This module replaces the previous routes2.py approach and consolidates 
-all home-related routes into a single blueprint that is properly registered
-with the main app.py application.
-
-Routes provided:
-- / : Main landing page (index)
-- /dashboard : Dashboard with summary statistics
-- /about : About page
-- /settings : User settings page
-- /help : Help and documentation
+the dashboard, home page, and user settings.
 """
 from flask import Blueprint, render_template, request, jsonify, current_app, session, redirect, url_for
 
-from app import db
+from app2 import db
 from models import TaxCode, Property, TaxDistrict
 
 # Create a blueprint for the home routes
@@ -63,8 +51,3 @@ def settings():
 def help_page():
     """Render the help page."""
     return render_template('help.html', page_title="Help & Documentation")
-
-def init_home_routes(app):
-    """Register home routes with the Flask app."""
-    app.register_blueprint(home_bp)
-    app.logger.info('Home routes initialized')

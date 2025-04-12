@@ -1,8 +1,17 @@
 """
-Entry point for the Levy Calculation System application.
+PRODUCTION ENTRY POINT for the Levy Calculation System application.
 
-This module serves as the main entry point for running the Flask
-application locally with Gunicorn or directly with the Flask development server.
+This module serves as the primary entry point for running the Flask
+application in production with Gunicorn, as well as for direct execution
+with the Flask development server.
+
+This file provides:
+1. The 'app' object that Gunicorn looks for when starting the server
+2. Basic logging configuration
+3. Proper host/port binding for development server execution
+
+NOTE: This file imports from app.py, which is the authoritative source
+for all application configuration, blueprints, and route registration.
 """
 
 import os
