@@ -1,0 +1,98 @@
+eplit AI Agent Codebase Review Instructions
+Initial Setup and Repository Analysis
+bash# First, clone and navigate to the repository
+git clone [REPOSITORY_URL]
+cd [REPOSITORY_NAME]
+# Generate a high-level overview of the codebase structure
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | sort > codebase_structure.txt
+# Count lines of code by file type
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -name "*.js" | xargs wc -l | sort -nr
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -name "*.css" | xargs wc -l | sort -nr
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -name "*.html" | xargs wc -l | sort -nr
+# Check commit history to understand development progression
+git log --oneline --graph --all
+Professional Web Developer Review
+bash# Analyze code quality and standards compliance
+npx eslint .
+# Check for security vulnerabilities
+npm audit
+# Review test coverage
+npm test -- --coverage
+# Evaluate API endpoints and functionality
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "router\.|app\.|api" | sort
+# Assess database integration completeness
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "database\|schema\|model" | sort
+Professional Web Designer Review
+bash# Identify UI components and styles
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -name "*.css" -o -name "*.scss" -o -name "*.less" | sort
+# Check responsive design implementation
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -name "*.css" | xargs grep -l "media" | sort
+# Review accessibility features
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -name "*.html" -o -name "*.jsx" -o -name "*.tsx" | xargs grep -l "aria-\|role=" | sort
+Benton County Washington County Assessor Review
+bash# Identify property assessment features
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "property\|assessment\|parcel\|tax" | sort
+# Check compliance with local regulations
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "compliance\|regulation\|county\|Washington" | sort
+# Review data validation for property records
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "validate\|schema" | sort
+Professional Data Engineer Review
+bash# Analyze data models and structures
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "model\|schema\|datatype" | sort
+# Evaluate ETL processes
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "import\|export\|load\|transform" | sort
+# Check data validation and integrity measures
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "validate\|sanitize\|clean" | sort
+Professional End User Review
+bash# Start the application in test mode
+npm run dev
+# Generate list of user-facing features
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" -name "*.js" -o -name "*.jsx" -o -name "*.tsx" | xargs grep -l "render\|component\|view" | sort
+# Check form validation and user feedback
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "form\|input\|validation\|error\|message" | sort
+Professional Real Estate Appraiser Review
+bash# Identify property valuation features
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "appraisal\|valuation\|estimate\|property value" | sort
+# Check for market analysis tools
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "market\|comparable\|comp\|analysis" | sort
+# Review reporting functionalities
+find . -type f -not -path "*/node_modules/*" -not -path "*/\.git/*" | xargs grep -l "report\|print\|export\|pdf" | sort
+MVP Progress Evaluation Matrix
+After collecting all the information above, analyze the findings using this structured approach:
+Feature Completeness Assessment
+Core features implemented: ___%
+Secondary features implemented: ___%
+Critical path functionality: Complete/Incomplete
+Code Quality and Stability
+Test coverage: ___%
+Linting issues: High/Medium/Low
+Security vulnerabilities: High/Medium/Low
+User Experience Readiness
+UI components implemented: ___%
+Responsive design: Complete/Partial/Incomplete
+Accessibility compliance: High/Medium/Low
+Domain-Specific Functionality
+Property assessment features: ___%
+Data management capabilities: ___%
+Reporting mechanisms: ___%
+Overall MVP Readiness Score
+Calculate a weighted average based on project requirements
+Generate a radar chart visualizing strengths and weaknesses
+Provide estimated time to MVP completion
+This comprehensive multi-perspective analysis will yield actionable insights into the current state of development while identifying both strengths and critical gaps that must be addressed before MVP release.
+Chat
+🕵️‍♀️
+Replit AI Agent Codebase Review Instructions
+2 sources
+The provided text outlines a detailed review process for a software codebase, employing various automated checks and expert perspectives. It describes steps for initial repository analysis, including structure and code counts, and specifies evaluations by different professional roles, such as web developers, designers, and domain-specific experts. These reviews focus on aspects like code quality, security, UI/UX, and relevant functionalities. Finally, it introduces an MVP progress evaluation matrix to synthesize findings and assess the project's readiness for release.
+
+Start typing...
+2 sources
+
+
+
+Studio
+Audio Overview
+Deep Dive conversation
+Two hosts (English only)
+Notes
