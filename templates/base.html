@@ -289,8 +289,14 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint and 'mcp_army' in request.endpoint %}active{% endif %}" href="/mcp-army/dashboard">
+                        <a class="nav-link {% if request.endpoint and ('mcp_army' in request.endpoint or request.endpoint == 'mcp_army_dashboard_direct') %}active{% endif %}" href="/mcp-army-dashboard">
                             <i class="bi bi-robot me-1"></i>MCP Army
+                        </a>
+                    </li>
+                    <!-- Alternative entry point for Agent Dashboard -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'agent_dashboard' %}active{% endif %}" href="/agent-dashboard">
+                            <i class="bi bi-diagram-3 me-1"></i>Agent Dashboard
                         </a>
                     </li>
                     <li class="nav-item dropdown">

@@ -304,6 +304,11 @@ app.register_blueprint(tours_bp)
 app.register_blueprint(advanced_mcp_bp)
 app.register_blueprint(examples_bp)
 app.register_blueprint(budget_impact_bp)
+
+# Register direct MCP Army dashboard route
+from mcp_army_route import register_direct_routes
+register_direct_routes(app)
+app.logger.info("Direct MCP Army dashboard route registered")
 # Note: levy_audit_bp is registered via register_levy_audit_routes
 # Note: user_audit_bp is registered via register_user_audit_routes
 
