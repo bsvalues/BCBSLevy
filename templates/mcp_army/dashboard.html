@@ -579,10 +579,16 @@
       $.ajax({
         url: '/mcp-army/api/experiences/stats',
         method: 'GET',
+        timeout: 5000, // 5 second timeout to avoid hanging UI
         success: function(data) {
           let html = '';
-          if (data.total_experiences === 0) {
-            html = '<p>No experiences recorded yet.</p>';
+          if (!data || data.total_experiences === 0) {
+            html = `
+              <div class="alert alert-info">
+                <p class="mb-0">No experiences recorded yet.</p>
+                <small>Experiences will be collected as agents interact with the system.</small>
+              </div>
+            `;
           } else {
             html = `
               <p><strong>Total Experiences:</strong> ${data.total_experiences}</p>
@@ -591,7 +597,7 @@
               
               <h6>By Event Type</h6>
               <ul>
-                ${Object.entries(data.by_event_type).map(([type, count]) => 
+                ${Object.entries(data.by_event_type || {}).map(([type, count]) => 
                   `<li>${type}: ${count}</li>`
                 ).join('')}
               </ul>
@@ -600,8 +606,19 @@
           $('#experience-stats').html(html);
         },
         error: function(err) {
-          $('#experience-stats').html('<p class="text-danger">Error loading experience statistics</p>');
           console.error('Error loading experience statistics:', err);
+          
+          // Generate placeholder content that gives useful information
+          const html = `
+            <div class="alert alert-warning">
+              <p class="mb-1"><strong>Experience statistics unavailable</strong></p>
+              <p class="mb-0 small">The experience replay system may still be initializing.</p>
+            </div>
+            <p><strong>What are experiences?</strong></p>
+            <p class="small">Experiences represent agent interactions and outcomes that are stored in a replay buffer for learning and improvement.</p>
+          `;
+          
+          $('#experience-stats').html(html);
         }
       });
     }
@@ -618,8 +635,9 @@
       $.ajax({
         url: `/mcp-army/api/agents/${firstAgentId}/experiences?limit=5`,
         method: 'GET',
+        timeout: 5000, // 5 second timeout
         success: function(data) {
-          if (!data.experiences || data.experiences.length === 0) {
+          if (!data || !data.experiences || data.experiences.length === 0) {
             $('#recent-experiences').html('<tr><td colspan="3" class="text-center">No experiences recorded yet</td></tr>');
             return;
           }
@@ -628,9 +646,9 @@
           data.experiences.forEach(exp => {
             html += `
               <tr>
-                <td>${exp.agentId}</td>
-                <td><span class="badge ${exp.eventType === 'error' ? 'badge-danger' : 'badge-info'}">${exp.eventType}</span></td>
-                <td>${new Date(exp.timestamp).toLocaleTimeString()}</td>
+                <td>${exp.agentId || firstAgentId}</td>
+                <td><span class="badge ${exp.eventType === 'error' ? 'bg-danger' : 'bg-info'}">${exp.eventType || 'interaction'}</span></td>
+                <td>${new Date(exp.timestamp || Date.now()).toLocaleTimeString()}</td>
               </tr>
             `;
           });
@@ -638,8 +656,23 @@
           $('#recent-experiences').html(html);
         },
         error: function(err) {
-          $('#recent-experiences').html('<tr><td colspan="3" class="text-center text-danger">Error loading experiences</td></tr>');
           console.error('Error loading recent experiences:', err);
+          
+          // Show example data while the API is being developed
+          const sampleData = `
+            <tr>
+              <td>${firstAgentId}</td>
+              <td><span class="badge bg-info">initialization</span></td>
+              <td>${new Date().toLocaleTimeString()}</td>
+            </tr>
+            <tr>
+              <td>MCP</td>
+              <td><span class="badge bg-success">coordination</span></td>
+              <td>${new Date().toLocaleTimeString()}</td>
+            </tr>
+          `;
+          
+          $('#recent-experiences').html(sampleData);
         }
       });
     }
@@ -940,9 +973,223 @@
       });
     });
     
-    // Initialize
+    // Function to load and initialize command structure visualization
+    function loadCommandStructure() {
+      $.ajax({
+        url: '/mcp-army/api/command-structure',
+        method: 'GET',
+        timeout: 5000, // 5 second timeout
+        success: function(data) {
+          if (data && data.command_structure) {
+            console.log("Command structure loaded successfully:", data);
+            
+            // Generate Mermaid diagram content based on command structure
+            const diagram = generateMermaidDiagram(data.command_structure, data.agent_relationships || {});
+            
+            // Update the diagram content
+            $('#command-structure-diagram').html(diagram);
+            
+            // Force Mermaid to parse and render the diagram
+            try {
+              // Clear existing diagram first
+              $('#command-structure-diagram').empty();
+              // Add the new diagram content
+              $('#command-structure-diagram').html(diagram);
+              
+              // Use a short timeout to ensure the DOM is updated before rendering
+              setTimeout(function() {
+                try {
+                  // Re-initialize mermaid to parse and render the new diagram
+                  mermaid.init(undefined, document.querySelector("#command-structure-diagram"));
+                } catch(innerErr) {
+                  console.error("Error in mermaid.init():", innerErr);
+                  $('#command-structure-diagram').html('<div class="alert alert-danger">Error rendering command structure diagram. See console for details.</div>');
+                }
+              }, 100);
+            } catch(e) {
+              console.error("Error initializing mermaid diagram:", e);
+              $('#command-structure-diagram').html('<div class="alert alert-danger">Error rendering command structure diagram. Please check console for details.</div>');
+            }
+            
+            // Update agent counts in the dashboard
+            updateAgentStatusCounts(data.command_structure);
+          } else {
+            console.error("Invalid command structure data received:", data);
+            $('#command-structure-diagram').html('<div class="alert alert-warning">Unable to load command structure data. The API may be unavailable.</div>');
+          }
+        },
+        error: function(err) {
+          console.error("Error fetching command structure:", err);
+          $('#command-structure-diagram').html('<div class="alert alert-danger">Error loading command structure data. See console for details.</div>');
+        }
+      });
+    }
+    
+    // Generate a Mermaid diagram from command structure data
+    function generateMermaidDiagram(commandStructure, agentRelationships) {
+      let diagram = "graph TD;\n";
+      
+      // Define node styles
+      diagram += "    classDef architect fill:#f9d71c,stroke:#333,stroke-width:2px;\n";
+      diagram += "    classDef coordinator fill:#66b2ff,stroke:#333,stroke-width:2px;\n";
+      diagram += "    classDef lead fill:#ff9966,stroke:#333,stroke-width:1px;\n";
+      diagram += "    classDef specialist fill:#99cc99,stroke:#333,stroke-width:1px;\n";
+      
+      // Add nodes for each role
+      const architectId = commandStructure.architect_prime;
+      if (architectId) {
+        diagram += `    ARCHITECT["${architectId}<br>Architect Prime"]:::architect;\n`;
+      }
+      
+      const coordinatorId = commandStructure.integration_coordinator;
+      if (coordinatorId) {
+        diagram += `    COORDINATOR["${coordinatorId}<br>Integration Coordinator"]:::coordinator;\n`;
+      }
+      
+      // Add component leads
+      const componentLeads = commandStructure.component_leads || {};
+      for (const component in componentLeads) {
+        const leadId = componentLeads[component];
+        diagram += `    LEAD_${leadId}["${leadId}<br>Component Lead: ${component}"]:::lead;\n`;
+      }
+      
+      // Add specialist agents
+      const specialistAgents = commandStructure.specialist_agents || {};
+      for (const domain in specialistAgents) {
+        const agents = specialistAgents[domain];
+        for (const agentId of agents) {
+          diagram += `    AGENT_${agentId}["${agentId}<br>Specialist: ${domain}"]:::specialist;\n`;
+        }
+      }
+      
+      // Add basic hierarchy connections
+      if (architectId && coordinatorId) {
+        diagram += `    COORDINATOR --> ARCHITECT;\n`;
+      }
+      
+      for (const component in componentLeads) {
+        const leadId = componentLeads[component];
+        if (coordinatorId) {
+          diagram += `    LEAD_${leadId} --> COORDINATOR;\n`;
+        }
+      }
+      
+      for (const domain in specialistAgents) {
+        const agents = specialistAgents[domain];
+        for (const agentId of agents) {
+          const component = Object.keys(componentLeads).find(comp => 
+            domain.toLowerCase().includes(comp.toLowerCase())
+          );
+          
+          if (component && componentLeads[component]) {
+            diagram += `    AGENT_${agentId} --> LEAD_${componentLeads[component]};\n`;
+          } else if (coordinatorId) {
+            diagram += `    AGENT_${agentId} --> COORDINATOR;\n`;
+          }
+        }
+      }
+      
+      return diagram;
+    }
+    
+    // Function to update agent status counts
+    function updateAgentStatusCounts(commandStructure) {
+      // Count agents by role
+      let totalAgents = 0;
+      let activeAgents = 0;
+      
+      // Count architect prime
+      if (commandStructure.architect_prime) {
+        totalAgents++;
+        activeAgents++;
+      }
+      
+      // Count integration coordinator
+      if (commandStructure.integration_coordinator) {
+        totalAgents++;
+        activeAgents++;
+      }
+      
+      // Count component leads
+      if (commandStructure.component_leads) {
+        for (const component in commandStructure.component_leads) {
+          totalAgents++;
+          activeAgents++;
+        }
+      }
+      
+      // Count specialist agents
+      if (commandStructure.specialist_agents) {
+        for (const domain in commandStructure.specialist_agents) {
+          const agents = commandStructure.specialist_agents[domain];
+          totalAgents += agents.length;
+          activeAgents += agents.length;
+        }
+      }
+      
+      // Update the display
+      $('.card-title:contains("Total Agents") + h2').text(totalAgents);
+      $('.card-title:contains("Active Agents") + h2').text(activeAgents);
+    }
+    
+    // Function to load agent status overview
+    function loadAgentStatusOverview() {
+      $.ajax({
+        url: '/mcp-army/api/agents',
+        method: 'GET',
+        timeout: 5000, // 5 second timeout
+        success: function(data) {
+          if (data && data.agents) {
+            // Update Help Request Count
+            const helpRequests = data.agents.filter(agent => 
+              agent.status && agent.status.assistance_needed
+            ).length;
+            
+            $('#help-request-count').text(helpRequests);
+            
+            // Update agent cards in the dashboard if they exist
+            data.agents.forEach(agent => {
+              const statusClass = getStatusClass(agent.status ? agent.status.status : 'unknown');
+              $(`.agent-card[data-agent-id="${agent.agent_id}"] .agent-status`)
+                .removeClass('status-active status-inactive status-error status-unknown')
+                .addClass(`status-${agent.status ? agent.status.status.toLowerCase() : 'unknown'}`)
+                .text(agent.status ? agent.status.status : 'Unknown');
+            });
+          }
+        },
+        error: function(err) {
+          console.error("Error fetching agent status overview:", err);
+        }
+      });
+    }
+    
+    // Helper function to get status class for an agent
+    function getStatusClass(status) {
+      switch(status.toLowerCase()) {
+        case 'active':
+          return 'status-active';
+        case 'inactive':
+          return 'status-inactive';
+        case 'error':
+          return 'status-error';
+        default:
+          return 'status-unknown';
+      }
+    }
+    
+    // Initialize all data loading
     loadExperienceStats();
     loadRecentExperiences();
+    loadCommandStructure();
+    loadAgentStatusOverview();
+    
+    // Set up periodic refresh (every 30 seconds)
+    setInterval(function() {
+      loadExperienceStats();
+      loadRecentExperiences();
+      loadCommandStructure();
+      loadAgentStatusOverview();
+    }, 30000);
     
     // For demo purposes, we'll load a simple communication graph visualization
     // In a full implementation, this would be a more sophisticated D3.js visualization

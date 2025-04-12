@@ -1,0 +1,91 @@
+Implementation and Testing Process for Replit AI Agent Suggestions
+Phase 1: Systematic Implementation
+Prioritization Framework
+Categorize suggestions by criticality (High/Medium/Low)
+Sort by dependencies (implement foundational changes first)
+Group related changes to minimize regression risks
+Iterative Implementation Cycle
+For each suggestion:
+1. Create feature branch from main
+2. Implement single suggestion
+3. Write/update unit tests
+4. Run pre-implementation validation
+5. Commit changes with descriptive message
+6. Submit for review
+Pre-Implementation Testing Protocol
+Run unit tests targeting the affected module
+Perform static code analysis
+Execute integration tests for connected components
+Validate against established acceptance criteria
+Phase 2: Post-Implementation Verification
+Comprehensive Testing
+After each implementation:
+- Run full test suite
+- Verify no regressions occurred
+- Confirm feature behaves as expected
+- Document test results
+Review Cycle
+Conduct code review against established standards
+Verify implementation matches suggestion intent
+Check for edge cases and exception handling
+Ensure proper documentation was added/updated
+Phase 3: Codebase Cleanup and Organization
+Code Structure Optimization
+- Standardize file naming conventions
+- Reorganize directory structure for logical grouping
+- Apply consistent module patterns
+- Extract common utilities to shared locations
+Code Quality Enhancement
+- Run linters with strict rules
+- Apply formatter for consistent styling
+- Eliminate dead/unreachable code
+- Reduce duplication through refactoring
+- Optimize imports and dependencies
+Documentation Refinement
+- Update inline documentation
+- Verify JSDoc/TypeDoc compliance
+- Create/update README files
+- Maintain changelog
+- Document architectural decisions
+Performance Optimization
+- Profile application for bottlenecks
+- Implement lazy loading where appropriate
+- Optimize database queries
+- Minimize bundle size
+- Apply caching strategies
+Final Review Checklist
+Architectural Integrity
+Validate component boundaries
+Verify proper separation of concerns
+Ensure consistent design patterns
+Technical Debt Assessment
+Identify remaining TODOs
+Document known limitations
+Create backlog for future improvements
+Production Readiness
+Verify error handling and logging
+Ensure proper environment configuration
+Validate deployment pipeline
+Test scaling capabilities
+Documentation Completeness
+API documentation
+Setup/installation guide
+User documentation
+Maintenance procedures
+This structured approach ensures each suggestion is properly implemented, thoroughly tested, and integrated into a well-organized codebase. The systematic cleanup process guarantees code quality while maintaining architectural integrity for sustainable future development.RetryClaude can make mistakes. Please double-check responses.
+Chat
+🕵️‍♀️
+Replit AI Agent Codebase Review Instructions
+2 sources
+The provided text outlines a detailed review process for a software codebase, employing various automated checks and expert perspectives. It describes steps for initial repository analysis, including structure and code counts, and specifies evaluations by different professional roles, such as web developers, designers, and domain-specific experts. These reviews focus on aspects like code quality, security, UI/UX, and relevant functionalities. Finally, it introduces an MVP progress evaluation matrix to synthesize findings and assess the project's readiness for release.
+
+Start typing...
+2 sources
+
+
+
+Studio
+Audio Overview
+Deep Dive conversation
+Two hosts (English only)
+Notes
