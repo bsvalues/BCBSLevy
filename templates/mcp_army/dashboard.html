@@ -9,12 +9,32 @@
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     margin-bottom: 20px;
-    transition: transform 0.2s;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    position: relative;
   }
   
   .agent-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-color: #3DA5BD;
+  }
+  
+  .agent-card:after {
+    content: "View Details";
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(61, 165, 189, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .agent-card:hover:after {
+    opacity: 1;
   }
   
   .agent-card .card-header {
@@ -112,6 +132,20 @@
     max-height: 400px;
     overflow-y: auto;
     padding-right: 5px;
+  }
+
+  /* Workflow list styling */
+  .workflow-list .list-group-item {
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid transparent;
+  }
+  
+  .workflow-list .list-group-item:hover {
+    border-left-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transform: translateX(3px);
   }
   
   /* Toast notification styles */
@@ -335,21 +369,37 @@
           <h5 class="mb-0">Collaborative Workflows</h5>
         </div>
         <div class="card-body">
-          <div class="list-group">
+          <div class="list-group workflow-list">
             <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center workflow-btn" data-workflow="levy_compliance_audit">
-              Levy Compliance Audit
+              <div>
+                <i class="bi bi-clipboard-check me-2"></i>
+                <strong>Levy Compliance Audit</strong>
+                <div class="small text-muted">Validates levy calculations against regulatory requirements</div>
+              </div>
               <span class="badge bg-primary">Basic</span>
             </button>
             <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center workflow-btn" data-workflow="cross_district_analysis">
-              Cross-District Analysis
+              <div>
+                <i class="bi bi-bar-chart me-2"></i>
+                <strong>Cross-District Analysis</strong>
+                <div class="small text-muted">Compares levy rates across multiple districts</div>
+              </div>
               <span class="badge bg-success">Advanced</span>
             </button>
             <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center workflow-btn" data-workflow="historical_trend_forecasting">
-              Historical Trend Forecasting
+              <div>
+                <i class="bi bi-graph-up me-2"></i>
+                <strong>Historical Trend Forecasting</strong>
+                <div class="small text-muted">Predicts future levy rates based on historical data</div>
+              </div>
               <span class="badge bg-warning">Complex</span>
             </button>
             <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center workflow-btn" data-workflow="regulatory_compliance_check">
-              Regulatory Compliance Check
+              <div>
+                <i class="bi bi-shield-check me-2"></i>
+                <strong>Regulatory Compliance Check</strong>
+                <div class="small text-muted">Ensures levy calculations meet legal requirements</div>
+              </div>
               <span class="badge bg-info">Standard</span>
             </button>
           </div>
@@ -676,9 +726,14 @@
       });
     }
     
-    // View agent details
-    $('.agent-details-btn').click(function() {
+    // Make entire agent card clickable
+    $('.agent-card').click(function() {
       const agentId = $(this).data('agent-id');
+      
+      // Don't trigger if the click was on the "Request Help" button
+      if ($(event.target).closest('.request-help-btn').length) {
+        return;
+      }
       
       $.ajax({
         url: `/mcp-army/api/agents/${agentId}`,
