@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Benton County Property Tax Portal - A public interface for property tax information.">
+    <meta name="author" content="Benton County Assessor's Office">
+    <title>LevyMaster - Intelligent Property Tax Calculation System</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Intro.js CSS for guided tours -->
+    <link href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
+    
+    <!-- Help Menu CSS -->
+    <link href="/static/css/help_menu.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="/static/css/styles.css" rel="stylesheet">
+    
+    <!-- Additional styles for specific pages -->
+    
+    
+    <!-- Benton County Styles -->
+    <style>
+        /* Benton County Modern Color Scheme */
+        :root {
+            --primary-color: #3DA5BD;   /* Lighter Teal Blue - Primary Brand Color */
+            --secondary-color: #66A355; /* Lighter Green - Secondary Brand Color */
+            --accent-color: #7CBFCC;    /* Light Teal - Accent Color */
+            --bg-dark: #ffffff;         /* White - For background */
+            --bg-light: #f8fafc;        /* Very Light Gray - Light Background */
+            --text-light: #333333;      /* Dark Gray - Text on light backgrounds */
+            --text-dark: #334155;       /* Dark Slate - Text on light backgrounds */
+            --benton-yellow: #F0C75C;   /* Brighter Yellow accent */
+            --border-color: #e5e7eb;    /* Light Border Color */
+            --card-bg: #ffffff;         /* Card Background */
+            --hover-bg: #f1f5f9;        /* Hover Background */
+        }
+        
+        /* Base Elements */
+        body {
+            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            letter-spacing: -0.011em;
+        }
+        
+        /* Navbar Styling */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: linear-gradient(90deg, #2D5F8B 0%, #3DA5BD 100%) !important;
+            border-bottom: none;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.25rem;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Buttons */
+        .btn {
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #2994ac !important;
+            border-color: #2994ac !important;
+            box-shadow: 0 4px 6px rgba(29, 78, 216, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline-light:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+            transform: translateY(-1px);
+        }
+        
+        /* Cards */
+        .card {
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.04), 0 4px 6px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        /* Hero section with modern gradient */
+        .hero-section {
+            background: linear-gradient(135deg, #1D3A54 0%, #2D5F8B 100%) !important;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('/static/images/benton-county-header.png') center center;
+            background-size: cover;
+            opacity: 0.2;
+            z-index: 0;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Custom header with Benton County vineyard image */
+        .app-header-bg {
+            background-image: linear-gradient(90deg, rgba(29, 58, 84, 0.75), rgba(61, 165, 189, 0.75)), 
+                             url('/static/images/benton-county-header.png');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .app-header-bg h1, .app-header-bg .h1,
+        .app-header-bg h2, .app-header-bg .h2 {
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+        
+        .app-header-bg .lead {
+            font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(90deg, #3DA5BD, #66A355);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip navigation for accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
+    
+    <!-- Header and navigation -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark py-3" style="background: linear-gradient(90deg, #2D5F8B 0%, #3DA5BD 100%);">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="/public/">
+                    <img src="/static/images/benton-county-logo.png" alt="Benton County Logo" height="40" class="me-2">
+                    <span>Benton County Tax Portal</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNavbar" aria-controls="publicNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="publicNavbar">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link " href="/public/">
+                                <i class="bi bi-house-door me-1"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="/public/search">
+                                <i class="bi bi-search me-1"></i>Property Search
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="/public/districts">
+                                <i class="bi bi-geo-alt me-1"></i>Tax Districts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="/public/glossary">
+                                <i class="bi bi-book me-1"></i>Tax Glossary
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="bi bi-arrow-up-right-square me-1"></i>Main System
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item me-2">
+                            <a href="#" id="help-button" class="btn btn-outline-light btn-sm" title="Help & Tour">
+                                <i class="bi bi-question-circle"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Page header section -->
+        
+<!-- Hero Section with Animated Background -->
+<div class="hero-section text-center py-5">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="mt-5 mb-5" id="main-header">
+                    <!-- Benton County Logo Badge -->
+                    <div class="mx-auto mb-4" style="max-width: 120px;">
+                        <img src="/static/images/benton-county-logo.png" alt="Benton County Logo" class="img-fluid">
+                    </div>
+                    
+                    <h1 class="display-2 fw-bold mb-3 gradient-text">LevyMaster</h1>
+                    <p class="lead mb-4 fs-4 text-light">Benton County's Intelligent Property Tax Platform</p>
+                    <p class="lead mb-5 text-light">Transform complex tax calculations into clear, actionable insights with AI-powered analytics</p>
+                    
+                    <!-- Main navigation buttons -->
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-3">
+                        <a href="/levy-calculator/" class="btn btn-primary btn-lg px-4 rounded-pill">
+                            <i class="bi bi-calculator me-2"></i>Calculate Levy
+                        </a>
+                        <a href="/public/search" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                            <i class="bi bi-search me-2"></i>Property Search
+                        </a>
+                        <a href="/dashboard/" class="btn btn-success btn-lg px-4 rounded-pill">
+                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                        </a>
+                    </div>
+                    
+                    <!-- Full Navigation Panel -->
+                    <div class="bg-dark bg-opacity-50 rounded-4 p-4 mb-4 text-start">
+                        <h5 class="border-bottom border-light pb-2 mb-3 text-light">Quick Navigation</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <h6 class="text-light mb-2"><i class="bi bi-database me-2"></i>Data Management</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="/data/import/data" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Import Data</a></li>
+                                    <li><a href="/data/export" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Export Data</a></li>
+                                    <li><a href="/db-fix/" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Database Maintenance</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-light mb-2"><i class="bi bi-graph-up me-2"></i>Analysis</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="/historical-analysis/historical-rates" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Historical Analysis</a></li>
+                                    <li><a href="/forecasting/forecast" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Forecasting</a></li>
+                                    <li><a href="/budget-impact/" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Budget Impact</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-light mb-2"><i class="bi bi-clipboard-data me-2"></i>Reports</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="/reports/dashboard" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Reports Dashboard</a></li>
+                                    <li><a href="/levy-audit/" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Levy Audit</a></li>
+                                    <li><a href="/mcp/insights" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> AI Insights</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Animated particles background -->
+    <div id="particles-js" class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 1;"></div>
+</div>
+
+    </header>
+    
+    <!-- Main content -->
+    <main id="main-content" class="py-5">
+        <div class="container">
+            <!-- Flash messages -->
+            
+                
+            
+            
+            <!-- Main content block for page-specific content -->
+            
+<div data-auto-tour="dashboard">
+    <!-- Tools Showcase Carousel Section -->
+    <section class="py-5 tools-carousel-section" style="background-color: #f8fafc;">
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold">Explore Our Tools</h2>
+                <p class="lead text-muted">See what LevyMaster can do for you</p>
+                <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
+            </div>
+
+            <!-- Carousel with Tool Spotlights -->
+            <div id="toolsCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="5000">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Levy Audit"></button>
+                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="1" aria-label="Budget Impact Analysis"></button>
+                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="2" aria-label="Historical Trends"></button>
+                </div>
+                <div class="carousel-inner rounded-4 overflow-hidden" style="box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);">
+                    <!-- Slide 1: Levy Audit Tool -->
+                    <div class="carousel-item active">
+                        <div class="position-relative" style="height: 400px;">
+                            <img src="/static/images/carousel/rsmtn+sunset-composit.jpg" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Levy Audit">
+                            <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(29, 58, 84, 0.8), rgba(29, 58, 84, 0.6), rgba(29, 58, 84, 0.2)); padding: 2rem;">
+                                <div class="row h-100 align-items-center">
+                                    <div class="col-md-6">
+                                        <h3 class="display-6 fw-bold mb-3">Levy Audit Assistant</h3>
+                                        <p class="lead mb-4">Intelligent compliance verification with AI-powered insights and recommendations.</p>
+                                        <div class="d-flex gap-3">
+                                            <a href="/levy-audit/" class="btn btn-primary rounded-pill px-4">
+                                                <i class="bi bi-shield-check me-2"></i>Try It Now
+                                            </a>
+                                            <a href="/levy-audit/compliance-audit" class="btn btn-outline-light rounded-pill px-4">
+                                                <i class="bi bi-info-circle me-2"></i>Learn More
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 2: Budget Impact Calculator -->
+                    <div class="carousel-item">
+                        <div class="position-relative" style="height: 400px;">
+                            <img src="/static/images/carousel/3629742582_a3a12b5359_b.jpg" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Budget Impact Analysis">
+                            <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(102, 163, 85, 0.8), rgba(102, 163, 85, 0.6), rgba(102, 163, 85, 0.2)); padding: 2rem;">
+                                <div class="row h-100 align-items-center">
+                                    <div class="col-md-6">
+                                        <h3 class="display-6 fw-bold mb-3">Budget Impact Calculator</h3>
+                                        <p class="lead mb-4">Analyze how property tax changes impact district budgets and taxpayers.</p>
+                                        <div class="d-flex gap-3">
+                                            <a href="/budget-impact/" class="btn btn-dark rounded-pill px-4">
+                                                <i class="bi bi-calculator me-2"></i>Calculate Impact
+                                            </a>
+                                            <a href="/budget-impact/" class="btn btn-outline-dark rounded-pill px-4">
+                                                <i class="bi bi-bar-chart me-2"></i>View Budget Analysis
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slide 3: Historical Trends Analysis -->
+                    <div class="carousel-item">
+                        <div class="position-relative" style="height: 400px;">
+                            <img src="/static/images/carousel/Arizona-sunset.jpg" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Historical Trends">
+                            <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(61, 165, 189, 0.8), rgba(61, 165, 189, 0.6), rgba(61, 165, 189, 0.2)); padding: 2rem;">
+                                <div class="row h-100 align-items-center">
+                                    <div class="col-md-6">
+                                        <h3 class="display-6 fw-bold mb-3">Historical Trends Analysis</h3>
+                                        <p class="lead mb-4">Visualize tax rate changes over time with predictive forecasting.</p>
+                                        <div class="d-flex gap-3">
+                                            <a href="/historical-analysis/historical-rates" class="btn btn-light rounded-pill px-4">
+                                                <i class="bi bi-graph-up-arrow me-2"></i>View Trends
+                                            </a>
+                                            <a href="/forecasting/forecast" class="btn btn-outline-light rounded-pill px-4">
+                                                <i class="bi bi-binoculars me-2"></i>See Forecasts
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#toolsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#toolsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section with Elegant Cards -->
+    <section class="py-5 features-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Powerful Tax Analysis Tools</h2>
+                <p class="lead text-muted">Comprehensive solutions for property tax management in Benton County</p>
+                <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="levy-calculation" style="overflow: hidden;">
+                        <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #3DA5BD, #5da2b3); height: 4px;"></div>
+                        <div class="card-body text-center p-5">
+                            <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(61, 165, 189, 0.1);">
+                                <i class="bi bi-calculator" style="color: #3DA5BD;"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3 fw-bold">Levy Calculation</h3>
+                            <p class="card-text text-muted">Accurate property tax levy calculations with automatic statutory compliance verification and intelligent rate optimization.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="historical-analysis" style="overflow: hidden;">
+                        <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #66A355, #78c265); height: 4px;"></div>
+                        <div class="card-body text-center p-5">
+                            <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(102, 163, 85, 0.1);">
+                                <i class="bi bi-graph-up-arrow" style="color: #66A355;"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3 fw-bold">Historical Analysis</h3>
+                            <p class="card-text text-muted">Advanced historical analysis with AI-powered forecasting to identify trends and predict future levy rates with confidence intervals.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="compliance" style="overflow: hidden;">
+                        <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #F0C75C, #f5d78a); height: 4px;"></div>
+                        <div class="card-body text-center p-5">
+                            <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(240, 199, 92, 0.1);">
+                                <i class="bi bi-shield-check" style="color: #F0C75C;"></i>
+                            </div>
+                            <h3 class="card-title h4 mb-3 fw-bold">Compliance Verification</h3>
+                            <p class="card-text text-muted">Automated compliance checks ensure all calculations meet statutory requirements and identify potential issues before they occur.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Dashboard Preview Section with Modern Design -->
+    <section class="py-5 my-5 app-header-bg rounded-4 mx-3">
+        <div class="container py-4">
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <h2 class="display-6 fw-bold mb-4">Interactive Dashboard</h2>
+                    <p class="lead mb-4 text-light opacity-90">Monitor key metrics, visualize trends, and gain insights with our intuitive dashboard interface.</p>
+                    <div class="bg-white bg-opacity-10 p-4 rounded-3 mb-4">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-3 d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
+                                <span class="text-light">Real-time data visualization</span>
+                            </li>
+                            <li class="mb-3 d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
+                                <span class="text-light">Customizable reports and exports</span>
+                            </li>
+                            <li class="mb-3 d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
+                                <span class="text-light">AI-powered trend analysis</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="/dashboard/" class="btn btn-light rounded-pill px-4 fw-medium">
+                        <i class="bi bi-speedometer2 me-2"></i>Explore Dashboard
+                    </a>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative">
+                        <!-- Decorative dots pattern overlay -->
+                        <div class="position-absolute top-0 end-0 p-3">
+                            <svg width="80" height="80" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="10" cy="10" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="25" cy="10" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="40" cy="10" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="10" cy="25" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="25" cy="25" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="40" cy="25" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="10" cy="40" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="25" cy="40" r="2" fill="#3DA5BD" opacity="0.5"/>
+                                <circle cx="40" cy="40" r="2" fill="#3DA5BD" opacity="0.5"/>
+                            </svg>
+                        </div>
+                        <img src="/static/images/dashboard-preview.png" alt="LevyMaster Dashboard" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reports & Export Features Section -->
+    <section class="py-5 reports-section" style="background-color: #f8fafc;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Reports & Data Exports</h2>
+                <p class="lead text-muted">Generate customized reports and export data for your specific needs</p>
+                <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
+            </div>
+            
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <img src="/static/images/reports-preview.png" alt="Reports Preview" class="img-fluid rounded-4 shadow-lg">
+                </div>
+                <div class="col-lg-6">
+                    <h3 class="h2 fw-bold mb-4">Flexible Reporting System</h3>
+                    <p class="lead mb-4">Generate comprehensive reports with customizable parameters to meet your specific needs.</p>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(61, 165, 189, 0.1);">
+                                    <i class="bi bi-file-earmark-pdf" style="color: #3DA5BD;"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h5 fw-bold">PDF Export</h4>
+                                    <p class="text-muted small">Professional-quality documents ready for printing or distribution</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(102, 163, 85, 0.1);">
+                                    <i class="bi bi-file-earmark-excel" style="color: #66A355;"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h5 fw-bold">Excel Export</h4>
+                                    <p class="text-muted small">Detailed worksheets for further analysis and manipulation</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(240, 199, 92, 0.1);">
+                                    <i class="bi bi-globe" style="color: #F0C75C;"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h5 fw-bold">GIS Integration</h4>
+                                    <p class="text-muted small">Export geospatial data compatible with mapping systems</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(83, 123, 156, 0.1);">
+                                    <i class="bi bi-cloud-arrow-down" style="color: #537B9C;"></i>
+                                </div>
+                                <div>
+                                    <h4 class="h5 fw-bold">Batch Export</h4>
+                                    <p class="text-muted small">Schedule automated exports for multiple districts</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="/reports/dashboard" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-file-earmark-text me-2"></i>Explore Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Features Showcase Section -->
+    <section class="py-5 ai-features-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5 order-lg-2 mb-4 mb-lg-0">
+                    <div class="p-3 rounded-4 position-relative" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+                        <img src="/static/images/ai-features.png" alt="AI Features" class="img-fluid rounded-4 shadow-sm">
+                        <!-- Decorative elements -->
+                        <div class="position-absolute top-0 start-100 translate-middle">
+                            <div class="rounded-circle" style="width: 60px; height: 60px; background: linear-gradient(135deg, #3DA5BD 0%, #66A355 100%); opacity: 0.7;"></div>
+                        </div>
+                        <div class="position-absolute bottom-0 start-0 translate-middle">
+                            <div class="rounded-circle" style="width: 40px; height: 40px; background: linear-gradient(135deg, #F0C75C 0%, #f5d78a 100%); opacity: 0.7;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7 order-lg-1">
+                    <h2 class="display-5 fw-bold mb-4">AI-Powered Insights</h2>
+                    <p class="lead mb-4">LevyMaster leverages advanced artificial intelligence to provide deeper understanding and proactive recommendations for your property tax management.</p>
+                    
+                    <div class="mb-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge rounded-pill" style="background-color: #3DA5BD;">New</span>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Natural Language Interface</h4>
+                                        </div>
+                                        <p class="text-muted mb-0">Ask complex tax questions in plain English and receive instant, accurate answers.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge rounded-pill" style="background-color: #66A355;">Advanced</span>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Predictive Analytics</h4>
+                                        </div>
+                                        <p class="text-muted mb-0">Forecast future levy rates with sophisticated statistical models and machine learning.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge rounded-pill" style="background-color: #F0C75C;">Featured</span>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Levy Audit AI</h4>
+                                        </div>
+                                        <p class="text-muted mb-0">Automatic compliance verification that checks calculations against all applicable regulations.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <span class="badge rounded-pill" style="background-color: #537B9C;">Smart</span>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Anomaly Detection</h4>
+                                        </div>
+                                        <p class="text-muted mb-0">Identify unusual patterns in tax data that may indicate errors or optimization opportunities.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="/mcp/insights" class="btn btn-gradient rounded-pill px-4">
+                        <i class="bi bi-cpu me-2"></i>Explore AI Features
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="py-5 my-5 cta-section text-center">
+        <div class="container">
+            <div class="bg-gradient rounded-4 p-5 text-white" style="background: linear-gradient(135deg, #1D3A54 0%, #3DA5BD 100%);">
+                <h2 class="display-5 fw-bold mb-3">Ready to Transform Your Property Tax Management?</h2>
+                <p class="lead mb-4 col-lg-8 mx-auto">Join other municipalities that are using LevyMaster to streamline their property tax calculations and improve compliance.</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-10 col-lg-8">
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                            <a href="/examples/" class="btn btn-light btn-lg rounded-pill px-4 gap-3">
+                                <i class="bi bi-play-circle me-2"></i>Watch Demo
+                            </a>
+                            <a href="/public/search" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                                <i class="bi bi-search me-2"></i>Property Search
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-light text-dark py-4 mt-auto" style="border-top: 4px solid var(--primary-color);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="/static/images/benton-county-logo.png" alt="Benton County Logo" height="40" class="me-2">
+                        <div>
+                            <h5 class="mb-0">Benton County</h5>
+                            <small>Washington | Est. 1905</small>
+                        </div>
+                    </div>
+                    <p class="mb-1">A public interface for accessing property tax information in Benton County, Washington.</p>
+                    <p class="small text-secondary mb-0">© 2025 Benton County Assessor's Office. All rights reserved.</p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/public/search" class="text-decoration-none link-dark">Property Search</a></li>
+                        <li class="mb-2"><a href="/public/districts" class="text-decoration-none link-dark">Tax Districts</a></li>
+                        <li class="mb-2"><a href="/public/compare" class="text-decoration-none link-dark">Compare Properties</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="mb-3">Contact Information</h6>
+                    <p class="mb-1"><i class="bi bi-geo-alt-fill me-2"></i>5600 W. Canal Drive, Kennewick, WA</p>
+                    <p class="mb-1"><i class="bi bi-telephone-fill me-2"></i>(509) 736-3080</p>
+                    <p class="mb-1"><i class="bi bi-globe me-2"></i><a href="https://www.co.benton.wa.us/" class="text-decoration-none link-dark" target="_blank">www.co.benton.wa.us</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Levy Calculation System JS initialized successfully');
+        });
+    </script>
+    
+    <!-- Intro.js for guided tours -->
+    <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js"></script>
+    
+    <!-- Tour system - note: order matters! tour_initializer.js must be loaded before guided_tour.js -->
+    <script src="/static/js/tour_initializer.js"></script>
+    <script src="/static/js/guided_tour.js"></script>
+    
+    <!-- Help Menu System -->
+    <script src="/static/js/help_menu.js"></script>
+    
+    <!-- Additional scripts for specific pages -->
+    
+</body>
+</html>
