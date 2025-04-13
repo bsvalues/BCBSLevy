@@ -112,7 +112,7 @@ class AgentManager:
                 
                 # Set initial status
                 self.agent_statuses[agent_id] = {
-                    'status': 'initialized',
+                    'status': 'active',  # Mark as active immediately so it appears in the dashboard
                     'last_updated': datetime.utcnow().isoformat(),
                     'performance': {
                         'overall': 1.0,  # Start with perfect score
@@ -134,7 +134,7 @@ class AgentManager:
                     'eventType': 'status_update',
                     'timestamp': datetime.utcnow().isoformat(),
                     'payload': {
-                        'status': 'initialized',
+                        'status': 'active',  # Match the status we set in the agent_statuses
                         'agent_type': agent_type
                     }
                 })
