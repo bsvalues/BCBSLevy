@@ -126,24 +126,24 @@
 
 {% block scripts %}
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Handle tour start button clicks
-    $('.start-tour-btn').on('click', function() {
-        const tourId = $(this).data('tour-id');
-        
-        // AJAX request to start the tour
-        $.ajax({
-            url: `/tours/start/${tourId}`,
-            method: 'GET',
-            success: function(response) {
-                if (response.redirect) {
-                    window.location.href = response.redirect;
-                }
-            },
-            error: function(error) {
-                console.error('Error starting tour:', error);
-                alert('There was an error starting the tour. Please try again.');
-            }
+    document.querySelectorAll('.start-tour-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const tourId = this.getAttribute('data-tour-id');
+            
+            // Fetch request to start the tour
+            fetch(`/tours/start/${tourId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error starting tour:', error);
+                    alert('There was an error starting the tour. Please try again.');
+                });
         });
     });
 });

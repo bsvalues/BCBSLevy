@@ -6,7 +6,7 @@
  */
 
 // Initialize guided tour functionality when document is ready
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Check if we need to start a tour automatically (from URL parameter)
     const urlParams = new URLSearchParams(window.location.search);
     const tourToStart = urlParams.get('start_tour');
@@ -24,22 +24,8 @@ $(document).ready(function() {
         }, 500);
     }
     
-    // Add CSS for guided tours
-    if (!$('link[href*="guided_tour.css"]').length) {
-        $('head').append('<link rel="stylesheet" href="/static/css/guided_tour.css">');
-    }
-    
-    // Add CSS for intro.js if not already present
-    if (!$('link[href*="introjs.min.css"]').length) {
-        $('head').append('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/6.0.0/introjs.min.css">');
-    }
-    
-    // Add intro.js script if not already present
-    if (typeof introJs === 'undefined') {
-        $.getScript("https://cdnjs.cloudflare.com/ajax/libs/intro.js/6.0.0/intro.min.js", function() {
-            console.log("intro.js loaded dynamically");
-        });
-    }
+    // CSS and scripts are now loaded in base.html
+    console.log("Guided tour system initialized");
 });
 
 /**
@@ -353,7 +339,7 @@ function startTour(tourId) {
         tour.start();
         
         // Add the tour identifier class to body
-        $('body').addClass(tourId);
+        document.body.classList.add(tourId);
     } else {
         console.error("Tour not found:", tourId);
     }
@@ -365,6 +351,49 @@ function startTour(tourId) {
  */
 function recordTourCompletion(tourId) {
     // Send tour completion to server
+    fetch('/tours/complete/' + tourId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Tour completion recorded:", tourId);
+        
+        // Show success message
+        const toastElement = document.createElement('div');
+        toastElement.className = 'tour-completion-toast';
+        toastElement.innerHTML = 
+            '<div class="toast-header">' +
+            '  <i class="bi bi-check-circle-fill text-success me-2"></i>' +
+            '  <strong class="me-auto">Tour Completed</strong>' +
+            '  <button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
+            '</div>' +
+            '<div class="toast-body">' +
+            '  Congratulations! You\'ve completed the ' + tourId + ' tour.' +
+            '</div>';
+        
+        document.body.appendChild(toastElement);
+        
+        // Remove the tour identifier class from body
+        document.body.classList.remove(tourId);
+        
+        // Update UI to show completion if on tours page
+        const statusElements = document.querySelectorAll('.tour-card[data-tour-id="' + tourId + '"] .tour-status');
+        if (statusElements.length > 0) {
+            statusElements.forEach(element => {
+                element.classList.remove('badge-secondary');
+                element.classList.add('badge-success');
+                element.innerHTML = '<i class="bi bi-check-circle"></i> Completed';
+            });
+        }
+    })
+    .catch(error => {
+        console.error("Error recording tour completion:", error);
+    });
+    
+    /* Original jQuery implementation
     $.ajax({
         url: '/tours/complete/' + tourId,
         method: 'POST',
@@ -372,27 +401,32 @@ function recordTourCompletion(tourId) {
             console.log("Tour completion recorded:", tourId);
             
             // Show success message
-            $('body').append(
-                '<div class="tour-completion-toast">' +
-                '  <div class="toast-header">' +
-                '    <i class="bi bi-check-circle-fill text-success me-2"></i>' +
-                '    <strong class="me-auto">Tour Completed</strong>' +
-                '    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
-                '  </div>' +
-                '  <div class="toast-body">' +
-                '    Congratulations! You\'ve completed the ' + tourId + ' tour.' +
-                '  </div>' +
-                '</div>'
-            );
+            const toastElement = document.createElement('div');
+            toastElement.className = 'tour-completion-toast';
+            toastElement.innerHTML = 
+                '<div class="toast-header">' +
+                '  <i class="bi bi-check-circle-fill text-success me-2"></i>' +
+                '  <strong class="me-auto">Tour Completed</strong>' +
+                '  <button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
+                '</div>' +
+                '<div class="toast-body">' +
+                '  Congratulations! You\'ve completed the ' + tourId + ' tour.' +
+                '</div>';
+            
+            document.body.appendChild(toastElement);
             
             // Remove the tour identifier class from body
-            $('body').removeClass(tourId);
+            document.body.classList.remove(tourId);
             
             // Update UI to show completion if on tours page
-            $('.tour-card[data-tour-id="' + tourId + '"] .tour-status')
-                .removeClass('badge-secondary')
-                .addClass('badge-success')
-                .html('<i class="bi bi-check-circle"></i> Completed');
+            const statusElements = document.querySelectorAll('.tour-card[data-tour-id="' + tourId + '"] .tour-status');
+            if (statusElements.length > 0) {
+                statusElements.forEach(element => {
+                    element.classList.remove('badge-secondary');
+                    element.classList.add('badge-success');
+                    element.innerHTML = '<i class="bi bi-check-circle"></i> Completed';
+                });
+            }
         },
         error: function(xhr, status, error) {
             console.error("Error recording tour completion:", error);
