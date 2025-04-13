@@ -768,3 +768,198 @@ class LevyOverrideLog(db.Model):
     
     def __repr__(self):
         return f'<LevyOverrideLog {self.id} field={self.field_name} approved={self.approved}>'
+
+
+# Data Quality Models
+
+class DataQualityScore(AuditMixin, db.Model):
+    """
+    Model for storing data quality metrics over time.
+    
+    This table tracks overall data quality scores as well as specific
+    dimension scores (completeness, accuracy, consistency) to monitor
+    data quality trends over time.
+    """
+    __tablename__ = 'data_quality_score'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    overall_score = db.Column(db.Float, nullable=False)
+    completeness_score = db.Column(db.Float, nullable=False)
+    accuracy_score = db.Column(db.Float, nullable=False)
+    consistency_score = db.Column(db.Float, nullable=False)
+    timeliness_score = db.Column(db.Float, nullable=True)
+    
+    # Detailed metrics
+    completeness_fields_missing = db.Column(db.Integer, nullable=True)
+    accuracy_errors = db.Column(db.Integer, nullable=True)
+    consistency_issues = db.Column(db.Integer, nullable=True)
+    
+    # Report period
+    year = db.Column(db.Integer, nullable=True, index=True)
+    month = db.Column(db.Integer, nullable=True)
+    day = db.Column(db.Integer, nullable=True)
+    
+    __table_args__ = (
+        db.Index('idx_quality_date', 'year', 'month', 'day'),
+    )
+    
+    def __repr__(self):
+        return f'<DataQualityScore {self.id} overall={self.overall_score:.1f}%>'
+
+
+class ValidationRule(AuditMixin, db.Model):
+    """
+    Model for storing validation rules used in data quality assessment.
+    
+    These rules define the expected data quality standards and are used
+    to validate incoming data and assess overall data quality.
+    """
+    __tablename__ = 'validation_rule'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    entity_type = db.Column(db.String(64), nullable=False, index=True)  # Property, TaxDistrict, etc.
+    rule_type = db.Column(db.String(64), nullable=False, index=True)  # Format, Range, Uniqueness, Relationship, etc.
+    severity = db.Column(db.String(32), nullable=False, default='WARNING')  # ERROR, WARNING, INFO
+    
+    # Rule definition (stored as JSON for flexibility)
+    rule_definition = db.Column(db.JSON, nullable=False)
+    
+    # Rule performance metrics
+    enabled = db.Column(db.Boolean, default=True, nullable=False)
+    pass_rate = db.Column(db.Float, nullable=True)
+    last_run = db.Column(db.DateTime, nullable=True)
+    run_count = db.Column(db.Integer, default=0, nullable=False)
+    fail_count = db.Column(db.Integer, default=0, nullable=False)
+    
+    __table_args__ = (
+        db.Index('idx_rule_type_entity', 'rule_type', 'entity_type'),
+    )
+    
+    def __repr__(self):
+        return f'<ValidationRule {self.name} type={self.rule_type}>'
+
+
+class ValidationResult(AuditMixin, db.Model):
+    """
+    Model for storing results of validation rule executions.
+    
+    This table tracks each validation rule execution result, providing
+    a detailed history of data quality validations and their outcomes.
+    """
+    __tablename__ = 'validation_result'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    rule_id = db.Column(db.Integer, db.ForeignKey('validation_rule.id'), nullable=False, index=True)
+    entity_id = db.Column(db.Integer, nullable=False, index=True)
+    entity_type = db.Column(db.String(64), nullable=False, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    
+    passed = db.Column(db.Boolean, nullable=False, index=True)
+    error_message = db.Column(db.Text, nullable=True)
+    error_details = db.Column(db.JSON, nullable=True)
+    
+    # Context information
+    context = db.Column(db.JSON, nullable=True)  # Import batch ID, user ID, etc.
+    
+    rule = db.relationship('ValidationRule', backref='results')
+    
+    __table_args__ = (
+        db.Index('idx_validation_entity_rule', 'entity_type', 'entity_id', 'rule_id'),
+        db.Index('idx_validation_timestamp_passed', 'timestamp', 'passed'),
+    )
+    
+    def __repr__(self):
+        return f'<ValidationResult rule_id={self.rule_id} passed={self.passed}>'
+
+
+class ErrorPattern(AuditMixin, db.Model):
+    """
+    Model for storing detected error patterns from validation results.
+    
+    This table stores automatically identified patterns of validation errors,
+    allowing for more efficient data quality improvement efforts by targeting
+    systemic issues.
+    """
+    __tablename__ = 'error_pattern'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    entity_type = db.Column(db.String(64), nullable=False, index=True)
+    pattern_type = db.Column(db.String(64), nullable=False, index=True)  # Format, Value, Missing, etc.
+    
+    # Pattern metrics
+    frequency = db.Column(db.Integer, default=0, nullable=False)
+    impact = db.Column(db.String(32), nullable=False)  # HIGH, MEDIUM, LOW
+    impact_score = db.Column(db.Float, nullable=True)  # Numeric impact score
+    
+    # Related entities
+    affected_entities = db.Column(db.Integer, default=0, nullable=False)  # Count of affected entities
+    affected_fields = db.Column(db.JSON, nullable=True)  # List of affected fields
+    
+    # AI-generated recommendation
+    recommendation = db.Column(db.Text, nullable=True)
+    auto_fixable = db.Column(db.Boolean, default=False, nullable=False)
+    fix_script = db.Column(db.Text, nullable=True)
+    
+    # Status tracking
+    status = db.Column(db.String(32), default='ACTIVE', nullable=False)  # ACTIVE, FIXED, IGNORED
+    resolution_notes = db.Column(db.Text, nullable=True)
+    resolved_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    resolved_at = db.Column(db.DateTime, nullable=True)
+    
+    # Additional tracking
+    detected_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    last_occurrence = db.Column(db.DateTime, nullable=True, index=True)
+    
+    __table_args__ = (
+        db.Index('idx_pattern_status_impact', 'status', 'impact'),
+        db.Index('idx_pattern_entity_type', 'entity_type', 'pattern_type'),
+    )
+    
+    def __repr__(self):
+        return f'<ErrorPattern {self.name} impact={self.impact} status={self.status}>'
+
+
+class DataQualityActivity(AuditMixin, db.Model):
+    """
+    Model for tracking data quality improvement activities.
+    
+    This table logs all actions taken to improve data quality, including
+    rule changes, data corrections, and system enhancements.
+    """
+    __tablename__ = 'data_quality_activity'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    activity_type = db.Column(db.String(64), nullable=False, index=True)  # RULE_ADDED, DATA_FIXED, IMPORT, etc.
+    title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    
+    # Activity details
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    
+    # Related entity information
+    entity_type = db.Column(db.String(64), nullable=True, index=True)  # Rule, ErrorPattern, etc.
+    entity_id = db.Column(db.Integer, nullable=True, index=True)
+    
+    # Impact metrics
+    records_affected = db.Column(db.Integer, nullable=True)
+    impact_summary = db.Column(db.JSON, nullable=True)
+    
+    # Additional metadata
+    icon = db.Column(db.String(32), nullable=True, default='gear')
+    icon_class = db.Column(db.String(32), nullable=True, default='primary')
+    
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('data_quality_activities', lazy='dynamic'))
+    
+    __table_args__ = (
+        db.Index('idx_activity_timestamp', 'timestamp'),
+        db.Index('idx_activity_user_type', 'user_id', 'activity_type'),
+    )
+    
+    def __repr__(self):
+        return f'<DataQualityActivity {self.activity_type} {self.title}>'

@@ -1,0 +1,450 @@
+{% extends "base.html" %}
+
+{% block title %}Data Quality Dashboard{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .quality-card {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .quality-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .score-indicator {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .score-circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(var(--score-color) var(--score-percent), #f0f0f0 var(--score-percent));
+        transform: rotate(-90deg);
+    }
+    
+    .score-value {
+        position: absolute;
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+    
+    .trend-arrow {
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+    }
+    
+    .trend-up { color: #28a745; }
+    .trend-down { color: #dc3545; }
+    .trend-neutral { color: #6c757d; }
+    
+    .validation-rule-bar {
+        height: 25px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, var(--bs-success) var(--pass-rate), var(--bs-danger) var(--pass-rate));
+    }
+    
+    .rule-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+    }
+    
+    .error-pattern-card {
+        border-left: 4px solid var(--bs-danger);
+    }
+    
+    .metric-trend-chart {
+        height: 200px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 mb-0">Data Quality Dashboard</h1>
+            <p class="lead text-muted">Comprehensive view of data quality metrics and validation performance</p>
+        </div>
+    </div>
+    
+    <!-- Overall Quality Scores -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card quality-card h-100">
+                <div class="card-body text-center p-4">
+                    <h5 class="card-title">Overall Data Quality</h5>
+                    <div class="score-indicator mt-3 mb-2" style="--score-percent: {{ overall_score * 3.6 }}deg; --score-color: {% if overall_score >= 90 %}#28a745{% elif overall_score >= 70 %}#ffc107{% else %}#dc3545{% endif %};">
+                        <div class="score-circle"></div>
+                        <div class="score-value">{{ overall_score }}%</div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <span class="text-muted">{{ previous_score }}% last week</span>
+                        {% if overall_score > previous_score %}
+                        <span class="trend-arrow trend-up"><i class="bi bi-arrow-up-circle-fill"></i></span>
+                        {% elif overall_score < previous_score %}
+                        <span class="trend-arrow trend-down"><i class="bi bi-arrow-down-circle-fill"></i></span>
+                        {% else %}
+                        <span class="trend-arrow trend-neutral"><i class="bi bi-dash-circle-fill"></i></span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card quality-card h-100">
+                <div class="card-body text-center p-4">
+                    <h5 class="card-title">Completeness</h5>
+                    <div class="score-indicator mt-3 mb-2" style="--score-percent: {{ completeness_score * 3.6 }}deg; --score-color: {% if completeness_score >= 90 %}#28a745{% elif completeness_score >= 70 %}#ffc107{% else %}#dc3545{% endif %};">
+                        <div class="score-circle"></div>
+                        <div class="score-value">{{ completeness_score }}%</div>
+                    </div>
+                    <p class="text-muted mb-0">{{ completeness_fields_missing }} fields missing</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card quality-card h-100">
+                <div class="card-body text-center p-4">
+                    <h5 class="card-title">Accuracy</h5>
+                    <div class="score-indicator mt-3 mb-2" style="--score-percent: {{ accuracy_score * 3.6 }}deg; --score-color: {% if accuracy_score >= 90 %}#28a745{% elif accuracy_score >= 70 %}#ffc107{% else %}#dc3545{% endif %};">
+                        <div class="score-circle"></div>
+                        <div class="score-value">{{ accuracy_score }}%</div>
+                    </div>
+                    <p class="text-muted mb-0">{{ accuracy_errors }} validation errors</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card quality-card h-100">
+                <div class="card-body text-center p-4">
+                    <h5 class="card-title">Consistency</h5>
+                    <div class="score-indicator mt-3 mb-2" style="--score-percent: {{ consistency_score * 3.6 }}deg; --score-color: {% if consistency_score >= 90 %}#28a745{% elif consistency_score >= 70 %}#ffc107{% else %}#dc3545{% endif %};">
+                        <div class="score-circle"></div>
+                        <div class="score-value">{{ consistency_score }}%</div>
+                    </div>
+                    <p class="text-muted mb-0">{{ consistency_issues }} consistency issues</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Validation Rule Performance -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Validation Rule Performance</h5>
+                </div>
+                <div class="card-body">
+                    {% for rule in validation_rules %}
+                    <div class="mb-4">
+                        <div class="rule-label">
+                            <span>{{ rule.name }}</span>
+                            <span>{{ rule.pass_rate }}% Pass Rate</span>
+                        </div>
+                        <div class="validation-rule-bar" style="--pass-rate: {{ rule.pass_rate }}%"></div>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>{{ rule.failed }} Failed</span>
+                            <span>{{ rule.passed }} Passed</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Data Quality Trends</h5>
+                </div>
+                <div class="card-body">
+                    <div class="metric-trend-chart" id="qualityTrendChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Error Pattern Analysis -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Error Pattern Analysis</h5>
+                    <button class="btn btn-sm btn-outline-primary">Export Report</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Error Pattern</th>
+                                    <th>Frequency</th>
+                                    <th>Impact</th>
+                                    <th>Affected Entities</th>
+                                    <th>Recommendation</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pattern in error_patterns %}
+                                <tr>
+                                    <td>{{ pattern.name }}</td>
+                                    <td>{{ pattern.frequency }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ pattern.impact_class }}">{{ pattern.impact }}</span>
+                                    </td>
+                                    <td>{{ pattern.affected_entities }}</td>
+                                    <td>{{ pattern.recommendation }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Data Quality Improvement Suggestions -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">AI-Generated Improvement Suggestions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="bi bi-lightbulb text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold">Enhance Address Validation</h6>
+                            <p class="text-muted mb-1">Address validation errors account for 42% of data quality issues. Consider implementing a standardized address validation system using the USPS API.</p>
+                            <div>
+                                <span class="badge bg-success me-2">High Impact</span>
+                                <span class="badge bg-info">Medium Effort</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="bi bi-lightbulb text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold">Implement Data Deduplication</h6>
+                            <p class="text-muted mb-1">Analysis identified 127 potential duplicate property records. Implementing a deduplication process could improve consistency scores by approximately 18%.</p>
+                            <div>
+                                <span class="badge bg-success me-2">High Impact</span>
+                                <span class="badge bg-warning text-dark">High Effort</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="bi bi-lightbulb text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold">Standardize Property Classifications</h6>
+                            <p class="text-muted mb-1">Property classification inconsistencies impact 8% of records. Creating a standardized classification system would improve data quality and analysis capabilities.</p>
+                            <div>
+                                <span class="badge bg-primary me-2">Medium Impact</span>
+                                <span class="badge bg-info">Medium Effort</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Recent Data Quality Activities</h5>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <div class="timeline">
+                        {% for activity in quality_activities %}
+                        <div class="timeline-item mb-4 pb-4" {% if not loop.last %}style="border-bottom: 1px solid #f0f0f0;"{% endif %}>
+                            <div class="d-flex">
+                                <div class="bg-{{ activity.icon_class }} rounded-circle p-2 me-3" style="height: 40px; width: 40px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-{{ activity.icon }} text-white"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">{{ activity.title }}</h6>
+                                    <p class="text-muted mb-1">{{ activity.description }}</p>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-muted">{{ activity.time }}</small>
+                                        <small class="ms-2 text-muted">by {{ activity.user }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Data Quality Trend Chart
+    const ctx = document.getElementById('qualityTrendChart').getContext('2d');
+    const qualityTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ quality_trend_dates|tojson }},
+            datasets: [{
+                label: 'Overall Score',
+                data: {{ quality_trend_overall|tojson }},
+                borderColor: '#3DA5BD',
+                backgroundColor: 'rgba(61, 165, 189, 0.1)',
+                tension: 0.3,
+                fill: true
+            }, {
+                label: 'Completeness',
+                data: {{ quality_trend_completeness|tojson }},
+                borderColor: '#28a745',
+                backgroundColor: 'transparent',
+                tension: 0.3,
+                borderDash: [5, 5]
+            }, {
+                label: 'Accuracy',
+                data: {{ quality_trend_accuracy|tojson }},
+                borderColor: '#ffc107',
+                backgroundColor: 'transparent',
+                tension: 0.3,
+                borderDash: [5, 5]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Button is added in the code below
+    
+    // Function to fetch AI-powered recommendations
+    function fetchAIRecommendations() {
+        const aiSectionHeader = findElementByText('.card-header', 'AI-Generated Improvement Suggestions');
+        const recommendationsContainer = aiSectionHeader.closest('.card').querySelector('.card-body');
+        
+        // Show loading state
+        recommendationsContainer.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Generating AI recommendations...</p></div>';
+        
+        fetch('/data-quality/ai-recommendations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.recommendations && data.recommendations.length > 0) {
+                let html = '';
+                
+                data.recommendations.forEach(rec => {
+                    html += `
+                    <div class="d-flex align-items-start mb-4">
+                        <div class="bg-light rounded-circle p-3 me-3">
+                            <i class="bi bi-lightbulb text-warning"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold">${rec.title}</h6>
+                            <p class="text-muted mb-1">${rec.description}</p>
+                            <div>
+                                <span class="badge bg-${rec.impact_class} me-2">${rec.impact}</span>
+                                <span class="badge bg-${rec.effort_class}">${rec.effort}</span>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                
+                recommendationsContainer.innerHTML = html;
+            } else {
+                recommendationsContainer.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Unable to generate recommendations:</strong> ${data.error || 'Unknown error'}
+                </div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching AI recommendations:', error);
+            recommendationsContainer.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Error:</strong> Unable to connect to the AI recommendation service.
+            </div>`;
+        });
+    }
+    
+    // Custom jQuery-like selector
+    function contains(selector, text) {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).filter(element => element.textContent.includes(text));
+    }
+    
+    // Use a more direct approach to find the AI section without custom selectors
+    function findElementByText(selector, text) {
+        const elements = document.querySelectorAll(selector);
+        return Array.from(elements).find(element => element.textContent.includes(text));
+    }
+    
+    // Retry with a safer approach
+    const aiSectionHeaderAlt = findElementByText('.card-header', 'AI-Generated Improvement Suggestions');
+    if (aiSectionHeaderAlt) {
+        const refreshButton = document.createElement('button');
+        refreshButton.className = 'btn btn-sm btn-outline-primary';
+        refreshButton.innerHTML = '<i class="bi bi-robot me-1"></i> Refresh AI Recommendations';
+        refreshButton.addEventListener('click', fetchAIRecommendations);
+        
+        // Use a direct DOM approach
+        const aiSuggestionsCardBody = aiSectionHeaderAlt.closest('.card').querySelector('.card-body');
+        
+        // Add the refresh button to the header
+        if (aiSectionHeaderAlt && !aiSectionHeaderAlt.querySelector('.btn')) {
+            aiSectionHeaderAlt.appendChild(refreshButton);
+        }
+    }
+});
+</script>
+{% endblock %}

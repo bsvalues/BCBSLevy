@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Validation Rules{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .rule-card {
+        transition: all 0.2s ease;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .rule-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    }
+    
+    .rule-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .rule-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+    
+    .status-active {
+        background-color: #28a745;
+    }
+    
+    .status-disabled {
+        background-color: #6c757d;
+    }
+    
+    .rule-type-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .severity-error {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+    
+    .severity-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+    
+    .severity-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0;
+        border: 1px solid rgba(13, 202, 240, 0.2);
+    }
+    
+    .entity-property {
+        background-color: rgba(61, 165, 189, 0.1);
+        color: #3DA5BD;
+        border: 1px solid rgba(61, 165, 189, 0.2);
+    }
+    
+    .entity-taxdistrict {
+        background-color: rgba(102, 163, 85, 0.1);
+        color: #66A355;
+        border: 1px solid rgba(102, 163, 85, 0.2);
+    }
+    
+    .entity-taxcode {
+        background-color: rgba(240, 199, 92, 0.1);
+        color: #F0C75C;
+        border: 1px solid rgba(240, 199, 92, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-5 mb-0">Validation Rules</h1>
+                <p class="lead text-muted">Manage data validation rules for quality assurance</p>
+            </div>
+            <div>
+                <a href="{{ url_for('data_quality.create_rule') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Rule
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form action="" method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="entityType" class="form-label">Entity Type</label>
+                            <select class="form-select" id="entityType" name="entity_type">
+                                <option value="">All Entities</option>
+                                <option value="Property">Property</option>
+                                <option value="TaxDistrict">Tax District</option>
+                                <option value="TaxCode">Tax Code</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ruleType" class="form-label">Rule Type</label>
+                            <select class="form-select" id="ruleType" name="rule_type">
+                                <option value="">All Types</option>
+                                <option value="Format">Format</option>
+                                <option value="Range">Range</option>
+                                <option value="Required">Required</option>
+                                <option value="Uniqueness">Uniqueness</option>
+                                <option value="Relationship">Relationship</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="severity" class="form-label">Severity</label>
+                            <select class="form-select" id="severity" name="severity">
+                                <option value="">All Severities</option>
+                                <option value="ERROR">Error</option>
+                                <option value="WARNING">Warning</option>
+                                <option value="INFO">Info</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="enabled">Enabled</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="col-12 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                            <button type="reset" class="btn btn-outline-secondary ms-2">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Rules Grid -->
+    <div class="row g-4">
+        {% for rule in rules %}
+        <div class="col-lg-4">
+            <div class="card rule-card h-100">
+                <div class="card-header bg-white">
+                    <div class="rule-header">
+                        <div>
+                            <span class="rule-status {{ 'status-active' if rule.enabled else 'status-disabled' }}"></span>
+                            <span class="fw-bold">{{ rule.name }}</span>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-graph-up me-2"></i>View Results</a></li>
+                                {% if rule.enabled %}
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-pause-circle me-2"></i>Disable</a></li>
+                                {% else %}
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-play-circle me-2"></i>Enable</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge rule-type-badge entity-{{ rule.entity_type|lower }}">{{ rule.entity_type }}</span>
+                        <span class="badge rule-type-badge">{{ rule.rule_type }}</span>
+                        <span class="badge rule-type-badge severity-{{ rule.severity|lower }}">{{ rule.severity }}</span>
+                    </div>
+                    
+                    <p class="text-muted small mb-3">{{ rule.description }}</p>
+                    
+                    <div class="d-flex justify-content-between text-muted small mb-2">
+                        <span>Pass Rate:</span>
+                        <span class="fw-bold {{ 'text-success' if rule.pass_rate >= 90 else 'text-warning' if rule.pass_rate >= 75 else 'text-danger' }}">
+                            {{ rule.pass_rate if rule.pass_rate is not none else 'N/A' }}%
+                        </span>
+                    </div>
+                    
+                    <div class="progress mb-3" style="height: 5px;">
+                        <div class="progress-bar {{ 'bg-success' if rule.pass_rate >= 90 else 'bg-warning' if rule.pass_rate >= 75 else 'bg-danger' }}" 
+                             role="progressbar" style="width: {{ rule.pass_rate if rule.pass_rate is not none else 0 }}%">
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between text-muted small">
+                        <span>Last Run:</span>
+                        <span>{{ rule.last_run|default('Never', true)|datetime }}</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between">
+                        <a href="#" class="btn btn-sm btn-outline-primary">Run Now</a>
+                        <a href="#" class="btn btn-sm btn-outline-secondary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>No validation rules found. <a href="{{ url_for('data_quality.create_rule') }}">Create your first rule</a>.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

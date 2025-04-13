@@ -1,0 +1,516 @@
+{% extends "base.html" %}
+
+{% block title %}Create Validation Rule{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .form-section {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+    }
+    
+    .form-section-title {
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .rule-preview {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .rule-json {
+        background-color: #f0f0f0;
+        border-radius: 0.25rem;
+        padding: 1rem;
+        font-family: monospace;
+        white-space: pre-wrap;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('data_quality.dashboard') }}">Data Quality</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('data_quality.validation_rules') }}">Validation Rules</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create Rule</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 mb-0">Create Validation Rule</h1>
+            <p class="lead text-muted">Define a new data validation rule to improve data quality</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <form action="{{ url_for('data_quality.create_rule') }}" method="post" id="ruleForm">
+                <!-- Basic Information -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Rule Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <div class="form-text">Choose a descriptive name for this validation rule</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="form-text">Provide details about what this rule validates and why it's important</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="entity_type" class="form-label">Entity Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="entity_type" name="entity_type" required>
+                                    <option value="">Select Entity Type</option>
+                                    <option value="Property">Property</option>
+                                    <option value="TaxDistrict">Tax District</option>
+                                    <option value="TaxCode">Tax Code</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="rule_type" class="form-label">Rule Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="rule_type" name="rule_type" required>
+                                    <option value="">Select Rule Type</option>
+                                    <option value="Format">Format Validation</option>
+                                    <option value="Range">Range Check</option>
+                                    <option value="Required">Required Field</option>
+                                    <option value="Uniqueness">Uniqueness Check</option>
+                                    <option value="Relationship">Relationship Validation</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="severity" class="form-label">Severity <span class="text-danger">*</span></label>
+                                <select class="form-select" id="severity" name="severity" required>
+                                    <option value="">Select Severity</option>
+                                    <option value="ERROR">Error</option>
+                                    <option value="WARNING">Warning</option>
+                                    <option value="INFO">Info</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rule Definition -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Rule Definition</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="formatFields" class="rule-fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="field_name" class="form-label">Field Name <span class="text-danger">*</span></label>
+                                <select class="form-select field-selector" id="field_name" name="field_name">
+                                    <option value="">Select Field</option>
+                                    <!-- These will be populated based on entity_type -->
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="pattern" class="form-label">Regex Pattern <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="pattern" name="pattern">
+                                <div class="form-text">Regular expression pattern to validate field format</div>
+                            </div>
+                        </div>
+                        
+                        <div id="rangeFields" class="rule-fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="range_field" class="form-label">Field Name <span class="text-danger">*</span></label>
+                                <select class="form-select field-selector" id="range_field" name="range_field">
+                                    <option value="">Select Field</option>
+                                    <!-- These will be populated based on entity_type -->
+                                </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="min_value" class="form-label">Minimum Value</label>
+                                    <input type="number" class="form-control" id="min_value" name="min_value" step="any">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="max_value" class="form-label">Maximum Value</label>
+                                    <input type="number" class="form-control" id="max_value" name="max_value" step="any">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="requiredFields" class="rule-fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="required_field" class="form-label">Field Name <span class="text-danger">*</span></label>
+                                <select class="form-select field-selector" id="required_field" name="required_field">
+                                    <option value="">Select Field</option>
+                                    <!-- These will be populated based on entity_type -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="allow_empty" name="allow_empty">
+                                <label class="form-check-label" for="allow_empty">
+                                    Allow empty strings (only check for null)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="uniquenessFields" class="rule-fields" style="display: none;">
+                            <div class="mb-3">
+                                <label for="uniqueness_field" class="form-label">Field Name <span class="text-danger">*</span></label>
+                                <select class="form-select field-selector" id="uniqueness_field" name="uniqueness_field">
+                                    <option value="">Select Field</option>
+                                    <!-- These will be populated based on entity_type -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="scope_by_year" name="scope_by_year" checked>
+                                <label class="form-check-label" for="scope_by_year">
+                                    Scope uniqueness by year
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="relationshipFields" class="rule-fields" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="source_field" class="form-label">Source Field <span class="text-danger">*</span></label>
+                                    <select class="form-select field-selector" id="source_field" name="source_field">
+                                        <option value="">Select Field</option>
+                                        <!-- These will be populated based on entity_type -->
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="related_entity" class="form-label">Related Entity <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="related_entity" name="related_entity">
+                                        <option value="">Select Entity</option>
+                                        <option value="Property">Property</option>
+                                        <option value="TaxDistrict">Tax District</option>
+                                        <option value="TaxCode">Tax Code</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="related_field" class="form-label">Related Field <span class="text-danger">*</span></label>
+                                <select class="form-select" id="related_field" name="related_field">
+                                    <option value="">Select Field</option>
+                                    <!-- These will be populated based on related_entity -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="error_message" class="form-label">Error Message <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="error_message" name="error_message" required>
+                            <div class="form-text">Message to display when validation fails</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="enabled" name="enabled" checked>
+                            <label class="form-check-label" for="enabled">
+                                Enable rule upon creation
+                            </label>
+                        </div>
+                        
+                        <input type="hidden" id="rule_definition" name="rule_definition" value="{}">
+                        
+                        <div class="rule-preview">
+                            <h6>Rule Preview</h6>
+                            <div class="rule-json" id="rulePreview">
+                                {
+                                    // Rule definition will appear here
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('data_quality.validation_rules') }}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary" id="saveButton">
+                        <i class="bi bi-check-circle me-2"></i>Create Rule
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2 text-primary"></i>
+                        Guidance
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Rule Types</h6>
+                    <ul class="mb-4">
+                        <li><strong>Format Validation:</strong> Checks if field values match a specific pattern (regex)</li>
+                        <li><strong>Range Check:</strong> Verifies numeric values are within acceptable limits</li>
+                        <li><strong>Required Field:</strong> Ensures a field is not null or empty</li>
+                        <li><strong>Uniqueness Check:</strong> Confirms values are unique across records</li>
+                        <li><strong>Relationship Validation:</strong> Validates foreign key relationships</li>
+                    </ul>
+                    
+                    <h6>Severity Levels</h6>
+                    <ul class="mb-4">
+                        <li><strong>Error:</strong> Critical issue that must be fixed</li>
+                        <li><strong>Warning:</strong> Potential issue that should be reviewed</li>
+                        <li><strong>Info:</strong> Informational validation that doesn't affect quality score</li>
+                    </ul>
+                    
+                    <h6>Best Practices</h6>
+                    <ul>
+                        <li>Use descriptive names for easy identification</li>
+                        <li>Write clear error messages that explain how to fix the issue</li>
+                        <li>Start with critical validations before adding more granular rules</li>
+                        <li>Group related validations for better organization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Field mappings for different entity types
+    const fieldMappings = {
+        'Property': [
+            'property_id', 'tax_code_id', 'owner_name', 'property_address', 
+            'city', 'state', 'zip_code', 'property_type', 'assessed_value', 
+            'market_value', 'land_value', 'building_value', 'tax_exempt',
+            'exemption_amount', 'taxable_value', 'tax_amount', 'longitude', 'latitude'
+        ],
+        'TaxDistrict': [
+            'district_name', 'district_code', 'district_type', 'county', 
+            'state', 'description', 'is_active', 'contact_name', 
+            'contact_email', 'contact_phone', 'statutory_limit', 
+            'tax_district_id', 'levy_code', 'linked_levy_code'
+        ],
+        'TaxCode': [
+            'tax_code', 'tax_district_id', 'description', 
+            'total_assessed_value', 'total_levy_amount', 'effective_tax_rate'
+        ]
+    };
+    
+    // Get form elements
+    const entityTypeSelect = document.getElementById('entity_type');
+    const ruleTypeSelect = document.getElementById('rule_type');
+    const ruleFields = document.querySelectorAll('.rule-fields');
+    const fieldSelectors = document.querySelectorAll('.field-selector');
+    const ruleDefinitionInput = document.getElementById('rule_definition');
+    const rulePreview = document.getElementById('rulePreview');
+    const ruleForm = document.getElementById('ruleForm');
+    
+    // Show/hide rule type fields based on selection
+    ruleTypeSelect.addEventListener('change', function() {
+        // Hide all rule fields
+        ruleFields.forEach(field => {
+            field.style.display = 'none';
+        });
+        
+        // Show the selected rule type fields
+        const selectedType = this.value;
+        if (selectedType) {
+            const fieldsToShow = document.getElementById(selectedType.toLowerCase() + 'Fields');
+            if (fieldsToShow) {
+                fieldsToShow.style.display = 'block';
+            }
+        }
+        
+        updateRulePreview();
+    });
+    
+    // Populate field selectors based on entity type
+    entityTypeSelect.addEventListener('change', function() {
+        const entityType = this.value;
+        const fields = fieldMappings[entityType] || [];
+        
+        // Update all field selectors
+        fieldSelectors.forEach(selector => {
+            // Save current value
+            const currentValue = selector.value;
+            
+            // Clear options except the first one
+            while (selector.options.length > 1) {
+                selector.remove(1);
+            }
+            
+            // Add new options
+            fields.forEach(field => {
+                const option = document.createElement('option');
+                option.value = field;
+                option.textContent = field;
+                selector.appendChild(option);
+            });
+            
+            // Try to restore previous value if it exists in new options
+            if (fields.includes(currentValue)) {
+                selector.value = currentValue;
+            }
+        });
+        
+        updateRulePreview();
+    });
+    
+    // Update rule preview when any form field changes
+    document.querySelectorAll('input, select, textarea').forEach(element => {
+        element.addEventListener('change', updateRulePreview);
+        if (element.tagName === 'INPUT' && element.type === 'text') {
+            element.addEventListener('input', updateRulePreview);
+        }
+    });
+    
+    // Function to update rule preview
+    function updateRulePreview() {
+        const entityType = entityTypeSelect.value;
+        const ruleType = ruleTypeSelect.value;
+        
+        if (!entityType || !ruleType) {
+            rulePreview.textContent = '{\n    // Select entity type and rule type\n}';
+            return;
+        }
+        
+        let ruleDefinition = {
+            entity_type: entityType,
+            rule_type: ruleType,
+            error_message: document.getElementById('error_message').value || 'Validation failed',
+            enabled: document.getElementById('enabled').checked
+        };
+        
+        // Add fields specific to the rule type
+        switch (ruleType) {
+            case 'Format':
+                ruleDefinition.field = document.getElementById('field_name').value;
+                ruleDefinition.pattern = document.getElementById('pattern').value;
+                break;
+                
+            case 'Range':
+                ruleDefinition.field = document.getElementById('range_field').value;
+                ruleDefinition.min = document.getElementById('min_value').value;
+                ruleDefinition.max = document.getElementById('max_value').value;
+                break;
+                
+            case 'Required':
+                ruleDefinition.field = document.getElementById('required_field').value;
+                ruleDefinition.allow_empty = document.getElementById('allow_empty').checked;
+                break;
+                
+            case 'Uniqueness':
+                ruleDefinition.field = document.getElementById('uniqueness_field').value;
+                ruleDefinition.scope_by_year = document.getElementById('scope_by_year').checked;
+                break;
+                
+            case 'Relationship':
+                ruleDefinition.source_field = document.getElementById('source_field').value;
+                ruleDefinition.related_entity = document.getElementById('related_entity').value;
+                ruleDefinition.related_field = document.getElementById('related_field').value;
+                break;
+        }
+        
+        // Update hidden input and preview
+        ruleDefinitionInput.value = JSON.stringify(ruleDefinition);
+        rulePreview.textContent = JSON.stringify(ruleDefinition, null, 4);
+    }
+    
+    // Handle form submission
+    ruleForm.addEventListener('submit', function(e) {
+        // Validate that rule definition is complete
+        const ruleDefinition = JSON.parse(ruleDefinitionInput.value || '{}');
+        const ruleType = ruleTypeSelect.value;
+        
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Basic validations
+        if (!ruleDefinition.entity_type) {
+            isValid = false;
+            errorMessage = 'Entity type is required';
+        } else if (!ruleDefinition.rule_type) {
+            isValid = false;
+            errorMessage = 'Rule type is required';
+        } else {
+            // Rule type specific validations
+            switch (ruleType) {
+                case 'Format':
+                    if (!ruleDefinition.field) {
+                        isValid = false;
+                        errorMessage = 'Field name is required for Format validation';
+                    } else if (!ruleDefinition.pattern) {
+                        isValid = false;
+                        errorMessage = 'Pattern is required for Format validation';
+                    }
+                    break;
+                    
+                case 'Range':
+                    if (!ruleDefinition.field) {
+                        isValid = false;
+                        errorMessage = 'Field name is required for Range check';
+                    } else if (!ruleDefinition.min && !ruleDefinition.max) {
+                        isValid = false;
+                        errorMessage = 'At least one of Min or Max value is required for Range check';
+                    }
+                    break;
+                    
+                case 'Required':
+                    if (!ruleDefinition.field) {
+                        isValid = false;
+                        errorMessage = 'Field name is required for Required field validation';
+                    }
+                    break;
+                    
+                case 'Uniqueness':
+                    if (!ruleDefinition.field) {
+                        isValid = false;
+                        errorMessage = 'Field name is required for Uniqueness check';
+                    }
+                    break;
+                    
+                case 'Relationship':
+                    if (!ruleDefinition.source_field) {
+                        isValid = false;
+                        errorMessage = 'Source field is required for Relationship validation';
+                    } else if (!ruleDefinition.related_entity) {
+                        isValid = false;
+                        errorMessage = 'Related entity is required for Relationship validation';
+                    } else if (!ruleDefinition.related_field) {
+                        isValid = false;
+                        errorMessage = 'Related field is required for Relationship validation';
+                    }
+                    break;
+            }
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please correct the following error:\n' + errorMessage);
+        }
+    });
+    
+    // Initialize preview
+    updateRulePreview();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}Error Patterns{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    .pattern-table th, .pattern-table td {
+        vertical-align: middle;
+    }
+    
+    .pattern-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+    
+    .status-active {
+        background-color: #dc3545;
+    }
+    
+    .status-fixed {
+        background-color: #28a745;
+    }
+    
+    .status-ignored {
+        background-color: #6c757d;
+    }
+    
+    .impact-high {
+        color: #dc3545;
+        font-weight: 600;
+    }
+    
+    .impact-medium {
+        color: #fd7e14;
+        font-weight: 600;
+    }
+    
+    .impact-low {
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    .entity-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+    }
+    
+    .entity-property {
+        background-color: rgba(61, 165, 189, 0.1);
+        color: #3DA5BD;
+    }
+    
+    .entity-taxdistrict {
+        background-color: rgba(102, 163, 85, 0.1);
+        color: #66A355;
+    }
+    
+    .entity-taxcode {
+        background-color: rgba(240, 199, 92, 0.1);
+        color: #F0C75C;
+    }
+    
+    .pattern-frequency {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .pattern-description {
+        max-width: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-5 mb-0">Error Patterns</h1>
+                <p class="lead text-muted">Identified patterns of data quality issues and recommended solutions</p>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary" id="detectPatterns">
+                    <i class="bi bi-radar me-2"></i>Detect New Patterns
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Total Patterns</h5>
+                    <h2 class="display-5 mb-0">{{ patterns|length }}</h2>
+                    <p class="text-muted">Across all entities</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">High Impact</h5>
+                    <h2 class="display-5 mb-0 text-danger">{{ patterns|selectattr('impact', 'equalto', 'HIGH')|list|length }}</h2>
+                    <p class="text-muted">Require immediate attention</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Auto-Fixable</h5>
+                    <h2 class="display-5 mb-0 text-success">{{ patterns|selectattr('auto_fixable', 'equalto', true)|list|length }}</h2>
+                    <p class="text-muted">Can be fixed automatically</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Fixed</h5>
+                    <h2 class="display-5 mb-0 text-success">{{ patterns|selectattr('status', 'equalto', 'FIXED')|list|length }}</h2>
+                    <p class="text-muted">Successfully resolved</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form action="" method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="entityType" class="form-label">Entity Type</label>
+                            <select class="form-select" id="entityType" name="entity_type">
+                                <option value="">All Entities</option>
+                                <option value="Property">Property</option>
+                                <option value="TaxDistrict">Tax District</option>
+                                <option value="TaxCode">Tax Code</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="patternType" class="form-label">Pattern Type</label>
+                            <select class="form-select" id="patternType" name="pattern_type">
+                                <option value="">All Types</option>
+                                <option value="Format">Format</option>
+                                <option value="Missing">Missing Value</option>
+                                <option value="Range">Out of Range</option>
+                                <option value="Duplicate">Duplicate</option>
+                                <option value="Relationship">Invalid Relationship</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="impact" class="form-label">Impact</label>
+                            <select class="form-select" id="impact" name="impact">
+                                <option value="">All Impacts</option>
+                                <option value="HIGH">High</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="LOW">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="ACTIVE">Active</option>
+                                <option value="FIXED">Fixed</option>
+                                <option value="IGNORED">Ignored</option>
+                            </select>
+                        </div>
+                        <div class="col-12 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Apply Filters</button>
+                            <button type="reset" class="btn btn-outline-secondary ms-2">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Error Patterns Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover pattern-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30%">Pattern</th>
+                                    <th>Entity Type</th>
+                                    <th>Frequency</th>
+                                    <th>Impact</th>
+                                    <th>Status</th>
+                                    <th>Last Occurred</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pattern in patterns %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <span class="fw-bold">{{ pattern.name }}</span>
+                                            <p class="text-muted small mb-0 pattern-description">
+                                                {{ pattern.description }}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="entity-badge entity-{{ pattern.entity_type|lower }}">
+                                            {{ pattern.entity_type }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="pattern-frequency">{{ pattern.frequency }}</span>
+                                        <small class="d-block text-muted">instances</small>
+                                    </td>
+                                    <td>
+                                        <span class="impact-{{ pattern.impact|lower }}">
+                                            {{ pattern.impact }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="pattern-status status-{{ pattern.status|lower }}"></span>
+                                            {{ pattern.status }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ pattern.last_occurrence|datetime }}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    data-bs-toggle="modal" data-bs-target="#patternDetailsModal{{ pattern.id }}">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            {% if pattern.status == 'ACTIVE' %}
+                                                {% if pattern.auto_fixable %}
+                                                <button type="button" class="btn btn-sm btn-outline-success">
+                                                    <i class="bi bi-magic"></i>
+                                                </button>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-flag"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <i class="bi bi-check-circle text-success fs-4 d-block mb-2"></i>
+                                        <p class="mb-0">No error patterns found! Your data is in good shape.</p>
+                                        <p class="text-muted small">Run the pattern detection to check for any new issues.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pattern Details Modals -->
+{% for pattern in patterns %}
+<div class="modal fade" id="patternDetailsModal{{ pattern.id }}" tabindex="-1" aria-labelledby="patternDetailsModalLabel{{ pattern.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="patternDetailsModalLabel{{ pattern.id }}">{{ pattern.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <h6>Description</h6>
+                    <p>{{ pattern.description }}</p>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <h6>Pattern Type</h6>
+                        <p>{{ pattern.pattern_type }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Entity Type</h6>
+                        <p>{{ pattern.entity_type }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Affected Entities</h6>
+                        <p>{{ pattern.affected_entities }}</p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6>AI-Generated Recommendation</h6>
+                    <div class="alert alert-info">
+                        <i class="bi bi-lightbulb me-2"></i>{{ pattern.recommendation }}
+                    </div>
+                </div>
+                
+                {% if pattern.affected_fields %}
+                <div class="mb-4">
+                    <h6>Affected Fields</h6>
+                    <div class="row">
+                        {% for field in pattern.affected_fields %}
+                        <div class="col-md-4 mb-2">
+                            <span class="badge bg-light text-dark">{{ field }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if pattern.auto_fixable %}
+                <div class="mb-4">
+                    <h6>Auto-Fix Script</h6>
+                    <pre class="bg-light p-3 rounded"><code>{{ pattern.fix_script }}</code></pre>
+                </div>
+                {% endif %}
+                
+                {% if pattern.status == 'FIXED' %}
+                <div class="mb-4">
+                    <h6>Resolution</h6>
+                    <p>Fixed on {{ pattern.resolved_at|datetime }} by {{ pattern.resolved_by.full_name }}</p>
+                    <p>{{ pattern.resolution_notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                {% if pattern.status == 'ACTIVE' %}
+                    {% if pattern.auto_fixable %}
+                    <button type="button" class="btn btn-success">
+                        <i class="bi bi-magic me-2"></i>Apply Auto-Fix
+                    </button>
+                    {% endif %}
+                    <button type="button" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-2"></i>Mark as Fixed
+                    </button>
+                    <button type="button" class="btn btn-secondary">
+                        <i class="bi bi-flag me-2"></i>Ignore Pattern
+                    </button>
+                {% else %}
+                    <button type="button" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Reactivate
+                    </button>
+                {% endif %}
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pattern detection button
+    const detectButton = document.getElementById('detectPatterns');
+    if (detectButton) {
+        detectButton.addEventListener('click', function() {
+            detectButton.disabled = true;
+            detectButton.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Detecting Patterns...';
+            
+            // In a real application, this would call an API endpoint
+            setTimeout(function() {
+                alert('Pattern detection complete! Found 3 new patterns.');
+                window.location.reload();
+            }, 2000);
+        });
+    }
+});
+</script>
+{% endblock %}

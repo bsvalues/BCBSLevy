@@ -342,6 +342,16 @@ app.logger.info("Search routes initialized")
 init_home_routes(app)
 app.logger.info("Home routes initialized")
 
+# Initialize data quality routes
+try:
+    from routes_data_quality import init_app as init_data_quality_routes
+    init_data_quality_routes(app)
+    app.logger.info("Data quality routes initialized")
+except ImportError as e:
+    app.logger.warning(f"Could not import data quality routes: {str(e)}")
+except Exception as e:
+    app.logger.error(f"Error initializing data quality routes: {str(e)}")
+
 # Import models after db is defined to avoid circular imports
 with app.app_context():
     # Import dependencies for MCP and AI functionalities
