@@ -2,137 +2,121 @@
 
 {% block title %}Guided Tours - LevyMaster{% endblock %}
 
-{% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/guided_tour.css') }}">
-<style>
-    .tour-card {
-        transition: transform 0.2s, box-shadow 0.2s;
-        height: 100%;
-    }
-    
-    .tour-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .tour-icon {
-        background-color: #f0f8ff;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        color: #0d6efd;
-        margin-bottom: 1rem;
-    }
-    
-    .tour-completed-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 0.75rem;
-    }
-    
-    .stats-card {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 25px;
-    }
-    
-    .stats-value {
-        font-size: 2rem;
-        font-weight: 600;
-        margin-bottom: 0;
-        color: #0d6efd;
-    }
-    
-    .stats-label {
-        font-size: 0.9rem;
-        color: #6c757d;
-        margin-bottom: 0;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="container py-4">
-    <!-- Page header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="mb-0">Guided Tours</h1>
-            <p class="lead text-muted">Learn how to use LevyMaster with interactive guided tours</p>
-        </div>
-        <a href="{{ url_for('tours.start_tour', tour_id='welcomeTour') }}" class="btn btn-primary" id="startWelcomeTour">
-            <i class="bi bi-play-circle me-2"></i>Start Welcome Tour
-        </a>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="stats-card">
-                <p class="stats-value">{{ stats.total_tours_completed }}</p>
-                <p class="stats-label">Tours Completed</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stats-card">
-                <p class="stats-value">{{ stats.most_popular_tour }}</p>
-                <p class="stats-label">Most Popular Tour</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="stats-card">
-                <p class="stats-value">{{ stats.completion_rate }}%</p>
-                <p class="stats-label">Completion Rate</p>
-            </div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-5 mb-4">
+                <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                Guided Tours
+            </h1>
+            <p class="lead">
+                Explore the features of LevyMaster with these interactive guided tours.
+                Each tour provides step-by-step instructions to help you navigate and understand
+                key functionality.
+            </p>
         </div>
     </div>
 
-    <!-- Available Tours -->
-    <h2 class="mb-3">Available Tours</h2>
-    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
-        {% for tour in tours %}
-        <div class="col">
-            <div class="card tour-card h-100 position-relative">
-                {% if tour.completed %}
-                <span class="badge bg-success tour-completed-badge">Completed</span>
-                {% endif %}
-                <div class="card-body d-flex flex-column">
-                    <div class="tour-icon align-self-center">
-                        <i class="bi {{ tour.icon }}"></i>
-                    </div>
-                    <h5 class="card-title text-center mb-3">{{ tour.name }}</h5>
-                    <p class="card-text flex-grow-1">{{ tour.description }}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ tour.duration }}</small>
-                        <button class="btn btn-outline-primary btn-sm start-tour-btn" data-tour-id="{{ tour.id }}">
-                            Start Tour
-                        </button>
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Available Tours</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for tour in tours %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100 tour-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi {{ tour.icon }} text-primary me-2"></i>
+                                        {{ tour.name }}
+                                    </h5>
+                                    <div class="mb-2">
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-clock me-1"></i> {{ tour.duration }}
+                                        </span>
+                                        {% if tour.completed == 'True' %}
+                                        <span class="badge bg-success ms-1">
+                                            <i class="bi bi-check-circle me-1"></i> Completed
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="card-text">{{ tour.description }}</p>
+                                </div>
+                                <div class="card-footer bg-white border-top-0">
+                                    <button class="btn btn-primary btn-sm start-tour-btn" data-tour-id="{{ tour.id }}">
+                                        <i class="bi bi-play-circle me-1"></i>
+                                        Start Tour
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
 
-    <!-- Tour Benefits -->
-    <div class="row mt-4">
-        <div class="col-md-8 offset-md-2">
-            <div class="card border-0 shadow-sm">
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Tour Statistics</h5>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Benefits of Guided Tours</h3>
-                    <p class="card-text">Our interactive guided tours help you get the most out of LevyMaster by:</p>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i>Learning the new navigation structure quickly</li>
-                        <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i>Understanding key features and how they work together</li>
-                        <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i>Discovering advanced functionality you might have missed</li>
-                        <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i>Reducing the learning curve for new users</li>
-                        <li class="list-group-item bg-transparent"><i class="bi bi-check-circle-fill text-success me-2"></i>Boosting productivity through better system knowledge</li>
-                    </ul>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="stat-icon bg-primary text-white">
+                                <i class="bi bi-signpost-2"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">Total Tours Completed</h6>
+                            <h4 class="mb-0">{{ stats.total_tours_completed }}</h4>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0">
+                            <div class="stat-icon bg-success text-white">
+                                <i class="bi bi-trophy"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">Most Popular Tour</h6>
+                            <p class="mb-0">{{ stats.most_popular_tour }}</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="stat-icon bg-info text-white">
+                                <i class="bi bi-percent"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-0">Completion Rate</h6>
+                            <h4 class="mb-0">{{ stats.completion_rate }}%</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Need Help?</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        If you need additional assistance beyond the guided tours, please check out our
+                        <a href="{{ url_for('docs.index') if 'docs' in blueprints else '#' }}">documentation</a> or 
+                        <a href="{{ url_for('help.support') if 'help' in blueprints else '#' }}">contact support</a>.
+                    </p>
+                    <p>
+                        <a href="{{ url_for('glossary.glossary') if 'glossary' in blueprints else '#' }}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-book me-1"></i> View Glossary
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -141,42 +125,26 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/6.0.0/intro.min.js"></script>
-<script src="{{ url_for('static', filename='js/guided_tour.js') }}"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle "Start Tour" button clicks
-    document.querySelectorAll('.start-tour-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const tourId = this.getAttribute('data-tour-id');
-            
-            fetch('/tours/start/' + tourId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.redirect) {
-                        window.location.href = data.redirect;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error starting tour:', error);
-                });
-        });
-    });
-    
-    // Handle "Start Welcome Tour" button
-    document.getElementById('startWelcomeTour').addEventListener('click', function(e) {
-        e.preventDefault();
+$(document).ready(function() {
+    // Handle tour start button clicks
+    $('.start-tour-btn').on('click', function() {
+        const tourId = $(this).data('tour-id');
         
-        fetch('/tours/start/welcomeTour')
-            .then(response => response.json())
-            .then(data => {
-                if (data.redirect) {
-                    window.location.href = data.redirect;
+        // AJAX request to start the tour
+        $.ajax({
+            url: `/tours/start/${tourId}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.redirect) {
+                    window.location.href = response.redirect;
                 }
-            })
-            .catch(error => {
-                console.error('Error starting welcome tour:', error);
-            });
+            },
+            error: function(error) {
+                console.error('Error starting tour:', error);
+                alert('There was an error starting the tour. Please try again.');
+            }
+        });
     });
 });
 </script>

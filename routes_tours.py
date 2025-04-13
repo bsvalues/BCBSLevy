@@ -219,7 +219,7 @@ def get_tour_completion_stats():
         'completion_rate': 0
     }
 
-def register_routes(app):
+def register_tour_routes(app):
     """
     Register the tours blueprint with the Flask application.
     
