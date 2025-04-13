@@ -20,6 +20,62 @@ from utils.api_logging import APICallRecord, track_anthropic_api_call, api_track
 
 logger = logging.getLogger(__name__)
 
+# Initialize the Claude service
+_claude_service = None
+
+def get_claude_service():
+    """
+    Get or initialize the global Claude service instance.
+    
+    Returns:
+        ClaudeService: The global Claude service instance
+    """
+    global _claude_service
+    if _claude_service is None:
+        try:
+            _claude_service = ClaudeService()
+        except Exception as e:
+            logger.error(f"Failed to initialize Claude service: {str(e)}")
+            return None
+    return _claude_service
+
+def execute_anthropic_query(prompt: str, system_prompt: str = None) -> str:
+    """
+    Execute a query against the Anthropic Claude API with error handling.
+    
+    This function serves as a simple wrapper for making Claude queries
+    from various parts of the application. It handles all the common error cases
+    and provides consistent response formatting.
+    
+    Args:
+        prompt: The query to send to Claude
+        system_prompt: Optional system instructions for Claude
+        
+    Returns:
+        The response text from Claude, or error message if query fails
+    """
+    try:
+        # Get or initialize the Claude service
+        claude = get_claude_service()
+        if not claude:
+            return "Claude service unavailable. Please check API configuration."
+            
+        # Format as a message for chat API
+        messages = [{"role": "user", "content": prompt}]
+        
+        # Execute the query
+        response = claude.chat(messages, system_prompt=system_prompt)
+        
+        # Extract the text response
+        if response and response.content:
+            return response.content[0].text
+            
+        return "No response generated."
+        
+    except Exception as e:
+        logger.error(f"Error executing Claude query: {str(e)}")
+        return f"Error: {str(e)}"
+
 class ClaudeService:
     """Service for interacting with the Anthropic Claude API."""
     

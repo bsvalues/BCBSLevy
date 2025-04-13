@@ -17,6 +17,12 @@ import threading
 from utils.mcp_core import registry
 from utils.mcp_agents import MCPAgent
 from utils.mcp_experience import collaboration_manager, AgentCommunicationBus
+from typing import Any
+
+# Define AgentNotAvailableError for better error handling
+class AgentNotAvailableError(Exception):
+    """Raised when a requested agent is not available."""
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -732,3 +738,38 @@ class AgentManager:
 
 # Initialize the global agent manager
 agent_manager = AgentManager()
+
+# Function to get an agent by ID
+def get_agent(agent_id: str) -> Any:
+    """
+    Get an agent by ID.
+    
+    This function serves as a wrapper around the collaboration manager's get_agent method
+    for accessing agents from outside the MCP framework. It provides a standardized interface
+    for retrieving agent instances throughout the application.
+    
+    Args:
+        agent_id: The ID of the agent to retrieve
+        
+    Returns:
+        The agent instance if found, None otherwise
+        
+    Raises:
+        AgentNotAvailableError: If the agent is not available
+    """
+    try:
+        # Check if collaboration manager is initialized
+        if not collaboration_manager:
+            logger.warning("Collaboration manager not initialized")
+            return None
+            
+        # Retrieve the agent from the collaboration manager
+        agent = collaboration_manager.get_agent(agent_id)
+        if not agent:
+            logger.warning(f"Agent {agent_id} not found")
+            raise AgentNotAvailableError(f"Agent {agent_id} not available")
+            
+        return agent
+    except Exception as e:
+        logger.error(f"Error retrieving agent {agent_id}: {str(e)}")
+        raise AgentNotAvailableError(f"Error retrieving agent {agent_id}: {str(e)}")

@@ -22,6 +22,9 @@ agent_manager = None
 collaboration_manager = None
 master_prompt_manager = None
 
+# Flag to indicate whether MCP Army system is enabled
+MCP_ARMY_ENABLED = True  # Set to True by default, can be configured by environment variables
+
 def init_mcp_army(app: Optional[Flask] = None) -> bool:
     """
     Initialize the MCP Army system.
