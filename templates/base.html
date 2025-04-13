@@ -272,7 +272,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('data_management.data_quality') if 'data_management.data_quality' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('data_management.import_history') }}">
                                     <i class="bi bi-card-checklist me-2"></i>Data Quality
                                 </a>
                             </li>
@@ -296,12 +296,12 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.trend_report') if 'reports.trend_report' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
                                     <i class="bi bi-arrow-up-right me-2"></i>Trends & Patterns
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.comparative_analysis') if 'reports.comparative_analysis' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('reports.comparative_analysis') if 'reports.comparative_analysis' in blueprints else '#' }}">
                                     <i class="bi bi-bar-chart me-2"></i>Comparative Analysis
                                 </a>
                             </li>
@@ -312,7 +312,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.visualizations') if 'reports.visualizations' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('reports.visualizations') if 'reports.visualizations' in blueprints else '#' }}">
                                     <i class="bi bi-pie-chart me-2"></i>Visualizations
                                 </a>
                             </li>
@@ -336,7 +336,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('mcp.workflow_manager') if 'mcp.workflow_manager' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('mcp.workflow_manager') if 'mcp.workflow_manager' in blueprints else '#' }}">
                                     <i class="bi bi-diagram-3 me-2"></i>Workflow Orchestration
                                 </a>
                             </li>
@@ -347,7 +347,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('mcp.collaborative_workflows') if 'mcp.collaborative_workflows' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('mcp.collaborative_workflows') if 'mcp.collaborative_workflows' in blueprints else '#' }}">
                                     <i class="bi bi-people me-2"></i>Collaborative Workflows
                                 </a>
                             </li>
@@ -376,18 +376,18 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.compliance_reports') if 'reports.compliance_reports' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('reports.compliance_reports') if 'reports.compliance_reports' in blueprints else '#' }}">
                                     <i class="bi bi-check2-square me-2"></i>Compliance Reports
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.custom_reports') if 'reports.custom_reports' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('reports.custom_reports') if 'reports.custom_reports' in blueprints else '#' }}">
                                     <i class="bi bi-pencil-square me-2"></i>Custom Reports
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.scheduled_reports') if 'reports.scheduled_reports' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('reports.scheduled_reports') if 'reports.scheduled_reports' in blueprints else '#' }}">
                                     <i class="bi bi-calendar-check me-2"></i>Scheduled Reports
                                 </a>
                             </li>
@@ -411,7 +411,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.system_logs') if 'admin.system_logs' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.system_logs') if 'admin.system_logs' in blueprints else '#' }}">
                                     <i class="bi bi-journal-text me-2"></i>System Logs
                                 </a>
                             </li>
@@ -422,12 +422,12 @@
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.database_backup') if 'admin.database_backup' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.database_backup') if 'admin.database_backup' in blueprints else '#' }}">
                                     <i class="bi bi-cloud-arrow-up me-2"></i>Database Backup
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.performance') if 'admin.performance' in dir() else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.performance') if 'admin.performance' in blueprints else '#' }}">
                                     <i class="bi bi-speedometer me-2"></i>Performance
                                 </a>
                             </li>
@@ -482,7 +482,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.profile') if 'auth.profile' in dir() else '#' }}">
+                        <a class="nav-link" href="{{ url_for('auth.profile') if 'auth.profile' in blueprints else '#' }}">
                             <i class="bi bi-person-circle me-1"></i>Profile
                         </a>
                     </li>

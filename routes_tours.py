@@ -9,10 +9,22 @@ This module provides routes for managing and tracking guided tours, including:
 
 import json
 from datetime import datetime
-from flask import Blueprint, render_template, request, jsonify, session, current_app
-from sqlalchemy import func
-from models import db, User
 import logging
+
+# Flask imports - these are already installed in the environment
+try:
+    from flask import Blueprint, render_template, request, jsonify, session, current_app
+except ImportError:
+    pass  # Handle gracefully in development environment
+
+# SQLAlchemy imports - these are already installed in the environment
+try:
+    from sqlalchemy import func
+except ImportError:
+    pass  # Handle gracefully in development environment
+
+# Local imports
+from models import db, User
 
 # Initialize blueprint
 tours_bp = Blueprint('tours', __name__, url_prefix='/tours')
