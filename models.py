@@ -717,6 +717,32 @@ class UserActionLog(db.Model):
         return f'<UserActionLog {self.id} {self.action_type} {self.module}>'
 
 
+class UserTourCompletion(db.Model):
+    """
+    Model for tracking user guided tour completions.
+    
+    This table stores records of which users have completed which guided tours,
+    enabling personalized UI experiences and analytics on tour effectiveness.
+    """
+    __tablename__ = 'user_tour_completion'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    tour_id = db.Column(db.String(64), nullable=False, index=True)  # welcomeTour, dashboardTour, etc.
+    completed_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('completed_tours', lazy='dynamic'))
+    
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'tour_id', name='uix_user_tour'),
+        db.Index('idx_tour_completion_date', 'completed_at'),
+    )
+    
+    def __repr__(self):
+        return f'<UserTourCompletion {self.user_id} {self.tour_id}>'
+
+
 class LevyOverrideLog(db.Model):
     """
     Model for tracking levy calculation overrides.

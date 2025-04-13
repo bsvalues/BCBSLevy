@@ -24,7 +24,7 @@ except ImportError:
     pass  # Handle gracefully in development environment
 
 # Local imports
-from models import db, User
+from models import db, User, UserTourCompletion
 
 # Initialize blueprint
 tours_bp = Blueprint('tours', __name__, url_prefix='/tours')
@@ -176,13 +176,22 @@ def get_user_completed_tours(user_id):
         List of completed tour IDs
     """
     # First check session
+    session_tours = []
     if hasattr(session, 'completed_tours'):
-        return session.get('completed_tours', [])
+        session_tours = session.get('completed_tours', [])
     
-    # Then check database if we have a UserTourCompletion model
-    # This would require adding a model for tracking tour completions
-    # For now, return empty list or session data
-    return []
+    # Then check database for UserTourCompletion records
+    try:
+        db_tours = []
+        completions = UserTourCompletion.query.filter_by(user_id=user_id).all()
+        db_tours = [completion.tour_id for completion in completions]
+        
+        # Combine session and database tours
+        all_tours = list(set(session_tours + db_tours))
+        return all_tours
+    except Exception as e:
+        logger.error(f"Error retrieving tour completions: {str(e)}")
+        return session_tours
 
 def record_tour_completion_in_db(user_id, tour_id):
     """
@@ -195,14 +204,28 @@ def record_tour_completion_in_db(user_id, tour_id):
     Returns:
         None
     """
-    # This would require adding a model for tracking tour completions
-    # For now, just log the completion
-    logger.info(f"Recording tour completion in database: User {user_id}, Tour {tour_id}")
-    
-    # If you add a UserTourCompletion model later, you could use:
-    # completion = UserTourCompletion(user_id=user_id, tour_id=tour_id)
-    # db.session.add(completion)
-    # db.session.commit()
+    try:
+        # Check if there's already a completion record
+        existing = UserTourCompletion.query.filter_by(
+            user_id=user_id, 
+            tour_id=tour_id
+        ).first()
+        
+        if not existing:
+            # Create a new record if one doesn't exist
+            completion = UserTourCompletion(
+                user_id=user_id,
+                tour_id=tour_id
+            )
+            db.session.add(completion)
+            db.session.commit()
+            logger.info(f"Recorded tour completion: User {user_id}, Tour {tour_id}")
+        else:
+            logger.info(f"Tour already completed: User {user_id}, Tour {tour_id}")
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error recording tour completion: {str(e)}")
+        raise
 
 def get_tour_completion_stats():
     """
@@ -211,13 +234,41 @@ def get_tour_completion_stats():
     Returns:
         Dictionary with tour completion statistics
     """
-    # This would require querying the database for real stats
-    # For now, return placeholder stats
-    return {
-        'total_tours_completed': 0,
-        'most_popular_tour': 'welcomeTour',
-        'completion_rate': 0
-    }
+    try:
+        # Get total number of completed tours
+        total_completed = UserTourCompletion.query.count()
+        
+        # Get most popular tour
+        most_popular = None
+        completion_rate = 0
+        
+        if total_completed > 0:
+            # Find most popular tour using SQL grouping and counting
+            from sqlalchemy import func
+            popular_result = db.session.query(
+                UserTourCompletion.tour_id,
+                func.count(UserTourCompletion.id).label('count')
+            ).group_by(UserTourCompletion.tour_id).order_by(func.count(UserTourCompletion.id).desc()).first()
+            
+            if popular_result:
+                most_popular = popular_result[0]
+                
+            # Calculate completion rate (completed tours / users)
+            user_count = User.query.count() or 1  # Avoid division by zero
+            completion_rate = int((total_completed / (user_count * 6)) * 100)  # Assuming 6 tours per user
+        
+        return {
+            'total_tours_completed': total_completed,
+            'most_popular_tour': most_popular or 'welcomeTour',
+            'completion_rate': min(completion_rate, 100)  # Cap at 100%
+        }
+    except Exception as e:
+        logger.error(f"Error getting tour stats: {str(e)}")
+        return {
+            'total_tours_completed': 0,
+            'most_popular_tour': 'welcomeTour',
+            'completion_rate': 0
+        }
 
 def register_tour_routes(app):
     """
