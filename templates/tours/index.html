@@ -28,8 +28,8 @@
                     <div class="row">
                         {% for tour in tours %}
                         <div class="col-md-6 mb-4">
-                            <div class="card h-100 tour-card">
-                                <div class="card-body">
+                            <div class="card h-100 tour-card" data-tour-id="{{ tour.id }}">
+                                <div class="card-body tour-card-content">
                                     <h5 class="card-title">
                                         <i class="bi {{ tour.icon }} text-primary me-2"></i>
                                         {{ tour.name }}
@@ -46,11 +46,11 @@
                                     </div>
                                     <p class="card-text">{{ tour.description }}</p>
                                 </div>
-                                <div class="card-footer bg-white border-top-0">
-                                    <button class="btn btn-primary btn-sm start-tour-btn" data-tour-id="{{ tour.id }}">
+                                <div class="card-footer bg-white border-top-0 text-center">
+                                    <span class="start-tour-text">
                                         <i class="bi bi-play-circle me-1"></i>
                                         Start Tour
-                                    </button>
+                                    </span>
                                 </div>
                             </div>
                         </div>
