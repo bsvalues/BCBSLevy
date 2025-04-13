@@ -393,43 +393,5 @@ function recordTourCompletion(tourId) {
         console.error("Error recording tour completion:", error);
     });
     
-    /* Original jQuery implementation
-    $.ajax({
-        url: '/tours/complete/' + tourId,
-        method: 'POST',
-        success: function(response) {
-            console.log("Tour completion recorded:", tourId);
-            
-            // Show success message
-            const toastElement = document.createElement('div');
-            toastElement.className = 'tour-completion-toast';
-            toastElement.innerHTML = 
-                '<div class="toast-header">' +
-                '  <i class="bi bi-check-circle-fill text-success me-2"></i>' +
-                '  <strong class="me-auto">Tour Completed</strong>' +
-                '  <button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
-                '</div>' +
-                '<div class="toast-body">' +
-                '  Congratulations! You\'ve completed the ' + tourId + ' tour.' +
-                '</div>';
-            
-            document.body.appendChild(toastElement);
-            
-            // Remove the tour identifier class from body
-            document.body.classList.remove(tourId);
-            
-            // Update UI to show completion if on tours page
-            const statusElements = document.querySelectorAll('.tour-card[data-tour-id="' + tourId + '"] .tour-status');
-            if (statusElements.length > 0) {
-                statusElements.forEach(element => {
-                    element.classList.remove('badge-secondary');
-                    element.classList.add('badge-success');
-                    element.innerHTML = '<i class="bi bi-check-circle"></i> Completed';
-                });
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error("Error recording tour completion:", error);
-        }
-    });
+    // Original jQuery implementation has been completely replaced with the fetch API above
 }
