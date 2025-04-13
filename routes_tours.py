@@ -1,16 +1,211 @@
 """
-Routes for guided tours in the Levy Calculation System.
+Routes for guided tours management in the LevyMaster application.
 
-This module provides endpoints for guided tours that help users
-learn about different features of the application. Tours are
-structured as interactive walkthroughs that highlight UI elements
-and provide context for their functionality.
+This module provides routes for managing and tracking guided tours, including:
+- Tour index page listing available tours
+- Tour completion tracking
+- Tour statistics and analytics
 """
 
-from flask import Blueprint, jsonify, render_template, request, session
+import json
+from datetime import datetime
+from flask import Blueprint, render_template, request, jsonify, session, current_app
+from sqlalchemy import func
+from models import db, User
+import logging
 
-# Blueprint configuration
+# Initialize blueprint
 tours_bp = Blueprint('tours', __name__, url_prefix='/tours')
+
+# Setup logging
+logger = logging.getLogger(__name__)
+
+@tours_bp.route('/')
+def tour_index():
+    """
+    Display the tour index page with all available tours.
+    
+    Returns:
+        The rendered tours index template.
+    """
+    # Define available tours
+    available_tours = [
+        {
+            'id': 'welcomeTour',
+            'name': 'Welcome Tour',
+            'description': 'Overview of the LevyMaster navigation and main features',
+            'duration': '2-3 minutes',
+            'icon': 'bi-info-circle'
+        },
+        {
+            'id': 'dashboardTour',
+            'name': 'Dashboard Tour',
+            'description': 'Guide to understanding and utilizing the dashboard',
+            'duration': '2 minutes',
+            'icon': 'bi-speedometer2'
+        },
+        {
+            'id': 'calculatorTour',
+            'name': 'Levy Calculator Tour',
+            'description': 'Step-by-step guide to using the levy calculator',
+            'duration': '3-4 minutes',
+            'icon': 'bi-calculator'
+        },
+        {
+            'id': 'dataHubTour',
+            'name': 'Data Hub Tour',
+            'description': 'Overview of data import, export and management features',
+            'duration': '3 minutes',
+            'icon': 'bi-database'
+        },
+        {
+            'id': 'mcpArmyTour',
+            'name': 'AI & Agents Tour',
+            'description': 'Guide to using AI-powered features and agents',
+            'duration': '3 minutes',
+            'icon': 'bi-robot'
+        },
+        {
+            'id': 'reportsTour',
+            'name': 'Reports Tour',
+            'description': 'Guide to generating and customizing reports',
+            'duration': '2-3 minutes',
+            'icon': 'bi-file-earmark-text'
+        }
+    ]
+    
+    # Get tour completion statistics
+    completion_stats = get_tour_completion_stats()
+    
+    # Add completion status to each tour (if authenticated)
+    user_completed_tours = []
+    if hasattr(session, 'user_id'):
+        user_completed_tours = get_user_completed_tours(session.get('user_id'))
+    
+    for tour in available_tours:
+        tour['completed'] = str(tour['id'] in user_completed_tours)
+    
+    return render_template(
+        'tours/index.html',
+        tours=available_tours,
+        stats=completion_stats,
+        page_title="Guided Tours"
+    )
+
+@tours_bp.route('/start/<tour_id>')
+def start_tour(tour_id):
+    """
+    Start a specific tour by redirecting to the appropriate page.
+    
+    Args:
+        tour_id: The ID of the tour to start
+        
+    Returns:
+        A redirect to the appropriate starting page with tour parameter
+    """
+    # Map of tour starting points
+    tour_starting_points = {
+        'welcomeTour': '/?start_tour=welcomeTour',
+        'dashboardTour': '/dashboard?start_tour=dashboardTour',
+        'calculatorTour': '/levy-calculator?start_tour=calculatorTour',
+        'dataHubTour': '/data/import?start_tour=dataHubTour',
+        'mcpArmyTour': '/mcp-army-dashboard?start_tour=mcpArmyTour',
+        'reportsTour': '/reports?start_tour=reportsTour'
+    }
+    
+    # Log tour start
+    logger.info(f"User {session.get('user_id', 'anonymous')} started tour: {tour_id}")
+    
+    # Return the redirect URL as JSON
+    return jsonify({
+        'redirect': tour_starting_points.get(tour_id, '/?start_tour=' + tour_id)
+    })
+
+@tours_bp.route('/complete/<tour_id>', methods=['POST'])
+def complete_tour(tour_id):
+    """
+    Record a completed tour for the current user.
+    
+    Args:
+        tour_id: The ID of the completed tour
+        
+    Returns:
+        JSON response with success status
+    """
+    # Log tour completion
+    logger.info(f"User {session.get('user_id', 'anonymous')} completed tour: {tour_id}")
+    
+    # If user is authenticated, store completion in session
+    if hasattr(session, 'user_id'):
+        # Get current completed tours
+        completed_tours = session.get('completed_tours', [])
+        
+        # Add the current tour if not already completed
+        if tour_id not in completed_tours:
+            completed_tours.append(tour_id)
+            session['completed_tours'] = completed_tours
+            
+            # Save to database if we have a user model with tour tracking
+            try:
+                record_tour_completion_in_db(session.get('user_id'), tour_id)
+            except Exception as e:
+                logger.error(f"Error recording tour completion: {str(e)}")
+    
+    return jsonify({'success': True})
+
+def get_user_completed_tours(user_id):
+    """
+    Get list of tours completed by a specific user.
+    
+    Args:
+        user_id: The user ID to check
+        
+    Returns:
+        List of completed tour IDs
+    """
+    # First check session
+    if hasattr(session, 'completed_tours'):
+        return session.get('completed_tours', [])
+    
+    # Then check database if we have a UserTourCompletion model
+    # This would require adding a model for tracking tour completions
+    # For now, return empty list or session data
+    return []
+
+def record_tour_completion_in_db(user_id, tour_id):
+    """
+    Record a tour completion in the database.
+    
+    Args:
+        user_id: The user ID
+        tour_id: The tour ID
+        
+    Returns:
+        None
+    """
+    # This would require adding a model for tracking tour completions
+    # For now, just log the completion
+    logger.info(f"Recording tour completion in database: User {user_id}, Tour {tour_id}")
+    
+    # If you add a UserTourCompletion model later, you could use:
+    # completion = UserTourCompletion(user_id=user_id, tour_id=tour_id)
+    # db.session.add(completion)
+    # db.session.commit()
+
+def get_tour_completion_stats():
+    """
+    Get statistics about tour completions.
+    
+    Returns:
+        Dictionary with tour completion statistics
+    """
+    # This would require querying the database for real stats
+    # For now, return placeholder stats
+    return {
+        'total_tours_completed': 0,
+        'most_popular_tour': 'welcomeTour',
+        'completion_rate': 0
+    }
 
 def register_routes(app):
     """
@@ -18,183 +213,9 @@ def register_routes(app):
     
     Args:
         app: The Flask application instance
+        
+    Returns:
+        None
     """
     app.register_blueprint(tours_bp)
-    app.logger.info('Tours blueprint registered')
-
-@tours_bp.route('/')
-def tours_home():
-    """
-    Render the tours homepage showing available guided tours.
-    
-    Returns:
-        Rendered template for the tours homepage
-    """
-    tours = [
-        {
-            'id': 'welcome',
-            'name': 'Welcome Tour',
-            'description': 'Get oriented with the LevyMaster system and navigation.',
-            'duration': '3-5 minutes',
-            'icon': 'bi-info-circle'
-        },
-        {
-            'id': 'dashboard',
-            'name': 'Dashboard Tour',
-            'description': 'Learn about the key metrics and features on your dashboard.',
-            'duration': '2-3 minutes',
-            'icon': 'bi-speedometer2'
-        },
-        {
-            'id': 'calculator',
-            'name': 'Levy Calculator Tour',
-            'description': 'Learn how to calculate property tax levies effectively.',
-            'duration': '4-6 minutes',
-            'icon': 'bi-calculator'
-        },
-        {
-            'id': 'data_import',
-            'name': 'Data Import Tour',
-            'description': 'Understand how to import and manage your data.',
-            'duration': '3-4 minutes',
-            'icon': 'bi-cloud-upload'
-        },
-        {
-            'id': 'analysis',
-            'name': 'Analytics Tools Tour',
-            'description': 'Explore the various analytics and reporting tools.',
-            'duration': '5-7 minutes',
-            'icon': 'bi-graph-up'
-        },
-        {
-            'id': 'mcp_army',
-            'name': 'MCP Army Tour',
-            'description': 'Get acquainted with the AI agent system.',
-            'duration': '4-5 minutes',
-            'icon': 'bi-robot'
-        }
-    ]
-    
-    return render_template('tours/index.html', tours=tours)
-
-@tours_bp.route('/start/<tour_id>')
-def start_tour(tour_id):
-    """
-    Start a guided tour by tour ID.
-    
-    Args:
-        tour_id: The ID of the tour to start
-        
-    Returns:
-        JSON response with tour configuration
-    """
-    # Store in session that this tour has been started
-    tours_started = session.get('tours_started', [])
-    if tour_id not in tours_started:
-        tours_started.append(tour_id)
-        session['tours_started'] = tours_started
-    
-    # Redirect to appropriate page based on tour type
-    if tour_id == 'welcome':
-        return jsonify({
-            'redirect': '/',
-            'start_tour': 'welcomeTour',
-            'message': 'Welcome to the guided tour of LevyMaster!'
-        })
-    elif tour_id == 'dashboard':
-        return jsonify({
-            'redirect': '/dashboard',
-            'start_tour': 'dashboardTour',
-            'message': 'Welcome to the Dashboard tour!'
-        })
-    elif tour_id == 'calculator':
-        return jsonify({
-            'redirect': '/levy-calculator',
-            'start_tour': 'calculatorTour',
-            'message': 'Welcome to the Levy Calculator tour!'
-        })
-    elif tour_id == 'data_import':
-        return jsonify({
-            'redirect': '/data/import',
-            'start_tour': 'dataImportTour',
-            'message': 'Welcome to the Data Import tour!'
-        })
-    elif tour_id == 'analysis':
-        return jsonify({
-            'redirect': '/analysis/forecasting',
-            'start_tour': 'analysisTour',
-            'message': 'Welcome to the Analytics Tools tour!'
-        })
-    elif tour_id == 'mcp_army':
-        return jsonify({
-            'redirect': '/mcp-army-dashboard',
-            'start_tour': 'mcpArmyTour',
-            'message': 'Welcome to the MCP Army tour!'
-        })
-    else:
-        return jsonify({
-            'error': 'Tour not found',
-            'redirect': '/tours'
-        }), 404
-
-@tours_bp.route('/progress')
-def tour_progress():
-    """
-    Get the user's tour progress.
-    
-    Returns:
-        JSON response with tour completion status
-    """
-    # Get progress from session
-    tours_started = session.get('tours_started', [])
-    tours_completed = session.get('tours_completed', [])
-    
-    all_tours = ['welcome', 'dashboard', 'calculator', 'data_import', 'analysis', 'mcp_army']
-    progress = {
-        'started': tours_started,
-        'completed': tours_completed,
-        'total': len(all_tours),
-        'completed_count': len(tours_completed),
-        'percentage': round((len(tours_completed) / len(all_tours)) * 100) if all_tours else 0
-    }
-    
-    return jsonify(progress)
-
-@tours_bp.route('/complete/<tour_id>', methods=['POST'])
-def complete_tour(tour_id):
-    """
-    Mark a tour as completed.
-    
-    Args:
-        tour_id: The ID of the tour to mark as completed
-        
-    Returns:
-        JSON response confirming completion
-    """
-    # Store in session that this tour has been completed
-    tours_completed = session.get('tours_completed', [])
-    if tour_id not in tours_completed:
-        tours_completed.append(tour_id)
-        session['tours_completed'] = tours_completed
-    
-    return jsonify({
-        'success': True,
-        'message': f'Tour {tour_id} marked as completed',
-        'completed': tours_completed
-    })
-
-@tours_bp.route('/reset', methods=['POST'])
-def reset_tours():
-    """
-    Reset all tour progress.
-    
-    Returns:
-        JSON response confirming reset
-    """
-    session.pop('tours_started', None)
-    session.pop('tours_completed', None)
-    
-    return jsonify({
-        'success': True,
-        'message': 'All tour progress has been reset'
-    })
+    logger.info('Tours routes registered')

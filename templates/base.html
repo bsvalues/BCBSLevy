@@ -195,22 +195,26 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Main Navigation - Left Side -->
                 <ul class="navbar-nav me-auto">
+                    <!-- 1. Home/Dashboard -->
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}" href="{{ url_for('dashboard.index') }}">
+                        <a class="nav-link {% if request.endpoint == 'dashboard.index' or request.endpoint == 'home.index' %}active{% endif %}" href="{{ url_for('dashboard.index') }}">
                             <i class="bi bi-speedometer2 me-1"></i>Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'search.search_page' %}active{% endif %}" href="{{ url_for('search.search_page') }}">
-                            <i class="bi bi-search me-1"></i>Search
-                        </a>
-                    </li>
+                    
+                    <!-- 2. Tax Management -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="dataDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-database me-1"></i>Data
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and 'levy_calculator' in request.endpoint %}active{% endif %}" href="#" id="taxDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-calculator me-1"></i>Tax Management
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="dataDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="taxDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('levy_calculator.calculator') }}">
+                                    <i class="bi bi-calculator-fill me-2"></i>Levy Calculator
+                                </a>
+                            </li>
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('data_management.list_tax_districts') }}">
                                     <i class="bi bi-geo-alt me-2"></i>Tax Districts
@@ -221,6 +225,31 @@
                                     <i class="bi bi-house me-2"></i>Property Lookup
                                 </a>
                             </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('levy_calculator.impact_calculator') }}">
+                                    <i class="bi bi-cash-coin me-2"></i>Bill Impact Calculator
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('budget_impact.index') }}">
+                                    <i class="bi bi-building me-2"></i>Budget Impact
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('historical_analysis.compliance') }}">
+                                    <i class="bi bi-check-circle me-2"></i>Compliance Check
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- 3. Data Hub -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('data_management' in request.endpoint or 'levy_exports' in request.endpoint or 'search' in request.endpoint) %}active{% endif %}" href="#" id="dataHubDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-database me-1"></i>Data Hub
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="dataHubDropdown">
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('data_management.import_data') }}">
                                     <i class="bi bi-cloud-upload me-2"></i>Import Data
@@ -232,25 +261,30 @@
                                 </a>
                             </li>
                             <li>
-                                <hr class="dropdown-divider">
+                                <a class="dropdown-item" href="{{ url_for('search.search_page') }}">
+                                    <i class="bi bi-search me-2"></i>Search
+                                </a>
                             </li>
+                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('data_management.import_history') }}">
                                     <i class="bi bi-archive me-2"></i>Import History
                                 </a>
                             </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('data_management.data_quality') if 'data_management.data_quality' in dir() else '#' }}">
+                                    <i class="bi bi-card-checklist me-2"></i>Data Quality
+                                </a>
+                            </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'levy_calculator.calculator' %}active{% endif %}" href="{{ url_for('levy_calculator.calculator') }}">
-                            <i class="bi bi-calculator me-1"></i>Levy Calculator
-                        </a>
-                    </li>
+                    
+                    <!-- 4. Analytics & Insights -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="analysisDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-graph-up me-1"></i>Analysis
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('forecasting' in request.endpoint or 'historical_analysis' in request.endpoint or 'tax_strategy' in request.endpoint) %}active{% endif %}" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-graph-up me-1"></i>Analytics
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="analysisDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="analyticsDropdown">
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('forecasting.forecast') }}">
                                     <i class="bi bi-graph-up-arrow me-2"></i>Forecasting
@@ -262,46 +296,67 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('historical_analysis.compliance') }}">
-                                    <i class="bi bi-check-circle me-2"></i>Compliance Check
+                                <a class="dropdown-item" href="{{ url_for('reports.trend_report') if 'reports.trend_report' in dir() else '#' }}">
+                                    <i class="bi bi-arrow-up-right me-2"></i>Trends & Patterns
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('levy_calculator.impact_calculator') }}">
-                                    <i class="bi bi-cash-coin me-2"></i>Bill Impact Calculator
+                                <a class="dropdown-item" href="{{ url_for('reports.comparative_analysis') if 'reports.comparative_analysis' in dir() else '#' }}">
+                                    <i class="bi bi-bar-chart me-2"></i>Comparative Analysis
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('tax_strategy.index') }}">
+                                    <i class="bi bi-diagram-3 me-2"></i>Tax Strategy Tree
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('budget_impact.index') }}">
-                                    <i class="bi bi-building me-2"></i>Budget Impact Visualization
+                                <a class="dropdown-item" href="{{ url_for('reports.visualizations') if 'reports.visualizations' in dir() else '#' }}">
+                                    <i class="bi bi-pie-chart me-2"></i>Visualizations
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- 5. AI & Agents -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('mcp_army' in request.endpoint or request.endpoint == 'mcp_army_dashboard_direct' or request.endpoint == 'agent_dashboard' or 'levy_audit' in request.endpoint) %}active{% endif %}" href="#" id="aiDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-robot me-1"></i>AI & Agents
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="aiDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/mcp-army-dashboard">
+                                    <i class="bi bi-robot me-2"></i>MCP Army Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/agent-dashboard">
+                                    <i class="bi bi-gear-wide-connected me-2"></i>Agent Configuration
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('mcp.workflow_manager') if 'mcp.workflow_manager' in dir() else '#' }}">
+                                    <i class="bi bi-diagram-3 me-2"></i>Workflow Orchestration
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('levy_audit.index') }}">
-                                    <i class="bi bi-shield-check me-2"></i>Levy Audit
+                                    <i class="bi bi-shield-check me-2"></i>Levy Audit Assistant
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('tax_strategy.index') }}">
-                                    <i class="bi bi-diagram-3 me-2"></i>Tax Strategy Decision Tree
+                                <a class="dropdown-item" href="{{ url_for('mcp.collaborative_workflows') if 'mcp.collaborative_workflows' in dir() else '#' }}">
+                                    <i class="bi bi-people me-2"></i>Collaborative Workflows
                                 </a>
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint and ('mcp_army' in request.endpoint or request.endpoint == 'mcp_army_dashboard_direct') %}active{% endif %}" href="/mcp-army-dashboard">
-                            <i class="bi bi-robot me-1"></i>MCP Army
-                        </a>
-                    </li>
-                    <!-- Alternative entry point for Agent Dashboard -->
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'agent_dashboard' %}active{% endif %}" href="/agent-dashboard">
-                            <i class="bi bi-diagram-3 me-1"></i>Agent Dashboard
-                        </a>
-                    </li>
+                    
+                    <!-- 6. Reports -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and 'reports' in request.endpoint %}active{% endif %}" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-file-earmark-text me-1"></i>Reports
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
@@ -317,30 +372,31 @@
                             </li>
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
-                                    <i class="bi bi-arrow-up-right me-2"></i>Trend Report
+                                    <i class="bi bi-arrow-up-right me-2"></i>Trend Reports
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
-                                    <i class="bi bi-bar-chart me-2"></i>Comparative Analysis
+                                <a class="dropdown-item" href="{{ url_for('reports.compliance_reports') if 'reports.compliance_reports' in dir() else '#' }}">
+                                    <i class="bi bi-check2-square me-2"></i>Compliance Reports
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
-                                    <i class="bi bi-person-lines-fill me-2"></i>User Activity
+                                <a class="dropdown-item" href="{{ url_for('reports.custom_reports') if 'reports.custom_reports' in dir() else '#' }}">
+                                    <i class="bi bi-pencil-square me-2"></i>Custom Reports
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('user_audit.index') }}">
-                                    <i class="bi bi-clipboard-check me-2"></i>User Audit Log
+                                <a class="dropdown-item" href="{{ url_for('reports.scheduled_reports') if 'reports.scheduled_reports' in dir() else '#' }}">
+                                    <i class="bi bi-calendar-check me-2"></i>Scheduled Reports
                                 </a>
                             </li>
                         </ul>
                     </li>
                     
+                    <!-- 7. Admin -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('admin' in request.endpoint or 'user_audit' in request.endpoint) %}active{% endif %}" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-gear me-1"></i>Admin
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
@@ -355,41 +411,80 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.index') if 'admin' in blueprints else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.system_logs') if 'admin.system_logs' in dir() else '#' }}">
                                     <i class="bi bi-journal-text me-2"></i>System Logs
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('user_audit.index') }}">
+                                    <i class="bi bi-clipboard-check me-2"></i>Audit Logs
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('admin.index') if 'admin' in blueprints else '#' }}">
+                                <a class="dropdown-item" href="{{ url_for('admin.database_backup') if 'admin.database_backup' in dir() else '#' }}">
                                     <i class="bi bi-cloud-arrow-up me-2"></i>Database Backup
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('admin.performance') if 'admin.performance' in dir() else '#' }}">
+                                    <i class="bi bi-speedometer me-2"></i>Performance
                                 </a>
                             </li>
                         </ul>
                     </li>
                 </ul>
+                
+                <!-- Right Side Navigation - Help & Resources -->
                 <ul class="navbar-nav">
+                    <!-- 8. Help & Resources -->
                     <li class="nav-item">
                         <a href="#" class="nav-link" id="helpMenuToggle">
                             <i class="bi bi-question-circle me-1"></i>Help
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('glossary' in request.endpoint or 'tours' in request.endpoint) %}active{% endif %}" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-book me-1"></i>Resources
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="resourcesDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('tours.tour_index') if 'tours' in blueprints else '#' }}">
+                                    <i class="bi bi-info-circle me-2"></i>Guided Tours
+                                </a>
+                            </li>
                             <li>
                                 <a class="dropdown-item" href="{{ url_for('glossary.glossary') if 'glossary' in blueprints else '#' }}">
                                     <i class="bi bi-journal-bookmark me-2"></i>Glossary
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('tours.tour_index') if 'tours' in blueprints else '#' }}">
-                                    <i class="bi bi-info-circle me-2"></i>Guided Tours
+                                <a class="dropdown-item" href="{{ url_for('docs.index') if 'docs' in blueprints else '#' }}">
+                                    <i class="bi bi-file-earmark-text me-2"></i>Documentation
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('tutorials.video_tutorials') if 'tutorials' in blueprints else '#' }}">
+                                    <i class="bi bi-play-circle me-2"></i>Video Tutorials
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('help.faq') if 'help' in blueprints else '#' }}">
+                                    <i class="bi bi-question-circle me-2"></i>FAQ
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('help.support') if 'help' in blueprints else '#' }}">
+                                    <i class="bi bi-envelope me-2"></i>Contact Support
                                 </a>
                             </li>
                         </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.profile') if 'auth.profile' in dir() else '#' }}">
+                            <i class="bi bi-person-circle me-1"></i>Profile
+                        </a>
                     </li>
                 </ul>
             </div>
