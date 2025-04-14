@@ -1232,6 +1232,880 @@ class LevyAuditAgent(MCPAgent):
                 "audit_results": "Data quality audit failed to complete"
             }
 
+    def simulate_budget_impact(self,
+                             district_id: Optional[str] = None,
+                             scenario_parameters: Optional[Dict[str, Any]] = None,
+                             year: Optional[int] = None,
+                             multi_year: bool = False,
+                             sensitivity_analysis: bool = False) -> Dict[str, Any]:
+        """
+        Simulate the budget impact of levy rate changes with AI-powered analysis.
+        
+        This capability extends standard budget simulations with AI-driven insights,
+        impact analysis, and recommendations. It provides contextual understanding of
+        how tax changes affect different stakeholders.
+        
+        Args:
+            district_id: Optional tax district ID to focus analysis on
+            scenario_parameters: Dictionary with simulation parameters
+            year: Base year for simulation (defaults to current)
+            multi_year: Whether to perform multi-year projections
+            sensitivity_analysis: Whether to perform sensitivity analysis
+            
+        Returns:
+            Detailed simulation results with AI-generated insights and visualizable data
+        """
+        if not self.claude:
+            return {
+                "error": "Claude service not available",
+                "simulation_results": "Budget impact simulation not available"
+            }
+        
+        try:
+            # Import required modules
+            from flask import current_app
+            from sqlalchemy import desc, func, case
+            import logging
+            from datetime import datetime, timedelta
+            import numpy as np
+            import json
+            from models import (
+                TaxDistrict, TaxCode, Property, TaxCodeHistoricalRate,
+                ImportLog, LevyAuditRecord
+            )
+            
+            # Get database session
+            db = current_app.extensions.get('sqlalchemy').db
+            
+            # Set default year if not provided
+            current_year = datetime.now().year
+            if not year:
+                year = current_year
+                
+            # Default scenario parameters if none provided
+            if not scenario_parameters:
+                scenario_parameters = {
+                    'rate_change_percent': 0,
+                    'assessed_value_change_percent': 0,
+                    'inflation_rate': 2.0,
+                    'population_growth_rate': 1.0,
+                    'economic_growth_factor': 1.5,
+                    'district_type_filters': [],
+                    'revenue_targets': {},
+                    'fixed_costs': {},
+                    'variable_costs': {}
+                }
+                
+            # Determine projection years for multi-year simulations
+            projection_years = [year]
+            if multi_year:
+                projection_years = list(range(year, year + 5))  # 5-year projection
+            
+            # Get district data
+            district_data = None
+            if district_id:
+                district = db.session.query(TaxDistrict).filter(
+                    TaxDistrict.id == district_id,
+                    TaxDistrict.year == year
+                ).options(
+                    db.joinedload(TaxDistrict.tax_codes)
+                ).first()
+                
+                if not district:
+                    return {
+                        "error": f"Tax district with ID {district_id} not found for year {year}",
+                        "simulation_results": {}
+                    }
+                
+                # Get district baseline data
+                district_data = {
+                    'id': district.id,
+                    'name': district.name,
+                    'district_type': district.district_type,
+                    'tax_codes': [{
+                        'id': tc.id,
+                        'code': tc.code,
+                        'levy_rate': tc.levy_rate,
+                        'total_levy_amount': tc.total_levy_amount,
+                        'total_assessed_value': tc.total_assessed_value
+                    } for tc in district.tax_codes],
+                    'year': district.year
+                }
+                
+                # Calculate district totals
+                total_levy_amount = sum(tc.total_levy_amount or 0 for tc in district.tax_codes)
+                total_assessed_value = sum(tc.total_assessed_value or 0 for tc in district.tax_codes)
+                avg_levy_rate = 0
+                if total_assessed_value > 0:
+                    avg_levy_rate = (total_levy_amount / total_assessed_value) * 1000
+                
+                # Add district budget metrics
+                district_data.update({
+                    'total_levy_amount': total_levy_amount,
+                    'total_assessed_value': total_assessed_value,
+                    'avg_levy_rate': avg_levy_rate
+                })
+                
+                # Get property count
+                property_count = db.session.query(func.count(Property.id)).filter(
+                    Property.tax_code_id.in_([tc.id for tc in district.tax_codes]),
+                    Property.year == year
+                ).scalar() or 0
+                
+                # Calculate average tax per property
+                avg_tax_per_property = 0
+                if property_count > 0:
+                    avg_tax_per_property = total_levy_amount / property_count
+                
+                district_data.update({
+                    'property_count': property_count,
+                    'avg_tax_per_property': avg_tax_per_property
+                })
+                
+                # Get historical data
+                historical_years = list(range(year - 5, year))
+                historical_data = []
+                
+                for hist_year in historical_years:
+                    # Look for historical rates
+                    yearly_rates = db.session.query(TaxCodeHistoricalRate).filter(
+                        TaxCodeHistoricalRate.tax_code_id.in_([tc.id for tc in district.tax_codes]),
+                        TaxCodeHistoricalRate.year == hist_year
+                    ).all()
+                    
+                    if yearly_rates:
+                        year_total_levy = sum(rate.levy_amount or 0 for rate in yearly_rates)
+                        year_total_value = sum(rate.total_assessed_value or 0 for rate in yearly_rates)
+                        year_avg_rate = 0
+                        if year_total_value > 0:
+                            year_avg_rate = (year_total_levy / year_total_value) * 1000
+                            
+                        historical_data.append({
+                            'year': hist_year,
+                            'total_levy_amount': year_total_levy,
+                            'total_assessed_value': year_total_value,
+                            'avg_levy_rate': year_avg_rate
+                        })
+                        
+                district_data['historical_data'] = historical_data
+            
+            # If no specific district, get system-wide data
+            else:
+                # Get aggregate data for all districts
+                districts = db.session.query(TaxDistrict).filter(
+                    TaxDistrict.year == year
+                ).options(
+                    db.joinedload(TaxDistrict.tax_codes)
+                ).all()
+                
+                if not districts:
+                    return {
+                        "error": f"No tax districts found for year {year}",
+                        "simulation_results": {}
+                    }
+                
+                # Calculate system-wide metrics
+                total_levy_amount = 0
+                total_assessed_value = 0
+                total_property_count = 0
+                district_data = []
+                
+                for district in districts:
+                    district_levy_amount = sum(tc.total_levy_amount or 0 for tc in district.tax_codes)
+                    district_assessed_value = sum(tc.total_assessed_value or 0 for tc in district.tax_codes)
+                    district_avg_levy_rate = 0
+                    if district_assessed_value > 0:
+                        district_avg_levy_rate = (district_levy_amount / district_assessed_value) * 1000
+                    
+                    # Get property count
+                    district_property_count = db.session.query(func.count(Property.id)).filter(
+                        Property.tax_code_id.in_([tc.id for tc in district.tax_codes]),
+                        Property.year == year
+                    ).scalar() or 0
+                    
+                    # Calculate average tax per property
+                    district_avg_tax_per_property = 0
+                    if district_property_count > 0:
+                        district_avg_tax_per_property = district_levy_amount / district_property_count
+                    
+                    district_data.append({
+                        'id': district.id,
+                        'name': district.name,
+                        'district_type': district.district_type,
+                        'total_levy_amount': district_levy_amount,
+                        'total_assessed_value': district_assessed_value,
+                        'avg_levy_rate': district_avg_levy_rate,
+                        'property_count': district_property_count,
+                        'avg_tax_per_property': district_avg_tax_per_property,
+                        'year': district.year
+                    })
+                    
+                    # Update system totals
+                    total_levy_amount += district_levy_amount
+                    total_assessed_value += district_assessed_value
+                    total_property_count += district_property_count
+                
+                # Calculate system-wide averages
+                system_avg_levy_rate = 0
+                if total_assessed_value > 0:
+                    system_avg_levy_rate = (total_levy_amount / total_assessed_value) * 1000
+                
+                system_avg_tax_per_property = 0
+                if total_property_count > 0:
+                    system_avg_tax_per_property = total_levy_amount / total_property_count
+                
+                # Create system-wide summary
+                system_data = {
+                    'total_levy_amount': total_levy_amount,
+                    'total_assessed_value': total_assessed_value,
+                    'avg_levy_rate': system_avg_levy_rate,
+                    'property_count': total_property_count,
+                    'avg_tax_per_property': system_avg_tax_per_property,
+                    'districts': district_data,
+                    'year': year
+                }
+                
+                # Get historical system-wide data
+                historical_years = list(range(year - 5, year))
+                historical_data = []
+                
+                for hist_year in historical_years:
+                    # Get aggregate data for historical year
+                    yearly_rates = db.session.query(TaxCodeHistoricalRate).filter(
+                        TaxCodeHistoricalRate.year == hist_year
+                    ).all()
+                    
+                    if yearly_rates:
+                        year_total_levy = sum(rate.levy_amount or 0 for rate in yearly_rates)
+                        year_total_value = sum(rate.total_assessed_value or 0 for rate in yearly_rates)
+                        year_avg_rate = 0
+                        if year_total_value > 0:
+                            year_avg_rate = (year_total_levy / year_total_value) * 1000
+                            
+                        historical_data.append({
+                            'year': hist_year,
+                            'total_levy_amount': year_total_levy,
+                            'total_assessed_value': year_total_value,
+                            'avg_levy_rate': year_avg_rate
+                        })
+                        
+                system_data['historical_data'] = historical_data
+                district_data = system_data
+                
+            # Now run the budget impact simulation
+            simulation_results = {}
+            
+            # Extract scenario parameters
+            rate_change_percent = scenario_parameters.get('rate_change_percent', 0)
+            assessed_value_change_percent = scenario_parameters.get('assessed_value_change_percent', 0)
+            inflation_rate = scenario_parameters.get('inflation_rate', 2.0)
+            population_growth_rate = scenario_parameters.get('population_growth_rate', 1.0)
+            economic_growth_factor = scenario_parameters.get('economic_growth_factor', 1.5)
+            district_type_filters = scenario_parameters.get('district_type_filters', [])
+            revenue_targets = scenario_parameters.get('revenue_targets', {})
+            fixed_costs = scenario_parameters.get('fixed_costs', {})
+            variable_costs = scenario_parameters.get('variable_costs', {})
+            
+            # Run simulation for single district or system-wide
+            if district_id:
+                # Deep copy district data for simulation
+                district_sim = district_data.copy()
+                district_sim['tax_codes'] = [tc.copy() for tc in district_data['tax_codes']]
+                
+                # Single-year simulation
+                if not multi_year:
+                    # Apply changes to each tax code
+                    for tc in district_sim['tax_codes']:
+                        # Apply rate change
+                        if rate_change_percent != 0:
+                            tc['levy_rate'] = tc['levy_rate'] * (1 + rate_change_percent / 100)
+                        
+                        # Apply assessed value change
+                        if assessed_value_change_percent != 0:
+                            tc['total_assessed_value'] = tc['total_assessed_value'] * (1 + assessed_value_change_percent / 100)
+                        
+                        # Recalculate levy amount
+                        tc['total_levy_amount'] = (tc['levy_rate'] / 1000) * tc['total_assessed_value']
+                    
+                    # Recalculate district totals
+                    district_sim['total_levy_amount'] = sum(tc['total_levy_amount'] for tc in district_sim['tax_codes'])
+                    district_sim['total_assessed_value'] = sum(tc['total_assessed_value'] for tc in district_sim['tax_codes'])
+                    
+                    # Recalculate average levy rate
+                    district_sim['avg_levy_rate'] = 0
+                    if district_sim['total_assessed_value'] > 0:
+                        district_sim['avg_levy_rate'] = (district_sim['total_levy_amount'] / district_sim['total_assessed_value']) * 1000
+                    
+                    # Recalculate average tax per property
+                    district_sim['avg_tax_per_property'] = 0
+                    if district_sim['property_count'] > 0:
+                        district_sim['avg_tax_per_property'] = district_sim['total_levy_amount'] / district_sim['property_count']
+                    
+                    # Calculate impact metrics
+                    impact = {
+                        'levy_amount_change': district_sim['total_levy_amount'] - district_data['total_levy_amount'],
+                        'levy_amount_percent': 0,
+                        'assessed_value_change': district_sim['total_assessed_value'] - district_data['total_assessed_value'],
+                        'assessed_value_percent': 0,
+                        'levy_rate_change': district_sim['avg_levy_rate'] - district_data['avg_levy_rate'],
+                        'levy_rate_percent': 0,
+                        'tax_per_property_change': district_sim['avg_tax_per_property'] - district_data['avg_tax_per_property'],
+                        'tax_per_property_percent': 0
+                    }
+                    
+                    # Calculate percentages
+                    if district_data['total_levy_amount'] > 0:
+                        impact['levy_amount_percent'] = (impact['levy_amount_change'] / district_data['total_levy_amount']) * 100
+                    
+                    if district_data['total_assessed_value'] > 0:
+                        impact['assessed_value_percent'] = (impact['assessed_value_change'] / district_data['total_assessed_value']) * 100
+                    
+                    if district_data['avg_levy_rate'] > 0:
+                        impact['levy_rate_percent'] = (impact['levy_rate_change'] / district_data['avg_levy_rate']) * 100
+                    
+                    if district_data['avg_tax_per_property'] > 0:
+                        impact['tax_per_property_percent'] = (impact['tax_per_property_change'] / district_data['avg_tax_per_property']) * 100
+                    
+                    district_sim['impact'] = impact
+                    
+                    # Add to simulation results
+                    simulation_results = {
+                        'baseline': district_data,
+                        'simulation': district_sim,
+                        'scenario': scenario_parameters,
+                        'multi_year': False
+                    }
+                    
+                # Multi-year simulation
+                else:
+                    multi_year_projections = []
+                    cumulative_rate_change = 0
+                    cumulative_value_change = 0
+                    
+                    # Project baseline as starting point
+                    current_projection = district_data.copy()
+                    current_projection['tax_codes'] = [tc.copy() for tc in district_data['tax_codes']]
+                    
+                    for proj_year in projection_years:
+                        year_index = projection_years.index(proj_year)
+                        
+                        # Apply compounding changes only after first year
+                        if year_index > 0:
+                            # Calculate cumulative changes
+                            cumulative_rate_change += rate_change_percent / 100
+                            cumulative_value_change += assessed_value_change_percent / 100 + inflation_rate / 100
+                            
+                            # Apply to each tax code
+                            for tc in current_projection['tax_codes']:
+                                # Apply rate change
+                                tc['levy_rate'] = district_data['tax_codes'][current_projection['tax_codes'].index(tc)]['levy_rate'] * (1 + cumulative_rate_change)
+                                
+                                # Apply assessed value change with inflation
+                                tc['total_assessed_value'] = district_data['tax_codes'][current_projection['tax_codes'].index(tc)]['total_assessed_value'] * (1 + cumulative_value_change)
+                                
+                                # Recalculate levy amount
+                                tc['total_levy_amount'] = (tc['levy_rate'] / 1000) * tc['total_assessed_value']
+                            
+                            # Adjust property count for population growth
+                            current_projection['property_count'] = district_data['property_count'] * (1 + (population_growth_rate / 100) * year_index)
+                        
+                        # Recalculate district totals
+                        current_projection['total_levy_amount'] = sum(tc['total_levy_amount'] for tc in current_projection['tax_codes'])
+                        current_projection['total_assessed_value'] = sum(tc['total_assessed_value'] for tc in current_projection['tax_codes'])
+                        
+                        # Recalculate average levy rate
+                        current_projection['avg_levy_rate'] = 0
+                        if current_projection['total_assessed_value'] > 0:
+                            current_projection['avg_levy_rate'] = (current_projection['total_levy_amount'] / current_projection['total_assessed_value']) * 1000
+                        
+                        # Recalculate average tax per property
+                        current_projection['avg_tax_per_property'] = 0
+                        if current_projection['property_count'] > 0:
+                            current_projection['avg_tax_per_property'] = current_projection['total_levy_amount'] / current_projection['property_count']
+                        
+                        # Calculate impact compared to baseline
+                        impact = {
+                            'levy_amount_change': current_projection['total_levy_amount'] - district_data['total_levy_amount'],
+                            'levy_amount_percent': 0,
+                            'assessed_value_change': current_projection['total_assessed_value'] - district_data['total_assessed_value'],
+                            'assessed_value_percent': 0,
+                            'levy_rate_change': current_projection['avg_levy_rate'] - district_data['avg_levy_rate'],
+                            'levy_rate_percent': 0,
+                            'tax_per_property_change': current_projection['avg_tax_per_property'] - district_data['avg_tax_per_property'],
+                            'tax_per_property_percent': 0
+                        }
+                        
+                        # Calculate percentages
+                        if district_data['total_levy_amount'] > 0:
+                            impact['levy_amount_percent'] = (impact['levy_amount_change'] / district_data['total_levy_amount']) * 100
+                        
+                        if district_data['total_assessed_value'] > 0:
+                            impact['assessed_value_percent'] = (impact['assessed_value_change'] / district_data['total_assessed_value']) * 100
+                        
+                        if district_data['avg_levy_rate'] > 0:
+                            impact['levy_rate_percent'] = (impact['levy_rate_change'] / district_data['avg_levy_rate']) * 100
+                        
+                        if district_data['avg_tax_per_property'] > 0:
+                            impact['tax_per_property_percent'] = (impact['tax_per_property_change'] / district_data['avg_tax_per_property']) * 100
+                        
+                        # Create year projection
+                        year_projection = current_projection.copy()
+                        year_projection['year'] = proj_year
+                        year_projection['impact'] = impact
+                        
+                        multi_year_projections.append(year_projection)
+                    
+                    # Add to simulation results
+                    simulation_results = {
+                        'baseline': district_data,
+                        'projections': multi_year_projections,
+                        'scenario': scenario_parameters,
+                        'multi_year': True
+                    }
+                    
+                # Add sensitivity analysis if requested
+                if sensitivity_analysis:
+                    sensitivity_scenarios = []
+                    
+                    # Generate sensitivity test cases
+                    test_rate_changes = [
+                        rate_change_percent - 2,
+                        rate_change_percent - 1, 
+                        rate_change_percent, 
+                        rate_change_percent + 1, 
+                        rate_change_percent + 2
+                    ]
+                    
+                    test_value_changes = [
+                        assessed_value_change_percent - 2,
+                        assessed_value_change_percent - 1,
+                        assessed_value_change_percent,
+                        assessed_value_change_percent + 1,
+                        assessed_value_change_percent + 2
+                    ]
+                    
+                    # Run simulation for each test case
+                    for test_rate in test_rate_changes:
+                        # Deep copy district data
+                        test_sim = district_data.copy()
+                        test_sim['tax_codes'] = [tc.copy() for tc in district_data['tax_codes']]
+                        
+                        # Apply test rate to each tax code
+                        for tc in test_sim['tax_codes']:
+                            tc['levy_rate'] = tc['levy_rate'] * (1 + test_rate / 100)
+                            tc['total_levy_amount'] = (tc['levy_rate'] / 1000) * tc['total_assessed_value']
+                        
+                        # Recalculate totals
+                        test_sim['total_levy_amount'] = sum(tc['total_levy_amount'] for tc in test_sim['tax_codes'])
+                        test_sim['avg_levy_rate'] = 0
+                        if test_sim['total_assessed_value'] > 0:
+                            test_sim['avg_levy_rate'] = (test_sim['total_levy_amount'] / test_sim['total_assessed_value']) * 1000
+                        
+                        # Calculate impact
+                        levy_amount_change = test_sim['total_levy_amount'] - district_data['total_levy_amount']
+                        levy_amount_percent = 0
+                        if district_data['total_levy_amount'] > 0:
+                            levy_amount_percent = (levy_amount_change / district_data['total_levy_amount']) * 100
+                            
+                        # Add to sensitivity scenarios
+                        sensitivity_scenarios.append({
+                            'parameter': 'rate_change_percent',
+                            'value': test_rate,
+                            'result': {
+                                'total_levy_amount': test_sim['total_levy_amount'],
+                                'change': levy_amount_change,
+                                'percent': levy_amount_percent
+                            }
+                        })
+                    
+                    for test_value in test_value_changes:
+                        # Deep copy district data
+                        test_sim = district_data.copy()
+                        test_sim['tax_codes'] = [tc.copy() for tc in district_data['tax_codes']]
+                        
+                        # Apply test value to each tax code
+                        for tc in test_sim['tax_codes']:
+                            tc['total_assessed_value'] = tc['total_assessed_value'] * (1 + test_value / 100)
+                            tc['total_levy_amount'] = (tc['levy_rate'] / 1000) * tc['total_assessed_value']
+                        
+                        # Recalculate totals
+                        test_sim['total_levy_amount'] = sum(tc['total_levy_amount'] for tc in test_sim['tax_codes'])
+                        test_sim['total_assessed_value'] = sum(tc['total_assessed_value'] for tc in test_sim['tax_codes'])
+                        
+                        # Calculate impact
+                        levy_amount_change = test_sim['total_levy_amount'] - district_data['total_levy_amount']
+                        levy_amount_percent = 0
+                        if district_data['total_levy_amount'] > 0:
+                            levy_amount_percent = (levy_amount_change / district_data['total_levy_amount']) * 100
+                            
+                        # Add to sensitivity scenarios
+                        sensitivity_scenarios.append({
+                            'parameter': 'assessed_value_change_percent',
+                            'value': test_value,
+                            'result': {
+                                'total_levy_amount': test_sim['total_levy_amount'],
+                                'change': levy_amount_change,
+                                'percent': levy_amount_percent
+                            }
+                        })
+                    
+                    # Add sensitivity analysis to results
+                    simulation_results['sensitivity_analysis'] = sensitivity_scenarios
+            
+            # System-wide simulation for multiple districts
+            else:
+                # Single-year simulation
+                if not multi_year:
+                    # Deep copy system data for simulation
+                    system_sim = system_data.copy()
+                    system_sim['districts'] = [d.copy() for d in system_data['districts']]
+                    
+                    # Apply changes to each district
+                    for dist in system_sim['districts']:
+                        # Apply filter - only modify districts of specified types if filters provided
+                        if district_type_filters and dist['district_type'] not in district_type_filters:
+                            continue
+                        
+                        # Apply rate change
+                        if rate_change_percent != 0:
+                            dist['avg_levy_rate'] = dist['avg_levy_rate'] * (1 + rate_change_percent / 100)
+                        
+                        # Apply assessed value change
+                        if assessed_value_change_percent != 0:
+                            dist['total_assessed_value'] = dist['total_assessed_value'] * (1 + assessed_value_change_percent / 100)
+                        
+                        # Recalculate levy amount
+                        dist['total_levy_amount'] = (dist['avg_levy_rate'] / 1000) * dist['total_assessed_value']
+                        
+                        # Recalculate average tax per property
+                        if dist['property_count'] > 0:
+                            dist['avg_tax_per_property'] = dist['total_levy_amount'] / dist['property_count']
+                    
+                    # Recalculate system totals
+                    system_sim['total_levy_amount'] = sum(d['total_levy_amount'] for d in system_sim['districts'])
+                    system_sim['total_assessed_value'] = sum(d['total_assessed_value'] for d in system_sim['districts'])
+                    
+                    # Recalculate average levy rate
+                    system_sim['avg_levy_rate'] = 0
+                    if system_sim['total_assessed_value'] > 0:
+                        system_sim['avg_levy_rate'] = (system_sim['total_levy_amount'] / system_sim['total_assessed_value']) * 1000
+                    
+                    # Recalculate average tax per property
+                    system_sim['avg_tax_per_property'] = 0
+                    if system_sim['property_count'] > 0:
+                        system_sim['avg_tax_per_property'] = system_sim['total_levy_amount'] / system_sim['property_count']
+                    
+                    # Calculate impact metrics
+                    impact = {
+                        'levy_amount_change': system_sim['total_levy_amount'] - system_data['total_levy_amount'],
+                        'levy_amount_percent': 0,
+                        'assessed_value_change': system_sim['total_assessed_value'] - system_data['total_assessed_value'],
+                        'assessed_value_percent': 0,
+                        'levy_rate_change': system_sim['avg_levy_rate'] - system_data['avg_levy_rate'],
+                        'levy_rate_percent': 0,
+                        'tax_per_property_change': system_sim['avg_tax_per_property'] - system_data['avg_tax_per_property'],
+                        'tax_per_property_percent': 0
+                    }
+                    
+                    # Calculate percentages
+                    if system_data['total_levy_amount'] > 0:
+                        impact['levy_amount_percent'] = (impact['levy_amount_change'] / system_data['total_levy_amount']) * 100
+                    
+                    if system_data['total_assessed_value'] > 0:
+                        impact['assessed_value_percent'] = (impact['assessed_value_change'] / system_data['total_assessed_value']) * 100
+                    
+                    if system_data['avg_levy_rate'] > 0:
+                        impact['levy_rate_percent'] = (impact['levy_rate_change'] / system_data['avg_levy_rate']) * 100
+                    
+                    if system_data['avg_tax_per_property'] > 0:
+                        impact['tax_per_property_percent'] = (impact['tax_per_property_change'] / system_data['avg_tax_per_property']) * 100
+                    
+                    system_sim['impact'] = impact
+                    
+                    # District-level impacts
+                    district_impacts = {}
+                    for sim_dist in system_sim['districts']:
+                        dist_id = sim_dist['id']
+                        base_dist = next((d for d in system_data['districts'] if d['id'] == dist_id), None)
+                        
+                        if base_dist:
+                            dist_impact = {
+                                'levy_amount_change': sim_dist['total_levy_amount'] - base_dist['total_levy_amount'],
+                                'levy_amount_percent': 0,
+                                'assessed_value_change': sim_dist['total_assessed_value'] - base_dist['total_assessed_value'],
+                                'assessed_value_percent': 0,
+                                'levy_rate_change': sim_dist['avg_levy_rate'] - base_dist['avg_levy_rate'],
+                                'levy_rate_percent': 0,
+                                'tax_per_property_change': sim_dist['avg_tax_per_property'] - base_dist['avg_tax_per_property'],
+                                'tax_per_property_percent': 0
+                            }
+                            
+                            # Calculate percentages
+                            if base_dist['total_levy_amount'] > 0:
+                                dist_impact['levy_amount_percent'] = (dist_impact['levy_amount_change'] / base_dist['total_levy_amount']) * 100
+                            
+                            if base_dist['total_assessed_value'] > 0:
+                                dist_impact['assessed_value_percent'] = (dist_impact['assessed_value_change'] / base_dist['total_assessed_value']) * 100
+                            
+                            if base_dist['avg_levy_rate'] > 0:
+                                dist_impact['levy_rate_percent'] = (dist_impact['levy_rate_change'] / base_dist['avg_levy_rate']) * 100
+                            
+                            if base_dist['avg_tax_per_property'] > 0:
+                                dist_impact['tax_per_property_percent'] = (dist_impact['tax_per_property_change'] / base_dist['avg_tax_per_property']) * 100
+                            
+                            district_impacts[dist_id] = dist_impact
+                    
+                    system_sim['district_impacts'] = district_impacts
+                    
+                    # Add to simulation results
+                    simulation_results = {
+                        'baseline': system_data,
+                        'simulation': system_sim,
+                        'scenario': scenario_parameters,
+                        'multi_year': False
+                    }
+                    
+                # Multi-year simulation
+                else:
+                    multi_year_projections = []
+                    cumulative_rate_change = 0
+                    cumulative_value_change = 0
+                    
+                    # Project baseline as starting point
+                    current_projection = system_data.copy()
+                    current_projection['districts'] = [d.copy() for d in system_data['districts']]
+                    
+                    for proj_year in projection_years:
+                        year_index = projection_years.index(proj_year)
+                        
+                        # Apply compounding changes only after first year
+                        if year_index > 0:
+                            # Calculate cumulative changes
+                            cumulative_rate_change += rate_change_percent / 100
+                            cumulative_value_change += assessed_value_change_percent / 100 + inflation_rate / 100
+                            
+                            # Apply to each district
+                            for dist in current_projection['districts']:
+                                # Skip districts not in filter if specified
+                                if district_type_filters and dist['district_type'] not in district_type_filters:
+                                    continue
+                                
+                                # Apply rate change
+                                base_dist = next((d for d in system_data['districts'] if d['id'] == dist['id']), None)
+                                if base_dist:
+                                    dist['avg_levy_rate'] = base_dist['avg_levy_rate'] * (1 + cumulative_rate_change)
+                                    
+                                    # Apply assessed value change with inflation
+                                    dist['total_assessed_value'] = base_dist['total_assessed_value'] * (1 + cumulative_value_change)
+                                    
+                                    # Recalculate levy amount
+                                    dist['total_levy_amount'] = (dist['avg_levy_rate'] / 1000) * dist['total_assessed_value']
+                                    
+                                    # Adjust property count for population growth
+                                    dist['property_count'] = base_dist['property_count'] * (1 + (population_growth_rate / 100) * year_index)
+                                    
+                                    # Recalculate average tax per property
+                                    if dist['property_count'] > 0:
+                                        dist['avg_tax_per_property'] = dist['total_levy_amount'] / dist['property_count']
+                        
+                        # Recalculate system totals
+                        current_projection['total_levy_amount'] = sum(d['total_levy_amount'] for d in current_projection['districts'])
+                        current_projection['total_assessed_value'] = sum(d['total_assessed_value'] for d in current_projection['districts'])
+                        current_projection['property_count'] = sum(d['property_count'] for d in current_projection['districts'])
+                        
+                        # Recalculate average levy rate
+                        current_projection['avg_levy_rate'] = 0
+                        if current_projection['total_assessed_value'] > 0:
+                            current_projection['avg_levy_rate'] = (current_projection['total_levy_amount'] / current_projection['total_assessed_value']) * 1000
+                        
+                        # Recalculate average tax per property
+                        current_projection['avg_tax_per_property'] = 0
+                        if current_projection['property_count'] > 0:
+                            current_projection['avg_tax_per_property'] = current_projection['total_levy_amount'] / current_projection['property_count']
+                        
+                        # Calculate impact compared to baseline
+                        impact = {
+                            'levy_amount_change': current_projection['total_levy_amount'] - system_data['total_levy_amount'],
+                            'levy_amount_percent': 0,
+                            'assessed_value_change': current_projection['total_assessed_value'] - system_data['total_assessed_value'],
+                            'assessed_value_percent': 0,
+                            'levy_rate_change': current_projection['avg_levy_rate'] - system_data['avg_levy_rate'],
+                            'levy_rate_percent': 0,
+                            'tax_per_property_change': current_projection['avg_tax_per_property'] - system_data['avg_tax_per_property'],
+                            'tax_per_property_percent': 0
+                        }
+                        
+                        # Calculate percentages
+                        if system_data['total_levy_amount'] > 0:
+                            impact['levy_amount_percent'] = (impact['levy_amount_change'] / system_data['total_levy_amount']) * 100
+                        
+                        if system_data['total_assessed_value'] > 0:
+                            impact['assessed_value_percent'] = (impact['assessed_value_change'] / system_data['total_assessed_value']) * 100
+                        
+                        if system_data['avg_levy_rate'] > 0:
+                            impact['levy_rate_percent'] = (impact['levy_rate_change'] / system_data['avg_levy_rate']) * 100
+                        
+                        if system_data['avg_tax_per_property'] > 0:
+                            impact['tax_per_property_percent'] = (impact['tax_per_property_change'] / system_data['avg_tax_per_property']) * 100
+                        
+                        # Create year projection
+                        year_projection = current_projection.copy()
+                        year_projection['year'] = proj_year
+                        year_projection['impact'] = impact
+                        
+                        # Calculate district impacts
+                        district_impacts = {}
+                        for proj_dist in year_projection['districts']:
+                            dist_id = proj_dist['id']
+                            base_dist = next((d for d in system_data['districts'] if d['id'] == dist_id), None)
+                            
+                            if base_dist:
+                                dist_impact = {
+                                    'levy_amount_change': proj_dist['total_levy_amount'] - base_dist['total_levy_amount'],
+                                    'levy_amount_percent': 0,
+                                    'assessed_value_change': proj_dist['total_assessed_value'] - base_dist['total_assessed_value'],
+                                    'assessed_value_percent': 0,
+                                    'levy_rate_change': proj_dist['avg_levy_rate'] - base_dist['avg_levy_rate'],
+                                    'levy_rate_percent': 0,
+                                    'tax_per_property_change': proj_dist['avg_tax_per_property'] - base_dist['avg_tax_per_property'],
+                                    'tax_per_property_percent': 0
+                                }
+                                
+                                # Calculate percentages
+                                if base_dist['total_levy_amount'] > 0:
+                                    dist_impact['levy_amount_percent'] = (dist_impact['levy_amount_change'] / base_dist['total_levy_amount']) * 100
+                                
+                                if base_dist['total_assessed_value'] > 0:
+                                    dist_impact['assessed_value_percent'] = (dist_impact['assessed_value_change'] / base_dist['total_assessed_value']) * 100
+                                
+                                if base_dist['avg_levy_rate'] > 0:
+                                    dist_impact['levy_rate_percent'] = (dist_impact['levy_rate_change'] / base_dist['avg_levy_rate']) * 100
+                                
+                                if base_dist['avg_tax_per_property'] > 0:
+                                    dist_impact['tax_per_property_percent'] = (dist_impact['tax_per_property_change'] / base_dist['avg_tax_per_property']) * 100
+                                
+                                district_impacts[dist_id] = dist_impact
+                        
+                        year_projection['district_impacts'] = district_impacts
+                        
+                        multi_year_projections.append(year_projection)
+                    
+                    # Add to simulation results
+                    simulation_results = {
+                        'baseline': system_data,
+                        'projections': multi_year_projections,
+                        'scenario': scenario_parameters,
+                        'multi_year': True
+                    }
+            
+            # Now use Claude to generate insights about the simulation
+            prompt = f"""
+            As Lev, the world's foremost expert in property tax and levy analysis, review the
+            following budget impact simulation results and provide detailed insights and recommendations.
+            
+            SIMULATION RESULTS:
+            {json.dumps(simulation_results, indent=2)}
+            
+            Your analysis should cover:
+            1. Overall assessment of the budget impact scenario
+            2. Key insights about revenue changes and tax burdens
+            3. Potential stakeholder impacts (taxpayers, district services, etc.)
+            4. Recommendations for optimizing the scenario
+            5. Risks and considerations for implementation
+            6. Comparative analysis to historical trends
+            7. {"Analysis of multi-year projections and long-term sustainability" if multi_year else ""}
+            8. {"Sensitivity analysis insights and risk factors" if sensitivity_analysis else ""}
+            
+            Format your response as JSON with the following structure:
+            {{
+                "executive_summary": "Clear, concise summary of the simulation results and key takeaways",
+                "key_insights": [
+                    {{
+                        "area": "revenue|equity|taxpayer_impact|sustainability|other",
+                        "insight": "Detailed insight description",
+                        "significance": "high|medium|low"
+                    }},
+                    // Additional insights
+                ],
+                "stakeholder_impacts": [
+                    {{
+                        "stakeholder": "taxpayers|district_services|businesses|residential",
+                        "impact": "Description of specific impact on this stakeholder group",
+                        "magnitude": "positive|negative|mixed|neutral",
+                        "scale": "high|medium|low"
+                    }},
+                    // Additional stakeholder impacts
+                ],
+                "recommendations": [
+                    {{
+                        "title": "Concise recommendation title",
+                        "description": "Detailed explanation of the recommendation",
+                        "priority": "high|medium|low"
+                    }},
+                    // Additional recommendations
+                ],
+                "implementation_considerations": [
+                    "Consideration 1",
+                    "Consideration 2",
+                    // Additional considerations
+                ],
+                "historical_context": "Analysis comparing simulation to historical trends",
+                "multi_year_assessment": "Assessment of long-term projections and sustainability",
+                "optimal_scenario": {{
+                    "rate_change": recommended rate change value,
+                    "value_change": recommended value change value,
+                    "justification": "Explanation of why this scenario is optimal"
+                }}
+            }}
+            """
+            
+            # Use Claude to generate the analysis
+            response = self.claude.generate_text(prompt)
+            
+            # Extract JSON from response
+            try:
+                ai_insights = json.loads(response)
+                logger.info("Successfully generated budget impact simulation insights")
+                
+                # Sanitize the result to prevent XSS
+                sanitized_insights = sanitize_mcp_insights(ai_insights)
+                
+                # Add AI insights to simulation results
+                simulation_results['ai_insights'] = sanitized_insights
+                
+                return simulation_results
+                
+            except json.JSONDecodeError:
+                logger.error("Failed to parse JSON from Claude response for budget impact simulation")
+                fallback_insights = {
+                    "executive_summary": "Unable to generate AI insights for this budget impact simulation due to processing error.",
+                    "key_insights": [],
+                    "stakeholder_impacts": [],
+                    "recommendations": [
+                        {
+                            "title": "Review simulation parameters",
+                            "description": "The current scenario parameters may need adjustment to ensure realistic projections.",
+                            "priority": "medium"
+                        }
+                    ],
+                    "implementation_considerations": [
+                        "Simulation completed successfully, but AI analysis encountered an error.",
+                        "Raw numerical results are available for manual review."
+                    ]
+                }
+                
+                # Add fallback insights to simulation results
+                simulation_results['ai_insights'] = fallback_insights
+                
+                return simulation_results
+                
+        except Exception as e:
+            logger.error(f"Error in budget impact simulation: {str(e)}")
+            return {
+                "error": sanitize_html(str(e)),
+                "simulation_results": "Budget impact simulation failed to complete"
+            }
+    
     def verify_levy_calculation(self,
                               tax_code_id: str,
                               property_value: float,
@@ -1562,6 +2436,37 @@ def init_levy_audit_agent():
                     "comprehensive": {
                         "type": "boolean",
                         "description": "Whether to perform a deeper, more comprehensive audit"
+                    }
+                }
+            }
+        )
+        
+        registry.register_function(
+            func=agent.simulate_budget_impact,
+            name="simulate_budget_impact",
+            description="Simulate the budget impact of levy rate changes with AI-powered analysis",
+            parameter_schema={
+                "type": "object",
+                "properties": {
+                    "district_id": {
+                        "type": "string",
+                        "description": "Optional tax district ID to focus analysis on"
+                    },
+                    "scenario_parameters": {
+                        "type": "object",
+                        "description": "Dictionary with simulation parameters including rate_change_percent, assessed_value_change_percent, etc."
+                    },
+                    "year": {
+                        "type": "integer",
+                        "description": "Base year for simulation (defaults to current)"
+                    },
+                    "multi_year": {
+                        "type": "boolean",
+                        "description": "Whether to perform multi-year projections"
+                    },
+                    "sensitivity_analysis": {
+                        "type": "boolean",
+                        "description": "Whether to perform sensitivity analysis"
                     }
                 }
             }

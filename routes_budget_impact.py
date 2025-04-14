@@ -363,3 +363,154 @@ def calculate_impact_metrics(baseline_data, simulation_data):
                 break
     
     return impact_analysis
+
+@budget_impact_bp.route('/api/ai-simulation', methods=['POST'])
+def api_ai_budget_simulation():
+    """
+    API endpoint for AI-powered budget impact simulations with advanced insights.
+    
+    This endpoint leverages the LevyAuditAgent's AI capabilities to provide more 
+    sophisticated budget impact simulations with detailed scenario analysis,
+    stakeholder impact assessments, and optimization recommendations.
+    
+    Returns:
+        JSON response with simulation results and AI-generated insights
+    """
+    try:
+        # Get request data
+        data = request.json
+        
+        # Extract parameters from request
+        year = data.get('year', datetime.now().year)
+        district_id = data.get('district_id')
+        scenario_parameters = data.get('scenario_parameters', {})
+        multi_year = data.get('multi_year', False)
+        sensitivity_analysis = data.get('sensitivity_analysis', False)
+        
+        # Check if MCP Army is available
+        from utils.mcp_agent_manager import get_agent, AgentNotAvailableError
+        
+        # Import required modules for MCP
+        try:
+            from flask import current_app
+        except ImportError:
+            return jsonify({
+                'success': False,
+                'error': 'Required Flask imports not available',
+                'simulation_results': {}
+            }), 500
+            
+        # Check if MCP is enabled
+        MCP_ARMY_ENABLED = current_app.config.get('MCP_ARMY_ENABLED', False)
+        MCP_INTEGRATED = current_app.config.get('MCP_INTEGRATED', False)
+        
+        mcp_army_available = (MCP_ARMY_ENABLED or MCP_INTEGRATED) and get_agent is not None
+        
+        if not mcp_army_available:
+            current_app.logger.warning("MCP Army not available for AI budget impact simulation")
+            
+            # Fall back to standard simulation
+            # Get baseline data for comparison
+            if district_id:
+                district_ids = [district_id]
+            else:
+                # If no district specified, use all districts for the year
+                districts = TaxDistrict.query.filter(TaxDistrict.year == year).all()
+                district_ids = [d.id for d in districts]
+                
+            baseline_data = get_district_budget_data(district_ids, year)
+            
+            # Apply scenario modifications to create simulation data
+            simulation_data = simulate_budget_changes(baseline_data, scenario_parameters)
+            
+            # Calculate impact metrics
+            impact_analysis = calculate_impact_metrics(baseline_data, simulation_data)
+            
+            return jsonify({
+                'success': True,
+                'baseline': baseline_data,
+                'simulation': simulation_data,
+                'impact': impact_analysis,
+                'note': 'Standard simulation used (AI capabilities not available)'
+            })
+        
+        # Get the Levy Audit Agent
+        try:
+            levy_audit_agent = get_agent('Lev')
+            if not levy_audit_agent:
+                current_app.logger.warning("Levy Audit Agent not available")
+                return jsonify({
+                    'success': False, 
+                    'error': 'Required audit agent not available',
+                    'simulation_results': {}
+                })
+            
+            # Execute the budget impact simulation
+            current_app.logger.info(f"Running AI budget impact simulation")
+            simulation_result = levy_audit_agent.execute_capability(
+                'simulate_budget_impact',
+                {
+                    'district_id': district_id,
+                    'scenario_parameters': scenario_parameters,
+                    'year': year,
+                    'multi_year': multi_year,
+                    'sensitivity_analysis': sensitivity_analysis
+                }
+            )
+            
+            if 'error' in simulation_result:
+                return jsonify({
+                    'success': False,
+                    'error': simulation_result['error'],
+                    'simulation_results': {}
+                })
+            
+            # Add additional metadata
+            simulation_result['generated_at'] = datetime.now().isoformat()
+            
+            # Log the activity
+            try:
+                from models import db, DataQualityActivity
+                
+                activity = DataQualityActivity(
+                    activity_type='SIMULATION',
+                    title='AI Budget Impact Simulation Run',
+                    description=f'Executed {"multi-year" if multi_year else "single-year"} budget impact simulation {"with sensitivity analysis" if sensitivity_analysis else ""}',
+                    user_id=current_app.config.get('TESTING_USER_ID', 1),
+                    entity_type='BudgetImpactSimulation',
+                    icon='calculator',
+                    icon_class='success'
+                )
+                db.session.add(activity)
+                db.session.commit()
+            except Exception as log_error:
+                current_app.logger.warning(f"Could not log simulation activity: {str(log_error)}")
+            
+            return jsonify({
+                'success': True,
+                'simulation_results': simulation_result
+            })
+            
+        except AgentNotAvailableError:
+            current_app.logger.warning("Agent not available error")
+            return jsonify({
+                'success': False,
+                'error': 'Levy Audit Agent not available',
+                'simulation_results': {}
+            })
+            
+        except Exception as agent_error:
+            current_app.logger.error(f"Error executing budget impact simulation: {str(agent_error)}")
+            return jsonify({
+                'success': False,
+                'error': f"Agent error: {str(agent_error)}",
+                'simulation_results': {}
+            })
+    
+    except Exception as e:
+        current_app.logger.error(f"Error in AI budget impact simulation route: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'simulation_results': {}
+        }), 500

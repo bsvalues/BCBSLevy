@@ -289,11 +289,52 @@
         </div>
       </div>
       
+      <!-- Budget Impact Tool Selection -->
+      <div class="mb-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="m-0">Simulation Options</h5>
+          </div>
+          <div class="card-body">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="simulationType" id="standardSimulation" value="standard" checked>
+              <label class="form-check-label" for="standardSimulation">
+                Standard Simulation
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="simulationType" id="aiSimulation" value="ai">
+              <label class="form-check-label" for="aiSimulation">
+                AI-Powered Analysis
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="multiYearSimulation" value="multi-year">
+              <label class="form-check-label" for="multiYearSimulation">
+                Multi-Year Projection
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" id="sensitivityAnalysis" value="sensitivity">
+              <label class="form-check-label" for="sensitivityAnalysis">
+                Include Sensitivity Analysis
+              </label>
+            </div>
+            <div class="mt-2 small text-muted">
+              <p><i class="bi bi-info-circle me-1"></i> AI-Powered Analysis provides detailed insights and recommendations based on simulation results, and supports multi-year projections and sensitivity analysis.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- Budget Impact Tool -->
       <div class="impact-card">
         <div class="impact-card-header">
           <h5 class="m-0">Budget Impact Simulation</h5>
-          <button id="runSimulation" class="btn btn-primary btn-sm">Run Simulation</button>
+          <div>
+            <button id="runSimulation" class="btn btn-primary btn-sm">Run Simulation</button>
+            <button id="exportResults" class="btn btn-outline-secondary btn-sm ms-2" disabled>Export Results</button>
+          </div>
         </div>
         <div class="impact-card-body">
           <!-- Scenario Configuration -->
@@ -407,6 +448,171 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+            
+            <!-- AI Insights Section (Hidden by default) -->
+            <div id="aiInsightsContainer" class="mt-4" style="display: none;">
+              <div class="card">
+                <div class="card-header bg-primary bg-gradient text-white">
+                  <h5 class="m-0"><i class="bi bi-robot me-2"></i>AI-Powered Budget Impact Insights</h5>
+                </div>
+                <div class="card-body">
+                  <!-- Executive Summary -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold">Executive Summary</h6>
+                    <div id="executiveSummary" class="p-3 bg-light rounded">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Key Insights -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold">Key Insights</h6>
+                    <div id="keyInsights">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Stakeholder Impacts -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold">Stakeholder Impacts</h6>
+                    <div id="stakeholderImpacts">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Recommendations -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold">Recommendations</h6>
+                    <div id="recommendations">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Implementation Considerations -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold">Implementation Considerations</h6>
+                    <div id="implementationConsiderations">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Historical Context -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold">Historical Context</h6>
+                    <div id="historicalContext" class="p-3 bg-light rounded">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Multi-Year Assessment (Conditional) -->
+                  <div id="multiYearAssessmentContainer" class="mb-4" style="display: none;">
+                    <h6 class="fw-bold">Multi-Year Assessment</h6>
+                    <div id="multiYearAssessment" class="p-3 bg-light rounded">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Optimal Scenario -->
+                  <div class="mb-4">
+                    <h6 class="fw-bold">Optimal Scenario</h6>
+                    <div id="optimalScenario">
+                      <div class="loader-container">
+                        <p class="text-muted">Run AI simulation to see insights</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Multi-Year Projections (Hidden by default) -->
+            <div id="multiYearProjectionsContainer" class="mt-4" style="display: none;">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="m-0">Multi-Year Projections</h5>
+                </div>
+                <div class="card-body">
+                  <div class="mb-4">
+                    <canvas id="multiYearChart" height="300"></canvas>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                      <thead>
+                        <tr>
+                          <th>Year</th>
+                          <th>Total Levy Amount</th>
+                          <th>Avg Levy Rate</th>
+                          <th>Total Assessed Value</th>
+                          <th>Avg Tax Per Property</th>
+                          <th>Change From Baseline (%)</th>
+                        </tr>
+                      </thead>
+                      <tbody id="multiYearTableBody">
+                        <tr>
+                          <td colspan="6" class="text-center">Run multi-year simulation to see results</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Sensitivity Analysis (Hidden by default) -->
+            <div id="sensitivityAnalysisContainer" class="mt-4" style="display: none;">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="m-0">Sensitivity Analysis</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h6>Rate Change Sensitivity</h6>
+                      <canvas id="rateSensitivityChart" height="300"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                      <h6>Assessed Value Change Sensitivity</h6>
+                      <canvas id="valueSensitivityChart" height="300"></canvas>
+                    </div>
+                  </div>
+                  <div class="mt-4">
+                    <h6>Sensitivity Data</h6>
+                    <div class="table-responsive">
+                      <table class="table table-hover table-striped">
+                        <thead>
+                          <tr>
+                            <th>Parameter</th>
+                            <th>Value</th>
+                            <th>Total Levy Amount</th>
+                            <th>Change ($)</th>
+                            <th>Change (%)</th>
+                          </tr>
+                        </thead>
+                        <tbody id="sensitivityTableBody">
+                          <tr>
+                            <td colspan="5" class="text-center">Run sensitivity analysis to see results</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
