@@ -253,6 +253,13 @@ document.addEventListener('DOMContentLoaded', function() {
    * Run standard simulation via API
    */
   function runStandardSimulation(params) {
+    // Show loading state
+    runSimulationBtn.disabled = true;
+    runSimulationBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+    
+    // Clear any previous error messages
+    clearErrorMessages();
+    
     // Call the standard simulation API
     fetch('/budget-impact/api/simulation', {
       method: 'POST',
@@ -272,14 +279,29 @@ document.addEventListener('DOMContentLoaded', function() {
       return response.json();
     })
     .then(data => {
-      displaySimulationResults(data);
+      // Check for success property in response
+      if (data.success === false) {
+        // Show error toast
+        showErrorToast('Simulation Error', data.error || 'An error occurred during simulation');
+        console.error('Simulation API returned error:', data.error);
+        return;
+      }
+      
+      // Handle the new API response format with success property
+      if (data.success === true) {
+        displaySimulationResults(data);
+      } else {
+        // Handle legacy API response format without success property
+        displaySimulationResults(data);
+      }
+      
       runSimulationBtn.disabled = false;
       runSimulationBtn.innerHTML = 'Run Simulation';
       exportResultsBtn.disabled = false;
     })
     .catch(error => {
       console.error('Error running simulation:', error);
-      alert('Error running simulation. Please try again.');
+      showErrorToast('Simulation Failed', error.message || 'Please check the console for details');
       runSimulationBtn.disabled = false;
       runSimulationBtn.innerHTML = 'Run Simulation';
     });
@@ -289,6 +311,13 @@ document.addEventListener('DOMContentLoaded', function() {
    * Run AI-powered simulation via API
    */
   function runAISimulation(params) {
+    // Show loading state
+    runSimulationBtn.disabled = true;
+    runSimulationBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing AI Analysis...';
+    
+    // Clear any previous error messages
+    clearErrorMessages();
+    
     // Show appropriate containers based on options
     if (params.multi_year) {
       multiYearProjectionsContainer.style.display = 'block';
@@ -316,21 +345,59 @@ document.addEventListener('DOMContentLoaded', function() {
       return response.json();
     })
     .then(data => {
+      // Check if the API returned an error
       if (!data.success) {
-        throw new Error(data.error || 'Unknown error occurred');
+        // Show error toast with more details
+        showErrorToast('AI Simulation Error', data.error || 'Unknown error occurred with AI simulation');
+        console.error('AI simulation API returned error:', data.error);
+        
+        // If we have a fallback standard simulation in response, display it
+        if (data.baseline && data.simulation && data.impact) {
+          console.log('Using fallback standard simulation data');
+          displaySimulationResults(data);
+          showInfoToast('Using Standard Simulation', 'AI simulation failed, showing standard results instead');
+        }
+        
+        runSimulationBtn.disabled = false;
+        runSimulationBtn.innerHTML = 'Run Simulation';
+        return;
       }
       
+      // Process successful response
       const results = data.simulation_results;
+      
+      if (!results) {
+        showErrorToast('Simulation Error', 'No simulation results returned');
+        console.error('No simulation results returned from AI API');
+        runSimulationBtn.disabled = false;
+        runSimulationBtn.innerHTML = 'Run Simulation';
+        return;
+      }
+      
+      // Display results
       displayAISimulationResults(results);
+      
+      // If we have optimization recommendations, enable the apply button
+      if (results.optimization_recommendations) {
+        enableOptimizationRecommendations(results.optimization_recommendations);
+      }
+      
+      // Show success toast
+      showSuccessToast('AI Simulation Complete', 'The AI simulation was successfully processed');
+      
+      // Re-enable buttons
       runSimulationBtn.disabled = false;
       runSimulationBtn.innerHTML = 'Run Simulation';
       exportResultsBtn.disabled = false;
     })
     .catch(error => {
       console.error('Error running AI simulation:', error);
-      alert('Error running AI simulation: ' + error.message);
+      showErrorToast('AI Simulation Failed', error.message || 'Please check the console for details');
+      
+      // Reset UI
       runSimulationBtn.disabled = false;
       runSimulationBtn.innerHTML = 'Run Simulation';
+      aiInsightsContainer.innerHTML = '<div class="alert alert-danger">AI simulation failed. Please try again or use standard simulation.</div>';
     });
   }
   
@@ -1265,6 +1332,142 @@ function applyOptimalScenario(rateChange, valueChange) {
   assessedValueSlider.value = valueChange;
   assessedValueValue.textContent = `${valueChange}%`;
   
-  // Alert user
-  alert('Optimal scenario values applied! Click "Run Simulation" to see results.');
+  // Notify user with toast
+  showSuccessToast('Values Applied', 'Optimal scenario values have been applied! Click "Run Simulation" to see results.');
+}
+
+/**
+ * Clear all error messages in the UI
+ */
+function clearErrorMessages() {
+  // Remove any existing alert messages
+  const existingAlerts = document.querySelectorAll('.alert');
+  existingAlerts.forEach(alert => {
+    if (alert.parentNode) {
+      alert.parentNode.removeChild(alert);
+    }
+  });
+  
+  // Hide any existing toasts
+  const existingToasts = document.querySelectorAll('.toast');
+  existingToasts.forEach(toast => {
+    const bsToast = bootstrap.Toast.getInstance(toast);
+    if (bsToast) {
+      bsToast.hide();
+    }
+  });
+}
+
+/**
+ * Show an error toast notification
+ * 
+ * @param {string} title - The toast title
+ * @param {string} message - The toast message
+ */
+function showErrorToast(title, message) {
+  // Create toast container if it doesn't exist
+  let toastContainer = document.getElementById('toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toast-container';
+    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    document.body.appendChild(toastContainer);
+  }
+  
+  // Create toast element
+  const toastId = 'error-toast-' + new Date().getTime();
+  const toastHtml = `
+    <div id="${toastId}" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <strong>${title}</strong>: ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  `;
+  
+  toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+  
+  // Show the toast
+  const toastElement = document.getElementById(toastId);
+  const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+  toast.show();
+  
+  // Log the error
+  console.error(`${title}: ${message}`);
+}
+
+/**
+ * Show an info toast notification
+ * 
+ * @param {string} title - The toast title
+ * @param {string} message - The toast message
+ */
+function showInfoToast(title, message) {
+  // Create toast container if it doesn't exist
+  let toastContainer = document.getElementById('toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toast-container';
+    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    document.body.appendChild(toastContainer);
+  }
+  
+  // Create toast element
+  const toastId = 'info-toast-' + new Date().getTime();
+  const toastHtml = `
+    <div id="${toastId}" class="toast align-items-center text-dark bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <strong>${title}</strong>: ${message}
+        </div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  `;
+  
+  toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+  
+  // Show the toast
+  const toastElement = document.getElementById(toastId);
+  const toast = new bootstrap.Toast(toastElement, { delay: 4000 });
+  toast.show();
+}
+
+/**
+ * Show a success toast notification
+ * 
+ * @param {string} title - The toast title
+ * @param {string} message - The toast message
+ */
+function showSuccessToast(title, message) {
+  // Create toast container if it doesn't exist
+  let toastContainer = document.getElementById('toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toast-container';
+    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+    document.body.appendChild(toastContainer);
+  }
+  
+  // Create toast element
+  const toastId = 'success-toast-' + new Date().getTime();
+  const toastHtml = `
+    <div id="${toastId}" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <strong>${title}</strong>: ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  `;
+  
+  toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+  
+  // Show the toast
+  const toastElement = document.getElementById(toastId);
+  const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+  toast.show();
 }

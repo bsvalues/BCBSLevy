@@ -62,28 +62,80 @@ def api_budget_simulation():
     Returns:
         JSON response with simulation results
     """
-    # Get request data
-    data = request.json
-    
-    # Extract parameters from request
-    year = data.get('year', datetime.now().year)
-    scenario = data.get('scenario', {})
-    district_ids = data.get('district_ids', [])
-    
-    # Get baseline data for comparison
-    baseline_data = get_district_budget_data(district_ids, year)
-    
-    # Apply scenario modifications to create simulation data
-    simulation_data = simulate_budget_changes(baseline_data, scenario)
-    
-    # Calculate impact metrics
-    impact_analysis = calculate_impact_metrics(baseline_data, simulation_data)
-    
-    return jsonify({
-        'baseline': baseline_data,
-        'simulation': simulation_data,
-        'impact': impact_analysis
-    })
+    try:
+        # Validate request has JSON data
+        if not request.is_json:
+            current_app.logger.warning("Invalid request format - JSON expected")
+            return jsonify({
+                'success': False,
+                'error': 'Invalid request format. JSON expected.',
+                'baseline': {},
+                'simulation': {},
+                'impact': {}
+            }), 400
+        
+        # Get request data
+        data = request.json
+        
+        # Extract parameters from request with validation
+        year = data.get('year', datetime.now().year)
+        if not isinstance(year, int):
+            try:
+                year = int(year)
+            except (ValueError, TypeError):
+                year = datetime.now().year
+                current_app.logger.warning(f"Invalid year format: {data.get('year')}, using current year")
+                
+        scenario = data.get('scenario', {})
+        if not isinstance(scenario, dict):
+            current_app.logger.warning(f"Invalid scenario format: {type(scenario)}")
+            return jsonify({
+                'success': False,
+                'error': 'Invalid scenario format. Dictionary expected.',
+                'baseline': {},
+                'simulation': {},
+                'impact': {}
+            }), 400
+            
+        district_ids = data.get('district_ids', [])
+        if not isinstance(district_ids, list):
+            current_app.logger.warning(f"Invalid district_ids format: {type(district_ids)}")
+            return jsonify({
+                'success': False,
+                'error': 'Invalid district_ids format. List expected.',
+                'baseline': {},
+                'simulation': {},
+                'impact': {}
+            }), 400
+        
+        # Get baseline data for comparison
+        baseline_data = get_district_budget_data(district_ids, year)
+        
+        # Apply scenario modifications to create simulation data
+        simulation_data = simulate_budget_changes(baseline_data, scenario)
+        
+        # Calculate impact metrics
+        impact_analysis = calculate_impact_metrics(baseline_data, simulation_data)
+        
+        # Log successful simulation
+        current_app.logger.info(f"Budget simulation completed for year {year} with {len(district_ids)} districts")
+        
+        return jsonify({
+            'success': True,
+            'baseline': baseline_data,
+            'simulation': simulation_data,
+            'impact': impact_analysis
+        })
+    except Exception as e:
+        error_msg = str(e)
+        current_app.logger.error(f"Error in budget simulation: {error_msg}")
+        return jsonify({
+            'success': False,
+            'error': sanitize_html(error_msg),
+            'baseline': {},
+            'simulation': {},
+            'impact': {}
+        }), 500
 
 @budget_impact_bp.route('/api/districts/<int:year>')
 def api_districts_by_year(year):
@@ -378,19 +430,62 @@ def api_ai_budget_simulation():
         JSON response with simulation results and AI-generated insights
     """
     try:
+        # Validate request has JSON data
+        if not request.is_json:
+            current_app.logger.warning("Invalid request format for AI simulation - JSON expected")
+            return jsonify({
+                'success': False,
+                'error': 'Invalid request format. JSON expected.',
+                'simulation_results': {}
+            }), 400
+            
         # Get request data
         data = request.json
         
-        # Extract parameters from request
+        # Extract parameters from request with validation
         year = data.get('year', datetime.now().year)
+        if not isinstance(year, int):
+            try:
+                year = int(year)
+            except (ValueError, TypeError):
+                year = datetime.now().year
+                current_app.logger.warning(f"Invalid year format in AI simulation: {data.get('year')}, using current year")
+                
         district_id = data.get('district_id')
+        if district_id is not None and not isinstance(district_id, int):
+            try:
+                district_id = int(district_id)
+            except (ValueError, TypeError):
+                current_app.logger.warning(f"Invalid district_id format: {data.get('district_id')}")
+                return jsonify({
+                    'success': False,
+                    'error': 'Invalid district_id format. Integer expected.',
+                    'simulation_results': {}
+                }), 400
+                
         scenario_parameters = data.get('scenario_parameters', {})
+        if not isinstance(scenario_parameters, dict):
+            current_app.logger.warning(f"Invalid scenario_parameters format: {type(scenario_parameters)}")
+            return jsonify({
+                'success': False,
+                'error': 'Invalid scenario_parameters format. Dictionary expected.',
+                'simulation_results': {}
+            }), 400
+            
         multi_year = data.get('multi_year', False)
         sensitivity_analysis = data.get('sensitivity_analysis', False)
         
         # Check if MCP Army is available
-        from utils.mcp_agent_manager import get_agent, AgentNotAvailableError
-        
+        try:
+            from utils.mcp_agent_manager import get_agent, AgentNotAvailableError
+        except ImportError:
+            current_app.logger.error("MCP agent manager import failed")
+            return jsonify({
+                'success': False,
+                'error': 'MCP agent manager not available',
+                'simulation_results': {}
+            }), 500
+            
         # Import required modules for MCP
         try:
             from flask import current_app
