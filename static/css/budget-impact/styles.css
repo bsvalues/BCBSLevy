@@ -1,254 +1,200 @@
-/**
- * Budget Impact Visualization Styles
- * 
- * Custom styles for the budget impact visualization feature.
- */
+/* Budget Impact Visualization Styles */
 
-/* Transition effects for smooth visualization changes */
-.budget-transition {
-  transition: all 0.5s ease-in-out;
-}
-
-/* Special styles for impact indicators */
 .impact-increase {
-  color: #28a745;
-  background-color: rgba(40, 167, 69, 0.1);
-  border-radius: 4px;
-  padding: 0.2rem 0.5rem;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
+  color: #dc3545;
+  font-weight: 600;
 }
 
 .impact-decrease {
-  color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
-  border-radius: 4px;
-  padding: 0.2rem 0.5rem;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
+  color: #28a745;
+  font-weight: 600;
 }
 
 .impact-neutral {
   color: #6c757d;
-  background-color: rgba(108, 117, 125, 0.1);
-  border-radius: 4px;
-  padding: 0.2rem 0.5rem;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
+  font-weight: 600;
 }
 
-/* Impact indicator icons */
-.impact-increase::before,
-.impact-decrease::before,
-.impact-neutral::before {
-  content: "";
-  margin-right: 0.3rem;
-  width: 0;
-  height: 0;
-  display: inline-block;
-}
-
-.impact-increase::before {
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 8px solid #28a745;
-}
-
-.impact-decrease::before {
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 8px solid #dc3545;
-}
-
-.impact-neutral::before {
-  width: 8px;
-  height: 2px;
-  background-color: #6c757d;
-  margin-top: 3px;
-}
-
-/* Property count indicator */
-.property-count-badge {
-  background-color: #007bff;
-  color: white;
-  border-radius: 50px;
-  padding: 0.2rem 0.6rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  display: inline-block;
-  margin-left: 0.5rem;
-}
-
-/* Chart tooltips */
-.chart-tooltip {
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-}
-
-/* District filters */
-.district-filter-pill {
-  background-color: #e9ecef;
-  border-radius: 50px;
-  padding: 0.3rem 0.8rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.district-filter-pill:hover {
-  background-color: #dee2e6;
-}
-
-.district-filter-pill.active {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.district-filter-pill .remove-filter {
-  margin-left: 0.5rem;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  font-weight: bold;
-}
-
-.district-filter-pill.active .remove-filter {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-/* Scenario presets */
-.scenario-presets {
-  display: flex;
-  gap: 0.5rem;
+/* AI Insights Styles */
+.insight-card {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+  transition: all 0.3s ease;
 }
 
-.scenario-preset-btn {
+.insight-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.insight-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  padding: 0.3rem 0.8rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.scenario-preset-btn:hover {
-  background-color: #e9ecef;
+.insight-body {
+  padding: 1rem;
 }
 
-.scenario-preset-btn.active {
-  background-color: #17a2b8;
-  border-color: #17a2b8;
+/* Badges */
+.badge-high {
+  background-color: #dc3545;
   color: white;
 }
 
-/* Animated value transitions */
-.animated-value {
-  transition: all 0.5s ease;
+.badge-medium {
+  background-color: #fd7e14;
+  color: white;
 }
 
-.animated-value.highlight {
-  animation: highlight-pulse 1s ease;
+.badge-low {
+  background-color: #17a2b8;
+  color: white;
 }
 
-@keyframes highlight-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+.badge-positive {
+  background-color: #28a745;
+  color: white;
 }
 
-/* Loading overlay */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.badge-negative {
+  background-color: #dc3545;
+  color: white;
+}
+
+.badge-mixed {
+  background-color: #fd7e14;
+  color: white;
+}
+
+.badge-neutral {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Animation for AI insights */
+@keyframes highlightPulse {
+  0% { background-color: rgba(13, 110, 253, 0.05); }
+  50% { background-color: rgba(13, 110, 253, 0.15); }
+  100% { background-color: rgba(13, 110, 253, 0.05); }
+}
+
+.highlight-pulse {
+  animation: highlightPulse 2s ease-in-out;
+  border-radius: 4px;
+}
+
+/* Optimal scenario card */
+.optimal-scenario-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-left: 4px solid #28a745;
+}
+
+/* Multi-year projection styles */
+.projection-year {
+  font-weight: 600;
+  color: #495057;
+}
+
+.current-year {
+  font-weight: 700;
+  color: #0d6efd;
+}
+
+.projection-year-future {
+  color: #6c757d;
+}
+
+/* Sensitivity analysis styles */
+.sensitivity-parameter {
+  font-weight: 600;
+  min-width: 180px;
+}
+
+.sensitivity-value {
+  font-family: monospace;
+  padding: 0.1rem 0.3rem;
+  background-color: #f8f9fa;
+  border-radius: 3px;
+}
+
+/* Executive summary styles */
+.executive-summary {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  padding: 1rem;
+  background-color: rgba(13, 110, 253, 0.05);
+  border-radius: 8px;
+  border-left: 4px solid #0d6efd;
+}
+
+/* Implementation considerations */
+.implementation-consideration {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  border-left: 3px solid #6c757d;
+}
+
+/* Historical context */
+.historical-context {
+  font-style: italic;
+  padding: 1rem;
+  background-color: rgba(108, 117, 125, 0.05);
   border-radius: 8px;
 }
 
-/* Scrollable areas */
-.scrollable-container {
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 0.5rem;
+/* Optimal scenario apply button */
+.apply-optimal {
+  transition: all 0.2s ease;
 }
 
-.scrollable-container::-webkit-scrollbar {
-  width: 6px;
+.apply-optimal:hover {
+  transform: scale(1.05);
 }
 
-.scrollable-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+/* Custom tooltips */
+.custom-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
 }
 
-.scrollable-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+.custom-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 200px;
+  background-color: #212529;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -100px;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+.custom-tooltip .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #212529 transparent transparent transparent;
 }
 
-/* Comparison table styling */
-.comparison-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.comparison-table th,
-.comparison-table td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.comparison-table th {
-  background-color: #f8f9fa;
-  font-weight: 500;
-  text-align: left;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.comparison-table tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.05);
-}
-
-.comparison-table .baseline-column {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.comparison-table .simulation-column {
-  background-color: rgba(23, 162, 184, 0.05);
-}
-
-.comparison-table .change-column {
-  font-weight: 500;
+.custom-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }

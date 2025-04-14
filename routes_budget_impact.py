@@ -10,6 +10,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, current_app
 from sqlalchemy import desc, func, and_
 from models import db, TaxDistrict, TaxCode, TaxCodeHistoricalRate, Property
+from utils.sanitize_utils import sanitize_html, sanitize_mcp_insights
 
 # Create blueprint
 budget_impact_bp = Blueprint('budget_impact', __name__, url_prefix='/budget-impact')
@@ -486,9 +487,12 @@ def api_ai_budget_simulation():
             except Exception as log_error:
                 current_app.logger.warning(f"Could not log simulation activity: {str(log_error)}")
             
+            # Sanitize the simulation results before sending to browser
+            sanitized_simulation_result = sanitize_mcp_insights(simulation_result)
+            
             return jsonify({
                 'success': True,
-                'simulation_results': simulation_result
+                'simulation_results': sanitized_simulation_result
             })
             
         except AgentNotAvailableError:
@@ -500,17 +504,19 @@ def api_ai_budget_simulation():
             })
             
         except Exception as agent_error:
+            error_msg = f"Agent error: {str(agent_error)}"
             current_app.logger.error(f"Error executing budget impact simulation: {str(agent_error)}")
             return jsonify({
                 'success': False,
-                'error': f"Agent error: {str(agent_error)}",
+                'error': sanitize_html(error_msg),
                 'simulation_results': {}
             })
     
     except Exception as e:
-        current_app.logger.error(f"Error in AI budget impact simulation route: {str(e)}")
+        error_msg = str(e)
+        current_app.logger.error(f"Error in AI budget impact simulation route: {error_msg}")
         return jsonify({
             'success': False,
-            'error': str(e),
+            'error': sanitize_html(error_msg),
             'simulation_results': {}
         }), 500

@@ -18,6 +18,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional, Union, Tuple, cast
 
 from utils.anthropic_utils import get_claude_service, check_api_key_status
+from utils.sanitize_utils import sanitize_html, sanitize_mcp_insights
 from utils.mcp_agents import MCPAgent
 from utils.mcp_core import registry
 from utils.html_sanitizer import sanitize_html, sanitize_mcp_insights
