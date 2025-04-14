@@ -2,6 +2,22 @@
 
 {% block title %}Budget Impact Visualization{% endblock %}
 
+{% block toasts %}
+<!-- Toast notification when optimal scenario is applied -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="optimalAppliedToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header bg-success text-white">
+      <i class="bi bi-check-circle-fill me-2"></i>
+      <strong class="me-auto">Optimal Scenario Applied</strong>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      The AI-recommended optimal scenario values have been applied to the sliders. Run the simulation again to see the optimized results.
+    </div>
+  </div>
+</div>
+{% endblock %}
+
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/carousel-cards.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/budget-impact/styles.css') }}">

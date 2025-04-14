@@ -675,6 +675,49 @@ document.addEventListener('DOMContentLoaded', function() {
   /**
    * Display AI insights
    */
+  // Apply recommended optimal scenario values to sliders
+  function applyOptimalScenario(rateChange, valueChange) {
+    // Ensure parameters are valid numbers
+    if (typeof rateChange !== 'number' || isNaN(rateChange)) {
+      console.error('Invalid rate change value:', rateChange);
+      return;
+    }
+    
+    if (typeof valueChange !== 'number' || isNaN(valueChange)) {
+      console.error('Invalid value change value:', valueChange);
+      return;
+    }
+    
+    // Update tax rate slider
+    if (taxRateSlider) {
+      // Clamp to slider min/max
+      const min = parseFloat(taxRateSlider.min);
+      const max = parseFloat(taxRateSlider.max);
+      const clampedRate = Math.min(Math.max(rateChange, min), max);
+      
+      taxRateSlider.value = clampedRate;
+      taxRateValue.textContent = `${clampedRate}%`;
+    }
+    
+    // Update assessed value slider
+    if (assessedValueSlider) {
+      // Clamp to slider min/max
+      const min = parseFloat(assessedValueSlider.min);
+      const max = parseFloat(assessedValueSlider.max);
+      const clampedValue = Math.min(Math.max(valueChange, min), max);
+      
+      assessedValueSlider.value = clampedValue;
+      assessedValueValue.textContent = `${clampedValue}%`;
+    }
+    
+    // Show notification
+    const toast = new bootstrap.Toast(document.getElementById('optimalAppliedToast'));
+    toast.show();
+  }
+  
+  // Make function available to the window scope for the button onclick
+  window.applyOptimalScenario = applyOptimalScenario;
+  
   function displayAIInsights(insights) {
     // Display executive summary
     if (insights.executive_summary) {
