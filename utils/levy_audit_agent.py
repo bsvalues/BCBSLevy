@@ -2056,6 +2056,15 @@ class LevyAuditAgent(MCPAgent):
                     "rate_change": recommended rate change value,
                     "value_change": recommended value change value,
                     "justification": "Explanation of why this scenario is optimal"
+                }},
+                "optimization_recommendations": {{
+                    "property_value_growth": optimized property value growth percentage as float,
+                    "new_construction_growth": optimized new construction growth percentage as float,
+                    "exemption_rate": optimized exemption rate percentage as float,
+                    "tax_rate_adjustment": optimized tax rate adjustment percentage as float,
+                    "compliance_rate": optimized compliance rate percentage as float,
+                    "collection_efficiency": optimized collection efficiency percentage as float,
+                    "explanation": "Detailed explanation of how these optimized parameters improve budget outcomes"
                 }}
             }}
             """
@@ -2092,7 +2101,16 @@ class LevyAuditAgent(MCPAgent):
                     "implementation_considerations": [
                         "Simulation completed successfully, but AI analysis encountered an error.",
                         "Raw numerical results are available for manual review."
-                    ]
+                    ],
+                    "optimization_recommendations": {
+                        "property_value_growth": 2.0,
+                        "new_construction_growth": 1.5,
+                        "exemption_rate": 0.5,
+                        "tax_rate_adjustment": 1.0,
+                        "compliance_rate": 98.0,
+                        "collection_efficiency": 97.0,
+                        "explanation": "These are default recommended values. Please rerun the AI simulation for customized recommendations."
+                    }
                 }
                 
                 # Add fallback insights to simulation results

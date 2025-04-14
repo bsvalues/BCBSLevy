@@ -1436,6 +1436,104 @@ function showInfoToast(title, message) {
 }
 
 /**
+ * Enable and display optimization recommendations
+ * 
+ * @param {Object} recommendations - The optimization recommendations from the AI
+ */
+function enableOptimizationRecommendations(recommendations) {
+  // Get the recommendations container
+  const container = document.getElementById('recommendations');
+  if (!container) return;
+  
+  // Clear loading indicator
+  container.innerHTML = '';
+  
+  // Create recommendations content
+  let content = `
+    <div class="alert alert-info mb-3">
+      <i class="bi bi-lightbulb-fill me-2"></i>
+      <strong>AI-Recommended Optimal Scenario</strong>
+    </div>
+    <div class="card border-primary mb-3">
+      <div class="card-header bg-primary text-white">
+        Optimization Recommendations
+      </div>
+      <div class="card-body">
+        <p>The AI has analyzed your scenario and recommends the following parameter adjustments to optimize your budget impact:</p>
+        <ul class="list-group mb-3">
+  `;
+  
+  // Add each recommendation to the list
+  for (const [key, value] of Object.entries(recommendations)) {
+    const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    content += `<li class="list-group-item d-flex justify-content-between align-items-center">
+      ${formattedKey}
+      <span class="badge bg-primary rounded-pill">${typeof value === 'number' ? value.toFixed(2) : value}</span>
+    </li>`;
+  }
+  
+  // Add apply button
+  content += `
+        </ul>
+        <button id="applyOptimalScenario" class="btn btn-primary">
+          <i class="bi bi-magic me-2"></i>Apply Optimal Scenario
+        </button>
+        <small class="text-muted d-block mt-2">
+          Applying these recommendations will update the sliders to match the AI's optimal scenario.
+        </small>
+      </div>
+    </div>
+  `;
+  
+  // Insert content
+  container.innerHTML = content;
+  
+  // Add event listener to the apply button
+  document.getElementById('applyOptimalScenario').addEventListener('click', () => {
+    applyOptimizationRecommendations(recommendations);
+  });
+}
+
+/**
+ * Apply the AI optimization recommendations to the input controls
+ * 
+ * @param {Object} recommendations - The optimization recommendations
+ */
+function applyOptimizationRecommendations(recommendations) {
+  // Map recommendation keys to slider IDs
+  const sliderMapping = {
+    property_value_growth: 'propertyValueGrowth',
+    new_construction_growth: 'newConstructionGrowth',
+    exemption_rate: 'exemptionRate',
+    tax_rate_adjustment: 'taxRateAdjustment',
+    compliance_rate: 'complianceRate',
+    collection_efficiency: 'collectionEfficiency'
+    // Add more mappings as needed
+  };
+  
+  // Update each slider with the recommended value
+  for (const [key, value] of Object.entries(recommendations)) {
+    const sliderId = sliderMapping[key];
+    if (sliderId) {
+      const slider = document.getElementById(sliderId);
+      if (slider) {
+        slider.value = value;
+        // Trigger change event to update any associated displays
+        const event = new Event('input', { bubbles: true });
+        slider.dispatchEvent(event);
+      }
+    }
+  }
+  
+  // Show the toast notification
+  const optimalAppliedToast = new bootstrap.Toast(document.getElementById('optimalAppliedToast'));
+  optimalAppliedToast.show();
+  
+  // Also show a success toast
+  showSuccessToast('Optimal Scenario Applied', 'The AI-recommended values have been applied to the sliders. Run the simulation again to see the optimized results.');
+}
+
+/**
  * Show a success toast notification
  * 
  * @param {string} title - The toast title
