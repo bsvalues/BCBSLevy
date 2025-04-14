@@ -6,7 +6,9 @@ This module provides specialized AI agents for different tasks in the SaaS Levy 
 
 import json
 import logging
+import re
 from typing import Dict, List, Any, Optional, Union
+from sqlalchemy import func
 
 from utils.anthropic_utils import get_claude_service
 from utils.mcp_core import registry
@@ -105,6 +107,8 @@ class LevyAnalysisAgent(MCPAgent):
         # Register capabilities
         self.register_capability("analyze_tax_distribution")
         self.register_capability("predict_levy_rates")
+        self.register_capability("get_data_quality_metrics")
+        self.register_capability("generate_data_quality_recommendations")
         
         # Claude service for AI capabilities
         self.claude = get_claude_service()
@@ -135,6 +139,304 @@ class LevyAnalysisAgent(MCPAgent):
         # Get insights from Claude
         return self.claude.generate_levy_insights(levy_data)
     
+    def get_data_quality_metrics(self, params: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Get data quality metrics in real-time.
+        
+        This capability enables real-time monitoring of data quality metrics,
+        including completeness, accuracy, and consistency of tax data.
+        
+        Args:
+            params: Parameters for metrics generation
+                - realtime: Whether to get real-time metrics or historical
+                - dataset: Specific dataset to analyze (optional)
+                
+        Returns:
+            Dictionary containing data quality metrics
+        """
+        # Default parameters
+        realtime = params.get('realtime', True) if params else True
+        
+        try:
+            from flask import current_app
+            from sqlalchemy import desc, func
+            from flask_sqlalchemy import SQLAlchemy
+            from datetime import datetime
+            import logging
+            
+            # Get database session
+            db = current_app.extensions.get('sqlalchemy').db
+            
+            # Import models (done here to avoid circular imports)
+            from models import (
+                TaxDistrict, TaxCode, Property, 
+                DataQualityScore, ValidationRule, ValidationResult
+            )
+            
+            # Get latest data quality scores from database
+            latest_score = db.session.query(DataQualityScore).order_by(
+                desc(DataQualityScore.timestamp)
+            ).first()
+            
+            # Get validation rules with their performance metrics
+            validation_rules = db.session.query(
+                ValidationRule, 
+                func.count(ValidationResult.id).label('total'),
+                func.sum(ValidationResult.passed.cast(db.Integer)).label('passed')
+            ).outerjoin(
+                ValidationResult
+            ).group_by(
+                ValidationRule.id
+            ).all()
+            
+            # Calculate metrics from validation results if available
+            rule_metrics = []
+            for rule, total, passed in validation_rules:
+                if total > 0:
+                    pass_rate = (passed / total) * 100
+                else:
+                    pass_rate = 0
+                
+                rule_metrics.append({
+                    'id': rule.id,
+                    'name': rule.name,
+                    'description': rule.description,
+                    'pass_rate': pass_rate,
+                    'passed': passed,
+                    'failed': total - passed,
+                    'total': total,
+                    'severity': rule.severity
+                })
+            
+            # Generate metrics based on real database data
+            if latest_score:
+                metrics = {
+                    'overall_score': latest_score.overall_score,
+                    'completeness_score': latest_score.completeness_score,
+                    'accuracy_score': latest_score.accuracy_score,
+                    'consistency_score': latest_score.consistency_score,
+                    'timeliness_score': latest_score.timeliness_score,
+                    'completeness_fields_missing': latest_score.completeness_fields_missing,
+                    'accuracy_errors': latest_score.accuracy_errors,
+                    'consistency_issues': latest_score.consistency_issues,
+                    'validation_rules': rule_metrics,
+                    'timestamp': datetime.now().isoformat(),
+                    'realtime': realtime
+                }
+            else:
+                # No metrics available, return empty data
+                metrics = {
+                    'error': 'No data quality metrics available',
+                    'timestamp': datetime.now().isoformat(),
+                    'realtime': realtime
+                }
+            
+            return {'metrics': metrics}
+        
+        except Exception as e:
+            logger.error(f"Error getting data quality metrics: {str(e)}")
+            return {
+                'error': f"Failed to retrieve data quality metrics: {str(e)}",
+                'metrics': {}
+            }
+    
+    def generate_data_quality_recommendations(self, params: Dict[str, Any] = None) -> Dict[str, Any]:
+        """
+        Generate AI-powered recommendations for improving data quality.
+        
+        This capability analyzes current data quality metrics and validation results
+        to provide actionable recommendations for improving data quality.
+        
+        Args:
+            params: Parameters for recommendation generation
+                - focus_area: Specific area to focus on (completeness, accuracy, consistency)
+                - max_recommendations: Maximum number of recommendations to return
+                
+        Returns:
+            Dictionary containing data quality recommendations
+        """
+        if not self.claude:
+            return {
+                'error': 'Claude service not available',
+                'recommendations': []
+            }
+        
+        try:
+            # Default parameters
+            focus_area = params.get('focus_area', 'all') if params else 'all'
+            max_recommendations = params.get('max_recommendations', 5) if params else 5
+            
+            # First get current metrics
+            metrics_result = self.get_data_quality_metrics({'realtime': True})
+            
+            if 'error' in metrics_result:
+                return {
+                    'error': metrics_result['error'],
+                    'recommendations': []
+                }
+            
+            metrics = metrics_result.get('metrics', {})
+            
+            # Formulate query for Claude
+            prompt = f"""
+            As a data quality expert specializing in property tax systems, analyze these metrics and provide actionable recommendations:
+            
+            CURRENT DATA QUALITY METRICS:
+            - Overall Score: {metrics.get('overall_score', 'N/A')}
+            - Completeness: {metrics.get('completeness_score', 'N/A')}
+            - Accuracy: {metrics.get('accuracy_score', 'N/A')}
+            - Consistency: {metrics.get('consistency_score', 'N/A')}
+            - Timeliness: {metrics.get('timeliness_score', 'N/A')}
+            
+            ISSUES:
+            - Missing Fields: {metrics.get('completeness_fields_missing', 'N/A')}
+            - Accuracy Errors: {metrics.get('accuracy_errors', 'N/A')}
+            - Consistency Issues: {metrics.get('consistency_issues', 'N/A')}
+            
+            VALIDATION RULE PERFORMANCE:
+            """
+            
+            # Add validation rules if available
+            for rule in metrics.get('validation_rules', []):
+                prompt += f"- {rule.get('name')}: {rule.get('pass_rate', 0):.1f}% pass rate ({rule.get('passed', 0)} passed, {rule.get('failed', 0)} failed)\n"
+            
+            prompt += f"""
+            Based on this data, generate {max_recommendations} specific, actionable recommendations to improve data quality 
+            """
+            
+            if focus_area != 'all':
+                prompt += f"with focus on {focus_area}. "
+            else:
+                prompt += "across all areas. "
+                
+            prompt += """
+            For each recommendation, provide:
+            1. A concise title
+            2. A detailed description explaining the issue and solution
+            3. Impact level (High/Medium/Low)
+            4. Effort level (High/Medium/Low)
+            
+            Format as a JSON array with objects containing: title, description, impact, effort
+            """
+            
+            # Send to Claude
+            try:
+                from utils.anthropic_utils import execute_anthropic_query
+                
+                result = execute_anthropic_query(prompt)
+                
+                # Process Claude's response - extract JSON
+                json_match = re.search(r'```json\s*([\s\S]*?)\s*```', result)
+                if json_match:
+                    json_str = json_match.group(1)
+                    recommendations = json.loads(json_str)
+                else:
+                    # Try to find anything that looks like JSON array
+                    json_match = re.search(r'\[\s*\{.*\}\s*\]', result, re.DOTALL)
+                    if json_match:
+                        json_str = json_match.group(0)
+                        recommendations = json.loads(json_str)
+                    else:
+                        # Fallback to regexp extraction if JSON parsing fails
+                        recommendations = self._extract_recommendations_from_text(result)
+                
+                # Process recommendations to add styling classes
+                styled_recommendations = []
+                for rec in recommendations:
+                    if isinstance(rec, dict):
+                        # Map impact and effort to Bootstrap classes
+                        impact_class = self._map_level_to_class(rec.get('impact', 'Medium'))
+                        effort_class = self._map_level_to_class(rec.get('effort', 'Medium'), inverse=True)
+                        
+                        styled_recommendations.append({
+                            'title': rec.get('title', 'Recommendation'),
+                            'description': rec.get('description', ''),
+                            'impact': f"{rec.get('impact', 'Medium')} Impact",
+                            'impact_class': impact_class,
+                            'effort': f"{rec.get('effort', 'Medium')} Effort",
+                            'effort_class': effort_class
+                        })
+                
+                return {
+                    'success': True,
+                    'recommendations': styled_recommendations
+                }
+                
+            except Exception as e:
+                logger.error(f"Error generating recommendations with Claude: {str(e)}")
+                return {
+                    'error': f"Failed to generate recommendations: {str(e)}",
+                    'recommendations': []
+                }
+                
+        except Exception as e:
+            logger.error(f"Error generating data quality recommendations: {str(e)}")
+            return {
+                'error': f"Failed to generate recommendations: {str(e)}",
+                'recommendations': []
+            }
+    
+    def _map_level_to_class(self, level, inverse=False):
+        """Map impact/effort level to Bootstrap color class."""
+        level = level.lower() if level else 'medium'
+        
+        if not inverse:
+            # For impact (higher is better)
+            if 'high' in level:
+                return 'success'
+            elif 'medium' in level:
+                return 'primary'
+            else:
+                return 'warning'
+        else:
+            # For effort (lower is better)
+            if 'high' in level:
+                return 'warning'
+            elif 'medium' in level:
+                return 'info'
+            else:
+                return 'success'
+    
+    def _extract_recommendations_from_text(self, text):
+        """Extract recommendations from text if JSON parsing fails."""
+        recommendations = []
+        
+        # Define patterns
+        title_pattern = r'(?:^|\n)(?:Title:|#|\d+\.\s*)(.*?)(?:\n|$)'
+        desc_pattern = r'(?:Description:|Description)\s*(.*?)(?:\n\s*(?:Impact|Effort)|$)'
+        impact_pattern = r'(?:Impact:|Impact)\s*(.*?)(?:\n|$)'
+        effort_pattern = r'(?:Effort:|Effort)\s*(.*?)(?:\n|$)'
+        
+        # Split by recommendations (assume numbered or titled sections)
+        sections = re.split(r'\n\s*(?:\d+\.|#)\s*', text)
+        
+        for section in sections:
+            if not section.strip():
+                continue
+                
+            title_match = re.search(title_pattern, section, re.IGNORECASE)
+            desc_match = re.search(desc_pattern, section, re.IGNORECASE | re.DOTALL)
+            impact_match = re.search(impact_pattern, section, re.IGNORECASE)
+            effort_match = re.search(effort_pattern, section, re.IGNORECASE)
+            
+            title = title_match.group(1).strip() if title_match else "Recommendation"
+            description = desc_match.group(1).strip() if desc_match else section.strip()
+            impact = impact_match.group(1).strip() if impact_match else "Medium"
+            effort = effort_match.group(1).strip() if effort_match else "Medium"
+            
+            recommendations.append({
+                'title': title,
+                'description': description,
+                'impact': impact,
+                'effort': effort
+            })
+            
+            # Limit to 5 recommendations to prevent issues
+            if len(recommendations) >= 5:
+                break
+                
+        return recommendations
+    
     def compare_assessed_values(self, tax_code_1: str, tax_code_2: str) -> Dict[str, Any]:
         """
         Compare assessed values between two tax codes.
@@ -146,7 +448,78 @@ class LevyAnalysisAgent(MCPAgent):
         Returns:
             Comparison results
         """
-        # This is a placeholder - the actual implementation would compare real data
+        # Get real data from database if possible
+        try:
+            from flask import current_app
+            from models import TaxCode, Property
+            
+            # Get database session
+            db = current_app.extensions.get('sqlalchemy').db
+            
+            # Query tax code 1
+            tc1 = db.session.query(
+                TaxCode, 
+                func.sum(Property.assessed_value).label('total_value'),
+                func.count(Property.id).label('property_count')
+            ).join(
+                Property, Property.tax_code_id == TaxCode.id
+            ).filter(
+                TaxCode.code == tax_code_1
+            ).group_by(
+                TaxCode.id
+            ).first()
+            
+            # Query tax code 2
+            tc2 = db.session.query(
+                TaxCode, 
+                func.sum(Property.assessed_value).label('total_value'),
+                func.count(Property.id).label('property_count')
+            ).join(
+                Property, Property.tax_code_id == TaxCode.id
+            ).filter(
+                TaxCode.code == tax_code_2
+            ).group_by(
+                TaxCode.id
+            ).first()
+            
+            # Generate comparison from actual data
+            if tc1 and tc2:
+                tc1_value = float(tc1.total_value or 0)
+                tc2_value = float(tc2.total_value or 0)
+                difference = tc1_value - tc2_value
+                
+                if tc2_value > 0:
+                    percentage = (difference / tc2_value) * 100
+                else:
+                    percentage = 0
+                
+                return {
+                    "comparison": f"Comparison between {tax_code_1} and {tax_code_2}",
+                    "tax_code_1": {
+                        "code": tax_code_1,
+                        "total_assessed_value": tc1_value,
+                        "property_count": tc1.property_count
+                    },
+                    "tax_code_2": {
+                        "code": tax_code_2,
+                        "total_assessed_value": tc2_value,
+                        "property_count": tc2.property_count
+                    },
+                    "difference": {
+                        "absolute": difference,
+                        "percentage": percentage
+                    },
+                    "insights": [
+                        f"{tax_code_1} has {abs(percentage):.1f}% {'more' if percentage > 0 else 'less'} assessed value than {tax_code_2}",
+                        f"{tax_code_1} has {tc1.property_count - tc2.property_count} {'more' if tc1.property_count > tc2.property_count else 'fewer'} properties than {tax_code_2}",
+                        f"Average property value is {'higher' if tc1_value/tc1.property_count > tc2_value/tc2.property_count else 'lower'} in {tax_code_1}"
+                    ]
+                }
+        
+        except Exception as e:
+            logger.warning(f"Error fetching real comparison data: {str(e)}. Using sample data.")
+        
+        # Fallback to sample data if database query fails
         return {
             "comparison": f"Comparison between {tax_code_1} and {tax_code_2}",
             "tax_code_1": {
@@ -349,6 +722,50 @@ registry.register_function(
             "tax_code_2": {
                 "type": "string",
                 "description": "Second tax code"
+            }
+        }
+    }
+)
+
+# Register data quality metrics capability
+registry.register_function(
+    func=levy_analysis_agent.get_data_quality_metrics,
+    name="get_data_quality_metrics",
+    description="Get real-time data quality metrics",
+    parameter_schema={
+        "type": "object",
+        "properties": {
+            "realtime": {
+                "type": "boolean",
+                "description": "Whether to get real-time metrics or historical",
+                "default": True
+            },
+            "dataset": {
+                "type": "string",
+                "description": "Specific dataset to analyze (optional)"
+            }
+        }
+    }
+)
+
+# Register data quality recommendations capability
+registry.register_function(
+    func=levy_analysis_agent.generate_data_quality_recommendations,
+    name="generate_data_quality_recommendations",
+    description="Generate AI-powered recommendations for improving data quality",
+    parameter_schema={
+        "type": "object",
+        "properties": {
+            "focus_area": {
+                "type": "string",
+                "description": "Specific area to focus on (completeness, accuracy, consistency)",
+                "enum": ["all", "completeness", "accuracy", "consistency", "timeliness"],
+                "default": "all"
+            },
+            "max_recommendations": {
+                "type": "integer",
+                "description": "Maximum number of recommendations to return",
+                "default": 5
             }
         }
     }

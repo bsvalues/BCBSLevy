@@ -385,90 +385,64 @@ def ai_recommendations():
     """
     Get AI-powered recommendations for data quality improvements using the MCP Army.
     
-    This endpoint leverages the MCP system to analyze data quality issues
-    and generate actionable recommendations.
+    This endpoint leverages the MCP system and LevyAnalysisAgent to analyze data quality issues
+    and generate actionable recommendations for improving data quality.
     """
     try:
-        # Check if MCP Army is available
-        if not MCP_INTEGRATED or get_agent is None:
+        # Check if MCP Army is available - use consistent flag checking
+        current_app.logger.info(f"MCP Status Check (ai recommendations) - MCP_ARMY_ENABLED: {MCP_ARMY_ENABLED}, MCP_INTEGRATED: {MCP_INTEGRATED}")
+        mcp_army_available = (MCP_ARMY_ENABLED or MCP_INTEGRATED) and get_agent is not None
+        
+        if not mcp_army_available:
             current_app.logger.warning("MCP Army not available for AI recommendations")
+            recommendations = get_default_recommendations()
             return jsonify({
                 'success': False, 
                 'error': 'MCP Army integration not available',
-                'recommendations': []
+                'recommendations': recommendations
             })
+        
+        # Get parameters from request
+        focus_area = request.json.get('focus_area', 'all') if request.json else 'all'
+        max_recommendations = int(request.json.get('max_recommendations', 5)) if request.json else 5
         
         # Get levy analysis agent from the MCP Army for data quality assessment
-        levy_analysis_agent = get_agent('levy_analysis')
-        if not levy_analysis_agent:
-            current_app.logger.warning("Levy Analysis Agent not available")
-            return jsonify({
-                'success': False, 
-                'error': 'Required AI agent not available',
-                'recommendations': []
-            })
-        
-        # In real implementation, we would gather data quality metrics
-        data_quality_metrics = {}
-        
-        # Get the latest data quality scores and validation results
-        latest_score = db.session.query(DataQualityScore).order_by(desc(DataQualityScore.timestamp)).first()
-        if latest_score:
-            data_quality_metrics['overall_score'] = latest_score.overall_score
-            data_quality_metrics['completeness_score'] = latest_score.completeness_score
-            data_quality_metrics['accuracy_score'] = latest_score.accuracy_score
-            data_quality_metrics['consistency_score'] = latest_score.consistency_score
-        
-        # Get error patterns
-        error_patterns = db.session.query(ErrorPattern).filter(
-            ErrorPattern.status == 'ACTIVE'
-        ).order_by(desc(ErrorPattern.frequency)).limit(10).all()
-        
-        if error_patterns:
-            data_quality_metrics['error_patterns'] = [
-                {
-                    'name': pattern.name,
-                    'frequency': pattern.frequency,
-                    'impact': pattern.impact
-                } for pattern in error_patterns
-            ]
-        
-        # Use MCP Army for real-time analysis if available
         try:
-            if request.method == 'POST' and MCP_INTEGRATED:
-                # Get entity counts for context
-                property_count = db.session.query(func.count(Property.id)).scalar() or 0
-                tax_district_count = db.session.query(func.count(TaxDistrict.id)).scalar() or 0
-                tax_code_count = db.session.query(func.count(TaxCode.id)).scalar() or 0
-                
-                # Add to context
-                data_quality_metrics['entity_counts'] = {
-                    'properties': property_count,
-                    'tax_districts': tax_district_count,
-                    'tax_codes': tax_code_count
-                }
-                
-                # Get custom analysis from the levy analysis agent
-                result = levy_analysis_agent.execute_capability(
-                    'assess_data_quality',
-                    {'metrics': data_quality_metrics}
-                )
-                
-                if result and 'recommendations' in result:
-                    ai_recommendations = result['recommendations']
-                    current_app.logger.info(f"Retrieved {len(ai_recommendations)} AI recommendations from MCP Army")
-                    
-                    # Use these recommendations instead of the hardcoded ones
-                    recommendations = ai_recommendations
-                else:
-                    # Fall back to default recommendations if agent doesn't provide any
-                    current_app.logger.warning("Agent did not return recommendations, using defaults")
-                    recommendations = get_default_recommendations()
-            else:
-                # GET request - use default recommendations
+            levy_analysis_agent = get_agent('levy_analysis')
+            if not levy_analysis_agent:
+                current_app.logger.warning("Levy Analysis Agent not available")
                 recommendations = get_default_recommendations()
+                return jsonify({
+                    'success': False, 
+                    'error': 'Required AI agent not available',
+                    'recommendations': recommendations
+                })
+            
+            # Call the agent's new generate_data_quality_recommendations capability
+            current_app.logger.info(f"Calling LevyAnalysisAgent.generate_data_quality_recommendations with focus={focus_area}, max={max_recommendations}")
+            result = levy_analysis_agent.execute_capability(
+                'generate_data_quality_recommendations',
+                {
+                    'focus_area': focus_area,
+                    'max_recommendations': max_recommendations
+                }
+            )
+            
+            # Check if we got valid recommendations
+            if result and 'success' in result and result['success']:
+                recommendations = result.get('recommendations', [])
+                current_app.logger.info(f"Retrieved {len(recommendations)} AI recommendations from LevyAnalysisAgent")
+            else:
+                error_message = result.get('error', 'Unknown error generating recommendations') if result else 'No response from AI agent'
+                current_app.logger.warning(f"AI recommendation generation failed: {error_message}")
+                recommendations = get_default_recommendations()
+                
+        except AgentNotAvailableError:
+            current_app.logger.warning("Agent not available error, using default recommendations")
+            recommendations = get_default_recommendations()
+            
         except Exception as agent_error:
-            current_app.logger.error(f"Error getting AI recommendations from agent: {str(agent_error)}")
+            current_app.logger.error(f"Error executing agent capability: {str(agent_error)}")
             recommendations = get_default_recommendations()
         
         # Log the activity
@@ -494,7 +468,7 @@ def ai_recommendations():
         return jsonify({
             'success': False,
             'error': str(e),
-            'recommendations': []
+            'recommendations': get_default_recommendations()
         }), 500
 
 
