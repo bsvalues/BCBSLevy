@@ -9,7 +9,19 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-  // UI Elements
+  // Log initialization for debugging
+  console.log("Budget Impact Simulator JS initializing...");
+  
+  // Helper function to safely add event listeners
+  function addSafeEventListener(element, event, handler) {
+    if (element) {
+      element.addEventListener(event, handler);
+    } else {
+      console.warn(`Element not found for ${event} event.`);
+    }
+  }
+  
+  // UI Elements - with null checks
   const yearSelect = document.getElementById('yearSelect');
   const runSimulationBtn = document.getElementById('runSimulation');
   const exportResultsBtn = document.getElementById('exportResults');
@@ -44,88 +56,117 @@ document.addEventListener('DOMContentLoaded', function() {
   let rateSensitivityChart;
   let valueSensitivityChart;
   
-  // Event listeners
-  yearSelect.addEventListener('change', function() {
-    window.location.href = `/budget-impact/?year=${this.value}`;
-  });
+  // Only add events if we're on the budget impact page
+  if (!document.querySelector('.budget-impact-page')) {
+    console.log("Not on budget impact page, skipping event listeners");
+    return; // Exit early if not on the right page
+  }
   
-  taxRateSlider.addEventListener('input', function() {
-    taxRateValue.textContent = `${this.value}%`;
-  });
+  // Event listeners (with null checks)
+  if (yearSelect) {
+    yearSelect.addEventListener('change', function() {
+      window.location.href = `/budget-impact/?year=${this.value}`;
+    });
+  }
   
-  assessedValueSlider.addEventListener('input', function() {
-    assessedValueValue.textContent = `${this.value}%`;
-  });
+  if (taxRateSlider && taxRateValue) {
+    taxRateSlider.addEventListener('input', function() {
+      taxRateValue.textContent = `${this.value}%`;
+    });
+  }
   
-  applyToAllDistricts.addEventListener('change', function() {
-    districtTypeApplyContainer.style.display = this.checked ? 'none' : 'block';
-  });
+  if (assessedValueSlider && assessedValueValue) {
+    assessedValueSlider.addEventListener('input', function() {
+      assessedValueValue.textContent = `${this.value}%`;
+    });
+  }
+  
+  if (applyToAllDistricts && districtTypeApplyContainer) {
+    applyToAllDistricts.addEventListener('change', function() {
+      districtTypeApplyContainer.style.display = this.checked ? 'none' : 'block';
+    });
+  }
   
   // Filter districts by type
   districtTypeFilters.forEach(filter => {
-    filter.addEventListener('change', filterDistricts);
+    if (filter) {
+      filter.addEventListener('change', filterDistricts);
+    }
   });
   
   // Handle simulation type changes
-  aiSimulation.addEventListener('change', function() {
-    if (this.checked) {
-      // Enable additional options
-      multiYearSimulation.disabled = false;
-      sensitivityAnalysis.disabled = false;
-    }
-  });
+  if (aiSimulation && multiYearSimulation && sensitivityAnalysis) {
+    aiSimulation.addEventListener('change', function() {
+      if (this.checked) {
+        // Enable additional options
+        multiYearSimulation.disabled = false;
+        sensitivityAnalysis.disabled = false;
+      }
+    });
+  }
   
-  standardSimulation.addEventListener('change', function() {
-    if (this.checked) {
-      // Disable additional options
-      multiYearSimulation.checked = false;
-      multiYearSimulation.disabled = true;
-      sensitivityAnalysis.checked = false;
-      sensitivityAnalysis.disabled = true;
-    }
-  });
+  if (standardSimulation && multiYearSimulation && sensitivityAnalysis) {
+    standardSimulation.addEventListener('change', function() {
+      if (this.checked) {
+        // Disable additional options
+        multiYearSimulation.checked = false;
+        multiYearSimulation.disabled = true;
+        sensitivityAnalysis.checked = false;
+        sensitivityAnalysis.disabled = true;
+      }
+    });
+  }
   
-  multiYearSimulation.addEventListener('change', function() {
-    if (this.checked && !aiSimulation.checked) {
-      aiSimulation.checked = true;
-      standardSimulation.checked = false;
-    }
-  });
+  if (multiYearSimulation && aiSimulation && standardSimulation) {
+    multiYearSimulation.addEventListener('change', function() {
+      if (this.checked && !aiSimulation.checked) {
+        aiSimulation.checked = true;
+        standardSimulation.checked = false;
+      }
+    });
+  }
   
-  sensitivityAnalysis.addEventListener('change', function() {
-    if (this.checked && !aiSimulation.checked) {
-      aiSimulation.checked = true;
-      standardSimulation.checked = false;
-    }
-  });
+  if (sensitivityAnalysis && aiSimulation && standardSimulation) {
+    sensitivityAnalysis.addEventListener('change', function() {
+      if (this.checked && !aiSimulation.checked) {
+        aiSimulation.checked = true;
+        standardSimulation.checked = false;
+      }
+    });
+  }
   
-  // Run simulation button
-  runSimulationBtn.addEventListener('click', function() {
-    const selectedDistricts = getSelectedDistricts();
-    if (selectedDistricts.length === 0) {
-      alert('Please select at least one district for simulation.');
-      return;
-    }
-    
-    // Show loading state
-    runSimulationBtn.disabled = true;
-    runSimulationBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running...';
-    
-    // Clear previous results
-    resetResults();
-    
-    // Get simulation parameters
-    const params = getSimulationParameters();
-    
-    // Run appropriate simulation type
-    if (aiSimulation.checked) {
-      runAISimulation(params);
-    } else {
-      runStandardSimulation(params);
-    }
-  });
+  // Run simulation button (with null check)
+  if (runSimulationBtn) {
+    runSimulationBtn.addEventListener('click', function() {
+      const selectedDistricts = getSelectedDistricts();
+      if (selectedDistricts.length === 0) {
+        alert('Please select at least one district for simulation.');
+        return;
+      }
+      
+      // Show loading state
+      runSimulationBtn.disabled = true;
+      runSimulationBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running...';
+      
+      // Clear previous results
+      resetResults();
+      
+      // Get simulation parameters
+      const params = getSimulationParameters();
+      
+      // Run appropriate simulation type
+      if (aiSimulation && aiSimulation.checked) {
+        runAISimulation(params);
+      } else {
+        runStandardSimulation(params);
+      }
+    });
+  }
   
-  exportResultsBtn.addEventListener('click', exportResults);
+  // Export results button (with null check)
+  if (exportResultsBtn) {
+    exportResultsBtn.addEventListener('click', exportResults);
+  }
   
   // Initialize charts
   initializeCharts();
