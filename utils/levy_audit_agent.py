@@ -50,6 +50,8 @@ class LevyAuditAgent(MCPAgent):
         self.register_capability("provide_levy_recommendations")
         self.register_capability("process_levy_query")
         self.register_capability("verify_levy_calculation")
+        self.register_capability("audit_data_quality")
+        self.register_capability("analyze_levy_trends")
         
         # Claude service for AI capabilities
         self.claude = get_claude_service()
@@ -488,7 +490,748 @@ class LevyAuditAgent(MCPAgent):
         except Exception as e:
             logger.error(f"Error processing levy query: {str(e)}")
             return {"error": sanitize_html(str(e))}
+            
+    def analyze_levy_trends(self,
+                         district_id: Optional[str] = None,
+                         tax_code_id: Optional[str] = None, 
+                         year_range: Optional[List[int]] = None,
+                         trend_type: str = "rate",
+                         compare_to_similar: bool = False) -> Dict[str, Any]:
+        """
+        Analyze historical trends in levy rates and property taxes.
+        
+        This capability performs time-series analysis on levy data to identify
+        patterns, anomalies, and forecasts future trends based on historical data.
+        
+        Args:
+            district_id: Optional tax district ID to focus analysis on
+            tax_code_id: Optional tax code ID to focus analysis on
+            year_range: List containing start and end years for analysis, e.g. [2018, 2025]
+            trend_type: Type of trend analysis - 'rate', 'value', 'revenue', or 'comprehensive'
+            compare_to_similar: Whether to compare trends with similar districts/areas
+            
+        Returns:
+            Detailed trend analysis results with visualizable data and insights
+        """
+        if not self.claude:
+            return {
+                "error": "Claude service not available",
+                "trend_analysis": "Levy trend analysis not available"
+            }
+        
+        try:
+            # Import required modules
+            from flask import current_app
+            from sqlalchemy import desc, func
+            import logging
+            from datetime import datetime, timedelta
+            import numpy as np
+            from models import (
+                TaxDistrict, TaxCode, Property, TaxCodeHistoricalRate,
+                ImportLog, LevyAuditRecord
+            )
+            
+            # Get database session
+            db = current_app.extensions.get('sqlalchemy').db
+            
+            # Set default year range if not provided (7 years)
+            current_year = datetime.now().year
+            if not year_range:
+                year_range = [current_year - 6, current_year]
+            
+            start_year, end_year = year_range
+            
+            # Ensure we have 2 valid years and they're in the right order
+            if start_year > end_year:
+                start_year, end_year = end_year, start_year
+                
+            # Limit to reasonable range (max 10 years)
+            if (end_year - start_year) > 10:
+                end_year = start_year + 10
+                
+            years = list(range(start_year, end_year + 1))
+            
+            # Gather trend data based on parameters
+            trend_data = {}
+            
+            # Tax district specific analysis
+            if district_id:
+                # Get district details
+                district = db.session.query(TaxDistrict).filter(
+                    TaxDistrict.id == district_id
+                ).first()
+                
+                if not district:
+                    return {
+                        "error": f"Tax district with ID {district_id} not found",
+                        "trend_analysis": {}
+                    }
+                    
+                # Get tax codes associated with this district
+                tax_codes = db.session.query(TaxCode).filter(
+                    TaxCode.tax_district_id == district_id
+                ).all()
+                
+                tax_code_ids = [tc.id for tc in tax_codes]
+                
+                # Get historical rates for all tax codes in this district
+                historical_rates = db.session.query(TaxCodeHistoricalRate).filter(
+                    TaxCodeHistoricalRate.tax_code_id.in_(tax_code_ids),
+                    TaxCodeHistoricalRate.year.between(start_year, end_year)
+                ).all()
+                
+                # Organize by year
+                yearly_data = {year: [] for year in years}
+                for rate in historical_rates:
+                    if rate.year in yearly_data:
+                        yearly_data[rate.year].append({
+                            'tax_code_id': rate.tax_code_id,
+                            'levy_rate': rate.levy_rate,
+                            'levy_amount': rate.levy_amount,
+                            'total_assessed_value': rate.total_assessed_value
+                        })
+                
+                # Calculate district averages per year
+                district_trends = []
+                for year in years:
+                    rates = yearly_data.get(year, [])
+                    if rates:
+                        avg_rate = sum(r['levy_rate'] for r in rates if r['levy_rate'] is not None) / len(rates)
+                        total_levy = sum(r['levy_amount'] for r in rates if r['levy_amount'] is not None)
+                        total_value = sum(r['total_assessed_value'] for r in rates if r['total_assessed_value'] is not None)
+                    else:
+                        avg_rate = None
+                        total_levy = None
+                        total_value = None
+                        
+                    district_trends.append({
+                        'year': year,
+                        'avg_levy_rate': avg_rate,
+                        'total_levy_amount': total_levy,
+                        'total_assessed_value': total_value,
+                        'data_quality': 'high' if rates else 'missing'
+                    })
+                
+                trend_data['district'] = {
+                    'id': district.id,
+                    'name': district.name,
+                    'district_type': district.district_type,
+                    'yearly_trends': district_trends
+                }
+                
+                # Get similar districts if requested
+                if compare_to_similar:
+                    similar_districts = db.session.query(TaxDistrict).filter(
+                        TaxDistrict.district_type == district.district_type,
+                        TaxDistrict.id != district.id
+                    ).limit(5).all()
+                    
+                    similar_data = []
+                    for similar in similar_districts:
+                        # Get tax codes for this similar district
+                        similar_tax_codes = db.session.query(TaxCode).filter(
+                            TaxCode.tax_district_id == similar.id
+                        ).all()
+                        
+                        similar_tax_code_ids = [tc.id for tc in similar_tax_codes]
+                        
+                        # Get historical rates for similar district
+                        similar_historical_rates = db.session.query(TaxCodeHistoricalRate).filter(
+                            TaxCodeHistoricalRate.tax_code_id.in_(similar_tax_code_ids),
+                            TaxCodeHistoricalRate.year.between(start_year, end_year)
+                        ).all()
+                        
+                        # Organize by year
+                        similar_yearly_data = {year: [] for year in years}
+                        for rate in similar_historical_rates:
+                            if rate.year in similar_yearly_data:
+                                similar_yearly_data[rate.year].append({
+                                    'levy_rate': rate.levy_rate,
+                                    'levy_amount': rate.levy_amount,
+                                    'total_assessed_value': rate.total_assessed_value
+                                })
+                        
+                        # Calculate averages per year
+                        similar_trends = []
+                        for year in years:
+                            rates = similar_yearly_data.get(year, [])
+                            if rates:
+                                avg_rate = sum(r['levy_rate'] for r in rates if r['levy_rate'] is not None) / len(rates)
+                                total_levy = sum(r['levy_amount'] for r in rates if r['levy_amount'] is not None)
+                                total_value = sum(r['total_assessed_value'] for r in rates if r['total_assessed_value'] is not None)
+                            else:
+                                avg_rate = None
+                                total_levy = None
+                                total_value = None
+                                
+                            similar_trends.append({
+                                'year': year,
+                                'avg_levy_rate': avg_rate,
+                                'total_levy_amount': total_levy,
+                                'total_assessed_value': total_value
+                            })
+                        
+                        similar_data.append({
+                            'id': similar.id,
+                            'name': similar.name,
+                            'yearly_trends': similar_trends
+                        })
+                    
+                    trend_data['similar_districts'] = similar_data
+            
+            # Specific tax code analysis
+            elif tax_code_id:
+                # Get tax code details
+                tax_code = db.session.query(TaxCode).filter(
+                    TaxCode.id == tax_code_id
+                ).first()
+                
+                if not tax_code:
+                    return {
+                        "error": f"Tax code with ID {tax_code_id} not found",
+                        "trend_analysis": {}
+                    }
+                
+                # Get historical rates for this tax code
+                historical_rates = db.session.query(TaxCodeHistoricalRate).filter(
+                    TaxCodeHistoricalRate.tax_code_id == tax_code_id,
+                    TaxCodeHistoricalRate.year.between(start_year, end_year)
+                ).all()
+                
+                # Create yearly trend data
+                tax_code_trends = []
+                for year in years:
+                    rate_data = next((r for r in historical_rates if r.year == year), None)
+                    
+                    tax_code_trends.append({
+                        'year': year,
+                        'levy_rate': rate_data.levy_rate if rate_data else None,
+                        'levy_amount': rate_data.levy_amount if rate_data else None,
+                        'total_assessed_value': rate_data.total_assessed_value if rate_data else None,
+                        'data_quality': 'high' if rate_data else 'missing'
+                    })
+                
+                # Get district info for context
+                district = db.session.query(TaxDistrict).filter(
+                    TaxDistrict.id == tax_code.tax_district_id
+                ).first()
+                
+                trend_data['tax_code'] = {
+                    'id': tax_code.id,
+                    'code': tax_code.code,
+                    'district_name': district.name if district else "Unknown District",
+                    'yearly_trends': tax_code_trends
+                }
+            
+            # System-wide analysis (no specific district or tax code)
+            else:
+                # Get aggregated data for all districts by year
+                system_trends = []
+                
+                for year in years:
+                    # Get average levy rate across all tax codes for this year
+                    avg_rate_query = db.session.query(
+                        func.avg(TaxCodeHistoricalRate.levy_rate).label('avg_rate'),
+                        func.sum(TaxCodeHistoricalRate.levy_amount).label('total_levy'),
+                        func.sum(TaxCodeHistoricalRate.total_assessed_value).label('total_value')
+                    ).filter(
+                        TaxCodeHistoricalRate.year == year
+                    ).first()
+                    
+                    if avg_rate_query and avg_rate_query.avg_rate is not None:
+                        avg_rate = float(avg_rate_query.avg_rate)
+                        total_levy = float(avg_rate_query.total_levy) if avg_rate_query.total_levy is not None else None
+                        total_value = float(avg_rate_query.total_value) if avg_rate_query.total_value is not None else None
+                    else:
+                        avg_rate = None
+                        total_levy = None
+                        total_value = None
+                    
+                    # Count tax codes with data for this year
+                    tax_code_count = db.session.query(func.count(TaxCodeHistoricalRate.id)).filter(
+                        TaxCodeHistoricalRate.year == year
+                    ).scalar() or 0
+                    
+                    system_trends.append({
+                        'year': year,
+                        'avg_levy_rate': avg_rate,
+                        'total_levy_amount': total_levy,
+                        'total_assessed_value': total_value,
+                        'tax_code_count': tax_code_count,
+                        'data_quality': 'high' if tax_code_count > 0 else 'missing'
+                    })
+                
+                # Get district type breakdowns
+                district_type_averages = {}
+                district_types = db.session.query(TaxDistrict.district_type).distinct().all()
+                
+                for district_type_tuple in district_types:
+                    district_type = district_type_tuple[0]
+                    
+                    # Get districts of this type
+                    district_ids = db.session.query(TaxDistrict.id).filter(
+                        TaxDistrict.district_type == district_type
+                    ).all()
+                    district_ids = [d[0] for d in district_ids]
+                    
+                    # Get tax codes for these districts
+                    tax_code_ids = db.session.query(TaxCode.id).filter(
+                        TaxCode.tax_district_id.in_(district_ids)
+                    ).all()
+                    tax_code_ids = [tc[0] for tc in tax_code_ids]
+                    
+                    # Get historical rates for these tax codes by year
+                    type_yearly_trends = []
+                    
+                    for year in years:
+                        avg_rate_query = db.session.query(
+                            func.avg(TaxCodeHistoricalRate.levy_rate).label('avg_rate')
+                        ).filter(
+                            TaxCodeHistoricalRate.tax_code_id.in_(tax_code_ids),
+                            TaxCodeHistoricalRate.year == year
+                        ).first()
+                        
+                        if avg_rate_query and avg_rate_query.avg_rate is not None:
+                            avg_rate = float(avg_rate_query.avg_rate)
+                        else:
+                            avg_rate = None
+                        
+                        type_yearly_trends.append({
+                            'year': year,
+                            'avg_levy_rate': avg_rate
+                        })
+                    
+                    district_type_averages[district_type] = type_yearly_trends
+                
+                trend_data['system'] = {
+                    'yearly_trends': system_trends,
+                    'district_type_trends': district_type_averages
+                }
+            
+            # Add metadata
+            metadata = {
+                'years_analyzed': years,
+                'trend_type': trend_type,
+                'analysis_timestamp': datetime.now().isoformat(),
+                'comparison_included': compare_to_similar
+            }
+            
+            trend_data['metadata'] = metadata
+            
+            # Use Claude to analyze the trends
+            prompt = f"""
+            As Lev, the world's foremost expert in property tax and levy analysis, review the
+            following historical trend data and provide detailed insights and analysis.
+            
+            TREND DATA:
+            {json.dumps(trend_data, indent=2)}
+            
+            Focus your analysis on {"tax code " + str(tax_code_id) if tax_code_id else "district " + str(district_id) if district_id else "system-wide"} 
+            {"and comparison with similar districts" if compare_to_similar else ""} trends over {start_year}-{end_year}.
+            
+            Primarily analyze {trend_type} trends, with special attention to:
+            - Long-term patterns and trajectory
+            - Year-over-year changes and volatility
+            - Anomalies or outliers in the data
+            - Comparative analysis {"with similar districts" if compare_to_similar else "between district types"}
+            - Potential future projections based on historical trends
+            
+            Format your response as JSON with the following structure:
+            {{
+                "trend_summary": "Overall assessment of the analyzed trends",
+                "key_patterns": [
+                    {{
+                        "pattern_type": "trend|anomaly|volatility|comparison|projection",
+                        "description": "Description of the identified pattern",
+                        "affected_years": [year1, year2, ...],
+                        "significance": "high|medium|low",
+                        "potential_causes": ["Cause 1", "Cause 2", ...]
+                    }},
+                    // More patterns as applicable
+                ],
+                "year_over_year_analysis": [
+                    {{
+                        "years": "2022-2023", 
+                        "percent_change": float,
+                        "assessment": "Brief assessment of this yearly change"
+                    }},
+                    // More year pairs as applicable
+                ],
+                "long_term_assessment": "Assessment of the long-term trajectory",
+                "rate_volatility": "Assessment of rate stability/volatility over time",
+                "future_projection": "Projection of likely future trends",
+                "district_type_insights": ["Insight 1", "Insight 2", ...], // If system-wide
+                "comparative_insights": ["Insight 1", "Insight 2", ...], // If comparison requested
+                "data_quality_assessment": "Assessment of data completeness and reliability",
+                "next_analysis_recommendations": ["Recommendation 1", "Recommendation 2", ...]
+            }}
+            """
+            
+            # Use Claude to generate the analysis
+            response = self.claude.generate_text(prompt)
+            
+            # Extract JSON from response
+            try:
+                result = json.loads(response)
+                logger.info(f"Successfully generated levy trends analysis for {trend_type} data")
+                
+                # Sanitize the result to prevent XSS
+                sanitized_result = sanitize_mcp_insights(result)
+                
+                # Combine raw data with analysis
+                final_result = {
+                    'trend_data': trend_data,
+                    'analysis': sanitized_result
+                }
+                
+                return final_result
+                
+            except json.JSONDecodeError:
+                logger.error("Failed to parse JSON from Claude response for trend analysis")
+                fallback_response = {
+                    "trend_data": trend_data,
+                    "analysis": {
+                        "trend_summary": "Error processing trend analysis",
+                        "key_patterns": [],
+                        "year_over_year_analysis": [],
+                        "long_term_assessment": "Unable to assess long-term trajectory due to processing error",
+                        "data_quality_assessment": "Analysis processing error, raw data available for manual review",
+                        "next_analysis_recommendations": [
+                            "Try analyzing a shorter time period",
+                            "Verify data quality and completeness",
+                            "Contact system administrator if the problem persists"
+                        ]
+                    }
+                }
+                return fallback_response
+                
+        except Exception as e:
+            logger.error(f"Error in levy trend analysis: {str(e)}")
+            return {
+                "error": sanitize_html(str(e)),
+                "trend_analysis": "Levy trend analysis failed to complete"
+            }
     
+    def audit_data_quality(self,
+                          focus_areas: Optional[List[str]] = None,
+                          district_id: Optional[str] = None,
+                          comprehensive: bool = False) -> Dict[str, Any]:
+        """
+        Perform a comprehensive audit of data quality metrics for levy calculations.
+        
+        This capability assesses data quality across multiple dimensions including
+        completeness, accuracy, consistency, and timeliness. It can focus on system-wide
+        data quality or specific to a district.
+        
+        Args:
+            focus_areas: List of specific areas to focus on ('completeness', 'accuracy', 
+                        'consistency', 'timeliness') - if None, all areas are assessed
+            district_id: Optional tax district ID to focus the audit on
+            comprehensive: Whether to perform a deeper, more comprehensive audit
+            
+        Returns:
+            Detailed data quality audit results with findings and recommendations
+        """
+        if not self.claude:
+            return {
+                "error": "Claude service not available",
+                "audit_results": "Data quality audit not available"
+            }
+        
+        try:
+            # Import required modules
+            from flask import current_app
+            from sqlalchemy import desc, func, case
+            import logging
+            from datetime import datetime, timedelta
+            from models import DataQualityActivity
+            
+            # Get database session
+            db = current_app.extensions.get('sqlalchemy').db
+            
+            # Import models (done here to avoid circular imports)
+            from models import (
+                TaxDistrict, TaxCode, Property, DataQualityScore, 
+                ValidationRule, ValidationResult, ErrorPattern,
+                ImportLog, LevyAuditRecord
+            )
+            
+            # Default focus areas if none specified
+            if not focus_areas:
+                focus_areas = ['completeness', 'accuracy', 'consistency', 'timeliness']
+            
+            # Gather data quality metrics
+            metrics = {}
+            
+            # Get latest data quality scores
+            latest_score = db.session.query(DataQualityScore).order_by(
+                desc(DataQualityScore.timestamp)
+            ).first()
+            
+            if latest_score:
+                metrics['overall_score'] = latest_score.overall_score
+                metrics['completeness_score'] = latest_score.completeness_score
+                metrics['accuracy_score'] = latest_score.accuracy_score
+                metrics['consistency_score'] = latest_score.consistency_score
+                metrics['timeliness_score'] = latest_score.timeliness_score
+            
+            # Get validation rule performance
+            validation_rules = db.session.query(
+                ValidationRule, 
+                func.count(ValidationResult.id).label('total'),
+                func.sum(ValidationResult.passed.cast(db.Integer)).label('passed')
+            ).outerjoin(
+                ValidationResult
+            ).group_by(
+                ValidationRule.id
+            ).all()
+            
+            # Calculate metrics from validation results
+            rule_metrics = []
+            for rule, total, passed in validation_rules:
+                if total > 0:
+                    pass_rate = (passed / total) * 100
+                else:
+                    pass_rate = 0
+                
+                rule_metrics.append({
+                    'id': rule.id,
+                    'name': rule.name,
+                    'category': rule.category,
+                    'description': rule.description,
+                    'pass_rate': pass_rate,
+                    'passed': passed,
+                    'failed': total - passed,
+                    'total': total,
+                    'severity': rule.severity
+                })
+            
+            # Get error patterns
+            error_patterns = db.session.query(ErrorPattern).filter(
+                ErrorPattern.status == 'ACTIVE'
+            ).order_by(desc(ErrorPattern.frequency)).limit(15).all()
+            
+            pattern_data = [{
+                'name': pattern.name,
+                'description': pattern.description,
+                'category': pattern.category,
+                'frequency': pattern.frequency,
+                'impact': pattern.impact,
+                'status': pattern.status
+            } for pattern in error_patterns]
+            
+            # Get data counts for context
+            property_count = db.session.query(func.count(Property.id)).scalar() or 0
+            district_count = db.session.query(func.count(TaxDistrict.id)).scalar() or 0
+            code_count = db.session.query(func.count(TaxCode.id)).scalar() or 0
+            
+            # Get recent import statistics (last 30 days)
+            thirty_days_ago = datetime.now() - timedelta(days=30)
+            import_stats = db.session.query(
+                ImportLog.import_type,
+                func.count(ImportLog.id).label('count'),
+                func.avg(ImportLog.processed_records).label('avg_records'),
+                func.sum(case([(ImportLog.success == True, 1)], else_=0)).label('success_count'),
+                func.sum(case([(ImportLog.success == False, 1)], else_=0)).label('failure_count')
+            ).filter(
+                ImportLog.created_at >= thirty_days_ago
+            ).group_by(
+                ImportLog.import_type
+            ).all()
+            
+            import_data = [{
+                'type': import_type,
+                'count': count,
+                'avg_records': float(avg_records) if avg_records else 0,
+                'success_rate': (success_count / count * 100) if count > 0 else 0,
+                'failure_count': failure_count
+            } for import_type, count, avg_records, success_count, failure_count in import_stats]
+            
+            # Compile all metrics
+            all_metrics = {
+                'timestamp': datetime.now().isoformat(),
+                'data_counts': {
+                    'properties': property_count,
+                    'tax_districts': district_count,
+                    'tax_codes': code_count
+                },
+                'quality_scores': {
+                    'overall': latest_score.overall_score if latest_score else None,
+                    'completeness': latest_score.completeness_score if latest_score else None,
+                    'accuracy': latest_score.accuracy_score if latest_score else None,
+                    'consistency': latest_score.consistency_score if latest_score else None,
+                    'timeliness': latest_score.timeliness_score if latest_score else None
+                },
+                'validation_rules': rule_metrics,
+                'error_patterns': pattern_data,
+                'import_statistics': import_data,
+                'focus_areas': focus_areas,
+                'district_id': district_id,
+                'comprehensive': comprehensive
+            }
+            
+            # If specific district requested, add district-specific data
+            if district_id:
+                district_info = db.session.query(TaxDistrict).filter(
+                    TaxDistrict.id == district_id
+                ).first()
+                
+                if district_info:
+                    # Get district-specific error patterns
+                    district_errors = db.session.query(ErrorPattern).filter(
+                        ErrorPattern.status == 'ACTIVE',
+                        ErrorPattern.entity_type == 'tax_district',
+                        ErrorPattern.entity_id == district_id
+                    ).order_by(desc(ErrorPattern.frequency)).all()
+                    
+                    district_error_data = [{
+                        'name': pattern.name,
+                        'description': pattern.description,
+                        'category': pattern.category,
+                        'frequency': pattern.frequency,
+                        'impact': pattern.impact
+                    } for pattern in district_errors]
+                    
+                    # Get district levy audit history
+                    audit_history = db.session.query(LevyAuditRecord).filter(
+                        LevyAuditRecord.tax_district_id == district_id
+                    ).order_by(desc(LevyAuditRecord.created_at)).limit(5).all()
+                    
+                    audit_data = [{
+                        'id': audit.id,
+                        'audit_type': audit.audit_type,
+                        'year': audit.year,
+                        'compliance_score': audit.compliance_score,
+                        'status': audit.status,
+                        'created_at': audit.created_at.isoformat() if audit.created_at else None
+                    } for audit in audit_history]
+                    
+                    # Add to metrics
+                    all_metrics['district'] = {
+                        'name': district_info.name,
+                        'type': district_info.district_type,
+                        'error_patterns': district_error_data,
+                        'audit_history': audit_data
+                    }
+            
+            # Set up prompt for Claude analysis
+            prompt = f"""
+            As Lev, the world's foremost expert in property tax data quality and levy auditing, review the
+            following data quality metrics and provide detailed analysis and recommendations.
+            
+            DATA QUALITY METRICS:
+            {json.dumps(all_metrics, indent=2)}
+            
+            Perform a {"comprehensive" if comprehensive else "standard"} data quality audit focusing on:
+            {', '.join(focus_areas)}
+            
+            Analyze the metrics to identify:
+            1. Critical data quality issues that could impact levy calculations
+            2. Patterns and trends in data quality problems
+            3. Systemic issues versus isolated errors
+            4. Potential root causes for recurring issues
+            5. Compliance and regulatory concerns related to data quality
+            
+            For each focus area, provide:
+            - A detailed assessment of current status
+            - Key risks and issues identified
+            - Specific recommendations for improvement
+            - Priority levels for each recommendation
+            
+            Format your response as JSON with the following structure:
+            {{
+                "audit_summary": "Overall assessment of data quality",
+                "overall_data_quality_score": float,  // 0-100 score based on your expert assessment
+                "findings": [
+                    {{
+                        "focus_area": "One of: completeness, accuracy, consistency, timeliness",
+                        "assessment": "Your assessment of this area",
+                        "current_score": float,
+                        "key_issues": ["Issue 1", "Issue 2", ...],
+                        "risk_level": "critical|high|medium|low",
+                        "potential_impact": "Description of potential impact on levy calculations"
+                    }},
+                    // More findings...
+                ],
+                "recommendations": [
+                    {{
+                        "title": "Clear title of recommendation",
+                        "description": "Detailed explanation",
+                        "focus_area": "The area this addresses",
+                        "priority": "critical|high|medium|low",
+                        "effort_level": "high|medium|low",
+                        "estimated_impact": "high|medium|low"
+                    }},
+                    // More recommendations...
+                ],
+                "compliance_implications": [
+                    "Implication 1",
+                    "Implication 2",
+                    // More implications...
+                ],
+                "data_quality_trends": "Assessment of trends in data quality over time",
+                "next_steps": [
+                    "Step 1",
+                    "Step 2",
+                    // More steps...
+                ]
+            }}
+            """
+            
+            # Use Claude to generate the analysis
+            response = self.claude.generate_text(prompt)
+            
+            # Extract JSON from response
+            try:
+                result = json.loads(response)
+                logger.info("Successfully generated data quality audit")
+                
+                # Sanitize the result to prevent XSS
+                sanitized_result = sanitize_mcp_insights(result)
+                
+                # Log the audit activity
+                try:
+                    activity = DataQualityActivity(
+                        activity_type='AUDIT',
+                        title='Data Quality Audit Completed',
+                        description=f'Generated {"comprehensive" if comprehensive else "standard"} data quality audit focusing on {", ".join(focus_areas)}',
+                        user_id=current_app.config.get('TESTING_USER_ID', 1),
+                        entity_type='DataQualityAudit',
+                        icon='shield-check',
+                        icon_class='primary'
+                    )
+                    db.session.add(activity)
+                    db.session.commit()
+                except Exception as log_error:
+                    logger.error(f"Error logging audit activity: {str(log_error)}")
+                
+                return sanitized_result
+                
+            except json.JSONDecodeError:
+                logger.error("Failed to parse JSON from Claude response for data quality audit")
+                fallback_response = {
+                    "audit_summary": "Error processing data quality audit",
+                    "overall_data_quality_score": 0,
+                    "findings": [],
+                    "recommendations": [],
+                    "compliance_implications": [
+                        "Unable to assess compliance implications due to processing error"
+                    ],
+                    "data_quality_trends": "Error analyzing trends",
+                    "next_steps": [
+                        "Try running the audit again with more specific parameters",
+                        "Contact system administrator if the problem persists"
+                    ]
+                }
+                return fallback_response
+                
+        except Exception as e:
+            logger.error(f"Error in data quality audit: {str(e)}")
+            return {
+                "error": sanitize_html(str(e)),
+                "audit_results": "Data quality audit failed to complete"
+            }
+
     def verify_levy_calculation(self,
                               tax_code_id: str,
                               property_value: float,
@@ -759,6 +1502,68 @@ def init_levy_audit_agent():
                     }
                 },
                 "required": ["tax_code_id", "property_value"]
+            }
+        )
+        
+        registry.register_function(
+            func=agent.analyze_levy_trends,
+            name="analyze_levy_trends",
+            description="Analyze historical trends in levy rates and property taxes",
+            parameter_schema={
+                "type": "object",
+                "properties": {
+                    "district_id": {
+                        "type": "string",
+                        "description": "Tax district ID to focus analysis on (optional)"
+                    },
+                    "tax_code_id": {
+                        "type": "string",
+                        "description": "Tax code ID to focus analysis on (optional)"
+                    },
+                    "year_range": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "List containing start and end years for analysis, e.g. [2018, 2025]"
+                    },
+                    "trend_type": {
+                        "type": "string",
+                        "description": "Type of trend analysis - 'rate', 'value', 'revenue', or 'comprehensive'",
+                        "enum": ["rate", "value", "revenue", "comprehensive"]
+                    },
+                    "compare_to_similar": {
+                        "type": "boolean",
+                        "description": "Whether to compare trends with similar districts/areas"
+                    }
+                }
+            }
+        )
+        
+        registry.register_function(
+            func=agent.audit_data_quality,
+            name="audit_data_quality",
+            description="Perform a comprehensive audit of data quality metrics for levy calculations",
+            parameter_schema={
+                "type": "object",
+                "properties": {
+                    "focus_areas": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["completeness", "accuracy", "consistency", "timeliness"]
+                        },
+                        "description": "Specific areas to focus on ('completeness', 'accuracy', 'consistency', 'timeliness')"
+                    },
+                    "district_id": {
+                        "type": "string",
+                        "description": "Optional tax district ID to focus the audit on"
+                    },
+                    "comprehensive": {
+                        "type": "boolean",
+                        "description": "Whether to perform a deeper, more comprehensive audit"
+                    }
+                }
             }
         )
         

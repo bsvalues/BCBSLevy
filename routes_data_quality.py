@@ -780,6 +780,218 @@ def get_realtime_metrics():
             'error': str(e)
         }), 500
 
+@data_quality_bp.route('/trends', methods=['POST'])
+def analyze_levy_trends():
+    """
+    Analyze historical trends in levy rates and property taxes.
+    
+    This endpoint leverages the advanced AI capabilities of the Levy Audit Agent
+    to perform time-series analysis on levy data, identify patterns, detect anomalies,
+    and forecast future trends based on historical data.
+    """
+    try:
+        # Check if MCP Army is available
+        current_app.logger.info(f"MCP Status Check (trends) - MCP_ARMY_ENABLED: {MCP_ARMY_ENABLED}, MCP_INTEGRATED: {MCP_INTEGRATED}")
+        mcp_army_available = (MCP_ARMY_ENABLED or MCP_INTEGRATED) and get_agent is not None
+        
+        if not mcp_army_available:
+            current_app.logger.warning("MCP Army not available for levy trend analysis")
+            return jsonify({
+                'success': False, 
+                'error': 'MCP Army integration not available for levy trend analysis',
+                'trend_results': {}
+            })
+        
+        # Parse request parameters
+        params = request.json or {}
+        district_id = params.get('district_id')
+        tax_code_id = params.get('tax_code_id')
+        year_range = params.get('year_range')  # e.g. [2018, 2025]
+        trend_type = params.get('trend_type', 'rate')
+        compare_to_similar = params.get('compare_to_similar', False)
+        
+        # Get the Levy Audit Agent
+        try:
+            levy_audit_agent = get_agent('Lev')
+            if not levy_audit_agent:
+                current_app.logger.warning("Levy Audit Agent not available")
+                return jsonify({
+                    'success': False, 
+                    'error': 'Required audit agent not available',
+                    'trend_results': {}
+                })
+            
+            # Execute the levy trend analysis
+            current_app.logger.info(f"Running levy trend analysis of type {trend_type}")
+            trend_result = levy_audit_agent.execute_capability(
+                'analyze_levy_trends',
+                {
+                    'district_id': district_id,
+                    'tax_code_id': tax_code_id,
+                    'year_range': year_range,
+                    'trend_type': trend_type,
+                    'compare_to_similar': compare_to_similar
+                }
+            )
+            
+            if 'error' in trend_result:
+                return jsonify({
+                    'success': False,
+                    'error': trend_result['error'],
+                    'trend_results': {}
+                })
+            
+            # Add additional metadata
+            trend_result['generated_at'] = datetime.now().isoformat()
+            
+            # Log the action
+            activity = DataQualityActivity(
+                activity_type='ANALYSIS',
+                title='Levy Trend Analysis Run',
+                description=f'Executed {trend_type} trend analysis for {"district " + str(district_id) if district_id else "tax code " + str(tax_code_id) if tax_code_id else "system-wide"}',
+                user_id=current_app.config.get('TESTING_USER_ID', 1),
+                entity_type='LevyTrendAnalysis',
+                icon='chart-line',
+                icon_class='success'
+            )
+            db.session.add(activity)
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'trend_results': trend_result
+            })
+            
+        except AgentNotAvailableError:
+            current_app.logger.warning("Agent not available error")
+            return jsonify({
+                'success': False,
+                'error': 'Levy Audit Agent not available',
+                'trend_results': {}
+            })
+            
+        except Exception as agent_error:
+            current_app.logger.error(f"Error executing levy trend analysis: {str(agent_error)}")
+            return jsonify({
+                'success': False,
+                'error': f"Agent error: {str(agent_error)}",
+                'trend_results': {}
+            })
+    
+    except Exception as e:
+        current_app.logger.error(f"Error in levy trend analysis route: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'trend_results': {}
+        }), 500
+
+
+@data_quality_bp.route('/audit', methods=['POST'])
+def audit_data_quality():
+    """
+    Run a comprehensive data quality audit using the Levy Audit Agent.
+    
+    This endpoint leverages the advanced AI capabilities of the Levy Audit Agent
+    to perform a thorough analysis of data quality issues, identify patterns,
+    and provide actionable recommendations.
+    """
+    try:
+        # Check if MCP Army is available
+        current_app.logger.info(f"MCP Status Check (audit) - MCP_ARMY_ENABLED: {MCP_ARMY_ENABLED}, MCP_INTEGRATED: {MCP_INTEGRATED}")
+        mcp_army_available = (MCP_ARMY_ENABLED or MCP_INTEGRATED) and get_agent is not None
+        
+        if not mcp_army_available:
+            current_app.logger.warning("MCP Army not available for data quality audit")
+            return jsonify({
+                'success': False, 
+                'error': 'MCP Army integration not available for data quality auditing',
+                'audit_results': {}
+            })
+        
+        # Parse request parameters
+        params = request.json or {}
+        focus_areas = params.get('focus_areas', ['completeness', 'accuracy', 'consistency', 'timeliness'])
+        district_id = params.get('district_id')
+        comprehensive = params.get('comprehensive', False)
+        
+        # Get the Levy Audit Agent
+        try:
+            levy_audit_agent = get_agent('Lev')
+            if not levy_audit_agent:
+                current_app.logger.warning("Levy Audit Agent not available")
+                return jsonify({
+                    'success': False, 
+                    'error': 'Required audit agent not available',
+                    'audit_results': {}
+                })
+            
+            # Execute the data quality audit
+            current_app.logger.info(f"Running data quality audit with focus on {', '.join(focus_areas)}")
+            audit_result = levy_audit_agent.execute_capability(
+                'audit_data_quality',
+                {
+                    'focus_areas': focus_areas,
+                    'district_id': district_id,
+                    'comprehensive': comprehensive
+                }
+            )
+            
+            if 'error' in audit_result:
+                return jsonify({
+                    'success': False,
+                    'error': audit_result['error'],
+                    'audit_results': {}
+                })
+            
+            # Add additional metadata
+            audit_result['generated_at'] = datetime.now().isoformat()
+            audit_result['audit_type'] = 'comprehensive' if comprehensive else 'standard'
+            audit_result['focus_areas'] = focus_areas
+            
+            # Log the action
+            activity = DataQualityActivity(
+                activity_type='AUDIT',
+                title='Data Quality Audit Run',
+                description=f'Executed {"comprehensive" if comprehensive else "standard"} data quality audit focused on {", ".join(focus_areas)}',
+                user_id=current_app.config.get('TESTING_USER_ID', 1),
+                entity_type='DataQualityAudit',
+                icon='shield-check',
+                icon_class='primary'
+            )
+            db.session.add(activity)
+            db.session.commit()
+            
+            return jsonify({
+                'success': True,
+                'audit_results': audit_result
+            })
+            
+        except AgentNotAvailableError:
+            current_app.logger.warning("Agent not available error")
+            return jsonify({
+                'success': False,
+                'error': 'Levy Audit Agent not available',
+                'audit_results': {}
+            })
+            
+        except Exception as agent_error:
+            current_app.logger.error(f"Error executing data quality audit: {str(agent_error)}")
+            return jsonify({
+                'success': False,
+                'error': f"Agent error: {str(agent_error)}",
+                'audit_results': {}
+            })
+    
+    except Exception as e:
+        current_app.logger.error(f"Error in data quality audit route: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'audit_results': {}
+        }), 500
+
+
 def get_database_metrics():
     """
     Get data quality metrics from the database as a fallback.
