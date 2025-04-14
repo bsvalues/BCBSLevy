@@ -377,9 +377,11 @@ document.addEventListener('DOMContentLoaded', function() {
       // Display results
       displayAISimulationResults(results);
       
-      // If we have optimization recommendations, enable the apply button
-      if (results.optimization_recommendations) {
-        enableOptimizationRecommendations(results.optimization_recommendations);
+      // If we have optimization recommendations from the top-level API response or from the AI insights
+      if (data.optimization_recommendations) {
+        enableOptimizationRecommendations(data.optimization_recommendations);
+      } else if (results.ai_insights && results.ai_insights.optimization_recommendations) {
+        enableOptimizationRecommendations(results.ai_insights.optimization_recommendations);
       }
       
       // Show success toast
@@ -1448,6 +1450,12 @@ function enableOptimizationRecommendations(recommendations) {
   // Clear loading indicator
   container.innerHTML = '';
   
+  // Extract explanation if available
+  let explanation = 'The AI has analyzed your scenario and recommends parameter adjustments to optimize your budget impact.';
+  if (recommendations.explanation) {
+    explanation = recommendations.explanation;
+  }
+  
   // Create recommendations content
   let content = `
     <div class="alert alert-info mb-3">
@@ -1456,30 +1464,68 @@ function enableOptimizationRecommendations(recommendations) {
     </div>
     <div class="card border-primary mb-3">
       <div class="card-header bg-primary text-white">
-        Optimization Recommendations
+        <i class="bi bi-graph-up-arrow me-2"></i>Optimization Recommendations
       </div>
       <div class="card-body">
-        <p>The AI has analyzed your scenario and recommends the following parameter adjustments to optimize your budget impact:</p>
-        <ul class="list-group mb-3">
+        <p>${explanation}</p>
+        <div class="table-responsive">
+          <table class="table table-sm table-striped mb-3">
+            <thead class="table-light">
+              <tr>
+                <th>Parameter</th>
+                <th class="text-end">Recommended Value</th>
+              </tr>
+            </thead>
+            <tbody>
   `;
   
-  // Add each recommendation to the list
+  // Check if we have the two key parameters that map to our sliders
+  if (recommendations.tax_rate_adjustment !== undefined) {
+    content += `
+      <tr>
+        <td>Tax Rate Adjustment</td>
+        <td class="text-end fw-bold">${recommendations.tax_rate_adjustment.toFixed(2)}%</td>
+      </tr>
+    `;
+  }
+  
+  if (recommendations.property_value_growth !== undefined) {
+    content += `
+      <tr>
+        <td>Property Value Growth</td>
+        <td class="text-end fw-bold">${recommendations.property_value_growth.toFixed(2)}%</td>
+      </tr>
+    `;
+  }
+  
+  // Add all other recommendations
   for (const [key, value] of Object.entries(recommendations)) {
+    // Skip the ones we've already added and the explanation
+    if (key === 'tax_rate_adjustment' || key === 'property_value_growth' || key === 'explanation') {
+      continue;
+    }
+    
     const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    content += `<li class="list-group-item d-flex justify-content-between align-items-center">
-      ${formattedKey}
-      <span class="badge bg-primary rounded-pill">${typeof value === 'number' ? value.toFixed(2) : value}</span>
-    </li>`;
+    const formattedValue = typeof value === 'number' ? value.toFixed(2) : value;
+    
+    content += `
+      <tr>
+        <td>${formattedKey}</td>
+        <td class="text-end">${formattedValue}</td>
+      </tr>
+    `;
   }
   
   // Add apply button
   content += `
-        </ul>
+            </tbody>
+          </table>
+        </div>
         <button id="applyOptimalScenario" class="btn btn-primary">
-          <i class="bi bi-magic me-2"></i>Apply Optimal Scenario
+          <i class="bi bi-magic me-2"></i>Apply Optimal Values to Sliders
         </button>
         <small class="text-muted d-block mt-2">
-          Applying these recommendations will update the sliders to match the AI's optimal scenario.
+          Clicking this button will update the tax rate and property value sliders with the AI's recommended values.
         </small>
       </div>
     </div>
@@ -1500,29 +1546,44 @@ function enableOptimizationRecommendations(recommendations) {
  * @param {Object} recommendations - The optimization recommendations
  */
 function applyOptimizationRecommendations(recommendations) {
-  // Map recommendation keys to slider IDs
-  const sliderMapping = {
-    property_value_growth: 'propertyValueGrowth',
-    new_construction_growth: 'newConstructionGrowth',
-    exemption_rate: 'exemptionRate',
-    tax_rate_adjustment: 'taxRateAdjustment',
-    compliance_rate: 'complianceRate',
-    collection_efficiency: 'collectionEfficiency'
-    // Add more mappings as needed
-  };
+  // The optimization recommendation fields to actual slider mappings
+  // Since we currently only have two sliders: taxRateSlider and assessedValueSlider
   
-  // Update each slider with the recommended value
-  for (const [key, value] of Object.entries(recommendations)) {
-    const sliderId = sliderMapping[key];
-    if (sliderId) {
-      const slider = document.getElementById(sliderId);
-      if (slider) {
-        slider.value = value;
-        // Trigger change event to update any associated displays
-        const event = new Event('input', { bubbles: true });
-        slider.dispatchEvent(event);
-      }
-    }
+  // First, get the tax_rate_adjustment recommendation, with fallback to a default
+  let taxRateAdjustment = 0;
+  if (recommendations.tax_rate_adjustment !== undefined) {
+    taxRateAdjustment = recommendations.tax_rate_adjustment;
+  }
+  
+  // Then, get the property_value_growth recommendation, with fallback to a default
+  let propertyValueGrowth = 0; 
+  if (recommendations.property_value_growth !== undefined) {
+    propertyValueGrowth = recommendations.property_value_growth;
+  }
+  
+  // Apply to the actual sliders we have in the UI
+  const taxRateSlider = document.getElementById('taxRateSlider');
+  if (taxRateSlider) {
+    // Ensure the value is within the slider's range
+    taxRateSlider.value = Math.max(
+      parseFloat(taxRateSlider.min),
+      Math.min(parseFloat(taxRateSlider.max), taxRateAdjustment)
+    );
+    // Trigger input event to update the display
+    const event = new Event('input', { bubbles: true });
+    taxRateSlider.dispatchEvent(event);
+  }
+  
+  const assessedValueSlider = document.getElementById('assessedValueSlider');
+  if (assessedValueSlider) {
+    // Ensure the value is within the slider's range
+    assessedValueSlider.value = Math.max(
+      parseFloat(assessedValueSlider.min),
+      Math.min(parseFloat(assessedValueSlider.max), propertyValueGrowth)
+    );
+    // Trigger input event to update the display
+    const event = new Event('input', { bubbles: true });
+    assessedValueSlider.dispatchEvent(event);
   }
   
   // Show the toast notification

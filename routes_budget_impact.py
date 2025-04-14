@@ -8,7 +8,7 @@ and assessed values impact district budgets.
 
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, current_app
-from sqlalchemy import desc, func, and_
+from sqlalchemy import desc, func, and_, text
 from models import db, TaxDistrict, TaxCode, TaxCodeHistoricalRate, Property
 from utils.sanitize_utils import sanitize_html, sanitize_mcp_insights
 
@@ -27,29 +27,67 @@ def index():
     Returns:
         Rendered budget impact visualization template
     """
-    # Get available years
-    available_years = db.session.query(TaxDistrict.year).distinct().order_by(desc(TaxDistrict.year)).all()
-    available_years = [year[0] for year in available_years] or [datetime.now().year]
-    
-    # Get selected year (default to most recent)
-    year = request.args.get('year', available_years[0], type=int)
-    
-    # Get districts for selected year with tax codes
-    districts = TaxDistrict.query.filter(TaxDistrict.year == year).options(
-        db.joinedload(TaxDistrict.tax_codes)
-    ).order_by(TaxDistrict.district_name).all()
-    
-    # Get district types for filtering
-    district_types = db.session.query(TaxDistrict.district_type).distinct().order_by(TaxDistrict.district_type).all()
-    district_types = [district_type[0] for district_type in district_types]
-    
-    return render_template(
-        'budget-impact/index.html',
-        districts=districts,
-        district_types=district_types,
-        available_years=available_years,
-        year=year
-    )
+    try:
+        # Get available years with error handling
+        try:
+            available_years = db.session.query(TaxDistrict.year).distinct().order_by(desc(TaxDistrict.year)).all()
+            available_years = [year[0] for year in available_years] or [datetime.now().year]
+        except Exception as e:
+            current_app.logger.error(f"Error fetching available years: {str(e)}")
+            available_years = [datetime.now().year]
+            
+        # Get selected year (default to most recent)
+        current_year = available_years[0] if available_years else datetime.now().year
+        year = request.args.get('year', current_year, type=int)
+        
+        # Get districts for selected year with tax codes
+        try:
+            districts = TaxDistrict.query.filter(TaxDistrict.year == year).options(
+                db.joinedload(TaxDistrict.tax_codes)
+            ).order_by(TaxDistrict.district_name).all()
+        except Exception as e:
+            current_app.logger.error(f"Error fetching districts: {str(e)}")
+            districts = []
+            
+        # Get district types for filtering
+        try:
+            district_types = db.session.query(TaxDistrict.district_type).distinct().order_by(TaxDistrict.district_type).all()
+            district_types = [district_type[0] for district_type in district_types] if district_types else []
+        except Exception as e:
+            current_app.logger.error(f"Error fetching district types: {str(e)}")
+            district_types = []
+        
+        # If database connection was lost, try to reconnect
+        if not districts and not district_types:
+            current_app.logger.warning("No data retrieved, attempting to reconnect to database")
+            try:
+                db.session.remove()
+                db.session.rollback()
+                db.engine.dispose()
+                # After disposing, try a simple query to test connection
+                db.session.execute(text("SELECT 1")).scalar()
+                current_app.logger.info("Database reconnection successful")
+            except Exception as e:
+                current_app.logger.error(f"Database reconnection failed: {str(e)}")
+        
+        return render_template(
+            'budget-impact/index.html',
+            districts=districts,
+            district_types=district_types,
+            available_years=available_years,
+            year=year,
+            error=None
+        )
+    except Exception as e:
+        current_app.logger.error(f"Error in budget impact index route: {str(e)}")
+        return render_template(
+            'budget-impact/index.html',
+            districts=[],
+            district_types=[],
+            available_years=[datetime.now().year],
+            year=datetime.now().year,
+            error="An error occurred while loading budget impact data. Please try again later."
+        )
 
 @budget_impact_bp.route('/api/simulation', methods=['POST'])
 def api_budget_simulation():
@@ -585,9 +623,28 @@ def api_ai_budget_simulation():
             # Sanitize the simulation results before sending to browser
             sanitized_simulation_result = sanitize_mcp_insights(simulation_result)
             
+            # Extract optimization recommendations if they exist
+            optimization_recommendations = {}
+            try:
+                if 'ai_insights' in sanitized_simulation_result and 'optimization_recommendations' in sanitized_simulation_result['ai_insights']:
+                    optimization_recommendations = sanitized_simulation_result['ai_insights']['optimization_recommendations']
+            except Exception as extract_error:
+                current_app.logger.warning(f"Error extracting optimization recommendations: {str(extract_error)}")
+                # Provide fallback recommendations
+                optimization_recommendations = {
+                    "property_value_growth": 2.0,
+                    "new_construction_growth": 1.5,
+                    "exemption_rate": 0.5,
+                    "tax_rate_adjustment": 1.0,
+                    "compliance_rate": 98.0,
+                    "collection_efficiency": 97.0,
+                    "explanation": "These are default recommended values. Please rerun the AI simulation for customized recommendations."
+                }
+            
             return jsonify({
                 'success': True,
-                'simulation_results': sanitized_simulation_result
+                'simulation_results': sanitized_simulation_result,
+                'optimization_recommendations': optimization_recommendations
             })
             
         except AgentNotAvailableError:
