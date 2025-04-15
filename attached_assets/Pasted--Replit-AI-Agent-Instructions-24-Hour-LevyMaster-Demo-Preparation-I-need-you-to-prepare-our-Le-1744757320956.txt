@@ -1,0 +1,199 @@
+## Replit AI Agent Instructions: 24-Hour LevyMaster Demo Preparation
+
+I need you to prepare our LevyMaster application for an impressive demo within 24 hours. Work autonomously to optimize the application for demonstration, focusing on visual impact and stability rather than developing new features.
+
+## Project Context
+
+LevyMaster is our property tax levy management platform designed for the Benton County Assessor's Office. The application helps county officials calculate, manage, and distribute property tax levies across multiple taxing districts. The application needs to be prepared for a compelling demonstration that showcases its key capabilities in levy management, tax district configuration, and reporting.
+
+## Task Sequence
+
+Execute these tasks in order, completing each before moving to the next:
+
+### 1. Demo Environment Setup (4 hours)
+
+```
+Task: Create a polished demo environment with realistic sample data
+Priority: Critical
+Time allocation: 4 hours
+```
+
+1. Set up a dedicated demo instance with the following sample data:
+   - Multiple tax districts with varying millage rates
+   - Diverse property types with different assessment values
+   - Historical data showing year-over-year changes
+   - Sample budget requirements from different taxing authorities
+
+2. Create demo user accounts:
+   - Admin user with full system access
+   - Standard assessor user with typical permissions
+   - Read-only user for reporting access
+
+3. Verify all levy calculations are accurate with the sample data
+
+### 2. Core Demo Pathway Optimization (6 hours)
+
+```
+Task: Optimize key user workflows for the demo
+Priority: Critical
+Time allocation: 6 hours
+```
+
+1. Annual Levy Setup Workflow:
+   - Streamline the process of configuring tax year parameters
+   - Optimize the interface for importing budget requirements
+   - Enhance millage rate calculation visualization
+   - Ensure validation checks are clearly displayed
+
+2. Tax District Management Workflow:
+   - Improve district configuration interface
+   - Optimize visualization of jurisdictional relationships
+   - Enhance boundary management display if applicable
+   - Ensure smooth navigation between related screens
+
+3. Distribution Analysis Workflow:
+   - Enhance tax distribution visualizations
+   - Optimize year-over-year comparison displays
+   - Improve filtering and sorting capabilities
+   - Ensure export functionality works flawlessly
+
+### 3. Visual Enhancement (6 hours)
+
+```
+Task: Improve visual presentation for demo impact
+Priority: High
+Time allocation: 6 hours
+```
+
+1. Dashboard Improvements:
+   - Create a clean, visually impactful landing dashboard
+   - Add summary metrics and key performance indicators
+   - Implement informative charts for levy distribution
+   - Ensure responsive design works on presentation device
+
+2. Data Visualization:
+   - Enhance charts and graphs for levy information
+   - Implement visual indicators for changes and trends
+   - Add comparative visualizations for historical data
+   - Ensure consistent color scheme and styling
+
+3. User Interface Refinement:
+   - Optimize form layouts for clarity
+   - Improve navigation between key sections
+   - Add helpful tooltips for complex concepts
+   - Ensure consistent styling throughout
+
+### 4. Performance Optimization (4 hours)
+
+```
+Task: Ensure smooth performance during demo
+Priority: High
+Time allocation: 4 hours
+```
+
+1. Query Optimization:
+   - Optimize database queries for demo workflows
+   - Implement caching for frequently accessed data
+   - Ensure calculation performance is responsive
+
+2. Error Prevention:
+   - Add robust error handling for demo paths
+   - Create fallback options for potentially unstable features
+   - Prepare recovery strategies for potential issues
+
+3. Load Testing:
+   - Test with realistic data volumes
+   - Ensure responsiveness under typical conditions
+   - Verify all exports and reports generate quickly
+
+### 5. Demo Documentation (2 hours)
+
+```
+Task: Prepare supporting materials for the demo
+Priority: Medium
+Time allocation: 2 hours
+```
+
+1. Create Demo Script:
+   - Write step-by-step instructions for demonstrating each key feature
+   - Include talking points highlighting business value
+   - Note potential questions and prepared answers
+
+2. Prepare Explanatory Materials:
+   - Create brief slides for complex concepts like millage calculation
+   - Develop a one-page feature highlights document
+   - Prepare examples that illustrate the value of the system
+
+### 6. Final Testing and Deployment (2 hours)
+
+```
+Task: Test and deploy the demo environment
+Priority: Critical
+Time allocation: 2 hours
+```
+
+1. Comprehensive Testing:
+   - Run through all demo workflows multiple times
+   - Test on the intended presentation device
+   - Verify all calculations and displays are accurate
+
+2. Final Deployment:
+   - Deploy to a stable Replit environment
+   - Verify application performance in production setting
+   - Create a backup deployment as contingency
+
+## Technical Guidelines
+
+### Focus Areas
+- **Prioritize calculation accuracy** in all levy formulas
+- **Optimize visual presentation** of tax distribution data
+- **Ensure intuitive workflow** for levy management processes
+
+### Implementation Approach
+- Use existing components wherever possible
+- Focus on configuration and optimization rather than new development
+- Ensure all calculations are accurate and verifiable
+
+### Data Handling
+- Use realistic but sanitized county data
+- Ensure data illustrates various tax scenarios clearly
+- Pre-process data to remove any sensitive information
+
+## Decision-Making Framework
+
+When facing implementation decisions, prioritize in this order:
+1. Calculation accuracy and data integrity
+2. Visual impact and clarity of presentations
+3. Workflow efficiency and usability
+4. Performance and responsiveness
+
+For any technical issue, decide whether to:
+1. Fix the issue (if quick and critical)
+2. Create a workaround (if complex but needed)
+3. Exclude from demo (if non-critical)
+
+## Success Criteria
+
+The demo preparation is successful when:
+1. All levy calculations are accurate and clearly presented
+2. The tax district management workflow is intuitive and visual
+3. Distribution analysis provides clear insights and comparisons
+4. The application responds quickly throughout the demo
+5. All reports generate correctly and look professional
+
+## Communication Protocol
+
+Generate a progress report after completing each major section, including:
+- Tasks completed
+- Any issues encountered and resolutions
+- Screenshots of key improvements
+- Recommendations for the demo approach
+
+## Final Deliverables
+
+At the end of the 24-hour period, provide:
+1. Access link to the demo environment
+2. Credentials for all demo users
+3. Step-by-step demo script
+4. Known limitations or issues to be aware of
+5. Recommendations for conducting the demo
