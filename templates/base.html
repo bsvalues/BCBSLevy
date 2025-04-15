@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Benton County Levy Calculation System - A comprehensive property tax levy calculation and management system for Washington state.">
-    <title>{% block title %}Benton County Levy Calculation System{% endblock %}</title>
+    <meta name="description" content="Agent Nexus - A dynamic AI agent management platform enabling intelligent multi-agent workflow coordination with advanced visualization and interaction capabilities.">
+    <title>{% block title %}Agent Nexus | AI Agent Management Platform{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -33,10 +33,10 @@
     {% block extra_css %}{% endblock %}
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/benton-county-logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/agent-nexus-logo.png') }}">
     
     <style>
-        /* Benton County Light Modern Color Scheme */
+        /* Agent Nexus Light Modern Color Scheme */
         :root {
             --primary-color: #3DA5BD;   /* Lighter Teal Blue - Primary Brand Color */
             --secondary-color: #66A355; /* Lighter Green - Secondary Brand Color */
@@ -45,7 +45,7 @@
             --bg-light: #f8fafc;        /* Very Light Gray - Light Background */
             --text-light: #333333;      /* Dark Gray - Text on light backgrounds */
             --text-dark: #333333;       /* Dark Slate - Text on light backgrounds */
-            --benton-yellow: #F0C75C;   /* Brighter Yellow accent */
+            --accent-yellow: #F0C75C;   /* Brighter Yellow accent */
             --border-color: #e5e7eb;    /* Light Border Color */
             --card-bg: #ffffff;         /* Card Background */
             --hover-bg: #f1f5f9;        /* Hover Background */
@@ -132,10 +132,10 @@
             font-weight: 600;
         }
         
-        /* Custom header with Benton County vineyard image */
+        /* Custom header with tech/AI background */
         .app-header-bg {
-            background-image: linear-gradient(90deg, rgba(29, 58, 84, 0.75), rgba(61, 165, 189, 0.75)), 
-                             url('{{ url_for('static', filename='images/benton-county-header.png') }}');
+            background-image: linear-gradient(90deg, rgba(29, 58, 84, 0.85), rgba(61, 165, 189, 0.85)), 
+                             url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485');
             background-size: cover;
             background-position: center;
             color: white;
@@ -188,8 +188,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('home.index') }}">
-                <img src="{{ url_for('static', filename='images/benton-county-logo.png') }}" alt="Benton County Logo" height="40" class="d-inline-block align-text-top me-2">
-                <span class="ms-2">Levy<span class="fw-bold">Master</span></span>
+                <i class="bi bi-cpu-fill me-2" style="font-size: 1.5rem; color: #F0C75C;"></i>
+                <span class="ms-2">Agent<span class="fw-bold">Nexus</span></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -199,197 +199,191 @@
                 <ul class="navbar-nav me-auto">
                     <!-- 1. Home/Dashboard -->
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'dashboard.index' or request.endpoint == 'home.index' %}active{% endif %}" href="{{ url_for('dashboard.index') }}">
-                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        <a class="nav-link {% if request.endpoint == 'dashboard.index' or request.endpoint == 'home.index' %}active{% endif %}" href="{{ url_for('home.index') }}">
+                            <i class="bi bi-house-door me-1"></i>Home
                         </a>
                     </li>
                     
-                    <!-- 2. Tax Management -->
+                    <!-- 2. Agent Management -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {% if request.endpoint and 'levy_calculator' in request.endpoint %}active{% endif %}" href="#" id="taxDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-calculator me-1"></i>Tax Management
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('mcp_army' in request.endpoint or request.endpoint == 'mcp_army_dashboard_direct') %}active{% endif %}" href="#" id="agentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-robot me-1"></i>Agent Management
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="taxDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="agentDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('levy_calculator.calculator') }}">
-                                    <i class="bi bi-calculator-fill me-2"></i>Levy Calculator
+                                <a class="dropdown-item" href="{{ url_for('mcp_army_dashboard_direct') }}">
+                                    <i class="bi bi-grid-3x3-gap me-2"></i>Agent Console
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('data_management.list_tax_districts') }}">
-                                    <i class="bi bi-geo-alt me-2"></i>Tax Districts
+                                <a class="dropdown-item" href="/agent-creator">
+                                    <i class="bi bi-plus-circle me-2"></i>Create New Agent
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('data_management.list_tax_codes') }}">
-                                    <i class="bi bi-house me-2"></i>Property Lookup
+                                <a class="dropdown-item" href="/agent-templates">
+                                    <i class="bi bi-card-list me-2"></i>Agent Templates
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('levy_calculator.impact_calculator') }}">
-                                    <i class="bi bi-cash-coin me-2"></i>Bill Impact Calculator
+                                <a class="dropdown-item" href="/agent-training">
+                                    <i class="bi bi-mortarboard me-2"></i>Agent Training
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('budget_impact.index') }}">
-                                    <i class="bi bi-building me-2"></i>Budget Impact
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('historical_analysis.compliance') }}">
-                                    <i class="bi bi-check-circle me-2"></i>Compliance Check
+                                <a class="dropdown-item" href="/agent-settings">
+                                    <i class="bi bi-sliders me-2"></i>Agent Settings
                                 </a>
                             </li>
                         </ul>
                     </li>
                     
-                    <!-- 3. Data Hub -->
+                    <!-- 3. Workflow Design -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('data_management' in request.endpoint or 'levy_exports' in request.endpoint or 'search' in request.endpoint) %}active{% endif %}" href="#" id="dataHubDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-database me-1"></i>Data Hub
+                        <a class="nav-link dropdown-toggle" href="#" id="workflowDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-diagram-3 me-1"></i>Workflows
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="dataHubDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="workflowDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('data_management.import_data') }}">
-                                    <i class="bi bi-cloud-upload me-2"></i>Import Data
+                                <a class="dropdown-item" href="/workflow-designer">
+                                    <i class="bi bi-pencil-square me-2"></i>Workflow Designer
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('levy_exports.export_data') }}">
-                                    <i class="bi bi-cloud-download me-2"></i>Export Data
+                                <a class="dropdown-item" href="/workflow-templates">
+                                    <i class="bi bi-card-checklist me-2"></i>Workflow Templates
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('search.search_page') }}">
-                                    <i class="bi bi-search me-2"></i>Search
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('data_quality.dashboard') }}">
-                                    <i class="bi bi-shield-check me-2"></i>Data Quality
+                                <a class="dropdown-item" href="/workflow-monitor">
+                                    <i class="bi bi-display me-2"></i>Active Workflows
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('data_management.import_history') }}">
-                                    <i class="bi bi-archive me-2"></i>Import History
+                                <a class="dropdown-item" href="/workflow-history">
+                                    <i class="bi bi-clock-history me-2"></i>Workflow History
                                 </a>
                             </li>
-
+                            <li>
+                                <a class="dropdown-item" href="/workflow-validation">
+                                    <i class="bi bi-shield-check me-2"></i>Workflow Validation
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     
                     <!-- 4. Analytics & Insights -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('forecasting' in request.endpoint or 'historical_analysis' in request.endpoint or 'tax_strategy' in request.endpoint) %}active{% endif %}" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-graph-up me-1"></i>Analytics
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="analyticsDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('forecasting.forecast') }}">
-                                    <i class="bi bi-graph-up-arrow me-2"></i>Forecasting
+                                <a class="dropdown-item" href="/performance-metrics">
+                                    <i class="bi bi-speedometer2 me-2"></i>Performance Metrics
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('historical_analysis.historical_analysis') }}">
-                                    <i class="bi bi-clock-history me-2"></i>Historical Analysis
+                                <a class="dropdown-item" href="/agent-analytics">
+                                    <i class="bi bi-bar-chart me-2"></i>Agent Analytics
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
-                                    <i class="bi bi-arrow-up-right me-2"></i>Trends & Patterns
+                                <a class="dropdown-item" href="/workflow-efficiency">
+                                    <i class="bi bi-arrow-up-right me-2"></i>Workflow Efficiency
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.comparative_analysis') if 'reports.comparative_analysis' in blueprints else '#' }}">
-                                    <i class="bi bi-bar-chart me-2"></i>Comparative Analysis
+                                <a class="dropdown-item" href="/resource-utilization">
+                                    <i class="bi bi-cpu me-2"></i>Resource Utilization
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('tax_strategy.index') }}">
-                                    <i class="bi bi-diagram-3 me-2"></i>Tax Strategy Tree
+                                <a class="dropdown-item" href="/optimization-recommendations">
+                                    <i class="bi bi-lightning-charge me-2"></i>Optimization Tips
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.visualizations') if 'reports.visualizations' in blueprints else '#' }}">
-                                    <i class="bi bi-pie-chart me-2"></i>Visualizations
+                                <a class="dropdown-item" href="/custom-reports">
+                                    <i class="bi bi-file-earmark-bar-graph me-2"></i>Custom Reports
                                 </a>
                             </li>
                         </ul>
                     </li>
                     
-                    <!-- 5. AI & Agents -->
+                    <!-- 5. Integrations -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {% if request.endpoint and ('mcp_army' in request.endpoint or request.endpoint == 'mcp_army_dashboard_direct' or request.endpoint == 'agent_dashboard' or 'levy_audit' in request.endpoint) %}active{% endif %}" href="#" id="aiDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-robot me-1"></i>AI & Agents
+                        <a class="nav-link dropdown-toggle" href="#" id="integrationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Integrations
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="aiDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="integrationsDropdown">
                             <li>
-                                <a class="dropdown-item" href="/mcp-army-dashboard">
-                                    <i class="bi bi-robot me-2"></i>MCP Army Dashboard
+                                <a class="dropdown-item" href="/api-connections">
+                                    <i class="bi bi-hdd-network me-2"></i>API Connections
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="/agent-dashboard">
-                                    <i class="bi bi-gear-wide-connected me-2"></i>Agent Configuration
+                                <a class="dropdown-item" href="/llm-integrations">
+                                    <i class="bi bi-cpu me-2"></i>LLM Models
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('mcp.workflow_manager') if 'mcp.workflow_manager' in blueprints else '#' }}">
-                                    <i class="bi bi-diagram-3 me-2"></i>Workflow Orchestration
+                                <a class="dropdown-item" href="/tool-registry">
+                                    <i class="bi bi-tools me-2"></i>Tool Registry
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('levy_audit.index') }}">
-                                    <i class="bi bi-shield-check me-2"></i>Levy Audit Assistant
+                                <a class="dropdown-item" href="/webhooks">
+                                    <i class="bi bi-link-45deg me-2"></i>Webhooks
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('mcp.collaborative_workflows') if 'mcp.collaborative_workflows' in blueprints else '#' }}">
-                                    <i class="bi bi-people me-2"></i>Collaborative Workflows
+                                <a class="dropdown-item" href="/event-streams">
+                                    <i class="bi bi-activity me-2"></i>Event Streams
                                 </a>
                             </li>
                         </ul>
                     </li>
                     
-                    <!-- 6. Reports -->
+                    <!-- 6. Documentation -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle {% if request.endpoint and 'reports' in request.endpoint %}active{% endif %}" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-file-earmark-text me-1"></i>Reports
+                        <a class="nav-link dropdown-toggle" href="#" id="docsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-book me-1"></i>Documentation
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="docsDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
-                                    <i class="bi bi-file-earmark-bar-graph me-2"></i>District Summary
+                                <a class="dropdown-item" href="/getting-started">
+                                    <i class="bi bi-info-circle me-2"></i>Getting Started
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
-                                    <i class="bi bi-file-earmark-text me-2"></i>Tax Code Analysis
+                                <a class="dropdown-item" href="/agent-tutorials">
+                                    <i class="bi bi-mortarboard me-2"></i>Agent Tutorials
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.index') if 'reports' in blueprints else '#' }}">
-                                    <i class="bi bi-arrow-up-right me-2"></i>Trend Reports
+                                <a class="dropdown-item" href="/workflow-guides">
+                                    <i class="bi bi-journal-text me-2"></i>Workflow Guides
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.compliance_reports') if 'reports.compliance_reports' in blueprints else '#' }}">
-                                    <i class="bi bi-check2-square me-2"></i>Compliance Reports
+                                <a class="dropdown-item" href="/api-documentation">
+                                    <i class="bi bi-code-slash me-2"></i>API Reference
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.custom_reports') if 'reports.custom_reports' in blueprints else '#' }}">
-                                    <i class="bi bi-pencil-square me-2"></i>Custom Reports
+                                <a class="dropdown-item" href="/knowledge-base">
+                                    <i class="bi bi-archive me-2"></i>Knowledge Base
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('reports.scheduled_reports') if 'reports.scheduled_reports' in blueprints else '#' }}">
-                                    <i class="bi bi-calendar-check me-2"></i>Scheduled Reports
+                                <a class="dropdown-item" href="/community-forum">
+                                    <i class="bi bi-people me-2"></i>Community Forum
                                 </a>
                             </li>
                         </ul>
@@ -503,16 +497,16 @@
                 <h6>Quick Start Guides</h6>
                 <ul class="list-unstyled">
                     <li><a href="#"><i class="bi bi-file-earmark-text me-2"></i>Getting Started</a></li>
-                    <li><a href="#"><i class="bi bi-calculator me-2"></i>Levy Calculator Guide</a></li>
-                    <li><a href="#"><i class="bi bi-graph-up me-2"></i>Analysis Tools</a></li>
+                    <li><a href="#"><i class="bi bi-robot me-2"></i>Creating Your First Agent</a></li>
+                    <li><a href="#"><i class="bi bi-diagram-3 me-2"></i>Workflow Design</a></li>
                 </ul>
             </div>
             <div class="help-section">
                 <h6>Video Tutorials</h6>
                 <ul class="list-unstyled">
-                    <li><a href="#"><i class="bi bi-play-circle me-2"></i>Intro to LevyMaster</a></li>
-                    <li><a href="#"><i class="bi bi-play-circle me-2"></i>Data Import Tutorial</a></li>
-                    <li><a href="#"><i class="bi bi-play-circle me-2"></i>Advanced Reports</a></li>
+                    <li><a href="#"><i class="bi bi-play-circle me-2"></i>Intro to Agent Nexus</a></li>
+                    <li><a href="#"><i class="bi bi-play-circle me-2"></i>Agent Collaboration</a></li>
+                    <li><a href="#"><i class="bi bi-play-circle me-2"></i>Advanced Workflows</a></li>
                 </ul>
             </div>
             <div class="help-section">
@@ -521,24 +515,24 @@
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingOne">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                How do I import tax data?
+                                How do I create a new agent?
                             </button>
                         </h2>
                         <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
                             <div class="accordion-body">
-                                Navigate to Data > Import Data and follow the on-screen instructions to upload your CSV, Excel, or XML data files.
+                                Navigate to Agent Management > Create New Agent and follow the step-by-step wizard to configure your agent's capabilities, prompts, and tools.
                             </div>
                         </div>
                     </div>
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingTwo">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                Can I export my calculated results?
+                                How do agents communicate with each other?
                             </button>
                         </h2>
                         <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#helpAccordion">
                             <div class="accordion-body">
-                                Yes! After running calculations, click the Export button to download results in CSV, Excel, or PDF formats.
+                                Agents communicate through the Cognitive Process Protocol, sharing context and experiences while maintaining autonomy. Configure agent relationships in the Workflow Designer.
                             </div>
                         </div>
                     </div>
@@ -546,8 +540,8 @@
             </div>
             <div class="help-section">
                 <h6>Contact Support</h6>
-                <p>Need more help? Our support team is available Monday-Friday, 9am-5pm.</p>
-                <a href="mailto:support@levymaster.com" class="btn btn-outline-primary btn-sm"><i class="bi bi-envelope me-2"></i>Email Support</a>
+                <p>Need more help? Our support team is available 24/7 to assist with your agent management needs.</p>
+                <a href="mailto:support@agentnexus.ai" class="btn btn-outline-primary btn-sm"><i class="bi bi-envelope me-2"></i>Email Support</a>
             </div>
         </div>
     </div>
@@ -573,31 +567,31 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <h5>Benton County Levy Calculator</h5>
-                    <p class="text-muted">A sophisticated property tax levy analysis and management system.</p>
+                    <h5>Agent Nexus Platform</h5>
+                    <p class="text-muted">A dynamic AI agent management platform enabling intelligent multi-agent workflow coordination with advanced visualization and interaction capabilities.</p>
                 </div>
                 <div class="col-md-4">
                     <h5>Quick Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="{{ url_for('home.index') }}">Home</a></li>
-                        <li><a href="{{ url_for('glossary.glossary') if 'glossary' in blueprints else '#' }}">Glossary</a></li>
-                        <li><a href="{{ url_for('tours.tour_index') if 'tours' in blueprints else '#' }}">Guided Tours</a></li>
-                        <li><a href="{{ url_for('dashboard.index') if 'dashboard' in blueprints else '#' }}">Dashboard</a></li>
+                        <li><a href="/agent-creator">Create Agent</a></li>
+                        <li><a href="/workflow-designer">Design Workflow</a></li>
+                        <li><a href="/performance-metrics">Analytics</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
-                    <h5>Contact</h5>
-                    <address>
-                        <p class="mb-1"><i class="bi bi-geo-alt me-2"></i>7122 W. Okanogan Pl. Bldg A</p>
-                        <p class="mb-1">Kennewick, WA 99336</p>
-                        <p class="mb-1"><i class="bi bi-telephone me-2"></i>(509) 786-5600</p>
-                        <p class="mb-1"><i class="bi bi-envelope me-2"></i>support@levymaster.com</p>
-                    </address>
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/getting-started"><i class="bi bi-book me-2"></i>Documentation</a></li>
+                        <li><a href="/api-documentation"><i class="bi bi-code-slash me-2"></i>API Reference</a></li>
+                        <li><a href="/community-forum"><i class="bi bi-people me-2"></i>Community</a></li>
+                        <li><a href="/contact"><i class="bi bi-envelope me-2"></i>Contact Support</a></li>
+                    </ul>
                 </div>
             </div>
             <div class="row mt-3">
                 <div class="col-12 text-center">
-                    <p class="text-muted mb-0">&copy; {{ current_year }} Benton County. All rights reserved.</p>
+                    <p class="text-muted mb-0">&copy; {{ current_year }} Agent Nexus. All rights reserved.</p>
                 </div>
             </div>
         </div>

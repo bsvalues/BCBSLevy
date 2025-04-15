@@ -13,7 +13,7 @@
     --accent-color: #5da2b3;    /* Light Teal - Accent Color */
     --bg-dark: #193046;         /* Dark Navy - Background Color */
     --text-light: #f7f9fc;      /* Off-White - Text on dark backgrounds */
-    --benton-yellow: #e3b23c;   /* Yellow accent for special highlights */
+    --accent-yellow: #e3b23c;   /* Yellow accent for special highlights */
     --border-radius: 0.5rem;
     --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     --z-index-breadcrumb: 10;   /* Z-index for breadcrumb navigation */

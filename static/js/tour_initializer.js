@@ -539,7 +539,7 @@ function safeAddEventListener(selector, event, callback) {
 
 // Initialize when the DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Levy Calculation System JS initialized successfully');
+    console.log('Agent Nexus Platform JS initialized successfully');
     
     // Don't automatically start tours on page load
     // checkForAutomaticTour();

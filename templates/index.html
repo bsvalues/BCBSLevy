@@ -1,6 +1,6 @@
 {% extends "simple_base.html" %}
 
-{% block title %}LevyMaster - Intelligent Property Tax Calculation System{% endblock %}
+{% block title %}Agent Nexus - Intelligent Multi-Agent Workflow Platform{% endblock %}
 
 {% block page_header %}
 <!-- Hero Section with Animated Background -->
@@ -9,53 +9,53 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="mt-5 mb-5" id="main-header">
-                    <!-- Benton County Logo Badge -->
+                    <!-- Platform Logo Badge -->
                     <div class="mx-auto mb-4" style="max-width: 120px;">
-                        <img src="{{ url_for('static', filename='images/benton-county-logo.png') }}" alt="Benton County Logo" class="img-fluid">
+                        <i class="bi bi-cpu display-1 text-light"></i>
                     </div>
                     
-                    <h1 class="display-2 fw-bold mb-3 gradient-text">LevyMaster</h1>
-                    <p class="lead mb-4 fs-4 text-light">Benton County's Intelligent Property Tax Platform</p>
-                    <p class="lead mb-5 text-light">Transform complex tax calculations into clear, actionable insights with AI-powered analytics</p>
+                    <h1 class="display-2 fw-bold mb-3 gradient-text">Agent Nexus</h1>
+                    <p class="lead mb-4 fs-4 text-light">Dynamic AI Agent Management Platform</p>
+                    <p class="lead mb-5 text-light">Intelligent multi-agent workflow coordination with advanced visualization and interaction capabilities</p>
                     
                     <!-- Main navigation buttons -->
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-3">
-                        <a href="{{ url_for('levy_calculator.calculator') }}" class="btn btn-primary btn-lg px-4 rounded-pill">
-                            <i class="bi bi-calculator me-2"></i>Calculate Levy
+                        <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-primary btn-lg px-4 rounded-pill">
+                            <i class="bi bi-diagram-3 me-2"></i>Agent Dashboard
                         </a>
-                        <a href="{{ url_for('public.search') }}" class="btn btn-outline-light btn-lg px-4 rounded-pill">
-                            <i class="bi bi-search me-2"></i>Property Search
+                        <a href="/workflow-designer" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                            <i class="bi bi-bezier2 me-2"></i>Workflow Designer
                         </a>
-                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-success btn-lg px-4 rounded-pill">
-                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                        <a href="/agent-playground" class="btn btn-success btn-lg px-4 rounded-pill">
+                            <i class="bi bi-play-circle me-2"></i>Agent Playground
                         </a>
                     </div>
                     
                     <!-- Full Navigation Panel -->
                     <div class="bg-dark bg-opacity-50 rounded-4 p-4 mb-4 text-start">
-                        <h5 class="border-bottom border-light pb-2 mb-3 text-light">Quick Navigation</h5>
+                        <h5 class="border-bottom border-light pb-2 mb-3 text-light">Platform Navigation</h5>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <h6 class="text-light mb-2"><i class="bi bi-database me-2"></i>Data Management</h6>
+                                <h6 class="text-light mb-2"><i class="bi bi-robot me-2"></i>Agent Management</h6>
                                 <ul class="list-unstyled">
-                                    <li><a href="{{ url_for('data_management.import_data') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Import Data</a></li>
-                                    <li><a href="{{ url_for('data_management.export_data') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Export Data</a></li>
-                                    <li><a href="{{ url_for('db_fix.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Database Maintenance</a></li>
+                                    <li><a href="/agent-registry" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Agent Registry</a></li>
+                                    <li><a href="/agent-creator" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Create New Agent</a></li>
+                                    <li><a href="/agent-templates" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Agent Templates</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="text-light mb-2"><i class="bi bi-diagram-2 me-2"></i>Workflow Tools</h6>
+                                <ul class="list-unstyled">
+                                    <li><a href="/workflow-designer" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Workflow Designer</a></li>
+                                    <li><a href="/workflow-templates" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Workflow Templates</a></li>
+                                    <li><a href="/workflow-monitor" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Workflow Monitor</a></li>
                                 </ul>
                             </div>
                             <div class="col-md-4">
                                 <h6 class="text-light mb-2"><i class="bi bi-graph-up me-2"></i>Analysis</h6>
                                 <ul class="list-unstyled">
-                                    <li><a href="{{ url_for('historical_analysis.historical_analysis') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Historical Analysis</a></li>
-                                    <li><a href="{{ url_for('forecasting.forecast') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Forecasting</a></li>
-                                    <li><a href="{{ url_for('budget_impact.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Budget Impact</a></li>
-                                </ul>
-                            </div>
-                            <div class="col-md-4">
-                                <h6 class="text-light mb-2"><i class="bi bi-clipboard-data me-2"></i>Reports</h6>
-                                <ul class="list-unstyled">
-                                    <li><a href="{{ url_for('reports.reports_dashboard') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Reports Dashboard</a></li>
-                                    <li><a href="{{ url_for('levy_audit.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Levy Audit</a></li>
+                                    <li><a href="/performance-metrics" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Performance Metrics</a></li>
+                                    <li><a href="/agent-analytics" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Agent Analytics</a></li>
                                     <li><a href="{{ url_for('mcp.insights') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> AI Insights</a></li>
                                 </ul>
                             </div>
@@ -76,34 +76,34 @@
     <section class="py-5 tools-carousel-section" style="background-color: #f8fafc;">
         <div class="container">
             <div class="text-center mb-4">
-                <h2 class="display-5 fw-bold">Explore Our Tools</h2>
-                <p class="lead text-muted">See what LevyMaster can do for you</p>
+                <h2 class="display-5 fw-bold">Explore Our Platform</h2>
+                <p class="lead text-muted">See what Agent Nexus can do for you</p>
                 <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
             </div>
 
             <!-- Carousel with Tool Spotlights -->
             <div id="toolsCarousel" class="carousel slide mb-5" data-bs-ride="carousel" data-bs-interval="5000">
                 <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Levy Audit"></button>
-                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="1" aria-label="Budget Impact Analysis"></button>
-                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="2" aria-label="Historical Trends"></button>
+                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Agent Management"></button>
+                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="1" aria-label="Workflow Designer"></button>
+                    <button type="button" data-bs-target="#toolsCarousel" data-bs-slide-to="2" aria-label="Performance Analytics"></button>
                 </div>
                 <div class="carousel-inner rounded-4 overflow-hidden" style="box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);">
-                    <!-- Slide 1: Levy Audit Tool -->
+                    <!-- Slide 1: Agent Management -->
                     <div class="carousel-item active">
                         <div class="position-relative" style="height: 400px;">
-                            <img src="{{ url_for('static', filename='images/carousel/rsmtn+sunset-composit.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Levy Audit">
+                            <img src="{{ url_for('static', filename='images/carousel/rsmtn+sunset-composit.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Agent Management">
                             <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(29, 58, 84, 0.8), rgba(29, 58, 84, 0.6), rgba(29, 58, 84, 0.2)); padding: 2rem;">
                                 <div class="row h-100 align-items-center">
                                     <div class="col-md-6">
-                                        <h3 class="display-6 fw-bold mb-3">Levy Audit Assistant</h3>
-                                        <p class="lead mb-4">Intelligent compliance verification with AI-powered insights and recommendations.</p>
+                                        <h3 class="display-6 fw-bold mb-3">Agent Management Console</h3>
+                                        <p class="lead mb-4">Create, configure, and monitor intelligent AI agents with our intuitive management dashboard.</p>
                                         <div class="d-flex gap-3">
-                                            <a href="{{ url_for('levy_audit.index') }}" class="btn btn-primary rounded-pill px-4">
-                                                <i class="bi bi-shield-check me-2"></i>Try It Now
+                                            <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-primary rounded-pill px-4">
+                                                <i class="bi bi-robot me-2"></i>Launch Console
                                             </a>
-                                            <a href="{{ url_for('levy_audit.compliance_audit') }}" class="btn btn-outline-light rounded-pill px-4">
-                                                <i class="bi bi-info-circle me-2"></i>Learn More
+                                            <a href="/agent-templates" class="btn btn-outline-light rounded-pill px-4">
+                                                <i class="bi bi-info-circle me-2"></i>Browse Templates
                                             </a>
                                         </div>
                                     </div>
@@ -111,21 +111,21 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Slide 2: Budget Impact Calculator -->
+                    <!-- Slide 2: Workflow Designer -->
                     <div class="carousel-item">
                         <div class="position-relative" style="height: 400px;">
-                            <img src="{{ url_for('static', filename='images/carousel/3629742582_a3a12b5359_b.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Budget Impact Analysis">
+                            <img src="{{ url_for('static', filename='images/carousel/3629742582_a3a12b5359_b.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Workflow Designer">
                             <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(102, 163, 85, 0.8), rgba(102, 163, 85, 0.6), rgba(102, 163, 85, 0.2)); padding: 2rem;">
                                 <div class="row h-100 align-items-center">
                                     <div class="col-md-6">
-                                        <h3 class="display-6 fw-bold mb-3">Budget Impact Calculator</h3>
-                                        <p class="lead mb-4">Analyze how property tax changes impact district budgets and taxpayers.</p>
+                                        <h3 class="display-6 fw-bold mb-3">Workflow Designer</h3>
+                                        <p class="lead mb-4">Create complex agent workflows with our visual designer and orchestration tools.</p>
                                         <div class="d-flex gap-3">
-                                            <a href="{{ url_for('budget_impact.index') }}" class="btn btn-dark rounded-pill px-4">
-                                                <i class="bi bi-calculator me-2"></i>Calculate Impact
+                                            <a href="/workflow-designer" class="btn btn-dark rounded-pill px-4">
+                                                <i class="bi bi-bezier2 me-2"></i>Start Designing
                                             </a>
-                                            <a href="{{ url_for('budget_impact.index') }}" class="btn btn-outline-dark rounded-pill px-4">
-                                                <i class="bi bi-bar-chart me-2"></i>View Budget Analysis
+                                            <a href="/workflow-templates" class="btn btn-outline-dark rounded-pill px-4">
+                                                <i class="bi bi-card-list me-2"></i>View Templates
                                             </a>
                                         </div>
                                     </div>
@@ -133,21 +133,21 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Slide 3: Historical Trends Analysis -->
+                    <!-- Slide 3: Performance Analytics -->
                     <div class="carousel-item">
                         <div class="position-relative" style="height: 400px;">
-                            <img src="{{ url_for('static', filename='images/carousel/Arizona-sunset.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Historical Trends">
+                            <img src="{{ url_for('static', filename='images/carousel/Arizona-sunset.jpg') }}" class="d-block w-100 h-100" style="object-fit: cover; object-position: center;" alt="Performance Analytics">
                             <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(61, 165, 189, 0.8), rgba(61, 165, 189, 0.6), rgba(61, 165, 189, 0.2)); padding: 2rem;">
                                 <div class="row h-100 align-items-center">
                                     <div class="col-md-6">
-                                        <h3 class="display-6 fw-bold mb-3">Historical Trends Analysis</h3>
-                                        <p class="lead mb-4">Visualize tax rate changes over time with predictive forecasting.</p>
+                                        <h3 class="display-6 fw-bold mb-3">Performance Analytics</h3>
+                                        <p class="lead mb-4">Monitor your agent fleet with detailed analytics and real-time performance tracking.</p>
                                         <div class="d-flex gap-3">
-                                            <a href="{{ url_for('historical_analysis.historical_analysis') }}" class="btn btn-light rounded-pill px-4">
-                                                <i class="bi bi-graph-up-arrow me-2"></i>View Trends
+                                            <a href="/performance-metrics" class="btn btn-light rounded-pill px-4">
+                                                <i class="bi bi-graph-up-arrow me-2"></i>View Metrics
                                             </a>
-                                            <a href="{{ url_for('forecasting.forecast') }}" class="btn btn-outline-light rounded-pill px-4">
-                                                <i class="bi bi-binoculars me-2"></i>See Forecasts
+                                            <a href="/agent-analytics" class="btn btn-outline-light rounded-pill px-4">
+                                                <i class="bi bi-speedometer2 me-2"></i>Agent Analytics
                                             </a>
                                         </div>
                                     </div>
@@ -172,45 +172,45 @@
     <section class="py-5 features-section">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold">Powerful Tax Analysis Tools</h2>
-                <p class="lead text-muted">Comprehensive solutions for property tax management in Benton County</p>
+                <h2 class="display-5 fw-bold">Powerful Agent Management Tools</h2>
+                <p class="lead text-muted">Comprehensive solutions for AI agent orchestration and monitoring</p>
                 <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
             </div>
             
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="levy-calculation" style="overflow: hidden;">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="agent-management" style="overflow: hidden;">
                         <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #3DA5BD, #5da2b3); height: 4px;"></div>
                         <div class="card-body text-center p-5">
                             <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(61, 165, 189, 0.1);">
-                                <i class="bi bi-calculator" style="color: #3DA5BD;"></i>
+                                <i class="bi bi-robot" style="color: #3DA5BD;"></i>
                             </div>
-                            <h3 class="card-title h4 mb-3 fw-bold">Levy Calculation</h3>
-                            <p class="card-text text-muted">Accurate property tax levy calculations with automatic statutory compliance verification and intelligent rate optimization.</p>
+                            <h3 class="card-title h4 mb-3 fw-bold">Agent Management</h3>
+                            <p class="card-text text-muted">Create and configure intelligent AI agents with specialized roles, capabilities, and collaboration patterns for your specific needs.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="historical-analysis" style="overflow: hidden;">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="workflow-tools" style="overflow: hidden;">
                         <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #66A355, #78c265); height: 4px;"></div>
                         <div class="card-body text-center p-5">
                             <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(102, 163, 85, 0.1);">
-                                <i class="bi bi-graph-up-arrow" style="color: #66A355;"></i>
+                                <i class="bi bi-diagram-3" style="color: #66A355;"></i>
                             </div>
-                            <h3 class="card-title h4 mb-3 fw-bold">Historical Analysis</h3>
-                            <p class="card-text text-muted">Advanced historical analysis with AI-powered forecasting to identify trends and predict future levy rates with confidence intervals.</p>
+                            <h3 class="card-title h4 mb-3 fw-bold">Workflow Design</h3>
+                            <p class="card-text text-muted">Design complex multi-agent workflows with our visual designer, orchestration tools, and collaboration patterns for efficient task execution.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="compliance" style="overflow: hidden;">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="analytics" style="overflow: hidden;">
                         <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #F0C75C, #f5d78a); height: 4px;"></div>
                         <div class="card-body text-center p-5">
                             <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(240, 199, 92, 0.1);">
-                                <i class="bi bi-shield-check" style="color: #F0C75C;"></i>
+                                <i class="bi bi-graph-up" style="color: #F0C75C;"></i>
                             </div>
-                            <h3 class="card-title h4 mb-3 fw-bold">Compliance Verification</h3>
-                            <p class="card-text text-muted">Automated compliance checks ensure all calculations meet statutory requirements and identify potential issues before they occur.</p>
+                            <h3 class="card-title h4 mb-3 fw-bold">Performance Analytics</h3>
+                            <p class="card-text text-muted">Monitor your agent fleet with detailed performance metrics, task success rates, and optimization recommendations for peak efficiency.</p>
                         </div>
                     </div>
                 </div>
@@ -223,26 +223,26 @@
         <div class="container py-4">
             <div class="row align-items-center">
                 <div class="col-lg-5 mb-4 mb-lg-0">
-                    <h2 class="display-6 fw-bold mb-4">Interactive Dashboard</h2>
-                    <p class="lead mb-4 text-light opacity-90">Monitor key metrics, visualize trends, and gain insights with our intuitive dashboard interface.</p>
+                    <h2 class="display-6 fw-bold mb-4">Agent Command Center</h2>
+                    <p class="lead mb-4 text-light opacity-90">Monitor your AI agents, visualize workflows, and gain insights with our powerful command interface.</p>
                     <div class="bg-white bg-opacity-10 p-4 rounded-3 mb-4">
                         <ul class="list-unstyled mb-0">
                             <li class="mb-3 d-flex align-items-center">
                                 <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
-                                <span class="text-light">Real-time data visualization</span>
+                                <span class="text-light">Real-time agent status monitoring</span>
                             </li>
                             <li class="mb-3 d-flex align-items-center">
                                 <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
-                                <span class="text-light">Customizable reports and exports</span>
+                                <span class="text-light">Workflow visualization and tracing</span>
                             </li>
                             <li class="mb-3 d-flex align-items-center">
                                 <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
-                                <span class="text-light">AI-powered trend analysis</span>
+                                <span class="text-light">Agent performance analytics</span>
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-light rounded-pill px-4 fw-medium">
-                        <i class="bi bi-speedometer2 me-2"></i>Explore Dashboard
+                    <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-light rounded-pill px-4 fw-medium">
+                        <i class="bi bi-diagram-3 me-2"></i>Open Command Center
                     </a>
                 </div>
                 <div class="col-lg-7">
@@ -272,8 +272,8 @@
     <section class="py-5 reports-section" style="background-color: #f8fafc;">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold">Reports & Data Exports</h2>
-                <p class="lead text-muted">Generate customized reports and export data for your specific needs</p>
+                <h2 class="display-5 fw-bold">Agent Analytics & Insights</h2>
+                <p class="lead text-muted">Gain in-depth understanding of your AI agents' performance and capabilities</p>
                 <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
             </div>
             
@@ -282,58 +282,58 @@
                     <img src="{{ url_for('static', filename='images/reports-preview.png') }}" alt="Reports Preview" class="img-fluid rounded-4 shadow-lg">
                 </div>
                 <div class="col-lg-6">
-                    <h3 class="h2 fw-bold mb-4">Flexible Reporting System</h3>
-                    <p class="lead mb-4">Generate comprehensive reports with customizable parameters to meet your specific needs.</p>
+                    <h3 class="h2 fw-bold mb-4">Comprehensive Agent Analytics</h3>
+                    <p class="lead mb-4">Monitor agent performance, analyze workflows, and optimize your AI fleet with detailed metrics.</p>
                     
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <div class="d-flex">
                                 <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(61, 165, 189, 0.1);">
-                                    <i class="bi bi-file-earmark-pdf" style="color: #3DA5BD;"></i>
+                                    <i class="bi bi-graph-up" style="color: #3DA5BD;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">PDF Export</h4>
-                                    <p class="text-muted small">Professional-quality documents ready for printing or distribution</p>
+                                    <h4 class="h5 fw-bold">Performance Metrics</h4>
+                                    <p class="text-muted small">Track response times, success rates, and resource utilization</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex">
                                 <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(102, 163, 85, 0.1);">
-                                    <i class="bi bi-file-earmark-excel" style="color: #66A355;"></i>
+                                    <i class="bi bi-diagram-3" style="color: #66A355;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">Excel Export</h4>
-                                    <p class="text-muted small">Detailed worksheets for further analysis and manipulation</p>
+                                    <h4 class="h5 fw-bold">Workflow Analysis</h4>
+                                    <p class="text-muted small">Visualize task execution paths and identify bottlenecks</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex">
                                 <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(240, 199, 92, 0.1);">
-                                    <i class="bi bi-globe" style="color: #F0C75C;"></i>
+                                    <i class="bi bi-cpu" style="color: #F0C75C;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">GIS Integration</h4>
-                                    <p class="text-muted small">Export geospatial data compatible with mapping systems</p>
+                                    <h4 class="h5 fw-bold">Agent Collaboration</h4>
+                                    <p class="text-muted small">Map cross-agent communication and knowledge sharing</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex">
                                 <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(83, 123, 156, 0.1);">
-                                    <i class="bi bi-cloud-arrow-down" style="color: #537B9C;"></i>
+                                    <i class="bi bi-lightning-charge" style="color: #537B9C;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">Batch Export</h4>
-                                    <p class="text-muted small">Schedule automated exports for multiple districts</p>
+                                    <h4 class="h5 fw-bold">Optimization Insights</h4>
+                                    <p class="text-muted small">Receive AI-powered recommendations for performance tuning</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-file-earmark-text me-2"></i>Explore Reports
+                    <a href="/performance-metrics" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-speedometer2 me-2"></i>View Analytics
                     </a>
                 </div>
             </div>
@@ -357,8 +357,8 @@
                     </div>
                 </div>
                 <div class="col-lg-7 order-lg-1">
-                    <h2 class="display-5 fw-bold mb-4">AI-Powered Insights</h2>
-                    <p class="lead mb-4">LevyMaster leverages advanced artificial intelligence to provide deeper understanding and proactive recommendations for your property tax management.</p>
+                    <h2 class="display-5 fw-bold mb-4">Advanced Agent Capabilities</h2>
+                    <p class="lead mb-4">Agent Nexus leverages sophisticated AI techniques to create powerful, adaptable agents that can handle complex tasks through collaboration and continuous learning.</p>
                     
                     <div class="mb-4">
                         <div class="row g-4">
@@ -367,9 +367,9 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #3DA5BD;">New</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Natural Language Interface</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Multi-Agent Coordination</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Ask complex tax questions in plain English and receive instant, accurate answers.</p>
+                                        <p class="text-muted mb-0">Orchestrate complex workflows with agents that communicate, collaborate, and share context seamlessly.</p>
                                     </div>
                                 </div>
                             </div>
@@ -378,9 +378,9 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #66A355;">Advanced</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Predictive Analytics</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Adaptive Learning</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Forecast future levy rates with sophisticated statistical models and machine learning.</p>
+                                        <p class="text-muted mb-0">Agents continuously improve through experience sharing and feedback loops, becoming more efficient over time.</p>
                                     </div>
                                 </div>
                             </div>
@@ -389,9 +389,9 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #F0C75C;">Featured</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Levy Audit AI</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Specialized Expertise</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Automatic compliance verification that checks calculations against all applicable regulations.</p>
+                                        <p class="text-muted mb-0">Create domain-specific agents with fine-tuned capabilities for your industry or use case requirements.</p>
                                     </div>
                                 </div>
                             </div>
@@ -400,9 +400,9 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #537B9C;">Smart</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Anomaly Detection</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Human-Agent Collaboration</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Identify unusual patterns in tax data that may indicate errors or optimization opportunities.</p>
+                                        <p class="text-muted mb-0">Intuitive interfaces for directing agent activities, approving decisions, and integrating human expertise.</p>
                                     </div>
                                 </div>
                             </div>
@@ -410,7 +410,7 @@
                     </div>
                     
                     <a href="{{ url_for('mcp.insights') }}" class="btn btn-gradient rounded-pill px-4">
-                        <i class="bi bi-cpu me-2"></i>Explore AI Features
+                        <i class="bi bi-cpu me-2"></i>Explore Agent Capabilities
                     </a>
                 </div>
             </div>
@@ -421,16 +421,16 @@
     <section class="py-5 my-5 cta-section text-center">
         <div class="container">
             <div class="bg-gradient rounded-4 p-5 text-white" style="background: linear-gradient(135deg, #1D3A54 0%, #3DA5BD 100%);">
-                <h2 class="display-5 fw-bold mb-3">Ready to Transform Your Property Tax Management?</h2>
-                <p class="lead mb-4 col-lg-8 mx-auto">Join other municipalities that are using LevyMaster to streamline their property tax calculations and improve compliance.</p>
+                <h2 class="display-5 fw-bold mb-3">Ready to Transform Your AI Capabilities?</h2>
+                <p class="lead mb-4 col-lg-8 mx-auto">Join organizations using Agent Nexus to orchestrate intelligent AI agents that solve complex problems through collaboration.</p>
                 <div class="row justify-content-center">
                     <div class="col-md-10 col-lg-8">
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                            <a href="{{ url_for('examples.index') }}" class="btn btn-light btn-lg rounded-pill px-4 gap-3">
+                            <a href="/demo" class="btn btn-light btn-lg rounded-pill px-4 gap-3">
                                 <i class="bi bi-play-circle me-2"></i>Watch Demo
                             </a>
-                            <a href="{{ url_for('public.search') }}" class="btn btn-outline-light btn-lg rounded-pill px-4">
-                                <i class="bi bi-search me-2"></i>Property Search
+                            <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                                <i class="bi bi-robot me-2"></i>Launch Platform
                             </a>
                         </div>
                     </div>

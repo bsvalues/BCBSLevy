@@ -3,7 +3,7 @@ PRIMARY APPLICATION ENTRY POINT: Flask application initialization and configurat
 
 This module initializes the Flask application, configures extensions,
 sets up database connections, and registers all blueprints. This is the
-main entry point for the LevyMaster application and the authoritative
+main entry point for the Agent Nexus platform and the authoritative
 source for all application components.
 
 All blueprints and routes should be registered here to maintain a
@@ -254,7 +254,7 @@ def configure_logging(app):
         os.makedirs('logs')
     
     app.logger.setLevel(log_level)
-    app.logger.info('Levy Calculation System startup')
+    app.logger.info('Agent Nexus Platform startup')
 
 
 # Create the Flask application instance

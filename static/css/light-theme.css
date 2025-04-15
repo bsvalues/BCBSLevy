@@ -13,7 +13,7 @@
     --text-medium: #555555;     /* Medium text for light backgrounds */
     --bg-light: #f8f9fa;        /* Very light gray for subtle contrasts */
     --border-color: #e0e0e0;    /* Light gray for borders */
-    --benton-yellow: #e3b23c;   /* Yellow accent for special highlights */
+    --accent-yellow: #e3b23c;   /* Yellow accent for special highlights */
 }
 
 /* Overall body background */
