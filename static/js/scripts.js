@@ -1,9 +1,9 @@
 /**
- * Main JavaScript for the Agent Nexus Platform
+ * Main JavaScript for the LevyMaster
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Agent Nexus Platform JS initialized successfully');
+  console.log('LevyMaster JS initialized successfully');
   
   // Initialize Bootstrap components
   initializeBootstrapComponents();
@@ -227,7 +227,7 @@ function initializeHelpMenu() {
               <i class="bi bi-info-circle me-2"></i>Dashboard Tour
             </li>
             <li class="help-menu-item" data-action="glossary">
-              <i class="bi bi-book me-2"></i>Agent Glossary
+              <i class="bi bi-book me-2"></i>Levy Glossary
             </li>
             <li class="help-menu-item" data-action="faq">
               <i class="bi bi-question-circle me-2"></i>FAQ
