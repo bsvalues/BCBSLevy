@@ -538,7 +538,9 @@
 <script>
 // Additional page-specific JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elements
+    console.log('Levy Calculator JS loaded successfully');
+    
+    // DOM elements - safely reference them with null checks
     const levyCalculatorForm = document.getElementById('levyCalculatorForm');
     const forecastForm = document.getElementById('forecastForm');
     const calculatorResultsSection = document.getElementById('calculatorResultsSection');
@@ -547,8 +549,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const adjustedRateSection = document.getElementById('adjustedRateSection');
     const saveScenarioBtn = document.getElementById('saveScenarioBtn');
     const saveResultBtn = document.getElementById('saveResultBtn');
-    const saveScenarioModal = new bootstrap.Modal(document.getElementById('saveScenarioModal'));
-    const deleteScenarioModal = new bootstrap.Modal(document.getElementById('deleteScenarioModal'));
+    
+    // Initialize modals if they exist
+    const saveScenarioModalEl = document.getElementById('saveScenarioModal');
+    const deleteScenarioModalEl = document.getElementById('deleteScenarioModal');
+    const saveScenarioModal = saveScenarioModalEl ? new bootstrap.Modal(saveScenarioModalEl) : null;
+    const deleteScenarioModal = deleteScenarioModalEl ? new bootstrap.Modal(deleteScenarioModalEl) : null;
     
     // State
     let currentDistrict = null;
@@ -560,7 +566,8 @@ document.addEventListener('DOMContentLoaded', function() {
     tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
     
     // Form submission handler
-    levyCalculatorForm.addEventListener('submit', function(e) {
+    if (levyCalculatorForm) {
+        levyCalculatorForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const districtId = document.getElementById('taxDistrict').value;
@@ -609,8 +616,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    }
+
     // Tax district change handler
-    document.getElementById('taxDistrict').addEventListener('change', function(e) {
+    const taxDistrictSelect = document.getElementById('taxDistrict');
+    if (taxDistrictSelect) {
+        taxDistrictSelect.addEventListener('change', function(e) {
         const districtId = e.target.value;
         if (districtId) {
             fetch(`/levy-calculator/district/${districtId}`)
@@ -632,8 +643,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    }
+    
     // Forecast form submission handler
-    forecastForm.addEventListener('submit', function(e) {
+    if (forecastForm) {
+        forecastForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         if (!currentCalculation) {
@@ -678,8 +692,11 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('saveTargetYear').value = currentYear + 1;
     });
     
+    }
+    
     // Save scenario button click
-    saveScenarioBtn.addEventListener('click', function() {
+    if (saveScenarioBtn) {
+        saveScenarioBtn.addEventListener('click', function() {
         if (!currentCalculation) {
             alert('Please calculate a levy first.');
             return;
@@ -700,13 +717,20 @@ document.addEventListener('DOMContentLoaded', function() {
         saveScenarioModal.show();
     });
     
+    }
+    
     // Save result button also opens save modal
-    saveResultBtn.addEventListener('click', function() {
+    if (saveResultBtn) {
+        saveResultBtn.addEventListener('click', function() {
         saveScenarioBtn.click();
     });
     
+    }
+    
     // Confirm save button
-    document.getElementById('confirmSaveScenario').addEventListener('click', function() {
+    const confirmSaveScenarioBtn = document.getElementById('confirmSaveScenario');
+    if (confirmSaveScenarioBtn) {
+        confirmSaveScenarioBtn.addEventListener('click', function() {
         const form = document.getElementById('saveScenarioForm');
         const formData = new FormData(form);
         
@@ -732,13 +756,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    }
+    
     // Refresh scenarios button
-    document.getElementById('refreshScenariosBtn').addEventListener('click', function() {
+    const refreshScenariosBtn = document.getElementById('refreshScenariosBtn');
+    if (refreshScenariosBtn) {
+        refreshScenariosBtn.addEventListener('click', function() {
         loadSavedScenarios();
     });
     
+    }
+    
     // Bill impact button
-    document.getElementById('analyzeBillImpactBtn').addEventListener('click', function() {
+    const analyzeBillImpactBtn = document.getElementById('analyzeBillImpactBtn');
+    if (analyzeBillImpactBtn) {
+        analyzeBillImpactBtn.addEventListener('click', function() {
         if (!currentCalculation) {
             alert('Please calculate a levy first.');
             return;
@@ -766,8 +798,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    }
+    
     // Confirm delete button
-    document.getElementById('confirmDeleteScenario').addEventListener('click', function() {
+    const confirmDeleteScenarioBtn = document.getElementById('confirmDeleteScenario');
+    if (confirmDeleteScenarioBtn) {
+        confirmDeleteScenarioBtn.addEventListener('click', function() {
         if (!currentScenarioId) return;
         
         fetch(`/levy-calculator/delete-scenario/${currentScenarioId}`, {

@@ -268,6 +268,85 @@ def api_calculate():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@levy_calculator_bp.route('/district/<int:district_id>', methods=['GET'])
+def get_district_details(district_id):
+    """
+    API endpoint to get detailed information about a tax district.
+    
+    Returns:
+    {
+        "status": "success",
+        "district": {
+            "id": 1,
+            "district_name": "Sample District",
+            "district_code": "10001",
+            "statutory_limit": 3.5,
+            ...
+        },
+        "levy_rates": [
+            {
+                "year": 2025,
+                "levy_rate": 2.0,
+                "levy_amount": 1000000,
+                "assessed_value": 500000000
+            }
+        ]
+    }
+    """
+    try:
+        # Get the district
+        district = TaxDistrict.query.get(district_id)
+        if not district:
+            return jsonify({
+                "status": "error", 
+                "message": f"Tax district with ID {district_id} not found"
+            }), 404
+        
+        # Get tax codes for this district
+        tax_codes = TaxCode.query.filter_by(tax_district_id=district_id).all()
+        
+        # Get historical rates
+        historical_rates = []
+        if tax_codes:
+            # For simplicity, get rates for the first tax code
+            tax_code = tax_codes[0]
+            
+            # Get historical rates
+            rates = TaxCodeHistoricalRate.query.filter_by(
+                tax_code_id=tax_code.id
+            ).order_by(
+                TaxCodeHistoricalRate.year.desc()
+            ).all()
+            
+            for rate in rates:
+                historical_rates.append({
+                    "year": rate.year,
+                    "levy_rate": rate.levy_rate,
+                    "levy_amount": rate.levy_amount or 0,
+                    "assessed_value": rate.total_assessed_value or 0
+                })
+        
+        # Create result
+        result = {
+            "status": "success",
+            "district": {
+                "id": district.id,
+                "district_name": district.district_name,
+                "district_code": district.district_code,
+                "district_type": district.district_type,
+                "county": district.county,
+                "state": district.state,
+                "is_active": district.is_active,
+                "statutory_limit": district.statutory_limit
+            },
+            "levy_rates": historical_rates
+        }
+        
+        return jsonify(result)
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 @levy_calculator_bp.route('/api/calculate-rate', methods=['POST'])
 def api_calculate_rate():
     """
