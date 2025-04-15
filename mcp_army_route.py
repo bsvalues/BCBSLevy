@@ -54,9 +54,12 @@ def mcp_army_dashboard_direct():
 def register_direct_routes(app):
     """Register the direct route for MCP Army dashboard."""
     try:
+        # Register both URL patterns to ensure accessibility
         app.add_url_rule('/mcp-army-dashboard', 'mcp_army_dashboard_direct', mcp_army_dashboard_direct)
-        app.add_url_rule('/agent-dashboard', 'agent_dashboard', lambda: redirect('/mcp-army-dashboard'))
-        logger.info("Direct MCP Army dashboard route registered")
+        app.add_url_rule('/mcp-army/dashboard', 'mcp_army_dashboard', mcp_army_dashboard_direct)
+        app.add_url_rule('/agent-dashboard', 'agent_dashboard', lambda: redirect('/mcp-army/dashboard'))
+        
+        logger.info("Direct MCP Army dashboard routes registered")
         return True
     except Exception as e:
         logger.error(f"Error registering direct MCP Army dashboard route: {str(e)}")
