@@ -286,6 +286,7 @@ from routes_tax_strategy import tax_strategy_bp, register_tax_strategy_routes
 from routes_search import init_search_routes
 from routes_db_fix import db_fix_bp
 from routes_property_assessment import property_assessment_bp
+from routes_mcp_ui import register_mcp_ui_routes
 
 app.register_blueprint(data_management_bp)
 app.register_blueprint(property_assessment_bp)
@@ -351,6 +352,13 @@ except ImportError as e:
     app.logger.warning(f"Could not import data quality routes: {str(e)}")
 except Exception as e:
     app.logger.error(f"Error initializing data quality routes: {str(e)}")
+
+# Register MCP UI routes
+try:
+    register_mcp_ui_routes(app)
+    app.logger.info("MCP UI routes registered")
+except Exception as e:
+    app.logger.error(f"Error registering MCP UI routes: {str(e)}")
 
 # Import models after db is defined to avoid circular imports
 with app.app_context():

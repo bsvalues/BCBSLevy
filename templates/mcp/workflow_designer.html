@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Workflow Designer - LevyMaster{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-5 fw-bold">Workflow Designer</h1>
+            <p class="lead text-secondary">Create and manage multi-agent workflows for levy and tax processes</p>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Components</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Agents</h6>
+                        <div class="list-group mb-3">
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-calculator me-2 text-primary"></i> Levy Calculator
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-check-circle me-2 text-success"></i> Compliance Checker
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-graph-up me-2 text-info"></i> Rate Forecaster
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-search me-2 text-warning"></i> Data Analyzer
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Connectors</h6>
+                        <div class="list-group mb-3">
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-arrow-right me-2 text-secondary"></i> Sequential
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-diagram-3 me-2 text-secondary"></i> Parallel
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-code-slash me-2 text-secondary"></i> Conditional
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h6 class="fw-bold">Data Sources</h6>
+                        <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-database me-2 text-primary"></i> Tax Districts
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-database me-2 text-success"></i> Tax Codes
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-database me-2 text-info"></i> Properties
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action d-flex align-items-center" draggable="true">
+                                <i class="bi bi-database me-2 text-warning"></i> Historical Rates
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Workflow Canvas</h5>
+                    <div>
+                        <button class="btn btn-sm btn-light me-2">Save</button>
+                        <button class="btn btn-sm btn-light me-2">Validate</button>
+                        <button class="btn btn-sm btn-success">Deploy</button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="workflow-canvas" class="bg-light p-4" style="min-height: 500px; position: relative;">
+                        <!-- Demo workflow for visual purposes -->
+                        <div style="position: absolute; top: 50px; left: 80px;" class="card shadow-sm bg-white" draggable="true">
+                            <div class="card-header bg-primary text-white py-1 px-2">
+                                <small>Data Source</small>
+                            </div>
+                            <div class="card-body p-2 text-center">
+                                <i class="bi bi-database mb-2" style="font-size: 1.5rem;"></i>
+                                <p class="mb-0"><small>Tax Districts</small></p>
+                            </div>
+                        </div>
+                        
+                        <div style="position: absolute; top: 50px; left: 220px;">
+                            <i class="bi bi-arrow-right" style="font-size: 1.5rem;"></i>
+                        </div>
+                        
+                        <div style="position: absolute; top: 50px; left: 280px;" class="card shadow-sm bg-white" draggable="true">
+                            <div class="card-header bg-primary text-white py-1 px-2">
+                                <small>Agent</small>
+                            </div>
+                            <div class="card-body p-2 text-center">
+                                <i class="bi bi-calculator mb-2" style="font-size: 1.5rem;"></i>
+                                <p class="mb-0"><small>Levy Calculator</small></p>
+                            </div>
+                        </div>
+                        
+                        <div style="position: absolute; top: 50px; left: 420px;">
+                            <i class="bi bi-arrow-right" style="font-size: 1.5rem;"></i>
+                        </div>
+                        
+                        <div style="position: absolute; top: 50px; left: 480px;" class="card shadow-sm bg-white" draggable="true">
+                            <div class="card-header bg-success text-white py-1 px-2">
+                                <small>Agent</small>
+                            </div>
+                            <div class="card-body p-2 text-center">
+                                <i class="bi bi-check-circle mb-2" style="font-size: 1.5rem;"></i>
+                                <p class="mb-0"><small>Compliance Checker</small></p>
+                            </div>
+                        </div>
+                        
+                        <div style="position: absolute; top: 180px; left: 280px;" class="card shadow-sm bg-white" draggable="true">
+                            <div class="card-header bg-info text-white py-1 px-2">
+                                <small>Agent</small>
+                            </div>
+                            <div class="card-body p-2 text-center">
+                                <i class="bi bi-graph-up mb-2" style="font-size: 1.5rem;"></i>
+                                <p class="mb-0"><small>Rate Forecaster</small></p>
+                            </div>
+                        </div>
+                        
+                        <div style="position: absolute; top: 145px; left: 480px;">
+                            <i class="bi bi-arrow-down" style="font-size: 1.5rem;"></i>
+                        </div>
+                        
+                        <div style="position: absolute; top: 180px; left: 480px;" class="card shadow-sm bg-white" draggable="true">
+                            <div class="card-header bg-warning text-white py-1 px-2">
+                                <small>Agent</small>
+                            </div>
+                            <div class="card-body p-2 text-center">
+                                <i class="bi bi-file-earmark-text mb-2" style="font-size: 1.5rem;"></i>
+                                <p class="mb-0"><small>Report Generator</small></p>
+                            </div>
+                        </div>
+                        
+                        <div style="position: absolute; top: 180px; left: 420px;">
+                            <i class="bi bi-arrow-right" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Properties</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="workflow-name" class="form-label">Workflow Name</label>
+                                <input type="text" class="form-control" id="workflow-name" value="District Levy Calculation">
+                            </div>
+                            <div class="mb-3">
+                                <label for="workflow-description" class="form-label">Description</label>
+                                <textarea class="form-control" id="workflow-description" rows="2">Calculate and validate levy rates for all districts.</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="selected-element" class="form-label">Selected Element</label>
+                                <input type="text" class="form-control" id="selected-element" value="Compliance Checker" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="element-properties" class="form-label">Element Properties</label>
+                                <textarea class="form-control" id="element-properties" rows="4">type: Agent
+role: Validator
+input: Levy Calculation Results
+output: Compliance Report
+parameters: { threshold: 0.95, check_statutory: true }</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Saved Workflows</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action active">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">District Levy Calculation</h6>
+                                        <small>Current</small>
+                                    </div>
+                                    <small>Calculate and validate levy rates for all districts.</small>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Budget Impact Analysis</h6>
+                                        <small>Apr 14</small>
+                                    </div>
+                                    <small>Analyze budget impacts of levy changes.</small>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Forecasting Pipeline</h6>
+                                        <small>Apr 12</small>
+                                    </div>
+                                    <small>Generate multi-year forecasts with confidence intervals.</small>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Data Quality Check</h6>
+                                        <small>Apr 10</small>
+                                    </div>
+                                    <small>Validate imported data for quality issues.</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Workflow Designer page initialized');
+        
+        // Make elements draggable for demonstration
+        const draggableElements = document.querySelectorAll('[draggable="true"]');
+        
+        draggableElements.forEach(element => {
+            element.addEventListener('dragstart', function(e) {
+                e.dataTransfer.setData('text/plain', 'dragged');
+                setTimeout(() => {
+                    element.classList.add('dragging');
+                }, 0);
+            });
+            
+            element.addEventListener('dragend', function() {
+                element.classList.remove('dragging');
+            });
+        });
+        
+        // Canvas drag and drop handling
+        const canvas = document.getElementById('workflow-canvas');
+        
+        canvas.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        canvas.addEventListener('drop', function(e) {
+            e.preventDefault();
+            // In a real implementation, we would handle the drop here
+            console.log('Element dropped at position', e.clientX, e.clientY);
+        });
+    });
+</script>
+{% endblock %}
