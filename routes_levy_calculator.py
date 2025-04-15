@@ -13,7 +13,7 @@ from decimal import Decimal, ROUND_HALF_UP
 import json
 
 from app import db
-from models import TaxCode, TaxDistrict, Property, TaxCodeHistoricalRate
+from models import TaxCode, TaxDistrict, Property, TaxCodeHistoricalRate, LevyScenario, User
 
 # Create blueprint
 levy_calculator_bp = Blueprint('levy_calculator', __name__, url_prefix='/levy-calculator')
@@ -343,6 +343,466 @@ def get_district_details(district_id):
         }
         
         return jsonify(result)
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@levy_calculator_bp.route('/scenarios', methods=['GET'])
+def get_scenarios():
+    """
+    API endpoint to get saved levy scenarios for the current user.
+    
+    Returns:
+    {
+        "status": "success",
+        "scenarios": [
+            {
+                "id": 1,
+                "name": "Sample Scenario",
+                "description": "A sample scenario",
+                "district_id": 1,
+                "district_name": "Sample District",
+                "base_year": 2025,
+                "target_year": 2026,
+                "levy_amount": 1000000,
+                "assessed_value_change": 2.5,
+                "new_construction_value": 10000000,
+                "annexation_value": 0,
+                "result_levy_rate": 1.95,
+                "result_levy_amount": 1025000,
+                "is_public": true,
+                "created_at": "2025-01-01T00:00:00",
+                "updated_at": "2025-01-01T00:00:00"
+            }
+        ]
+    }
+    """
+    try:
+        # In a real app with authentication, you'd get the current user's ID
+        # For demo purposes, we'll return all public scenarios plus some from user ID 1
+        user_id = 1
+        
+        # Get user's scenarios and all public scenarios
+        scenarios = LevyScenario.query.filter(
+            (LevyScenario.user_id == user_id) | (LevyScenario.is_public == True)
+        ).order_by(LevyScenario.updated_at.desc()).all()
+        
+        scenarios_list = []
+        for scenario in scenarios:
+            district_name = scenario.tax_district.district_name if scenario.tax_district else "Unknown District"
+            
+            scenarios_list.append({
+                "id": scenario.id,
+                "name": scenario.name,
+                "description": scenario.description,
+                "district_id": scenario.tax_district_id,
+                "district_name": district_name,
+                "base_year": scenario.base_year,
+                "target_year": scenario.target_year,
+                "levy_amount": scenario.levy_amount,
+                "assessed_value_change": scenario.assessed_value_change,
+                "new_construction_value": scenario.new_construction_value,
+                "annexation_value": scenario.annexation_value,
+                "result_levy_rate": scenario.result_levy_rate,
+                "result_levy_amount": scenario.result_levy_amount,
+                "is_public": scenario.is_public,
+                "created_at": scenario.created_at.isoformat() if scenario.created_at else None,
+                "updated_at": scenario.updated_at.isoformat() if scenario.updated_at else None
+            })
+        
+        return jsonify({
+            "status": "success",
+            "scenarios": scenarios_list
+        })
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@levy_calculator_bp.route('/scenario/<int:scenario_id>', methods=['GET'])
+def get_scenario(scenario_id):
+    """
+    API endpoint to get a specific levy scenario.
+    
+    Returns:
+    {
+        "status": "success",
+        "scenario": {
+            "id": 1,
+            "name": "Sample Scenario",
+            "description": "A sample scenario",
+            "district_id": 1,
+            "district_name": "Sample District",
+            "base_year": 2025,
+            "target_year": 2026,
+            "levy_amount": 1000000,
+            "assessed_value_change": 2.5,
+            "new_construction_value": 10000000,
+            "annexation_value": 0,
+            "result_levy_rate": 1.95,
+            "result_levy_amount": 1025000,
+            "is_public": true,
+            "created_at": "2025-01-01T00:00:00",
+            "updated_at": "2025-01-01T00:00:00"
+        }
+    }
+    """
+    try:
+        scenario = LevyScenario.query.get(scenario_id)
+        if not scenario:
+            return jsonify({
+                "status": "error", 
+                "message": f"Scenario with ID {scenario_id} not found"
+            }), 404
+        
+        # In a real app with authentication, you'd check if the user can access this scenario
+        # For demo purposes, we'll allow access to all scenarios
+        
+        district_name = scenario.tax_district.district_name if scenario.tax_district else "Unknown District"
+        
+        result = {
+            "status": "success",
+            "scenario": {
+                "id": scenario.id,
+                "name": scenario.name,
+                "description": scenario.description,
+                "district_id": scenario.tax_district_id,
+                "district_name": district_name,
+                "base_year": scenario.base_year,
+                "target_year": scenario.target_year,
+                "levy_amount": scenario.levy_amount,
+                "assessed_value_change": scenario.assessed_value_change,
+                "new_construction_value": scenario.new_construction_value,
+                "annexation_value": scenario.annexation_value,
+                "result_levy_rate": scenario.result_levy_rate,
+                "result_levy_amount": scenario.result_levy_amount,
+                "is_public": scenario.is_public,
+                "created_at": scenario.created_at.isoformat() if scenario.created_at else None,
+                "updated_at": scenario.updated_at.isoformat() if scenario.updated_at else None
+            }
+        }
+        
+        return jsonify(result)
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@levy_calculator_bp.route('/delete-scenario/<int:scenario_id>', methods=['POST'])
+def delete_scenario(scenario_id):
+    """
+    API endpoint to delete a levy scenario.
+    
+    Returns:
+    {
+        "status": "success",
+        "message": "Scenario deleted successfully"
+    }
+    """
+    try:
+        scenario = LevyScenario.query.get(scenario_id)
+        if not scenario:
+            return jsonify({
+                "status": "error", 
+                "message": f"Scenario with ID {scenario_id} not found"
+            }), 404
+        
+        # In a real app with authentication, you'd check if the user can delete this scenario
+        # For demo purposes, we'll allow deletion of all scenarios
+        
+        db.session.delete(scenario)
+        db.session.commit()
+        
+        return jsonify({
+            "status": "success",
+            "message": "Scenario deleted successfully"
+        })
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@levy_calculator_bp.route('/save-scenario', methods=['POST'])
+def save_scenario():
+    """
+    API endpoint to save a levy scenario.
+    
+    Accepts POST with form data:
+    - scenario_id (optional): If provided, updates an existing scenario
+    - name: Name of the scenario
+    - description: Description of the scenario
+    - district_id: Tax district ID
+    - base_year: Base year for calculations
+    - target_year: Target year for forecasts
+    - levy_amount: Levy amount
+    - assessed_value_change: Percentage change in assessed value
+    - new_construction_value: Value of new construction
+    - annexation_value: Value of annexed property
+    - result_levy_rate: Calculated levy rate
+    - result_levy_amount: Calculated levy amount
+    - is_public: Whether the scenario is public
+    
+    Returns:
+    {
+        "status": "success",
+        "scenario_id": 1,
+        "message": "Scenario saved successfully"
+    }
+    """
+    try:
+        # In a real app with authentication, you'd get the current user's ID
+        # For demo purposes, we'll use user ID 1
+        user_id = 1
+        
+        # Get form data
+        scenario_id = request.form.get('scenario_id')
+        name = request.form.get('name')
+        description = request.form.get('description')
+        district_id = request.form.get('district_id')
+        base_year = request.form.get('base_year')
+        target_year = request.form.get('target_year')
+        levy_amount = request.form.get('levy_amount')
+        assessed_value_change = request.form.get('assessed_value_change', 0)
+        new_construction_value = request.form.get('new_construction_value', 0)
+        annexation_value = request.form.get('annexation_value', 0)
+        result_levy_rate = request.form.get('result_levy_rate')
+        result_levy_amount = request.form.get('result_levy_amount')
+        is_public = request.form.get('is_public', 'false').lower() == 'true'
+        
+        # Validate required fields
+        if not name or not district_id or not base_year or not target_year or not levy_amount:
+            return jsonify({
+                "status": "error",
+                "message": "Missing required fields"
+            }), 400
+        
+        # Convert types
+        try:
+            district_id = int(district_id)
+            base_year = int(base_year)
+            target_year = int(target_year)
+            levy_amount = float(levy_amount)
+            assessed_value_change = float(assessed_value_change)
+            new_construction_value = float(new_construction_value)
+            annexation_value = float(annexation_value)
+            result_levy_rate = float(result_levy_rate) if result_levy_rate else None
+            result_levy_amount = float(result_levy_amount) if result_levy_amount else None
+        except ValueError:
+            return jsonify({
+                "status": "error",
+                "message": "Invalid numeric values"
+            }), 400
+        
+        # Check if district exists
+        district = TaxDistrict.query.get(district_id)
+        if not district:
+            return jsonify({
+                "status": "error",
+                "message": f"Tax district with ID {district_id} not found"
+            }), 404
+        
+        # Create or update scenario
+        if scenario_id:
+            # Update existing scenario
+            scenario = LevyScenario.query.get(int(scenario_id))
+            if not scenario:
+                return jsonify({
+                    "status": "error",
+                    "message": f"Scenario with ID {scenario_id} not found"
+                }), 404
+            
+            # In a real app with authentication, you'd check if the user can update this scenario
+            # For demo purposes, we'll allow updates to all scenarios
+            
+            scenario.name = name
+            scenario.description = description
+            scenario.tax_district_id = district_id
+            scenario.base_year = base_year
+            scenario.target_year = target_year
+            scenario.levy_amount = levy_amount
+            scenario.assessed_value_change = assessed_value_change
+            scenario.new_construction_value = new_construction_value
+            scenario.annexation_value = annexation_value
+            scenario.result_levy_rate = result_levy_rate
+            scenario.result_levy_amount = result_levy_amount
+            scenario.is_public = is_public
+            
+            db.session.commit()
+            
+            return jsonify({
+                "status": "success",
+                "scenario_id": scenario.id,
+                "message": "Scenario updated successfully"
+            })
+        else:
+            # Create new scenario
+            scenario = LevyScenario(
+                user_id=user_id,
+                name=name,
+                description=description,
+                tax_district_id=district_id,
+                base_year=base_year,
+                target_year=target_year,
+                levy_amount=levy_amount,
+                assessed_value_change=assessed_value_change,
+                new_construction_value=new_construction_value,
+                annexation_value=annexation_value,
+                result_levy_rate=result_levy_rate,
+                result_levy_amount=result_levy_amount,
+                is_public=is_public
+            )
+            
+            db.session.add(scenario)
+            db.session.commit()
+            
+            return jsonify({
+                "status": "success",
+                "scenario_id": scenario.id,
+                "message": "Scenario created successfully"
+            })
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@levy_calculator_bp.route('/calculate', methods=['POST'])
+def calculate():
+    """
+    API endpoint for levy calculation.
+    
+    This calculates the levy rate from a district ID, levy amount, and optional year.
+    
+    Returns:
+    {
+        "status": "success",
+        "result": {
+            "district_id": 1,
+            "district_name": "Sample District",
+            "levy_amount": 1000000,
+            "assessed_value": 500000000,
+            "levy_rate": 2.0,
+            "statutory_limit": 3.5,
+            "within_limit": true,
+            "year": 2025
+        }
+    }
+    """
+    try:
+        # Get form data
+        district_id = request.form.get('taxDistrict')
+        levy_amount = request.form.get('levyAmount')
+        year = request.form.get('taxYear')
+        
+        if not district_id or not levy_amount:
+            return jsonify({
+                "status": "error",
+                "message": "Missing required fields: district_id, levy_amount"
+            }), 400
+        
+        # Convert types
+        try:
+            district_id = int(district_id)
+            levy_amount = float(levy_amount)
+            year = int(year) if year else None
+        except ValueError:
+            return jsonify({
+                "status": "error", 
+                "message": "Invalid numeric values"
+            }), 400
+        
+        # Get district
+        district = TaxDistrict.query.get(district_id)
+        if not district:
+            return jsonify({
+                "status": "error",
+                "message": f"Tax district with ID {district_id} not found"
+            }), 404
+        
+        # Get current year if not provided
+        if not year:
+            year = 2025  # Default to current year
+        
+        # Get assessed value for the district
+        # In a real app, this would come from a district's historical assessment data
+        # For demo purposes, generate a reasonable value
+        # Get tax codes for this district
+        tax_codes = TaxCode.query.filter_by(tax_district_id=district_id).all()
+        
+        assessed_value = 0
+        if tax_codes:
+            # Get historical assessed value
+            tax_code = tax_codes[0]
+            historical_rate = TaxCodeHistoricalRate.query.filter_by(
+                tax_code_id=tax_code.id,
+                year=year
+            ).first()
+            
+            if historical_rate and historical_rate.total_assessed_value:
+                assessed_value = historical_rate.total_assessed_value
+            else:
+                # Fallback to a reasonable value based on the levy amount
+                # A typical levy rate might be around 1-3 per $1,000
+                assessed_value = levy_amount * 500  # This gives a rate of about 2.0
+        else:
+            # Fallback
+            assessed_value = levy_amount * 500
+        
+        # Calculate levy rate
+        levy_rate = (levy_amount / assessed_value) * 1000 if assessed_value > 0 else 0
+        
+        # Check against statutory limit
+        statutory_limit = district.statutory_limit if hasattr(district, 'statutory_limit') and district.statutory_limit else 3.5
+        within_limit = levy_rate <= statutory_limit
+        
+        # Prepare compliance issues array (could be enhanced with real compliance rules)
+        compliance_issues = []
+        
+        # Handle special case compliance checks
+        # Example: Warn about high year-over-year increases
+        if tax_codes:
+            tax_code = tax_codes[0]
+            prev_year = year - 1
+            prev_rate = TaxCodeHistoricalRate.query.filter_by(
+                tax_code_id=tax_code.id,
+                year=prev_year
+            ).first()
+            
+            if prev_rate and prev_rate.levy_rate:
+                percent_increase = ((levy_rate - prev_rate.levy_rate) / prev_rate.levy_rate) * 100
+                if percent_increase > 10:  # Arbitrary threshold for demonstration
+                    compliance_issues.append({
+                        "type": "WARNING",
+                        "message": f"Levy rate increase of {percent_increase:.1f}% from previous year exceeds typical limits"
+                    })
+        
+        # Create result
+        result = {
+            "district_id": district_id,
+            "district_name": district.district_name,
+            "year": year,
+            "levy_amount": levy_amount,
+            "assessed_value": assessed_value,
+            "levy_rate": round(levy_rate, 4),
+            "statutory_limit": statutory_limit,
+            "within_limit": within_limit,
+            "compliance_issues": compliance_issues
+        }
+        
+        # If over the limit, provide adjusted values
+        if not within_limit:
+            adjusted_levy_amount = (statutory_limit * assessed_value) / 1000
+            levy_reduction = levy_amount - adjusted_levy_amount
+            
+            result["adjustment_data"] = {
+                "original_rate": round(levy_rate, 4),
+                "adjusted_rate": round(statutory_limit, 4),
+                "original_amount": round(levy_amount, 2),
+                "adjusted_amount": round(adjusted_levy_amount, 2),
+                "difference": round(levy_reduction, 2)
+            }
+        
+        return jsonify({
+            "status": "success",
+            "result": result
+        })
     
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
