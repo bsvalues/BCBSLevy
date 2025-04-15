@@ -55,18 +55,22 @@ const elements = {
 function initDashboard() {
     console.log('MCP Army Dashboard initializing...');
     
-    // Load initial data
-    fetchCommandStructure();
-    fetchAgents();
-    fetchExperienceStats();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Set up polling for updates
-    setInterval(refreshDashboard, 30000); // Refresh every 30 seconds
-    
-    console.log('MCP Army Dashboard initialized');
+    try {
+        // Load initial data
+        fetchCommandStructure();
+        fetchAgents();
+        fetchExperienceStats();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Set up polling for updates
+        setInterval(refreshDashboard, 30000); // Refresh every 30 seconds
+        
+        console.log('MCP Army Dashboard initialized');
+    } catch (error) {
+        console.error('Error initializing MCP Army Dashboard:', error);
+    }
 }
 
 /**
@@ -1270,7 +1274,13 @@ function formatWorkflowName(workflow) {
 }
 
 // Initialize the dashboard when the DOM is ready
-document.addEventListener('DOMContentLoaded', initDashboard);
+if (typeof jQuery !== 'undefined') {
+    // Use jQuery if available
+    $(document).ready(initDashboard);
+} else {
+    // Fallback to standard JavaScript
+    document.addEventListener('DOMContentLoaded', initDashboard);
+}
 
 // Export functions for testing
 if (typeof module !== 'undefined' && module.exports) {
