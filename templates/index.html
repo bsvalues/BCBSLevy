@@ -15,48 +15,48 @@
                     </div>
                     
                     <h1 class="display-2 fw-bold mb-3 gradient-text">LevyMaster</h1>
-                    <p class="lead mb-4 fs-4 text-light">Dynamic AI Agent Management Platform</p>
-                    <p class="lead mb-5 text-light">Intelligent multi-agent workflow coordination with advanced visualization and interaction capabilities</p>
+                    <p class="lead mb-4 fs-4 text-light">Advanced Tax Calculation System</p>
+                    <p class="lead mb-5 text-light">Comprehensive levy management with intelligent AI-powered analysis and forecasting</p>
                     
                     <!-- Main navigation buttons -->
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-3">
-                        <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-primary btn-lg px-4 rounded-pill">
+                        <a href="{{ url_for('levy_calculator.calculator') }}" class="btn btn-primary btn-lg px-4 rounded-pill">
+                            <i class="bi bi-calculator me-2"></i>Levy Calculator
+                        </a>
+                        <a href="{{ url_for('forecasting.index') }}" class="btn btn-outline-light btn-lg px-4 rounded-pill">
+                            <i class="bi bi-graph-up me-2"></i>Forecasting Tools
+                        </a>
+                        <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-success btn-lg px-4 rounded-pill">
                             <i class="bi bi-diagram-3 me-2"></i>Agent Dashboard
-                        </a>
-                        <a href="/workflow-designer" class="btn btn-outline-light btn-lg px-4 rounded-pill">
-                            <i class="bi bi-bezier2 me-2"></i>Workflow Designer
-                        </a>
-                        <a href="/agent-playground" class="btn btn-success btn-lg px-4 rounded-pill">
-                            <i class="bi bi-play-circle me-2"></i>Agent Playground
                         </a>
                     </div>
                     
                     <!-- Full Navigation Panel -->
                     <div class="bg-dark bg-opacity-50 rounded-4 p-4 mb-4 text-start">
-                        <h5 class="border-bottom border-light pb-2 mb-3 text-light">Platform Navigation</h5>
+                        <h5 class="border-bottom border-light pb-2 mb-3 text-light">Tax System Navigation</h5>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <h6 class="text-light mb-2"><i class="bi bi-robot me-2"></i>Agent Management</h6>
+                                <h6 class="text-light mb-2"><i class="bi bi-calculator me-2"></i>Levy Calculation</h6>
                                 <ul class="list-unstyled">
-                                    <li><a href="/agent-registry" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Agent Registry</a></li>
-                                    <li><a href="/agent-creator" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Create New Agent</a></li>
-                                    <li><a href="/agent-templates" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Agent Templates</a></li>
+                                    <li><a href="{{ url_for('levy_calculator.calculator') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Basic Calculator</a></li>
+                                    <li><a href="{{ url_for('levy_calculator.impact_calculator') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Impact Calculator</a></li>
+                                    <li><a href="{{ url_for('budget_impact.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Budget Analysis</a></li>
                                 </ul>
                             </div>
                             <div class="col-md-4">
-                                <h6 class="text-light mb-2"><i class="bi bi-diagram-2 me-2"></i>Workflow Tools</h6>
+                                <h6 class="text-light mb-2"><i class="bi bi-graph-up me-2"></i>Analysis & Forecasting</h6>
                                 <ul class="list-unstyled">
-                                    <li><a href="/workflow-designer" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Workflow Designer</a></li>
-                                    <li><a href="/workflow-templates" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Workflow Templates</a></li>
-                                    <li><a href="/workflow-monitor" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Workflow Monitor</a></li>
+                                    <li><a href="{{ url_for('forecasting.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Rate Forecasting</a></li>
+                                    <li><a href="{{ url_for('historical_analysis.compliance') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Historical Analysis</a></li>
+                                    <li><a href="{{ url_for('levy_audit.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Levy Audit</a></li>
                                 </ul>
                             </div>
                             <div class="col-md-4">
-                                <h6 class="text-light mb-2"><i class="bi bi-graph-up me-2"></i>Analysis</h6>
+                                <h6 class="text-light mb-2"><i class="bi bi-robot me-2"></i>AI Assistance</h6>
                                 <ul class="list-unstyled">
-                                    <li><a href="/performance-metrics" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Performance Metrics</a></li>
-                                    <li><a href="/agent-analytics" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Agent Analytics</a></li>
+                                    <li><a href="{{ url_for('mcp_army_dashboard_direct') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Agent Dashboard</a></li>
                                     <li><a href="{{ url_for('mcp.insights') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> AI Insights</a></li>
+                                    <li><a href="{{ url_for('tax_strategy.index') }}" class="text-light text-decoration-none"><i class="bi bi-arrow-right-short"></i> Tax Strategy</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -96,14 +96,14 @@
                             <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(29, 58, 84, 0.8), rgba(29, 58, 84, 0.6), rgba(29, 58, 84, 0.2)); padding: 2rem;">
                                 <div class="row h-100 align-items-center">
                                     <div class="col-md-6">
-                                        <h3 class="display-6 fw-bold mb-3">Agent Management Console</h3>
-                                        <p class="lead mb-4">Create, configure, and monitor intelligent AI agents with our intuitive management dashboard.</p>
+                                        <h3 class="display-6 fw-bold mb-3">Levy Calculator Suite</h3>
+                                        <p class="lead mb-4">Calculate, analyze, and optimize property tax levies with our comprehensive tax calculation tools.</p>
                                         <div class="d-flex gap-3">
-                                            <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-primary rounded-pill px-4">
-                                                <i class="bi bi-robot me-2"></i>Launch Console
+                                            <a href="{{ url_for('levy_calculator.calculator') }}" class="btn btn-primary rounded-pill px-4">
+                                                <i class="bi bi-calculator me-2"></i>Open Calculator
                                             </a>
-                                            <a href="/agent-templates" class="btn btn-outline-light rounded-pill px-4">
-                                                <i class="bi bi-info-circle me-2"></i>Browse Templates
+                                            <a href="{{ url_for('levy_calculator.impact_calculator') }}" class="btn btn-outline-light rounded-pill px-4">
+                                                <i class="bi bi-info-circle me-2"></i>Impact Analysis
                                             </a>
                                         </div>
                                     </div>
@@ -118,14 +118,14 @@
                             <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(102, 163, 85, 0.8), rgba(102, 163, 85, 0.6), rgba(102, 163, 85, 0.2)); padding: 2rem;">
                                 <div class="row h-100 align-items-center">
                                     <div class="col-md-6">
-                                        <h3 class="display-6 fw-bold mb-3">Workflow Designer</h3>
-                                        <p class="lead mb-4">Create complex agent workflows with our visual designer and orchestration tools.</p>
+                                        <h3 class="display-6 fw-bold mb-3">Rate Forecasting</h3>
+                                        <p class="lead mb-4">Predict future levy rates with confidence using our advanced statistical models and visualization tools.</p>
                                         <div class="d-flex gap-3">
-                                            <a href="/workflow-designer" class="btn btn-dark rounded-pill px-4">
-                                                <i class="bi bi-bezier2 me-2"></i>Start Designing
+                                            <a href="{{ url_for('forecasting.index') }}" class="btn btn-dark rounded-pill px-4">
+                                                <i class="bi bi-graph-up me-2"></i>Create Forecast
                                             </a>
-                                            <a href="/workflow-templates" class="btn btn-outline-dark rounded-pill px-4">
-                                                <i class="bi bi-card-list me-2"></i>View Templates
+                                            <a href="{{ url_for('historical_analysis.compliance') }}" class="btn btn-outline-dark rounded-pill px-4">
+                                                <i class="bi bi-card-list me-2"></i>Historical Rates
                                             </a>
                                         </div>
                                     </div>
@@ -140,14 +140,14 @@
                             <div class="carousel-caption d-none d-md-block text-start position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(61, 165, 189, 0.8), rgba(61, 165, 189, 0.6), rgba(61, 165, 189, 0.2)); padding: 2rem;">
                                 <div class="row h-100 align-items-center">
                                     <div class="col-md-6">
-                                        <h3 class="display-6 fw-bold mb-3">Performance Analytics</h3>
-                                        <p class="lead mb-4">Monitor your agent fleet with detailed analytics and real-time performance tracking.</p>
+                                        <h3 class="display-6 fw-bold mb-3">Compliance Audit</h3>
+                                        <p class="lead mb-4">Ensure tax calculations meet regulatory requirements with our AI-powered levy audit system.</p>
                                         <div class="d-flex gap-3">
-                                            <a href="/performance-metrics" class="btn btn-light rounded-pill px-4">
-                                                <i class="bi bi-graph-up-arrow me-2"></i>View Metrics
+                                            <a href="{{ url_for('levy_audit.index') }}" class="btn btn-light rounded-pill px-4">
+                                                <i class="bi bi-shield-check me-2"></i>Audit Levy
                                             </a>
-                                            <a href="/agent-analytics" class="btn btn-outline-light rounded-pill px-4">
-                                                <i class="bi bi-speedometer2 me-2"></i>Agent Analytics
+                                            <a href="{{ url_for('historical_analysis.compliance') }}" class="btn btn-outline-light rounded-pill px-4">
+                                                <i class="bi bi-file-earmark-text me-2"></i>Compliance Reports
                                             </a>
                                         </div>
                                     </div>
@@ -172,45 +172,45 @@
     <section class="py-5 features-section">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold">Powerful Agent Management Tools</h2>
-                <p class="lead text-muted">Comprehensive solutions for AI agent orchestration and monitoring</p>
+                <h2 class="display-5 fw-bold">Advanced Tax Calculation Features</h2>
+                <p class="lead text-muted">Comprehensive tools for levy management, forecasting, and compliance</p>
                 <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
             </div>
             
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="agent-management" style="overflow: hidden;">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="levy-calculator" style="overflow: hidden;">
                         <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #3DA5BD, #5da2b3); height: 4px;"></div>
                         <div class="card-body text-center p-5">
                             <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(61, 165, 189, 0.1);">
-                                <i class="bi bi-robot" style="color: #3DA5BD;"></i>
+                                <i class="bi bi-calculator" style="color: #3DA5BD;"></i>
                             </div>
-                            <h3 class="card-title h4 mb-3 fw-bold">Agent Management</h3>
-                            <p class="card-text text-muted">Create and configure intelligent AI agents with specialized roles, capabilities, and collaboration patterns for your specific needs.</p>
+                            <h3 class="card-title h4 mb-3 fw-bold">Levy Calculation</h3>
+                            <p class="card-text text-muted">Accurately calculate property tax levies with our comprehensive calculator suite, supporting multiple tax codes and districts.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="workflow-tools" style="overflow: hidden;">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="forecasting" style="overflow: hidden;">
                         <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #66A355, #78c265); height: 4px;"></div>
                         <div class="card-body text-center p-5">
                             <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(102, 163, 85, 0.1);">
-                                <i class="bi bi-diagram-3" style="color: #66A355;"></i>
+                                <i class="bi bi-graph-up" style="color: #66A355;"></i>
                             </div>
-                            <h3 class="card-title h4 mb-3 fw-bold">Workflow Design</h3>
-                            <p class="card-text text-muted">Design complex multi-agent workflows with our visual designer, orchestration tools, and collaboration patterns for efficient task execution.</p>
+                            <h3 class="card-title h4 mb-3 fw-bold">Rate Forecasting</h3>
+                            <p class="card-text text-muted">Predict future levy rates using advanced statistical models and AI-enhanced forecasting with customizable confidence intervals.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="analytics" style="overflow: hidden;">
+                    <div class="card h-100 border-0 shadow-sm hover-card" data-tour="compliance" style="overflow: hidden;">
                         <div class="position-absolute top-0 start-0 w-100 h-2" style="background: linear-gradient(90deg, #F0C75C, #f5d78a); height: 4px;"></div>
                         <div class="card-body text-center p-5">
                             <div class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(240, 199, 92, 0.1);">
-                                <i class="bi bi-graph-up" style="color: #F0C75C;"></i>
+                                <i class="bi bi-shield-check" style="color: #F0C75C;"></i>
                             </div>
-                            <h3 class="card-title h4 mb-3 fw-bold">Performance Analytics</h3>
-                            <p class="card-text text-muted">Monitor your agent fleet with detailed performance metrics, task success rates, and optimization recommendations for peak efficiency.</p>
+                            <h3 class="card-title h4 mb-3 fw-bold">Compliance Audit</h3>
+                            <p class="card-text text-muted">Ensure tax calculations meet all regulatory requirements with our AI-powered levy audit system and compliance verification tools.</p>
                         </div>
                     </div>
                 </div>
@@ -223,26 +223,26 @@
         <div class="container py-4">
             <div class="row align-items-center">
                 <div class="col-lg-5 mb-4 mb-lg-0">
-                    <h2 class="display-6 fw-bold mb-4">Agent Command Center</h2>
-                    <p class="lead mb-4 text-light opacity-90">Monitor your AI agents, visualize workflows, and gain insights with our powerful command interface.</p>
+                    <h2 class="display-6 fw-bold mb-4">Tax Analysis Center</h2>
+                    <p class="lead mb-4 text-light opacity-90">Leverage AI-powered tools to analyze, optimize, and validate your property tax calculations.</p>
                     <div class="bg-white bg-opacity-10 p-4 rounded-3 mb-4">
                         <ul class="list-unstyled mb-0">
                             <li class="mb-3 d-flex align-items-center">
                                 <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
-                                <span class="text-light">Real-time agent status monitoring</span>
+                                <span class="text-light">Comprehensive tax district analysis</span>
                             </li>
                             <li class="mb-3 d-flex align-items-center">
                                 <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
-                                <span class="text-light">Workflow visualization and tracing</span>
+                                <span class="text-light">Multi-year rate trend visualization</span>
                             </li>
                             <li class="mb-3 d-flex align-items-center">
                                 <i class="bi bi-check-circle-fill text-white me-3" style="color: #F0C75C !important;"></i>
-                                <span class="text-light">Agent performance analytics</span>
+                                <span class="text-light">Automatic compliance verification</span>
                             </li>
                         </ul>
                     </div>
                     <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-light rounded-pill px-4 fw-medium">
-                        <i class="bi bi-diagram-3 me-2"></i>Open Command Center
+                        <i class="bi bi-graph-up me-2"></i>Open Analysis Center
                     </a>
                 </div>
                 <div class="col-lg-7">
@@ -272,8 +272,8 @@
     <section class="py-5 reports-section" style="background-color: #f8fafc;">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold">Agent Analytics & Insights</h2>
-                <p class="lead text-muted">Gain in-depth understanding of your AI agents' performance and capabilities</p>
+                <h2 class="display-5 fw-bold">Tax Rate Analytics & Reports</h2>
+                <p class="lead text-muted">Gain in-depth understanding of your levy calculations and tax district performance</p>
                 <div class="separator mx-auto my-4" style="width: 80px; height: 4px; background: linear-gradient(90deg, #3DA5BD, #66A355);"></div>
             </div>
             
@@ -282,8 +282,8 @@
                     <img src="{{ url_for('static', filename='images/reports-preview.png') }}" alt="Reports Preview" class="img-fluid rounded-4 shadow-lg">
                 </div>
                 <div class="col-lg-6">
-                    <h3 class="h2 fw-bold mb-4">Comprehensive Agent Analytics</h3>
-                    <p class="lead mb-4">Monitor agent performance, analyze workflows, and optimize your AI fleet with detailed metrics.</p>
+                    <h3 class="h2 fw-bold mb-4">Comprehensive Tax Analytics</h3>
+                    <p class="lead mb-4">Monitor levy rates, analyze property tax trends, and optimize your tax strategies with detailed metrics.</p>
                     
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
@@ -292,48 +292,48 @@
                                     <i class="bi bi-graph-up" style="color: #3DA5BD;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">Performance Metrics</h4>
-                                    <p class="text-muted small">Track response times, success rates, and resource utilization</p>
+                                    <h4 class="h5 fw-bold">Historical Analysis</h4>
+                                    <p class="text-muted small">Track tax rate trends, year-over-year changes, and statutory limit compliance</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex">
                                 <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(102, 163, 85, 0.1);">
-                                    <i class="bi bi-diagram-3" style="color: #66A355;"></i>
+                                    <i class="bi bi-file-earmark-bar-graph" style="color: #66A355;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">Workflow Analysis</h4>
-                                    <p class="text-muted small">Visualize task execution paths and identify bottlenecks</p>
+                                    <h4 class="h5 fw-bold">Compliance Reports</h4>
+                                    <p class="text-muted small">Generate detailed compliance reports for regulatory requirements and auditing</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex">
                                 <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(240, 199, 92, 0.1);">
-                                    <i class="bi bi-cpu" style="color: #F0C75C;"></i>
+                                    <i class="bi bi-reception-4" style="color: #F0C75C;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">Agent Collaboration</h4>
-                                    <p class="text-muted small">Map cross-agent communication and knowledge sharing</p>
+                                    <h4 class="h5 fw-bold">Rate Forecasting</h4>
+                                    <p class="text-muted small">Project future tax rates using historical data and economic indicators</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex">
                                 <div class="feature-icon me-3 p-3 rounded-circle" style="background-color: rgba(83, 123, 156, 0.1);">
-                                    <i class="bi bi-lightning-charge" style="color: #537B9C;"></i>
+                                    <i class="bi bi-building" style="color: #537B9C;"></i>
                                 </div>
                                 <div>
-                                    <h4 class="h5 fw-bold">Optimization Insights</h4>
-                                    <p class="text-muted small">Receive AI-powered recommendations for performance tuning</p>
+                                    <h4 class="h5 fw-bold">District Comparison</h4>
+                                    <p class="text-muted small">Compare tax districts for comprehensive analysis and strategic planning</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <a href="/performance-metrics" class="btn btn-primary rounded-pill px-4">
-                        <i class="bi bi-speedometer2 me-2"></i>View Analytics
+                    <a href="{{ url_for('reports.reports_dashboard') }}" class="btn btn-primary rounded-pill px-4">
+                        <i class="bi bi-file-earmark-text me-2"></i>View Reports
                     </a>
                 </div>
             </div>
@@ -357,8 +357,8 @@
                     </div>
                 </div>
                 <div class="col-lg-7 order-lg-1">
-                    <h2 class="display-5 fw-bold mb-4">Advanced Agent Capabilities</h2>
-                    <p class="lead mb-4">LevyMaster leverages sophisticated AI techniques to create an advanced tax calculation and levy management system with comprehensive analysis capabilities.</p>
+                    <h2 class="display-5 fw-bold mb-4">Tax Calculation Intelligence</h2>
+                    <p class="lead mb-4">LevyMaster leverages sophisticated AI technologies to create an advanced tax calculation system with intelligent compliance checking and forecasting capabilities.</p>
                     
                     <div class="mb-4">
                         <div class="row g-4">
@@ -367,9 +367,9 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #3DA5BD;">New</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Multi-Agent Coordination</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Intelligent Rate Analysis</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Orchestrate complex workflows with agents that communicate, collaborate, and share context seamlessly.</p>
+                                        <p class="text-muted mb-0">Analyze tax levy rates across districts with AI-powered comparisons and pattern recognition for deeper insights.</p>
                                     </div>
                                 </div>
                             </div>
@@ -378,9 +378,9 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #66A355;">Advanced</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Adaptive Learning</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Predictive Forecasting</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Agents continuously improve through experience sharing and feedback loops, becoming more efficient over time.</p>
+                                        <p class="text-muted mb-0">Project future levy rates with accuracy using machine learning models that adapt to changing property values and economic conditions.</p>
                                     </div>
                                 </div>
                             </div>
@@ -389,9 +389,9 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #F0C75C;">Featured</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Specialized Expertise</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Automated Compliance</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Create domain-specific agents with fine-tuned capabilities for your industry or use case requirements.</p>
+                                        <p class="text-muted mb-0">Automatically verify tax calculations against state and local regulations, ensuring full compliance with all statutory requirements.</p>
                                     </div>
                                 </div>
                             </div>
@@ -400,17 +400,17 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-3">
                                             <span class="badge rounded-pill" style="background-color: #537B9C;">Smart</span>
-                                            <h4 class="h5 fw-bold mb-0 ms-2">Human-Agent Collaboration</h4>
+                                            <h4 class="h5 fw-bold mb-0 ms-2">Budget Impact Analysis</h4>
                                         </div>
-                                        <p class="text-muted mb-0">Intuitive interfaces for directing agent activities, approving decisions, and integrating human expertise.</p>
+                                        <p class="text-muted mb-0">Simulate the impact of tax rate changes on budgets and property owners, providing decision support for optimal rate setting.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <a href="{{ url_for('mcp.insights') }}" class="btn btn-gradient rounded-pill px-4">
-                        <i class="bi bi-cpu me-2"></i>Explore Agent Capabilities
+                    <a href="{{ url_for('levy_calculator.calculator') }}" class="btn btn-gradient rounded-pill px-4">
+                        <i class="bi bi-calculator me-2"></i>Try Tax Calculator
                     </a>
                 </div>
             </div>
@@ -421,16 +421,16 @@
     <section class="py-5 my-5 cta-section text-center">
         <div class="container">
             <div class="bg-gradient rounded-4 p-5 text-white" style="background: linear-gradient(135deg, #1D3A54 0%, #3DA5BD 100%);">
-                <h2 class="display-5 fw-bold mb-3">Ready to Transform Your AI Capabilities?</h2>
-                <p class="lead mb-4 col-lg-8 mx-auto">Join organizations using LevyMaster to streamline tax calculations and levy management with intelligent analysis capabilities.</p>
+                <h2 class="display-5 fw-bold mb-3">Ready to Transform Your Tax Calculation Process?</h2>
+                <p class="lead mb-4 col-lg-8 mx-auto">Join county assessors and tax professionals using LevyMaster to streamline property tax calculations with intelligent analysis capabilities.</p>
                 <div class="row justify-content-center">
                     <div class="col-md-10 col-lg-8">
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                            <a href="/demo" class="btn btn-light btn-lg rounded-pill px-4 gap-3">
-                                <i class="bi bi-play-circle me-2"></i>Watch Demo
+                            <a href="{{ url_for('levy_calculator.calculator') }}" class="btn btn-light btn-lg rounded-pill px-4 gap-3">
+                                <i class="bi bi-calculator me-2"></i>Start Calculating
                             </a>
                             <a href="{{ url_for('mcp_army_dashboard_direct') }}" class="btn btn-outline-light btn-lg rounded-pill px-4">
-                                <i class="bi bi-robot me-2"></i>Launch Platform
+                                <i class="bi bi-graph-up me-2"></i>Explore Analytics
                             </a>
                         </div>
                     </div>
