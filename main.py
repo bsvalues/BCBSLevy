@@ -1,5 +1,5 @@
 """
-PRODUCTION ENTRY POINT for the Agent Nexus Platform.
+PRODUCTION ENTRY POINT for the LevyMaster application.
 
 This module serves as the primary entry point for running the Flask
 application in production with Gunicorn, as well as for direct execution
@@ -23,7 +23,7 @@ from app import app
 logging.basicConfig(level=logging.DEBUG)
 
 # Log that application is being served
-app.logger.info("Starting Agent Nexus Platform")
+app.logger.info("Starting LevyMaster application")
 
 # This makes the app discoverable by Gunicorn
 # Do not modify this section - Gunicorn looks for app in this location

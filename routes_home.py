@@ -1,5 +1,5 @@
 """
-Core routes for the Agent Nexus Platform (PRIMARY HOME ROUTES).
+Core routes for the LevyMaster application (PRIMARY HOME ROUTES).
 
 This module provides the main routes for the application including
 the dashboard, home page, and user settings. This is the standardized
@@ -27,7 +27,7 @@ home_bp = Blueprint('home', __name__)
 @home_bp.route('/')
 def index():
     """Render the home/landing page."""
-    return render_template('index.html', page_title="Agent Nexus Platform")
+    return render_template('index.html', page_title="LevyMaster")
 
 @home_bp.route('/dashboard')
 def dashboard():
