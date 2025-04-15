@@ -340,7 +340,7 @@
     </div>
     <div class="col-lg-4">
         <!-- Saved Scenarios -->
-        <div class="calculator-section mb-4">
+        <div class="calculator-section mb-4" id="scenariosSection">
             <div class="calculator-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">My Saved Scenarios</h5>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshScenariosBtn">
@@ -348,45 +348,14 @@
                 </button>
             </div>
             <div class="calculator-body">
-                <div id="scenariosContainer">
-                    {% if recent_scenarios %}
-                        {% for scenario in recent_scenarios %}
-                        <div class="card scenario-card mb-3">
-                            <div class="card-body p-3">
-                                <h6 class="card-title mb-1">{{ scenario.name }}</h6>
-                                <p class="text-muted small mb-2">{{ scenario.description }}</p>
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="badge bg-light text-dark">{{ scenario.tax_district.district_name }}</span>
-                                    <span class="badge bg-primary">{{ scenario.target_year }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <p class="mb-0 small text-muted">Levy Amount</p>
-                                        <p class="mb-0 fw-bold">{{ scenario.result_levy_amount|format_currency }}</p>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0 small text-muted">Levy Rate</p>
-                                        <p class="mb-0 fw-bold">{{ scenario.result_levy_rate|format_number }}</p>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-between mt-3">
-                                    <button type="button" class="btn btn-sm btn-outline-primary load-scenario-btn" data-scenario-id="{{ scenario.id }}">
-                                        <i class="bi bi-arrow-clockwise me-1"></i>Load
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger delete-scenario-btn" data-scenario-id="{{ scenario.id }}">
-                                        <i class="bi bi-trash me-1"></i>Delete
-                                    </button>
-                                </div>
-                            </div>
+                <div id="scenariosList">
+                    <!-- Scenarios will be loaded dynamically via JavaScript -->
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="bi bi-folder text-muted display-5"></i>
-                            <p class="mt-3 mb-0 text-muted">No saved scenarios yet</p>
-                            <p class="small text-muted">Calculate a levy and save it to see it here</p>
-                        </div>
-                    {% endif %}
+                        <p class="mt-2 text-muted">Loading scenarios...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -482,9 +451,9 @@
             </div>
             <div class="modal-body">
                 <form id="saveScenarioForm">
-                    <input type="hidden" id="scenarioId" name="scenario_id">
-                    <input type="hidden" id="saveDistrict" name="district_id">
-                    <input type="hidden" id="saveYear" name="base_year">
+                    <input type="hidden" id="saveScenarioId" name="scenario_id">
+                    <input type="hidden" id="saveDistrictId" name="district_id">
+                    <input type="hidden" id="saveBaseYear" name="base_year">
                     <input type="hidden" id="saveTargetYear" name="target_year">
                     <input type="hidden" id="saveLevyAmount" name="levy_amount">
                     <input type="hidden" id="saveAssessedValueChange" name="assessed_value_change" value="0">
@@ -534,7 +503,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/levy_calculator.js') }}"></script>
+<script src="{{ url_for('static', filename='js/levy_calculator_updated.js') }}"></script>
 <script>
 // Additional page-specific JavaScript
 document.addEventListener('DOMContentLoaded', function() {
@@ -703,8 +672,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Pre-fill form
-        document.getElementById('saveDistrict').value = currentCalculation.district_id;
-        document.getElementById('saveYear').value = currentCalculation.year;
+        document.getElementById('saveDistrictId').value = currentCalculation.district_id;
+        document.getElementById('saveBaseYear').value = currentCalculation.year;
         document.getElementById('saveTargetYear').value = currentCalculation.year;
         document.getElementById('saveLevyAmount').value = currentCalculation.levy_amount;
         

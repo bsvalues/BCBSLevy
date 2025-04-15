@@ -634,21 +634,20 @@ def save_scenario():
             })
         else:
             # Create new scenario
-            scenario = LevyScenario(
-                user_id=user_id,
-                name=name,
-                description=description,
-                tax_district_id=district_id,
-                base_year=base_year,
-                target_year=target_year,
-                levy_amount=levy_amount,
-                assessed_value_change=assessed_value_change,
-                new_construction_value=new_construction_value,
-                annexation_value=annexation_value,
-                result_levy_rate=result_levy_rate,
-                result_levy_amount=result_levy_amount,
-                is_public=is_public
-            )
+            scenario = LevyScenario()
+            scenario.user_id = user_id
+            scenario.name = name
+            scenario.description = description
+            scenario.tax_district_id = district_id
+            scenario.base_year = base_year
+            scenario.target_year = target_year
+            scenario.levy_amount = levy_amount
+            scenario.assessed_value_change = assessed_value_change
+            scenario.new_construction_value = new_construction_value
+            scenario.annexation_value = annexation_value
+            scenario.result_levy_rate = result_levy_rate
+            scenario.result_levy_amount = result_levy_amount
+            scenario.is_public = is_public
             
             db.session.add(scenario)
             db.session.commit()

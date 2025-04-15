@@ -13,6 +13,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Load the saved scenarios if on levy calculator page
         if (document.getElementById('scenariosSection')) {
             loadSavedScenarios();
+            
+            // Add event listener for refresh button
+            const refreshButton = document.getElementById('refreshScenariosBtn');
+            if (refreshButton) {
+                refreshButton.addEventListener('click', loadSavedScenarios);
+            }
         }
         
         console.log('Levy Calculator JS loaded successfully');
@@ -34,6 +40,8 @@ function initLevyCalculator() {
     const adjustedRateSection = document.getElementById('adjustedRateSection');
     const saveScenarioBtn = document.getElementById('saveScenarioBtn');
     const saveResultBtn = document.getElementById('saveResultBtn');
+    const saveScenarioForm = document.getElementById('saveScenarioForm');
+    const confirmSaveScenarioBtn = document.getElementById('confirmSaveScenario');
     const taxDistrictSelect = document.getElementById('taxDistrict');
     
     // Check if we're on the levy calculator page
@@ -88,6 +96,10 @@ function initLevyCalculator() {
     
     if (saveResultBtn) {
         saveResultBtn.addEventListener('click', openSaveScenarioModal);
+    }
+    
+    if (confirmSaveScenarioBtn) {
+        confirmSaveScenarioBtn.addEventListener('click', handleSaveScenario);
     }
     
     if (taxDistrictSelect) {
@@ -346,6 +358,74 @@ function initLevyCalculator() {
     }
     
     /**
+     * Handle save scenario action
+     */
+    function handleSaveScenario() {
+        if (!currentCalculation) {
+            alert('Please calculate a levy rate first.');
+            return;
+        }
+        
+        // Show loading state
+        document.getElementById('confirmSaveScenario').innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+        document.getElementById('confirmSaveScenario').disabled = true;
+        
+        // Get form data
+        const formData = new FormData(saveScenarioForm);
+        
+        // Add forecast data if available
+        if (document.getElementById('assessedValueChange')) {
+            formData.append('assessed_value_change', document.getElementById('assessedValueChange').value || 0);
+            formData.append('new_construction_value', document.getElementById('newConstructionValue').value || 0);
+            formData.append('annexation_value', document.getElementById('annexationValue').value || 0);
+        }
+        
+        // Add calculation results
+        formData.append('result_levy_rate', currentCalculation.levy_rate);
+        formData.append('result_levy_amount', currentCalculation.levy_amount);
+        
+        // Send request to server
+        fetch('/levy-calculator/save-scenario', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reset button state
+            document.getElementById('confirmSaveScenario').innerHTML = 'Save Scenario';
+            document.getElementById('confirmSaveScenario').disabled = false;
+            
+            if (data.status === 'success') {
+                // Hide modal
+                if (saveScenarioModal) {
+                    saveScenarioModal.hide();
+                }
+                
+                // Set current scenario ID
+                currentScenarioId = data.scenario_id;
+                
+                // Show success message
+                alert(data.message);
+                
+                // Refresh scenarios list
+                loadSavedScenarios();
+            } else {
+                // Show error message
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error saving scenario:', error);
+            document.getElementById('confirmSaveScenario').innerHTML = 'Save Scenario';
+            document.getElementById('confirmSaveScenario').disabled = false;
+            alert('An error occurred while saving the scenario. Please try again.');
+        });
+    }
+    
+    /**
      * Load a specific scenario
      * @param {number} scenarioId - The scenario ID to load
      */
@@ -360,7 +440,8 @@ function initLevyCalculator() {
                     // Set form values
                     if (taxDistrictSelect) {
                         taxDistrictSelect.value = scenario.district_id;
-                        // Trigger change event
+                        
+                        // Trigger change event to load district details
                         const event = new Event('change');
                         taxDistrictSelect.dispatchEvent(event);
                     }
@@ -410,4 +491,195 @@ function initLevyCalculator() {
             maximumFractionDigits: 4
         }).format(value);
     }
+}
+
+/**
+ * Load saved scenarios
+ */
+function loadSavedScenarios() {
+    const scenariosContainer = document.getElementById('scenariosList');
+    if (!scenariosContainer) return;
+    
+    // Show loading state
+    scenariosContainer.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted">Loading saved scenarios...</p></div>';
+    
+    try {
+        // Fetch scenarios from API
+        fetch('/levy-calculator/scenarios')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success' && data.scenarios) {
+                    displayScenarios(data.scenarios);
+                } else {
+                    throw new Error(data.message || 'Failed to load scenarios');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading scenarios:', error);
+                scenariosContainer.innerHTML = `<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>${error.message || 'Error loading scenarios. Please try again.'}</div>`;
+            });
+    } catch (err) {
+        console.error('Error in loadSavedScenarios:', err);
+        scenariosContainer.innerHTML = `<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>Error loading scenarios: ${err.message}</div>`;
+    }
+    
+    /**
+     * Display the scenarios
+     * @param {Array} scenarios - Array of scenario objects
+     */
+    function displayScenarios(scenarios) {
+        if (!scenarios.length) {
+            scenariosContainer.innerHTML = '<div class="text-center py-4"><p class="text-muted">No saved scenarios yet.</p><p>Calculate a levy rate and save it to create your first scenario.</p></div>';
+            return;
+        }
+        
+        // Clear the container
+        scenariosContainer.innerHTML = '';
+        
+        // Create a row for the cards
+        const row = document.createElement('div');
+        row.className = 'row g-3';
+        
+        // Add each scenario
+        scenarios.forEach(scenario => {
+            const scenarioCard = createScenarioCard(scenario);
+            row.appendChild(scenarioCard);
+        });
+        
+        scenariosContainer.appendChild(row);
+    }
+    
+    /**
+     * Create a card for a scenario
+     * @param {Object} scenario - Scenario data
+     * @returns {HTMLElement} The scenario card element
+     */
+    function createScenarioCard(scenario) {
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4';
+        
+        const card = document.createElement('div');
+        card.className = 'card h-100 scenario-card';
+        card.innerHTML = `
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">${scenario.name}</h6>
+                <span class="badge ${scenario.is_public ? 'bg-info' : 'bg-secondary'} px-2">
+                    ${scenario.is_public ? 'Public' : 'Private'}
+                </span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-1">District</p>
+                <p class="mb-3">${scenario.district_name}</p>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <p class="text-muted small mb-1">Base Year</p>
+                        <p class="mb-0">${scenario.base_year}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted small mb-1">Target Year</p>
+                        <p class="mb-0">${scenario.target_year}</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <p class="text-muted small mb-1">Levy Amount</p>
+                        <p class="mb-0">${formatCurrency(scenario.levy_amount)}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted small mb-1">Levy Rate</p>
+                        <p class="mb-0">${formatRate(scenario.result_levy_rate || 0)}</p>
+                    </div>
+                </div>
+                
+                ${scenario.description ? `
+                <hr>
+                <p class="text-muted small mb-1">Description</p>
+                <p class="small mb-0">${scenario.description}</p>
+                ` : ''}
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <small class="text-muted">Created: ${new Date(scenario.created_at).toLocaleDateString()}</small>
+                <div class="btn-group btn-group-sm">
+                    <a href="/levy-calculator?scenario=${scenario.id}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-up-right-square"></i>
+                    </a>
+                    <button class="btn btn-outline-danger" data-scenario-id="${scenario.id}" data-action="delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Add event listeners for the delete button
+        const deleteBtn = card.querySelector('[data-action="delete"]');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => {
+                if (confirm(`Are you sure you want to delete the scenario "${scenario.name}"? This cannot be undone.`)) {
+                    deleteScenario(scenario.id);
+                }
+            });
+        }
+        
+        col.appendChild(card);
+        return col;
+    }
+    
+    /**
+     * Delete a scenario
+     * @param {number} scenarioId - The ID of the scenario to delete
+     */
+    function deleteScenario(scenarioId) {
+        fetch(`/levy-calculator/delete-scenario/${scenarioId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Reload scenarios
+                loadSavedScenarios();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting scenario:', error);
+            alert('An error occurred while deleting the scenario. Please try again.');
+        });
+    }
+}
+
+/**
+ * Format a decimal number as a currency string (outside of any function scope)
+ * @param {number} value - The number to format
+ * @returns {string} The formatted currency string
+ */
+function formatCurrency(value) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(value);
+}
+
+/**
+ * Format a decimal number as a rate with 3 decimal places (outside of any function scope)
+ * @param {number} value - The number to format
+ * @returns {string} The formatted rate string
+ */
+function formatRate(value) {
+    return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3
+    }).format(value);
 }
