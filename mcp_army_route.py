@@ -9,8 +9,7 @@ import logging
 from typing import Dict, Any, List
 
 # Import Flask components 
-import flask
-from flask import render_template, request, jsonify, current_app, redirect
+from flask import Flask, render_template, request, jsonify, current_app, redirect
 
 from utils.mcp_army_init import (
     get_agent_manager, get_collaboration_manager, 

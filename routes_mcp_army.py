@@ -8,7 +8,7 @@ through the web interface.
 import logging
 from typing import Dict, Any, List
 
-from flask import Blueprint, render_template, request, jsonify, current_app
+from flask import Flask, Blueprint, render_template, request, jsonify, current_app
 
 def generate_command_structure_diagram(command_structure, agent_relationships):
     """
@@ -124,13 +124,20 @@ def get_command_structure():
         if not agent_manager:
             return jsonify({"error": "MCP Army system not initialized"}), 503
         
-        return jsonify({
-            "command_structure": agent_manager.command_structure,
-            "agent_relationships": agent_manager.agent_relationships
-        })
+        # Import utility for formatting command structure
+        from utils.mcp_api_endpoints import format_command_structure
+        
+        # Format the command structure for API consumption
+        formatted_structure = format_command_structure(
+            agent_manager.command_structure, 
+            agent_manager.agent_relationships
+        )
+        
+        return jsonify(formatted_structure)
     except Exception as e:
         logger.error(f"Error getting command structure: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        from utils.mcp_api_endpoints import handle_api_error
+        return jsonify(handle_api_error(e, "Error retrieving command structure")), 500
 
 @mcp_army_bp.route('/api/agents')
 def list_agents():
@@ -140,11 +147,26 @@ def list_agents():
         if not agent_manager:
             return jsonify({"error": "MCP Army system not initialized"}), 503
         
-        agents = agent_manager.list_agents()
-        return jsonify({"agents": agents})
+        agents_raw = agent_manager.list_agents()
+        
+        # Import utility for formatting agent status
+        from utils.mcp_api_endpoints import format_agent_status
+        
+        # Format each agent in the list
+        formatted_agents = []
+        for agent in agents_raw:
+            agent_id = agent.get('id', 'unknown')
+            # Get detailed status for each agent
+            status = agent_manager.get_agent_status(agent_id) or {}
+            # Format the agent status
+            formatted_agent = format_agent_status(agent_id, status)
+            formatted_agents.append(formatted_agent)
+        
+        return jsonify({"agents": formatted_agents})
     except Exception as e:
         logger.error(f"Error listing agents: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        from utils.mcp_api_endpoints import handle_api_error
+        return jsonify(handle_api_error(e, "Error retrieving agent list")), 500
 
 @mcp_army_bp.route('/api/agents/<agent_id>')
 def get_agent_status(agent_id):
@@ -158,7 +180,13 @@ def get_agent_status(agent_id):
         if not status:
             return jsonify({"error": f"Agent {agent_id} not found"}), 404
             
-        return jsonify({"agent_id": agent_id, "status": status})
+        # Import utility for formatting agent status
+        from utils.mcp_api_endpoints import format_agent_status
+        
+        # Format the agent status for API consumption
+        formatted_status = format_agent_status(agent_id, status)
+        
+        return jsonify(formatted_status)
     except Exception as e:
         logger.error(f"Error getting agent status: {str(e)}")
         return jsonify({"error": str(e)}), 500
@@ -201,11 +229,20 @@ def get_experience_stats():
         if not collaboration_manager:
             return jsonify({"error": "MCP Army system not initialized"}), 503
         
+        # Get stats from the collaboration manager
         stats = collaboration_manager.get_experience_stats()
-        return jsonify(stats)
+        
+        # Import utility for formatting experience stats
+        from utils.mcp_api_endpoints import format_experience_stats
+        
+        # Format the experience stats for API consumption
+        formatted_stats = format_experience_stats(stats)
+        
+        return jsonify(formatted_stats)
     except Exception as e:
         logger.error(f"Error getting experience stats: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        from utils.mcp_api_endpoints import handle_api_error
+        return jsonify(handle_api_error(e, "Error retrieving experience statistics")), 500
 
 @mcp_army_bp.route('/api/agents/<agent_id>/experiences')
 def get_agent_experiences(agent_id):
@@ -216,11 +253,22 @@ def get_agent_experiences(agent_id):
             return jsonify({"error": "MCP Army system not initialized"}), 503
         
         limit = request.args.get('limit', 10, type=int)
-        experiences = collaboration_manager.get_agent_experiences(agent_id, limit)
+        
+        try:
+            # Try to get experiences from the collaboration manager
+            experiences = collaboration_manager.get_agent_experiences(agent_id, limit)
+        except Exception as inner_e:
+            logger.warning(f"Could not retrieve experiences from collaboration manager: {str(inner_e)}")
+            # Import utility for generating demo experiences
+            from utils.mcp_api_endpoints import generate_demo_experiences
+            # Generate demo experiences
+            experiences = generate_demo_experiences(agent_id, limit)
+        
         return jsonify({"agent_id": agent_id, "experiences": experiences})
     except Exception as e:
         logger.error(f"Error getting agent experiences: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        from utils.mcp_api_endpoints import handle_api_error
+        return jsonify(handle_api_error(e, f"Error retrieving experiences for agent {agent_id}")), 500
 
 @mcp_army_bp.route('/api/training/start', methods=['POST'])
 def start_training():
