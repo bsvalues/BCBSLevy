@@ -86,6 +86,12 @@ logger = logging.getLogger(__name__)
 # Define blueprint
 mcp_army_bp = Blueprint('mcp_army', __name__, url_prefix='/mcp-army')
 
+# Direct access route for dashboard
+@mcp_army_bp.route('/direct-dashboard')
+def mcp_army_dashboard_direct():
+    """Direct access to the MCP Army dashboard."""
+    return dashboard()
+
 @mcp_army_bp.route('/dashboard')
 def dashboard():
     """Render the MCP Army dashboard."""
