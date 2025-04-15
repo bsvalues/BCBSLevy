@@ -24,10 +24,12 @@ def calculator():
     Primary levy calculation tool for tax rates and amounts.
     """
     tax_codes = TaxCode.query.order_by(TaxCode.tax_code).all()
+    districts = TaxDistrict.query.order_by(TaxDistrict.district_name).all()
     
     return render_template(
         'levy_calculator.html',
-        tax_codes=tax_codes
+        tax_codes=tax_codes,
+        districts=districts
     )
 
 @levy_calculator_bp.route('/impact-calculator', methods=['GET', 'POST'])
@@ -260,6 +262,87 @@ def api_calculate():
         
         if year:
             result['year'] = year
+        
+        return jsonify(result)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@levy_calculator_bp.route('/api/calculate-rate', methods=['POST'])
+def api_calculate_rate():
+    """
+    API endpoint for calculating the levy rate given a levy amount and assessed value.
+    
+    Accepts POST with JSON:
+    {
+        "district_id": 1,
+        "levy_amount": 1000000,
+        "assessed_value": 500000000
+    }
+    
+    Returns:
+    {
+        "district_id": 1,
+        "district_name": "Sample District",
+        "levy_amount": 1000000,
+        "assessed_value": 500000000,
+        "levy_rate": 2.0,
+        "statutory_limit": 3.5,
+        "within_limit": true
+    }
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        district_id = data.get('district_id')
+        levy_amount = data.get('levy_amount')
+        assessed_value = data.get('assessed_value')
+        
+        if not district_id or not levy_amount or not assessed_value:
+            return jsonify({'error': 'Missing required parameters: district_id, levy_amount, assessed_value'}), 400
+        
+        # Convert inputs to proper types
+        try:
+            district_id = int(district_id)
+            levy_amount = float(levy_amount)
+            assessed_value = float(assessed_value)
+        except ValueError:
+            return jsonify({'error': 'Invalid parameter types'}), 400
+        
+        # Get tax district
+        district = TaxDistrict.query.get(district_id)
+        if not district:
+            return jsonify({'error': f'Tax district with ID {district_id} not found'}), 404
+        
+        # Calculate levy rate per $1,000 of assessed value
+        if assessed_value <= 0:
+            return jsonify({'error': 'Assessed value must be greater than zero'}), 400
+            
+        levy_rate = (levy_amount / assessed_value) * 1000
+        
+        # Get statutory limit (placeholder - would come from district settings)
+        statutory_limit = district.statutory_limit if hasattr(district, 'statutory_limit') else 3.5
+        within_limit = levy_rate <= statutory_limit
+        
+        # Format result
+        result = {
+            'district_id': district_id,
+            'district_name': district.district_name,
+            'levy_amount': levy_amount,
+            'assessed_value': assessed_value,
+            'levy_rate': round(levy_rate, 4),
+            'statutory_limit': statutory_limit,
+            'within_limit': within_limit
+        }
+        
+        # If over the limit, provide adjusted values
+        if not within_limit:
+            adjusted_levy_amount = (statutory_limit * assessed_value) / 1000
+            result['adjusted_levy_amount'] = round(adjusted_levy_amount, 2)
+            result['levy_reduction'] = round(levy_amount - adjusted_levy_amount, 2)
+            result['adjusted_levy_rate'] = round(statutory_limit, 4)
         
         return jsonify(result)
     

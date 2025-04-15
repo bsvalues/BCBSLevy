@@ -563,16 +563,36 @@ document.addEventListener('DOMContentLoaded', function() {
     levyCalculatorForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const formData = new FormData(levyCalculatorForm);
-        fetch('/levy-calculator/calculate', {
+        const districtId = document.getElementById('taxDistrict').value;
+        const levyAmount = document.getElementById('levyAmount').value;
+        
+        if (!districtId || !levyAmount) {
+            alert('Please provide tax district and levy amount');
+            return;
+        }
+        
+        // Get current district assessed value (in a real scenario, this would come from the database)
+        // For now, we'll use a placeholder value that would normally come from the district data
+        const assessedValue = 500000000; // This would normally be retrieved from the server
+        
+        // Call our API endpoint
+        fetch('/levy-calculator/api/calculate-rate', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                district_id: districtId,
+                levy_amount: parseFloat(levyAmount),
+                assessed_value: assessedValue
+            })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'success') {
-                displayResults(data.result);
-                currentCalculation = data.result;
+            if (!data.error) {
+                // Display results
+                displayResults(data);
+                currentCalculation = data;
                 
                 // Show results section
                 calculatorResultsSection.style.display = 'block';
@@ -580,12 +600,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Scroll to results
                 calculatorResultsSection.scrollIntoView({ behavior: 'smooth' });
             } else {
-                alert('Error: ' + data.message);
+                alert('Error: ' + data.error);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while calculating the levy.');
+            alert('An error occurred while calculating the levy rate.');
         });
     });
     
@@ -770,6 +790,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Helper functions
     function displayResults(result) {
+        // Set default year if not provided
+        const currentYear = new Date().getFullYear();
+        result.year = result.year || currentYear;
+        
         // Update result fields
         document.getElementById('resultDistrict').textContent = result.district_name;
         document.getElementById('resultYear').textContent = result.year;
@@ -786,8 +810,20 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('formulaLevyAmountFinal').textContent = formatCurrency(result.levy_amount);
         document.getElementById('formulaLevyRate').textContent = formatNumber(result.levy_rate);
         
-        // Show/hide compliance issues
-        if (result.compliance_issues && result.compliance_issues.length > 0) {
+        // Set status based on within_limit property
+        const withinLimit = result.within_limit !== undefined ? result.within_limit : true;
+        if (!withinLimit) {
+            const issuesList = document.getElementById('complianceIssuesList');
+            issuesList.innerHTML = '';
+            
+            const li = document.createElement('li');
+            li.textContent = `Levy rate exceeds statutory limit of ${result.statutory_limit} per $1,000`;
+            issuesList.appendChild(li);
+            
+            complianceIssuesSection.classList.remove('d-none');
+            document.getElementById('resultStatus').className = 'badge bg-warning px-3 py-2';
+            document.getElementById('resultStatus').textContent = 'Warning';
+        } else if (result.compliance_issues && result.compliance_issues.length > 0) {
             const issuesList = document.getElementById('complianceIssuesList');
             issuesList.innerHTML = '';
             
@@ -806,8 +842,15 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('resultStatus').textContent = 'Valid';
         }
         
-        // Show/hide adjusted rate section
-        if (result.adjustment_data) {
+        // Show/hide adjusted rate section when over the limit
+        if (!withinLimit && result.adjusted_levy_amount) {
+            document.getElementById('adjustedLevyRate').textContent = formatNumber(result.adjusted_levy_rate) + ' per $1,000';
+            document.getElementById('originalLevyRate').textContent = formatNumber(result.levy_rate) + ' per $1,000';
+            document.getElementById('adjustedLevyAmount').textContent = formatCurrency(result.adjusted_levy_amount);
+            document.getElementById('levyReduction').textContent = formatCurrency(result.levy_reduction);
+            
+            adjustedRateSection.classList.remove('d-none');
+        } else if (result.adjustment_data) {
             document.getElementById('adjustedLevyRate').textContent = formatNumber(result.adjustment_data.adjusted_rate) + ' per $1,000';
             document.getElementById('originalLevyRate').textContent = formatNumber(result.adjustment_data.original_rate) + ' per $1,000';
             document.getElementById('adjustedLevyAmount').textContent = formatCurrency(result.adjustment_data.adjusted_amount);
