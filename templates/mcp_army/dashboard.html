@@ -497,7 +497,10 @@
     }
   });
 </script>
+<!-- Include MCP Army Dashboard JavaScript -->
+<script src="{{ url_for('static', filename='js/mcp_army_dashboard.js') }}"></script>
 <script>
+  /* Legacy code for backwards compatibility */
   $(document).ready(function() {
     // Toast notification function
     function showToast(title, message, type = 'info', autohide = true, delay = 5000) {
