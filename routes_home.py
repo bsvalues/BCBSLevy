@@ -64,6 +64,11 @@ def help_page():
     """Render the help page."""
     return render_template('help.html', page_title="Help & Documentation")
 
+@home_bp.route('/demo-dashboard')
+def demo_dashboard():
+    """Render the enhanced demo dashboard for Benton County."""
+    return render_template('demo_dashboard.html', page_title="Benton County Levy Dashboard")
+
 def init_home_routes(app):
     """Register home routes with the Flask app."""
     app.register_blueprint(home_bp)
