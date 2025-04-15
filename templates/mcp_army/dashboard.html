@@ -498,7 +498,19 @@
   });
 </script>
 <!-- Include MCP Army Dashboard JavaScript -->
+<script>
+  console.log('Loading MCP Army Dashboard JavaScript...');
+</script>
 <script src="{{ url_for('static', filename='js/mcp_army_dashboard.js') }}"></script>
+<script>
+  console.log('MCP Army Dashboard JavaScript loaded');
+  // Check if the initDashboard function exists
+  if (typeof initDashboard === 'function') {
+    console.log('initDashboard function found');
+  } else {
+    console.error('initDashboard function not found');
+  }
+</script>
 <script>
   /* Legacy code for backwards compatibility */
   $(document).ready(function() {

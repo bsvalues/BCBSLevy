@@ -19,13 +19,13 @@ const state = {
 // DOM Elements
 const elements = {
     // Status cards
-    totalAgents: document.querySelector('.card-title:contains("Total Agents") + .display-4'),
-    activeAgents: document.querySelector('.card-title:contains("Active Agents") + .display-4'),
+    totalAgents: null, // Will be initialized during runtime
+    activeAgents: null, // Will be initialized during runtime
     helpRequests: document.getElementById('help-request-count'),
     
     // Agent elements
-    agentCards: document.querySelectorAll('.agent-card'),
-    requestHelpButtons: document.querySelectorAll('.request-help-btn'),
+    agentCards: null, // Will be initialized during runtime
+    requestHelpButtons: null, // Will be initialized during runtime
     
     // Experience elements
     experienceStats: document.getElementById('experience-stats'),
@@ -143,13 +143,25 @@ function fetchAgents() {
             console.log('Agents loaded:', state.agents.length);
             
             // Update the agent count displays
-            document.querySelectorAll('.card-title:contains("Total Agents") + .display-4').forEach(el => {
-                el.textContent = state.agents.length;
+            // Find all elements with class 'card-title' that contain 'Total Agents'
+            document.querySelectorAll('.card-title').forEach(el => {
+                if (el.textContent.includes('Total Agents')) {
+                    const displayElement = el.nextElementSibling;
+                    if (displayElement && displayElement.classList.contains('display-4')) {
+                        displayElement.textContent = state.agents.length;
+                    }
+                }
             });
             
             const activeAgents = state.agents.filter(agent => agent.status.status === 'active');
-            document.querySelectorAll('.card-title:contains("Active Agents") + .display-4').forEach(el => {
-                el.textContent = activeAgents.length;
+            // Find all elements with class 'card-title' that contain 'Active Agents'
+            document.querySelectorAll('.card-title').forEach(el => {
+                if (el.textContent.includes('Active Agents')) {
+                    const displayElement = el.nextElementSibling;
+                    if (displayElement && displayElement.classList.contains('display-4')) {
+                        displayElement.textContent = activeAgents.length;
+                    }
+                }
             });
             
             // Update agent cards
