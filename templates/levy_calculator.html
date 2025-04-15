@@ -722,63 +722,61 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save result button also opens save modal
     if (saveResultBtn) {
         saveResultBtn.addEventListener('click', function() {
-        saveScenarioBtn.click();
-    });
-    
+            saveScenarioBtn.click();
+        });
     }
     
     // Confirm save button
     const confirmSaveScenarioBtn = document.getElementById('confirmSaveScenario');
     if (confirmSaveScenarioBtn) {
         confirmSaveScenarioBtn.addEventListener('click', function() {
-        const form = document.getElementById('saveScenarioForm');
-        const formData = new FormData(form);
-        
-        fetch('/levy-calculator/save-scenario', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                saveScenarioModal.hide();
-                alert('Scenario saved successfully.');
-                
-                // Refresh scenarios list
-                loadSavedScenarios();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while saving the scenario.');
+            const form = document.getElementById('saveScenarioForm');
+            const formData = new FormData(form);
+            
+            fetch('/levy-calculator/save-scenario', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    saveScenarioModal.hide();
+                    alert('Scenario saved successfully.');
+                    
+                    // Refresh scenarios list
+                    loadSavedScenarios();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the scenario.');
+            });
         });
-    });
-    
     }
     
     // Refresh scenarios button
     const refreshScenariosBtn = document.getElementById('refreshScenariosBtn');
     if (refreshScenariosBtn) {
         refreshScenariosBtn.addEventListener('click', function() {
-        loadSavedScenarios();
-    });
-    
+            loadSavedScenarios();
+        });
     }
     
     // Bill impact button
     const analyzeBillImpactBtn = document.getElementById('analyzeBillImpactBtn');
     if (analyzeBillImpactBtn) {
         analyzeBillImpactBtn.addEventListener('click', function() {
-        if (!currentCalculation) {
-            alert('Please calculate a levy first.');
-            return;
-        }
-        
-        // Redirect to bill impact calculator with pre-filled values
-        window.location.href = `/levy-calculator/bill-impact?district_id=${currentCalculation.district_id}&levy_rate=${currentCalculation.levy_rate}`;
-    });
+            if (!currentCalculation) {
+                alert('Please calculate a levy first.');
+                return;
+            }
+            
+            // Redirect to bill impact calculator with pre-filled values
+            window.location.href = `/levy-calculator/bill-impact?district_id=${currentCalculation.district_id}&levy_rate=${currentCalculation.levy_rate}`;
+        });
+    }
     
     // Event delegation for dynamic buttons
     document.addEventListener('click', function(e) {
@@ -798,31 +796,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    }
-    
     // Confirm delete button
     const confirmDeleteScenarioBtn = document.getElementById('confirmDeleteScenario');
     if (confirmDeleteScenarioBtn) {
         confirmDeleteScenarioBtn.addEventListener('click', function() {
-        if (!currentScenarioId) return;
-        
-        fetch(`/levy-calculator/delete-scenario/${currentScenarioId}`, {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                deleteScenarioModal.hide();
-                loadSavedScenarios();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the scenario.');
+            if (!currentScenarioId) return;
+            
+            fetch(`/levy-calculator/delete-scenario/${currentScenarioId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    deleteScenarioModal.hide();
+                    loadSavedScenarios();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the scenario.');
+            });
         });
-    });
+    }
     
     // Helper functions
     function displayResults(result) {
