@@ -9,9 +9,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Initializing help menu...");
     
-    // Initialize the menu elements but don't show the popup automatically
-    createHelpMenuElements();
+    // Set up event listeners for the help menu and tour buttons
     setupHelpMenuListeners();
+    setupTourListeners();
     
     // Don't load content or display the menu automatically
     console.log("Help Menu System initialized");
@@ -21,14 +21,187 @@ document.addEventListener('DOMContentLoaded', function() {
  * Initialize the help menu system
  */
 function initHelpMenu() {
-    // Create help menu elements if they don't exist
-    createHelpMenuElements();
-    
     // Set up event listeners
     setupHelpMenuListeners();
+    setupTourListeners();
     
-    // Load default help content
-    loadHelpContent('default');
+    // Load default help content for the current page
+    loadPageSpecificContent();
+}
+
+/**
+ * Set up event listeners for the guided tour functionality
+ */
+function setupTourListeners() {
+    // Start tour button in navbar
+    const startTourButton = document.getElementById('startTourButton');
+    if (startTourButton) {
+        startTourButton.addEventListener('click', function() {
+            startGuidedTour();
+        });
+    }
+    
+    // Start tour button in help menu
+    const helpMenuTourBtn = document.getElementById('startGuidedTourBtn');
+    if (helpMenuTourBtn) {
+        helpMenuTourBtn.addEventListener('click', function() {
+            toggleHelpMenu(false); // Close help menu
+            startGuidedTour();     // Start the tour
+        });
+    }
+}
+
+/**
+ * Start a guided tour based on the current page
+ */
+function startGuidedTour() {
+    // Get current page context
+    const pageContext = getCurrentPageContext();
+    
+    // Use intro.js to start a tour
+    const intro = introJs();
+    
+    // Set tour options based on the page
+    switch(pageContext) {
+        case 'dashboard':
+            intro.setOptions({
+                steps: [
+                    {
+                        element: '.dashboard-header',
+                        intro: 'Welcome to the LevyMaster Dashboard! This gives you an overview of your tax districts and levy calculations.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '.dashboard-metrics',
+                        intro: 'Here are key metrics showing important statistics about your tax system.',
+                        position: 'right'
+                    },
+                    {
+                        element: '.dashboard-charts',
+                        intro: 'These charts visualize your levy data for better insights.',
+                        position: 'left'
+                    },
+                    {
+                        element: '.dashboard-actions',
+                        intro: 'Quick action buttons give you easy access to the most common tasks.',
+                        position: 'top'
+                    }
+                ],
+                showProgress: true,
+                showBullets: false,
+                showStepNumbers: true,
+                doneLabel: 'Finish Tour',
+                nextLabel: 'Next →',
+                prevLabel: '← Back'
+            });
+            break;
+            
+        case 'levy-calculator':
+            intro.setOptions({
+                steps: [
+                    {
+                        element: '.calculator-container',
+                        intro: 'Welcome to the Levy Calculator! This tool helps you calculate property tax levies for your districts.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '.district-selector',
+                        intro: 'First, select the tax district you want to calculate levies for.',
+                        position: 'right'
+                    },
+                    {
+                        element: '.calculator-inputs',
+                        intro: 'Enter the calculation parameters here, such as year and assessment values.',
+                        position: 'left'
+                    },
+                    {
+                        element: '.calculation-results',
+                        intro: 'Your calculation results will appear here with detailed breakdowns.',
+                        position: 'top'
+                    }
+                ],
+                showProgress: true,
+                showBullets: false,
+                showStepNumbers: true,
+                doneLabel: 'Finish Tour',
+                nextLabel: 'Next →',
+                prevLabel: '← Back'
+            });
+            break;
+            
+        default:
+            // Generic tour for any page
+            intro.setOptions({
+                steps: [
+                    {
+                        element: '.navbar',
+                        intro: 'This navigation bar gives you access to all the key features of LevyMaster.',
+                        position: 'bottom'
+                    },
+                    {
+                        element: '#helpMenuToggle',
+                        intro: 'Click here to access the Help Center with guides and tutorials.',
+                        position: 'left'
+                    },
+                    {
+                        element: '#resourcesDropdown',
+                        intro: 'Access documentation, glossaries, and other learning resources here.',
+                        position: 'left'
+                    },
+                    {
+                        element: 'footer',
+                        intro: 'The footer contains quick links and additional resources.',
+                        position: 'top'
+                    }
+                ],
+                showProgress: true,
+                showBullets: false,
+                showStepNumbers: true,
+                doneLabel: 'Finish Tour',
+                nextLabel: 'Next →',
+                prevLabel: '← Back'
+            });
+    }
+    
+    // Start the tour
+    intro.start();
+}
+
+/**
+ * Get the current page context based on the URL or page elements
+ * @returns {string} The page context identifier
+ */
+function getCurrentPageContext() {
+    const path = window.location.pathname;
+    
+    // Check URL patterns to determine context
+    if (path.includes('dashboard')) {
+        return 'dashboard';
+    } else if (path.includes('levy-calculator')) {
+        return 'levy-calculator';
+    } else if (path.includes('data-import')) {
+        return 'data-import';
+    } else if (path.includes('forecasting')) {
+        return 'forecasting';
+    }
+    
+    // Check for page-specific elements as a fallback
+    if (document.querySelector('.dashboard-container')) {
+        return 'dashboard';
+    } else if (document.querySelector('.calculator-container')) {
+        return 'levy-calculator';
+    }
+    
+    // Default context
+    return 'default';
+}
+
+/**
+ * Load content specific to the current page
+ */
+function loadPageSpecificContent() {
+    const context = getCurrentPageContext();
+    loadHelpContent(context);
 }
 
 /**
@@ -68,17 +241,17 @@ function createHelpMenuElements() {
  * Set up event listeners for the help menu
  */
 function setupHelpMenuListeners() {
-    // Toggle help menu on button click
-    const helpButton = document.getElementById('help-button');
-    if (helpButton) {
-        helpButton.addEventListener('click', function(e) {
+    // Toggle help menu on button click - New selector that matches our updated HTML
+    const helpMenuToggle = document.getElementById('helpMenuToggle');
+    if (helpMenuToggle) {
+        helpMenuToggle.addEventListener('click', function(e) {
             e.preventDefault();
             toggleHelpMenu();
         });
     }
     
     // Close help menu when clicking the close button
-    const closeButton = document.getElementById('close-help-menu');
+    const closeButton = document.getElementById('helpMenuClose');
     if (closeButton) {
         closeButton.addEventListener('click', function() {
             toggleHelpMenu(false);
@@ -86,7 +259,7 @@ function setupHelpMenuListeners() {
     }
     
     // Close help menu when clicking the backdrop
-    const backdrop = document.querySelector('.help-menu-backdrop');
+    const backdrop = document.getElementById('helpMenuBackdrop');
     if (backdrop) {
         backdrop.addEventListener('click', function() {
             toggleHelpMenu(false);
@@ -117,10 +290,11 @@ function setupHelpMenuListeners() {
  * @param {boolean|undefined} show - If true, show the menu; if false, hide it; if undefined, toggle
  */
 function toggleHelpMenu(show) {
-    const helpMenu = document.querySelector('.help-menu');
-    const backdrop = document.querySelector('.help-menu-backdrop');
+    const helpMenu = document.getElementById('helpMenu');
+    const backdrop = document.getElementById('helpMenuBackdrop');
     
     if (!helpMenu || !backdrop) {
+        console.warn('Help menu elements not found');
         return;
     }
     
@@ -134,6 +308,12 @@ function toggleHelpMenu(show) {
         helpMenu.classList.add('active');
         backdrop.classList.add('active');
         document.body.style.overflow = 'hidden';
+        
+        // Set focus to the search input for accessibility
+        const searchInput = helpMenu.querySelector('input[type="text"]');
+        if (searchInput) {
+            setTimeout(() => searchInput.focus(), 100);
+        }
     } else {
         helpMenu.classList.remove('active');
         backdrop.classList.remove('active');
