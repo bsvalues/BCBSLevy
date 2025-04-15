@@ -1,256 +1,79 @@
 /**
  * MCP Army Dashboard JavaScript
  * 
- * This script provides interactive functionality for the MCP Army dashboard,
- * including agent network visualization, message tracking, and real-time status updates.
+ * This script provides the frontend functionality for the MCP Army Dashboard,
+ * including real-time updates, data visualization, agent management, and workflow execution.
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    $('[data-toggle="tooltip"]').tooltip();
+// Global state
+const state = {
+    agents: [],
+    commandStructure: {},
+    agentRelationships: {},
+    experiences: {},
+    experienceStats: {},
+    helpRequests: 0,
+    notificationCount: 0
+};
+
+// DOM Elements
+const elements = {
+    // Status cards
+    totalAgents: document.querySelector('.card-title:contains("Total Agents") + .display-4'),
+    activeAgents: document.querySelector('.card-title:contains("Active Agents") + .display-4'),
+    helpRequests: document.getElementById('help-request-count'),
     
-    // Load experience replay statistics
-    loadExperienceStats();
+    // Agent elements
+    agentCards: document.querySelectorAll('.agent-card'),
+    requestHelpButtons: document.querySelectorAll('.request-help-btn'),
     
-    // Load recent experiences
-    loadRecentExperiences();
+    // Experience elements
+    experienceStats: document.getElementById('experience-stats'),
+    recentExperiences: document.getElementById('recent-experiences'),
+    startTrainingBtn: document.getElementById('start-training-btn'),
     
-    // Initialize communication network visualization
-    initCommunicationGraph();
+    // Activity feed
+    activityFeed: document.getElementById('activity-feed'),
+    clearNotificationsBtn: document.getElementById('clear-notifications-btn'),
     
-    // Set up event handlers
-    setupEventHandlers();
+    // Modals
+    agentDetailsModal: document.getElementById('agentDetailsModal'),
+    agentDetailsContent: document.getElementById('agentDetailsContent'),
+    workflowModal: document.getElementById('workflowModal'),
+    workflowForm: document.getElementById('workflowForm'),
+    workflowName: document.getElementById('workflowName'),
+    executeWorkflowBtn: document.getElementById('executeWorkflowBtn'),
     
-    // Set up periodic refreshing
+    // Visualization
+    commandStructureDiagram: document.getElementById('command-structure-diagram'),
+    communicationGraph: document.getElementById('communication-graph')
+};
+
+/**
+ * Initialize the dashboard
+ */
+function initDashboard() {
+    console.log('MCP Army Dashboard initializing...');
+    
+    // Load initial data
+    fetchCommandStructure();
+    fetchAgents();
+    fetchExperienceStats();
+    
+    // Set up event listeners
+    setupEventListeners();
+    
+    // Set up polling for updates
     setInterval(refreshDashboard, 30000); // Refresh every 30 seconds
     
-    console.log("MCP Army Dashboard JS initialized");
-});
-
-/**
- * Load experience statistics from the API
- */
-function loadExperienceStats() {
-    fetch('/mcp-army/api/experiences/stats')
-        .then(response => response.json())
-        .then(data => {
-            const statsDiv = document.getElementById('experience-stats');
-            if (!statsDiv) return;
-            
-            // Build HTML for experience stats
-            let html = '<div class="row">';
-            
-            // Total experiences
-            html += `
-                <div class="col-md-6">
-                    <div class="card bg-light mb-3">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Total Experiences</h5>
-                            <h2 class="display-5">${data.total_experiences || 0}</h2>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Buffer utilization
-            const utilizationPercent = Math.round((data.utilization || 0) * 100);
-            html += `
-                <div class="col-md-6">
-                    <div class="card bg-light mb-3">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Buffer Utilization</h5>
-                            <h2 class="display-5">${utilizationPercent}%</h2>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: ${utilizationPercent}%" 
-                                    aria-valuenow="${utilizationPercent}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            html += '</div>'; // End row
-            
-            // Add counts by agent if available
-            if (data.by_agent && Object.keys(data.by_agent).length > 0) {
-                html += '<h6>Experiences by Agent</h6>';
-                html += '<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Agent</th><th>Count</th></tr></thead><tbody>';
-                
-                for (const [agent, count] of Object.entries(data.by_agent)) {
-                    html += `<tr><td>${agent}</td><td>${count}</td></tr>`;
-                }
-                
-                html += '</tbody></table></div>';
-            }
-            
-            // Add counts by event type if available
-            if (data.by_event_type && Object.keys(data.by_event_type).length > 0) {
-                html += '<h6>Experiences by Event Type</h6>';
-                html += '<div class="table-responsive"><table class="table table-sm"><thead><tr><th>Event Type</th><th>Count</th></tr></thead><tbody>';
-                
-                for (const [eventType, count] of Object.entries(data.by_event_type)) {
-                    html += `<tr><td>${eventType}</td><td>${count}</td></tr>`;
-                }
-                
-                html += '</tbody></table></div>';
-            }
-            
-            // Add most recent timestamp if available
-            if (data.most_recent) {
-                const date = new Date(data.most_recent);
-                html += `<div class="text-muted mt-2">Last experience: ${date.toLocaleString()}</div>`;
-            }
-            
-            // Update DOM
-            statsDiv.innerHTML = html;
-        })
-        .catch(error => {
-            console.error('Error loading experience stats:', error);
-            document.getElementById('experience-stats').innerHTML = '<div class="alert alert-danger">Error loading experience statistics</div>';
-        });
+    console.log('MCP Army Dashboard initialized');
 }
 
 /**
- * Load recent experiences from the API
+ * Set up event listeners for dashboard interactivity
  */
-function loadRecentExperiences() {
-    // For now, initialize with an empty table
-    document.getElementById('recent-experiences').innerHTML = 
-        '<tr><td colspan="3" class="text-center">No experiences recorded yet</td></tr>';
-    
-    // In a future version, this could load actual data from an experience endpoint
-}
-
-/**
- * Initialize the agent communication network visualization
- */
-function initCommunicationGraph() {
-    const graphContainer = document.getElementById('communication-graph');
-    if (!graphContainer) return;
-    
-    // Get the agent data from the page
-    const agentsData = getAgentsData();
-    
-    // Create a network graph using D3.js if available, or fall back to a simpler visualization
-    if (typeof d3 !== 'undefined') {
-        // Create D3 force-directed graph
-        createD3Graph(graphContainer, agentsData);
-    } else {
-        // Create simple HTML table-based visualization
-        createSimpleGraph(graphContainer, agentsData);
-    }
-}
-
-/**
- * Extract agent data from the page
- */
-function getAgentsData() {
-    const agents = [];
-    const agentCards = document.querySelectorAll('.agent-card');
-    
-    agentCards.forEach(card => {
-        const agentId = card.dataset.agentId;
-        const status = card.querySelector('.agent-status').textContent;
-        
-        agents.push({
-            id: agentId,
-            status: status,
-            type: card.querySelector('.card-body p').textContent.replace('Type:', '').trim()
-        });
-    });
-    
-    return agents;
-}
-
-/**
- * Create a simple HTML-based graph visualization
- */
-function createSimpleGraph(container, agents) {
-    // Fetch the command structure
-    fetch('/mcp-army/api/command-structure')
-        .then(response => response.json())
-        .then(data => {
-            const relationships = [];
-            
-            // Extract relationships from command structure
-            const structure = data.command_structure;
-            const agentRelationships = data.agent_relationships || {};
-            
-            // Add relationships based on command structure
-            if (structure) {
-                // Architect to coordinator relationship
-                if (structure.architect_prime && structure.integration_coordinator) {
-                    relationships.push({
-                        source: structure.integration_coordinator,
-                        target: structure.architect_prime,
-                        type: 'reports_to'
-                    });
-                }
-                
-                // Component leads to coordinator relationships
-                if (structure.component_leads) {
-                    for (const [component, lead] of Object.entries(structure.component_leads)) {
-                        relationships.push({
-                            source: lead,
-                            target: structure.integration_coordinator,
-                            type: 'reports_to'
-                        });
-                        
-                        // Specialist agents to component lead relationships
-                        if (structure.specialist_agents && structure.specialist_agents[component]) {
-                            structure.specialist_agents[component].forEach(agent => {
-                                relationships.push({
-                                    source: agent,
-                                    target: lead,
-                                    type: 'reports_to'
-                                });
-                            });
-                        }
-                    }
-                }
-            }
-            
-            // Create a simple table-based visualization
-            let html = '<div class="table-responsive">';
-            html += '<table class="table table-sm"><thead><tr><th>Agent</th><th>Reports To</th><th>Status</th></tr></thead><tbody>';
-            
-            agents.forEach(agent => {
-                const reportsTo = relationships.find(r => r.source === agent.id)?.target || '-';
-                html += `<tr>
-                    <td>${agent.id}</td>
-                    <td>${reportsTo}</td>
-                    <td><span class="badge status-${agent.status.toLowerCase()}">${agent.status}</span></td>
-                </tr>`;
-            });
-            
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        })
-        .catch(error => {
-            console.error('Error loading command structure:', error);
-            container.innerHTML = '<div class="alert alert-danger">Error loading agent communication network</div>';
-        });
-}
-
-/**
- * Create a D3.js force-directed graph visualization
- * Note: This requires D3.js to be loaded
- */
-function createD3Graph(container, agents) {
-    if (typeof d3 === 'undefined') {
-        createSimpleGraph(container, agents);
-        return;
-    }
-    
-    // This is a placeholder - in a real implementation, this would create a D3 force-directed graph
-    container.innerHTML = '<div class="alert alert-info">Interactive agent network visualization will be available in a future update.</div>';
-}
-
-/**
- * Set up event handlers for dashboard interactions
- */
-function setupEventHandlers() {
-    // Agent card click handler
+function setupEventListeners() {
+    // Agent card clicks
     document.querySelectorAll('.agent-card').forEach(card => {
         card.addEventListener('click', function() {
             const agentId = this.dataset.agentId;
@@ -258,424 +81,1216 @@ function setupEventHandlers() {
         });
     });
     
-    // Request help button handler
+    // Request help buttons
     document.querySelectorAll('.request-help-btn').forEach(button => {
         button.addEventListener('click', function(e) {
-            e.stopPropagation();
+            e.stopPropagation(); // Prevent triggering the card click
             const agentId = this.dataset.agentId;
             requestHelp(agentId);
         });
     });
     
-    // Clear notifications button
-    const clearBtn = document.getElementById('clear-notifications-btn');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            document.getElementById('activity-feed').innerHTML = '';
-        });
-    }
-    
     // Start training button
-    const trainingBtn = document.getElementById('start-training-btn');
-    if (trainingBtn) {
-        trainingBtn.addEventListener('click', startTrainingCycle);
-    }
+    document.getElementById('start-training-btn')?.addEventListener('click', startTraining);
     
-    // Workflow execution buttons
+    // Clear notifications button
+    document.getElementById('clear-notifications-btn')?.addEventListener('click', clearNotifications);
+    
+    // Workflow buttons
     document.querySelectorAll('.workflow-btn').forEach(button => {
         button.addEventListener('click', function() {
-            const workflow = this.dataset.workflow;
-            showWorkflowModal(workflow);
+            const workflowName = this.dataset.workflow;
+            openWorkflowModal(workflowName);
         });
     });
     
-    // Execute workflow button in modal
-    const executeBtn = document.getElementById('executeWorkflowBtn');
-    if (executeBtn) {
-        executeBtn.addEventListener('click', executeWorkflow);
-    }
+    // Execute workflow button
+    document.getElementById('executeWorkflowBtn')?.addEventListener('click', executeWorkflow);
 }
 
 /**
- * Show agent details in a modal
+ * Fetch the command structure from the API
+ */
+function fetchCommandStructure() {
+    fetch('/mcp-army/api/command-structure')
+        .then(response => response.json())
+        .then(data => {
+            state.commandStructure = data.command_structure || {};
+            state.agentRelationships = data.agent_relationships || {};
+            console.log('Command structure loaded:', state.commandStructure);
+            
+            // Initialize the communication graph
+            initCommunicationGraph();
+        })
+        .catch(error => {
+            console.error('Error fetching command structure:', error);
+            showToast('error', 'Error', 'Failed to load command structure. Try refreshing the page.');
+        });
+}
+
+/**
+ * Fetch agents from the API
+ */
+function fetchAgents() {
+    fetch('/mcp-army/api/agents')
+        .then(response => response.json())
+        .then(data => {
+            state.agents = data.agents || [];
+            console.log('Agents loaded:', state.agents.length);
+            
+            // Update the agent count displays
+            document.querySelectorAll('.card-title:contains("Total Agents") + .display-4').forEach(el => {
+                el.textContent = state.agents.length;
+            });
+            
+            const activeAgents = state.agents.filter(agent => agent.status.status === 'active');
+            document.querySelectorAll('.card-title:contains("Active Agents") + .display-4').forEach(el => {
+                el.textContent = activeAgents.length;
+            });
+            
+            // Update agent cards
+            updateAgentCards();
+        })
+        .catch(error => {
+            console.error('Error fetching agents:', error);
+            showToast('error', 'Error', 'Failed to load agents. Try refreshing the page.');
+        });
+}
+
+/**
+ * Fetch experience stats from the API
+ */
+function fetchExperienceStats() {
+    fetch('/mcp-army/api/experiences/stats')
+        .then(response => response.json())
+        .then(data => {
+            state.experienceStats = data;
+            console.log('Experience stats loaded:', state.experienceStats);
+            
+            // Update the experience stats display
+            updateExperienceStatsDisplay();
+            
+            // Fetch recent experiences for all agents
+            if (state.agents && state.agents.length > 0) {
+                fetchRecentExperiences(state.agents[0].agent_id);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching experience stats:', error);
+            showToast('error', 'Error', 'Failed to load experience statistics.');
+        });
+}
+
+/**
+ * Fetch recent experiences for a specific agent
+ */
+function fetchRecentExperiences(agentId) {
+    fetch(`/mcp-army/api/agents/${agentId}/experiences?limit=5`)
+        .then(response => response.json())
+        .then(data => {
+            state.experiences[agentId] = data.experiences || [];
+            console.log(`Experiences loaded for ${agentId}:`, state.experiences[agentId].length);
+            
+            // Update the recent experiences table
+            updateRecentExperiencesDisplay();
+        })
+        .catch(error => {
+            console.error(`Error fetching experiences for ${agentId}:`, error);
+            showToast('error', 'Error', `Failed to load experiences for ${agentId}.`);
+        });
+}
+
+/**
+ * Update the agent cards with current data
+ */
+function updateAgentCards() {
+    const agentContainer = document.querySelector('.agent-status .row');
+    if (!agentContainer) return;
+    
+    // Clear existing cards
+    agentContainer.innerHTML = '';
+    
+    // Create cards for each agent
+    state.agents.forEach(agent => {
+        const performance = agent.status.performance || { overall: 0.5 };
+        const perfPercent = Math.round((performance.overall || 0.5) * 100);
+        
+        const card = document.createElement('div');
+        card.className = 'col-md-6';
+        card.innerHTML = `
+            <div class="card agent-card" data-agent-id="${agent.agent_id}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>${agent.agent_id}</span>
+                    <span class="badge status-${agent.status.status || 'idle'} agent-status">${agent.status.status || 'idle'}</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>Type:</strong> ${agent.type || 'Unknown'}</p>
+                    <p><strong>Role:</strong> ${agent.role || 'Agent'}</p>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Performance:</span>
+                        <span>${perfPercent}%</span>
+                    </div>
+                    <div class="performance-indicator">
+                        <div class="performance-bar" style="width: ${perfPercent}%;"></div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-sm btn-outline-secondary request-help-btn" data-agent-id="${agent.agent_id}">Request Help</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        agentContainer.appendChild(card);
+    });
+    
+    // Re-attach event listeners
+    document.querySelectorAll('.agent-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const agentId = this.dataset.agentId;
+            showAgentDetails(agentId);
+        });
+    });
+    
+    document.querySelectorAll('.request-help-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent triggering the card click
+            const agentId = this.dataset.agentId;
+            requestHelp(agentId);
+        });
+    });
+}
+
+/**
+ * Update the experience stats display
+ */
+function updateExperienceStatsDisplay() {
+    const statsElement = document.getElementById('experience-stats');
+    if (!statsElement) return;
+    
+    const stats = state.experienceStats;
+    
+    statsElement.innerHTML = `
+        <div class="row">
+            <div class="col-6">
+                <div class="text-center">
+                    <h3 class="display-4">${stats.total_experiences || 0}</h3>
+                    <p class="text-muted">Total Experiences</p>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="text-center">
+                    <h3 class="display-4">${Math.round((stats.utilization || 0) * 100)}%</h3>
+                    <p class="text-muted">Utilization</p>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3">
+            <p><strong>Most Recent:</strong> ${formatDate(stats.most_recent)}</p>
+        </div>
+    `;
+}
+
+/**
+ * Update the recent experiences display
+ */
+function updateRecentExperiencesDisplay() {
+    const tableBody = document.getElementById('recent-experiences');
+    if (!tableBody) return;
+    
+    // Clear existing rows
+    tableBody.innerHTML = '';
+    
+    // Gather all experiences from all agents
+    const allExperiences = [];
+    Object.keys(state.experiences).forEach(agentId => {
+        state.experiences[agentId].forEach(exp => {
+            allExperiences.push({
+                agentId,
+                ...exp
+            });
+        });
+    });
+    
+    // Sort by timestamp, newest first
+    allExperiences.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    // Take the 5 most recent
+    const recentExperiences = allExperiences.slice(0, 5);
+    
+    if (recentExperiences.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="3" class="text-center">No experiences recorded</td></tr>';
+        return;
+    }
+    
+    // Create a row for each experience
+    recentExperiences.forEach(exp => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${exp.agentId}</td>
+            <td>${formatEventType(exp.eventType)}</td>
+            <td>${formatTimeAgo(exp.timestamp)}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+/**
+ * Initialize the communication graph visualization
+ */
+function initCommunicationGraph() {
+    const graphElement = document.getElementById('communication-graph');
+    if (!graphElement || !state.commandStructure || !state.agentRelationships) return;
+    
+    // Example implementation using a simple div-based visualization
+    // In a real application, you might want to use a library like D3.js or vis.js
+    
+    graphElement.innerHTML = '<div class="p-3 text-center">Communication Graph Visualization<br>(Placeholder for visualization library)</div>';
+    
+    // Add a basic representation of the command structure
+    const structureDiv = document.createElement('div');
+    structureDiv.className = 'mt-3 p-3 border rounded';
+    
+    let structureHTML = '<div class="fw-bold mb-2">Command Structure:</div>';
+    
+    // Add architect prime
+    if (state.commandStructure.architect_prime) {
+        structureHTML += `<div class="mb-2">Architect Prime: ${state.commandStructure.architect_prime}</div>`;
+    }
+    
+    // Add integration coordinator
+    if (state.commandStructure.integration_coordinator) {
+        structureHTML += `<div class="mb-2">Integration Coordinator: ${state.commandStructure.integration_coordinator}</div>`;
+    }
+    
+    // Add component leads
+    if (state.commandStructure.component_leads) {
+        structureHTML += '<div class="mb-2">Component Leads:</div><ul>';
+        Object.entries(state.commandStructure.component_leads).forEach(([component, lead]) => {
+            structureHTML += `<li>${component}: ${lead}</li>`;
+        });
+        structureHTML += '</ul>';
+    }
+    
+    // Add specialist agents
+    if (state.commandStructure.specialist_agents) {
+        structureHTML += '<div class="mb-2">Specialist Agents:</div><ul>';
+        Object.entries(state.commandStructure.specialist_agents).forEach(([domain, agents]) => {
+            structureHTML += `<li>${domain}: ${agents.join(', ')}</li>`;
+        });
+        structureHTML += '</ul>';
+    }
+    
+    structureDiv.innerHTML = structureHTML;
+    graphElement.appendChild(structureDiv);
+}
+
+/**
+ * Show details for a specific agent in a modal
  */
 function showAgentDetails(agentId) {
+    console.log('Showing details for agent:', agentId);
+    
+    const modal = document.getElementById('agentDetailsModal');
+    const contentElement = document.getElementById('agentDetailsContent');
+    
+    if (!modal || !contentElement) return;
+    
+    contentElement.innerHTML = '<p>Loading agent details...</p>';
+    
+    // Show the modal
+    $(modal).modal('show');
+    
     // Fetch agent details
     fetch(`/mcp-army/api/agents/${agentId}`)
         .then(response => response.json())
-        .then(data => {
-            const modal = document.getElementById('agentDetailsModal');
-            const content = document.getElementById('agentDetailsContent');
+        .then(agent => {
+            console.log('Agent details loaded:', agent);
             
-            if (!modal || !content) return;
-            
-            // Build agent details HTML
-            let html = `<h4>${agentId}</h4>`;
-            html += `<div class="badge status-${data.status?.toLowerCase() || 'idle'} mb-3">${data.status || 'Idle'}</div>`;
-            
-            // Agent metadata
-            html += '<div class="card mb-3"><div class="card-body">';
-            if (data.type) html += `<p><strong>Type:</strong> ${data.type}</p>`;
-            if (data.role) html += `<p><strong>Role:</strong> ${data.role}</p>`;
-            if (data.component) html += `<p><strong>Component:</strong> ${data.component}</p>`;
-            if (data.domain) html += `<p><strong>Domain:</strong> ${data.domain}</p>`;
-            html += '</div></div>';
-            
-            // Agent capabilities
-            if (data.capabilities && data.capabilities.length > 0) {
-                html += '<h5>Capabilities</h5>';
-                html += '<ul class="list-group mb-3">';
-                data.capabilities.forEach(capability => {
-                    html += `<li class="list-group-item">${capability}</li>`;
-                });
-                html += '</ul>';
-            }
-            
-            // Agent performance metrics
-            if (data.performance) {
-                html += '<h5>Performance Metrics</h5>';
-                html += '<div class="card"><div class="card-body">';
+            // Format the content
+            let html = `
+                <div class="mb-4">
+                    <h4>${agent.agent_id}</h4>
+                    <span class="badge status-${agent.status.status || 'idle'}">${agent.status.status || 'idle'}</span>
+                </div>
                 
-                for (const [metric, value] of Object.entries(data.performance)) {
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Basic Information</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Type</th>
+                                <td>${agent.type || 'Unknown'}</td>
+                            </tr>
+                            <tr>
+                                <th>Role</th>
+                                <td>${agent.role || 'Agent'}</td>
+                            </tr>
+                            <tr>
+                                <th>Domain</th>
+                                <td>${agent.domain || 'General'}</td>
+                            </tr>
+                            <tr>
+                                <th>Component</th>
+                                <td>${agent.component || 'Default'}</td>
+                            </tr>
+                            <tr>
+                                <th>Last Updated</th>
+                                <td>${formatDate(agent.status.last_updated)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Performance Metrics</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Overall Performance</th>
+                                <td>${Math.round((agent.status.performance?.overall || 0) * 100)}%</td>
+                            </tr>
+                            <tr>
+                                <th>Task Success Rate</th>
+                                <td>${Math.round((agent.status.performance?.task_success_rate || 0) * 100)}%</td>
+                            </tr>
+                            <tr>
+                                <th>Response Time</th>
+                                <td>${agent.status.performance?.response_time || 0} ms</td>
+                            </tr>
+                            <tr>
+                                <th>Error Rate</th>
+                                <td>${Math.round((agent.status.performance?.error_rate || 0) * 100)}%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Capabilities</h5>
+                    <div class="row">
+            `;
+            
+            // Add capabilities buttons
+            if (agent.capabilities && agent.capabilities.length > 0) {
+                agent.capabilities.forEach(capability => {
                     html += `
-                        <div class="mb-2">
-                            <div class="d-flex justify-content-between">
-                                <span>${metric}:</span>
-                                <span>${(value * 100).toFixed(1)}%</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: ${value * 100}%" 
-                                    aria-valuenow="${value * 100}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-sm btn-outline-primary w-100 text-start capability-btn" 
+                                    data-agent-id="${agent.agent_id}" 
+                                    data-capability="${capability}">
+                                ${formatCapabilityName(capability)}
+                            </button>
                         </div>
                     `;
-                }
-                
-                html += '</div></div>';
+                });
+            } else {
+                html += '<div class="col-12"><p class="text-muted">No capabilities listed</p></div>';
             }
             
-            // Update modal content and show
-            content.innerHTML = html;
-            $(modal).modal('show');
+            html += `
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Recent Experiences</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Event Type</th>
+                                    <th>Time</th>
+                                    <th>Outcome</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agent-experiences-${agentId}">
+                                <tr>
+                                    <td colspan="3" class="text-center">Loading experiences...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="d-flex">
+                    <button class="btn btn-primary me-2 execute-capability-btn" data-agent-id="${agent.agent_id}">
+                        Execute Capability
+                    </button>
+                    <button class="btn btn-outline-secondary request-help-btn" data-agent-id="${agent.agent_id}">
+                        Request Help
+                    </button>
+                </div>
+            `;
+            
+            // Update the modal content
+            contentElement.innerHTML = html;
+            
+            // Attach event listeners
+            document.querySelectorAll('.capability-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const agentId = this.dataset.agentId;
+                    const capability = this.dataset.capability;
+                    executeCapability(agentId, capability);
+                });
+            });
+            
+            document.querySelectorAll('.execute-capability-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const agentId = this.dataset.agentId;
+                    showCapabilitySelector(agentId);
+                });
+            });
+            
+            // Load experiences for this agent
+            fetchAgentExperiences(agentId);
         })
         .catch(error => {
-            console.error('Error loading agent details:', error);
-            showToast('error', 'Error', `Could not load details for ${agentId}`);
+            console.error(`Error fetching details for agent ${agentId}:`, error);
+            contentElement.innerHTML = `<div class="alert alert-danger">Error loading agent details. Please try again.</div>`;
         });
+}
+
+/**
+ * Fetch experiences for a specific agent
+ */
+function fetchAgentExperiences(agentId) {
+    const tableBody = document.getElementById(`agent-experiences-${agentId}`);
+    if (!tableBody) return;
+    
+    fetch(`/mcp-army/api/agents/${agentId}/experiences?limit=5`)
+        .then(response => response.json())
+        .then(data => {
+            const experiences = data.experiences || [];
+            
+            // Update the state
+            state.experiences[agentId] = experiences;
+            
+            // Clear the table
+            tableBody.innerHTML = '';
+            
+            if (experiences.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3" class="text-center">No experiences recorded</td></tr>';
+                return;
+            }
+            
+            // Add a row for each experience
+            experiences.forEach(exp => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${formatEventType(exp.eventType)}</td>
+                    <td>${formatTimeAgo(exp.timestamp)}</td>
+                    <td>${exp.details?.outcome || 'N/A'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error(`Error fetching experiences for agent ${agentId}:`, error);
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Error loading experiences</td></tr>';
+        });
+}
+
+/**
+ * Show a selector for agent capabilities
+ */
+function showCapabilitySelector(agentId) {
+    // Find the agent
+    const agent = state.agents.find(a => a.agent_id === agentId);
+    if (!agent || !agent.capabilities || agent.capabilities.length === 0) {
+        showToast('warning', 'No Capabilities', `Agent ${agentId} has no registered capabilities.`);
+        return;
+    }
+    
+    // Create a modal for capability selection
+    const modalHTML = `
+        <div class="modal fade" id="capabilitySelectorModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Select Capability</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Select a capability to execute for agent <strong>${agentId}</strong>:</p>
+                        <div class="list-group">
+                            ${agent.capabilities.map(capability => `
+                                <button type="button" class="list-group-item list-group-item-action capability-select-btn"
+                                        data-agent-id="${agentId}" data-capability="${capability}">
+                                    ${formatCapabilityName(capability)}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add the modal to the document
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    
+    // Initialize the modal
+    const modal = document.getElementById('capabilitySelectorModal');
+    $(modal).modal('show');
+    
+    // Add event listeners
+    document.querySelectorAll('.capability-select-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const agentId = this.dataset.agentId;
+            const capability = this.dataset.capability;
+            $(modal).modal('hide');
+            
+            // Execute the capability
+            executeCapability(agentId, capability);
+            
+            // Remove the modal after hiding
+            $(modal).on('hidden.bs.modal', function() {
+                document.body.removeChild(modalContainer);
+            });
+        });
+    });
+    
+    // Remove the modal when hidden
+    $(modal).on('hidden.bs.modal', function() {
+        document.body.removeChild(modalContainer);
+    });
+}
+
+/**
+ * Execute a capability for a specific agent
+ */
+function executeCapability(agentId, capability) {
+    console.log(`Executing capability ${capability} for agent ${agentId}`);
+    
+    // Show toast
+    showToast('info', 'Executing Capability', `Requesting ${formatCapabilityName(capability)} from ${agentId}...`);
+    
+    // Create a parameters modal
+    const modalHTML = `
+        <div class="modal fade" id="capabilityParamsModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Capability Parameters</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Provide parameters for <strong>${formatCapabilityName(capability)}</strong>:</p>
+                        <form id="capabilityParamsForm">
+                            <div class="form-group">
+                                <label for="capabilityParams">Parameters (JSON):</label>
+                                <textarea class="form-control" id="capabilityParams" rows="5">{}</textarea>
+                                <small class="form-text text-muted">Enter parameters as a valid JSON object</small>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="executeCapabilityBtn">Execute</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add the modal to the document
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    
+    // Initialize the modal
+    const modal = document.getElementById('capabilityParamsModal');
+    $(modal).modal('show');
+    
+    // Execute button handler
+    document.getElementById('executeCapabilityBtn')?.addEventListener('click', function() {
+        const paramsText = document.getElementById('capabilityParams')?.value || '{}';
+        let params;
+        
+        try {
+            params = JSON.parse(paramsText);
+        } catch (error) {
+            showToast('error', 'Invalid JSON', 'Please provide a valid JSON object for parameters.');
+            return;
+        }
+        
+        // Hide the modal
+        $(modal).modal('hide');
+        
+        // Make the API call
+        fetch(`/mcp-army/api/agents/${agentId}/capabilities/${capability}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log('Capability execution result:', result);
+            
+            // Show success toast
+            showToast('success', 'Capability Executed', `Successfully executed ${formatCapabilityName(capability)}.`);
+            
+            // Show the result in a modal
+            showResultModal('Capability Result', result);
+            
+            // Add a notification to the activity feed
+            addNotification('capability', `Agent ${agentId} executed ${formatCapabilityName(capability)}`);
+        })
+        .catch(error => {
+            console.error(`Error executing capability ${capability} for agent ${agentId}:`, error);
+            showToast('error', 'Execution Failed', `Failed to execute ${formatCapabilityName(capability)}.`);
+        });
+        
+        // Remove the modal after hiding
+        $(modal).on('hidden.bs.modal', function() {
+            document.body.removeChild(modalContainer);
+        });
+    });
+    
+    // Remove the modal when hidden
+    $(modal).on('hidden.bs.modal', function() {
+        document.body.removeChild(modalContainer);
+    });
+}
+
+/**
+ * Show a result modal with JSON data
+ */
+function showResultModal(title, data) {
+    // Create the modal HTML
+    const modalHTML = `
+        <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${title}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <pre class="result-json">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add the modal to the document
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    
+    // Initialize the modal
+    const modal = document.getElementById('resultModal');
+    $(modal).modal('show');
+    
+    // Remove the modal when hidden
+    $(modal).on('hidden.bs.modal', function() {
+        document.body.removeChild(modalContainer);
+    });
 }
 
 /**
  * Request help for an agent
  */
 function requestHelp(agentId) {
-    // Find a suitable helper agent - use MCP by default
-    const helperAgentId = 'MCP';
+    console.log('Requesting help for agent:', agentId);
     
-    // Show a confirmation toast
-    showToast('info', 'Help Requested', `Requesting assistance for ${agentId} from ${helperAgentId}`);
+    // Find suitable agents to help
+    const helpers = state.agents.filter(agent => agent.agent_id !== agentId);
     
-    // Make API call to request assistance
-    fetch(`/mcp-army/api/agents/${agentId}/assistance/${helperAgentId}`, {
+    if (helpers.length === 0) {
+        showToast('warning', 'No Helpers', 'No other agents are available to help.');
+        return;
+    }
+    
+    // Create a modal for selecting a helper agent
+    const modalHTML = `
+        <div class="modal fade" id="helperSelectorModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Request Help</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Select an agent to help <strong>${agentId}</strong>:</p>
+                        <div class="list-group">
+                            ${helpers.map(helper => `
+                                <button type="button" class="list-group-item list-group-item-action helper-select-btn"
+                                        data-agent-id="${agentId}" data-helper-id="${helper.agent_id}">
+                                    ${helper.agent_id} (${helper.role || 'Agent'})
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add the modal to the document
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = modalHTML;
+    document.body.appendChild(modalContainer);
+    
+    // Initialize the modal
+    const modal = document.getElementById('helperSelectorModal');
+    $(modal).modal('show');
+    
+    // Add event listeners
+    document.querySelectorAll('.helper-select-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const agentId = this.dataset.agentId;
+            const helperId = this.dataset.helperId;
+            $(modal).modal('hide');
+            
+            // Submit the help request
+            submitHelpRequest(agentId, helperId);
+            
+            // Remove the modal after hiding
+            $(modal).on('hidden.bs.modal', function() {
+                document.body.removeChild(modalContainer);
+            });
+        });
+    });
+    
+    // Remove the modal when hidden
+    $(modal).on('hidden.bs.modal', function() {
+        document.body.removeChild(modalContainer);
+    });
+}
+
+/**
+ * Submit a help request to the API
+ */
+function submitHelpRequest(agentId, helperId) {
+    console.log(`Requesting help from ${helperId} for ${agentId}`);
+    
+    // Show toast
+    showToast('info', 'Requesting Help', `Requesting assistance from ${helperId} for ${agentId}...`);
+    
+    // Make the API call
+    fetch(`/mcp-army/api/agents/${helperId}/assistance/${agentId}`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             assistance_type: 'general'
         })
     })
     .then(response => response.json())
-    .then(data => {
-        addActivityNotification('Assistance', `${helperAgentId} is assisting ${agentId}`);
-        showToast('success', 'Help Initiated', `${helperAgentId} is now assisting ${agentId}`);
+    .then(result => {
+        console.log('Help request result:', result);
+        
+        // Show success toast
+        showToast('success', 'Help Requested', `Successfully requested help from ${helperId}.`);
+        
+        // Increment help request count
+        state.helpRequests++;
+        document.getElementById('help-request-count').textContent = state.helpRequests;
+        
+        // Add a notification to the activity feed
+        addNotification('assistance', `Agent ${helperId} is assisting ${agentId}`);
     })
     .catch(error => {
-        console.error('Error requesting assistance:', error);
-        showToast('error', 'Request Failed', `Could not request assistance for ${agentId}`);
+        console.error(`Error requesting help from ${helperId} for ${agentId}:`, error);
+        showToast('error', 'Request Failed', `Failed to request help from ${helperId}.`);
     });
-    
-    // Prevent event bubbling
-    return false;
 }
 
 /**
- * Start a training cycle using the experience replay buffer
+ * Start a training cycle
  */
-function startTrainingCycle() {
-    const trainingBtn = document.getElementById('start-training-btn');
-    if (trainingBtn) {
-        trainingBtn.disabled = true;
-        trainingBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Training...';
-    }
+function startTraining() {
+    console.log('Starting training cycle');
     
-    // Make API call to start training
+    // Show toast
+    showToast('info', 'Training', 'Starting training cycle...');
+    
+    // Make the API call
     fetch('/mcp-army/api/training/start', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             batch_size: 32
         })
     })
     .then(response => response.json())
-    .then(data => {
-        addActivityNotification('Training', 'Experience replay training cycle completed');
-        showToast('success', 'Training Complete', 'Agents have been updated with new experiences');
+    .then(result => {
+        console.log('Training result:', result);
         
-        // Re-enable button
-        if (trainingBtn) {
-            trainingBtn.disabled = false;
-            trainingBtn.innerHTML = 'Start Training Cycle';
-        }
+        // Show success toast
+        showToast('success', 'Training Started', 'Successfully started training cycle.');
         
-        // Refresh stats
-        loadExperienceStats();
+        // Add a notification to the activity feed
+        addNotification('training', 'Started agent training cycle');
     })
     .catch(error => {
-        console.error('Error starting training cycle:', error);
-        showToast('error', 'Training Failed', 'Could not complete the training cycle');
-        
-        // Re-enable button
-        if (trainingBtn) {
-            trainingBtn.disabled = false;
-            trainingBtn.innerHTML = 'Start Training Cycle';
-        }
+        console.error('Error starting training:', error);
+        showToast('error', 'Training Failed', 'Failed to start training cycle.');
     });
 }
 
 /**
- * Show the workflow execution modal
+ * Open the workflow execution modal
  */
-function showWorkflowModal(workflowName) {
-    const modal = document.getElementById('workflowModal');
-    if (!modal) return;
+function openWorkflowModal(workflowName) {
+    console.log('Opening workflow modal for:', workflowName);
     
-    // Set workflow name
+    // Set the workflow name
     document.getElementById('workflowName').value = workflowName;
     
-    // Update modal title
+    // Update the modal title
     document.getElementById('workflowModalLabel').textContent = `Execute ${formatWorkflowName(workflowName)} Workflow`;
     
-    // Load tax districts for dropdown
-    loadTaxDistricts();
-    
-    // Show modal
-    $(modal).modal('show');
+    // Show the modal
+    $('#workflowModal').modal('show');
 }
 
 /**
- * Format workflow name for display
- */
-function formatWorkflowName(name) {
-    return name
-        .split('_')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-}
-
-/**
- * Load tax districts for the workflow form
- */
-function loadTaxDistricts() {
-    const select = document.getElementById('taxDistrictId');
-    if (!select) return;
-    
-    // Clear existing options
-    select.innerHTML = '<option value="">Select a district...</option>';
-    
-    // Make API call to get districts
-    fetch('/api/districts')
-        .then(response => response.json())
-        .then(data => {
-            // Add districts to dropdown
-            data.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district.id;
-                option.textContent = district.name;
-                select.appendChild(option);
-            });
-        })
-        .catch(error => {
-            console.error('Error loading tax districts:', error);
-            select.innerHTML += '<option value="" disabled>Error loading districts</option>';
-        });
-}
-
-/**
- * Execute the selected workflow
+ * Execute a workflow
  */
 function executeWorkflow() {
     const workflowName = document.getElementById('workflowName').value;
     const taxDistrictId = document.getElementById('taxDistrictId').value;
     const year = document.getElementById('year').value;
+    const additionalParamsText = document.getElementById('additionalParams').value;
     
-    // Validate form
+    console.log(`Executing workflow ${workflowName} for district ${taxDistrictId} in year ${year}`);
+    
     if (!workflowName) {
-        showToast('error', 'Error', 'No workflow selected');
+        showToast('error', 'Validation Error', 'Workflow name is required.');
         return;
     }
     
-    // Get additional parameters
+    if (!taxDistrictId) {
+        showToast('error', 'Validation Error', 'Tax district is required.');
+        return;
+    }
+    
+    // Parse additional parameters if provided
     let additionalParams = {};
-    try {
-        const paramsText = document.getElementById('additionalParams').value;
-        if (paramsText) {
-            additionalParams = JSON.parse(paramsText);
+    if (additionalParamsText.trim()) {
+        try {
+            additionalParams = JSON.parse(additionalParamsText);
+        } catch (error) {
+            showToast('error', 'Invalid JSON', 'Additional parameters must be valid JSON.');
+            return;
         }
-    } catch (error) {
-        showToast('error', 'Error', 'Invalid JSON in additional parameters');
-        return;
     }
     
-    // Prepare parameters
-    const parameters = {
-        ...additionalParams,
-        year: parseInt(year)
+    // Hide the modal
+    $('#workflowModal').modal('hide');
+    
+    // Show a loading toast
+    showToast('info', 'Executing Workflow', `Executing ${formatWorkflowName(workflowName)} workflow...`);
+    
+    // Prepare the parameters
+    const params = {
+        workflow_name: workflowName,
+        parameters: {
+            district_id: parseInt(taxDistrictId, 10),
+            year: parseInt(year, 10),
+            ...additionalParams
+        }
     };
     
-    if (taxDistrictId) {
-        parameters.taxDistrictId = parseInt(taxDistrictId);
-    }
-    
-    // Disable execute button
-    const executeBtn = document.getElementById('executeWorkflowBtn');
-    if (executeBtn) {
-        executeBtn.disabled = true;
-        executeBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Executing...';
-    }
-    
-    // Make API call to execute workflow
+    // Make the API call
     fetch('/mcp-army/api/workflows/collaborative', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            workflow_name: workflowName,
-            parameters: parameters
-        })
+        body: JSON.stringify(params)
     })
     .then(response => response.json())
-    .then(data => {
-        // Hide modal
-        $('#workflowModal').modal('hide');
+    .then(result => {
+        console.log('Workflow execution result:', result);
         
-        // Show success message
-        showToast('success', 'Workflow Started', `${formatWorkflowName(workflowName)} workflow has been initiated`);
+        // Show success toast
+        showToast('success', 'Workflow Completed', `Successfully executed ${formatWorkflowName(workflowName)} workflow.`);
         
-        // Add to activity feed
-        addActivityNotification('Workflow', `${formatWorkflowName(workflowName)} workflow started`, 'primary');
+        // Show the result in a modal
+        showResultModal('Workflow Result', result);
         
-        // Reset execute button
-        if (executeBtn) {
-            executeBtn.disabled = false;
-            executeBtn.innerHTML = 'Execute';
-        }
+        // Add a notification to the activity feed
+        addNotification('workflow', `Executed ${formatWorkflowName(workflowName)} workflow`);
     })
     .catch(error => {
-        console.error('Error executing workflow:', error);
-        showToast('error', 'Execution Failed', `Could not execute ${formatWorkflowName(workflowName)} workflow`);
-        
-        // Reset execute button
-        if (executeBtn) {
-            executeBtn.disabled = false;
-            executeBtn.innerHTML = 'Execute';
-        }
+        console.error(`Error executing workflow ${workflowName}:`, error);
+        showToast('error', 'Execution Failed', `Failed to execute ${formatWorkflowName(workflowName)} workflow.`);
     });
+}
+
+/**
+ * Clear all notifications from the activity feed
+ */
+function clearNotifications() {
+    const activityFeed = document.getElementById('activity-feed');
+    if (!activityFeed) return;
+    
+    // Clear the activity feed
+    activityFeed.innerHTML = `
+        <div class="card notification-card mb-2">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                    <span class="badge bg-secondary">System</span>
+                    <small class="text-muted">just now</small>
+                </div>
+                <p class="mb-0 mt-1">All notifications cleared</p>
+            </div>
+        </div>
+    `;
+    
+    // Reset notification count
+    state.notificationCount = 0;
 }
 
 /**
  * Add a notification to the activity feed
  */
-function addActivityNotification(type, message, styleClass = 'info') {
-    const feed = document.getElementById('activity-feed');
-    if (!feed) return;
+function addNotification(type, message) {
+    const activityFeed = document.getElementById('activity-feed');
+    if (!activityFeed) return;
     
-    const now = new Date();
-    const timeString = 'just now';
+    // Determine badge class based on type
+    let badgeClass;
+    let badgeText;
     
-    const html = `
-        <div class="card notification-card mb-2">
-            <div class="card-body p-2">
-                <div class="d-flex justify-content-between align-items-start">
-                    <span class="badge bg-${styleClass}">${type}</span>
-                    <small class="text-muted">${timeString}</small>
-                </div>
-                <p class="mb-0 mt-1">${message}</p>
+    switch (type) {
+        case 'capability':
+            badgeClass = 'bg-primary';
+            badgeText = 'Capability';
+            break;
+        case 'assistance':
+            badgeClass = 'bg-info';
+            badgeText = 'Assistance';
+            break;
+        case 'training':
+            badgeClass = 'bg-warning';
+            badgeText = 'Training';
+            break;
+        case 'workflow':
+            badgeClass = 'bg-success';
+            badgeText = 'Workflow';
+            break;
+        default:
+            badgeClass = 'bg-secondary';
+            badgeText = 'System';
+    }
+    
+    // Create the notification card
+    const notificationCard = document.createElement('div');
+    notificationCard.className = 'card notification-card mb-2';
+    notificationCard.innerHTML = `
+        <div class="card-body p-2">
+            <div class="d-flex justify-content-between align-items-start">
+                <span class="badge ${badgeClass}">${badgeText}</span>
+                <small class="text-muted">just now</small>
             </div>
+            <p class="mb-0 mt-1">${message}</p>
         </div>
     `;
     
-    // Add to beginning of feed
-    feed.insertAdjacentHTML('afterbegin', html);
+    // Add the notification to the top of the feed
+    activityFeed.insertBefore(notificationCard, activityFeed.firstChild);
+    
+    // Limit to 10 notifications
+    while (activityFeed.children.length > 10) {
+        activityFeed.removeChild(activityFeed.lastChild);
+    }
+    
+    // Increment notification count
+    state.notificationCount++;
 }
 
 /**
  * Show a toast notification
  */
 function showToast(type, title, message) {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
     
-    const id = 'toast-' + Date.now();
-    const html = `
-        <div id="${id}" class="toast toast-${type}" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="me-auto">${title}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                ${message}
-            </div>
+    // Create the toast element
+    const toastElement = document.createElement('div');
+    toastElement.className = `toast toast-${type}`;
+    toastElement.setAttribute('role', 'alert');
+    toastElement.setAttribute('aria-live', 'assertive');
+    toastElement.setAttribute('aria-atomic', 'true');
+    toastElement.innerHTML = `
+        <div class="toast-header">
+            <strong class="me-auto">${title}</strong>
+            <small>just now</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
         </div>
     `;
     
-    container.insertAdjacentHTML('beforeend', html);
+    // Add the toast to the container
+    toastContainer.appendChild(toastElement);
     
-    // Show toast
-    const toastElement = document.getElementById(id);
-    const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 5000 });
+    // Initialize the toast
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 5000
+    });
+    
+    // Show the toast
     toast.show();
     
-    // Remove after hiding
+    // Remove the toast after it's hidden
     toastElement.addEventListener('hidden.bs.toast', function() {
-        toastElement.remove();
+        toastContainer.removeChild(toastElement);
     });
 }
 
 /**
- * Refresh dashboard data
+ * Refresh the dashboard data
  */
 function refreshDashboard() {
-    // Update agent statuses
-    document.querySelectorAll('.agent-card').forEach(card => {
-        const agentId = card.dataset.agentId;
-        
-        fetch(`/mcp-army/api/agents/${agentId}`)
-            .then(response => response.json())
-            .then(data => {
-                const statusBadge = card.querySelector('.agent-status');
-                if (statusBadge) {
-                    statusBadge.textContent = data.status || 'unknown';
-                    statusBadge.className = `badge status-${(data.status || 'unknown').toLowerCase()} agent-status`;
-                }
-                
-                const performanceBar = card.querySelector('.performance-bar');
-                if (performanceBar && data.performance && data.performance.overall !== undefined) {
-                    performanceBar.style.width = `${data.performance.overall * 100}%`;
-                    
-                    const performanceText = card.querySelector('.d-flex.justify-content-between.mb-1 span:last-child');
-                    if (performanceText) {
-                        performanceText.textContent = `${(data.performance.overall * 100).toFixed(2)}%`;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error(`Error updating status for ${agentId}:`, error);
-            });
-    });
+    console.log('Refreshing dashboard data...');
     
-    // Refresh experience stats
-    loadExperienceStats();
+    // Refresh all data
+    fetchCommandStructure();
+    fetchAgents();
+    fetchExperienceStats();
+}
+
+/**
+ * Format a date string to a readable format
+ */
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleString();
+    } catch (error) {
+        return dateString;
+    }
+}
+
+/**
+ * Format a date string to a "time ago" format
+ */
+function formatTimeAgo(dateString) {
+    if (!dateString) return 'N/A';
+    
+    try {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffSec = Math.floor(diffMs / 1000);
+        
+        if (diffSec < 60) {
+            return `${diffSec} second${diffSec !== 1 ? 's' : ''} ago`;
+        }
+        
+        const diffMin = Math.floor(diffSec / 60);
+        if (diffMin < 60) {
+            return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
+        }
+        
+        const diffHour = Math.floor(diffMin / 60);
+        if (diffHour < 24) {
+            return `${diffHour} hour${diffHour !== 1 ? 's' : ''} ago`;
+        }
+        
+        const diffDay = Math.floor(diffHour / 24);
+        return `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
+    } catch (error) {
+        return dateString;
+    }
+}
+
+/**
+ * Format an event type to a readable format
+ */
+function formatEventType(eventType) {
+    if (!eventType) return 'Unknown';
+    
+    // Convert snake_case or camelCase to Title Case with spaces
+    return eventType
+        .replace(/_/g, ' ')
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^\w/, c => c.toUpperCase())
+        .trim();
+}
+
+/**
+ * Format a capability name to a readable format
+ */
+function formatCapabilityName(capability) {
+    if (!capability) return 'Unknown';
+    
+    // Convert snake_case or camelCase to Title Case with spaces
+    return capability
+        .replace(/execute_workflow_/g, '')
+        .replace(/_/g, ' ')
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^\w/, c => c.toUpperCase())
+        .trim();
+}
+
+/**
+ * Format a workflow name to a readable format
+ */
+function formatWorkflowName(workflow) {
+    if (!workflow) return 'Unknown';
+    
+    // Convert snake_case or camelCase to Title Case with spaces
+    return workflow
+        .replace(/_/g, ' ')
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^\w/, c => c.toUpperCase())
+        .trim();
+}
+
+// Initialize the dashboard when the DOM is ready
+document.addEventListener('DOMContentLoaded', initDashboard);
+
+// Export functions for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        initDashboard,
+        fetchCommandStructure,
+        fetchAgents,
+        fetchExperienceStats,
+        updateAgentCards,
+        showAgentDetails,
+        executeCapability,
+        requestHelp,
+        startTraining,
+        executeWorkflow,
+        showToast,
+        addNotification,
+        formatDate,
+        formatTimeAgo,
+        formatEventType,
+        formatCapabilityName,
+        formatWorkflowName
+    };
 }
