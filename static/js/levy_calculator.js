@@ -6,10 +6,14 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the levy calculator functionality
-    initLevyCalculator();
-    
-    console.log('Levy Calculator JS loaded successfully');
+    try {
+        // Initialize the levy calculator functionality
+        initLevyCalculator();
+        
+        console.log('Levy Calculator JS loaded successfully');
+    } catch (err) {
+        console.error('Error initializing levy calculator:', err.message, err.stack);
+    }
 });
 
 /**
@@ -31,14 +35,33 @@ function initLevyCalculator() {
     if (!levyCalculatorForm) return;
     
     // Initialize tooltips
-    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+    try {
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+        } else {
+            console.warn('Bootstrap tooltip functionality not available');
+        }
+    } catch (err) {
+        console.error('Error initializing tooltips:', err.message);
+    }
     
     // Initialize modals if they exist
-    const saveScenarioModal = document.getElementById('saveScenarioModal') ? 
-        new bootstrap.Modal(document.getElementById('saveScenarioModal')) : null;
-    const deleteScenarioModal = document.getElementById('deleteScenarioModal') ? 
-        new bootstrap.Modal(document.getElementById('deleteScenarioModal')) : null;
+    let saveScenarioModal = null;
+    let deleteScenarioModal = null;
+    
+    try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            saveScenarioModal = document.getElementById('saveScenarioModal') ? 
+                new bootstrap.Modal(document.getElementById('saveScenarioModal')) : null;
+            deleteScenarioModal = document.getElementById('deleteScenarioModal') ? 
+                new bootstrap.Modal(document.getElementById('deleteScenarioModal')) : null;
+        } else {
+            console.warn('Bootstrap modal functionality not available');
+        }
+    } catch (err) {
+        console.error('Error initializing modals:', err.message);
+    }
     
     // State
     let currentDistrict = null;
