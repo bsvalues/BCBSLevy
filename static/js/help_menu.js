@@ -11,7 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up event listeners for the help menu and tour buttons
     setupHelpMenuListeners();
-    setupTourListeners();
+    
+    // Setup tour listeners if available
+    if (typeof setupTourListeners === 'function') {
+        setupTourListeners();
+    }
+    
+    // Add support for help tabs if needed
+    createHelpTabListeners();
     
     // Don't load content or display the menu automatically
     console.log("Help Menu System initialized");
@@ -282,6 +289,42 @@ function setupHelpMenuListeners() {
             loadHelpContent(e.detail.context);
         }
     });
+}
+
+/**
+ * Set up event listeners for the help menu tabs
+ */
+function createHelpTabListeners() {
+    // Add event listeners to the help menu tabs
+    const helpTabs = document.querySelectorAll('#helpTabs .nav-link');
+    if (helpTabs && helpTabs.length > 0) {
+        helpTabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all tabs
+                helpTabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab content
+                const tabContents = document.querySelectorAll('.tab-pane');
+                tabContents.forEach(content => {
+                    content.classList.remove('show', 'active');
+                });
+                
+                // Show the corresponding tab content
+                const targetId = this.getAttribute('data-bs-target');
+                if (targetId) {
+                    const targetContent = document.querySelector(targetId);
+                    if (targetContent) {
+                        targetContent.classList.add('show', 'active');
+                    }
+                }
+            });
+        });
+    }
 }
 
 /**

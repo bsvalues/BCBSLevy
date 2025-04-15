@@ -21,6 +21,18 @@ document.addEventListener('DOMContentLoaded', function() {
     if (popoverTriggerList.length > 0) {
       const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     }
+    
+    // Initialize dropdown toggles and nav tabs
+    document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
+      new bootstrap.Dropdown(dropdown);
+    });
+    
+    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
+      tab.addEventListener('click', function(e) {
+        e.preventDefault();
+        new bootstrap.Tab(this).show();
+      });
+    });
   }
   
   // Set up guided tours
@@ -34,10 +46,46 @@ document.addEventListener('DOMContentLoaded', function() {
         startTour(tourName);
       });
     });
+    
+    // Connect tour button in the navigation
+    const startTourButton = document.getElementById('startTourButton');
+    if (startTourButton) {
+      startTourButton.addEventListener('click', function() {
+        // Get current page context
+        const pageContext = getCurrentPageContext();
+        startTour(pageContext);
+      });
+    }
   }
   
-  // Help menu button creation is now managed in help_menu.js
-  // createHelpMenu();
+  // Connect user profile menu toggle
+  const userMenuToggle = document.getElementById('userMenuToggle');
+  if (userMenuToggle) {
+    userMenuToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      const userMenu = document.getElementById('userDropdownMenu');
+      if (userMenu) {
+        userMenu.classList.toggle('show');
+      }
+    });
+    
+    // Close the menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const userMenu = document.getElementById('userDropdownMenu');
+      if (userMenu && userMenu.classList.contains('show') && !userMenuToggle.contains(event.target) && !userMenu.contains(event.target)) {
+        userMenu.classList.remove('show');
+      }
+    });
+  }
+  
+  // Connect help menu toggle (backup connection)
+  const helpMenuToggle = document.getElementById('helpMenuToggle');
+  if (helpMenuToggle && typeof toggleHelpMenu === 'function') {
+    helpMenuToggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleHelpMenu();
+    });
+  }
 });
 
 /**
@@ -59,6 +107,54 @@ function startTour(tourName) {
   } catch (error) {
     console.error('Error starting tour:', error);
   }
+}
+
+/**
+ * Get the current page context based on the URL or page elements
+ * @returns {string} The page context identifier
+ */
+function getCurrentPageContext() {
+  const path = window.location.pathname;
+  
+  // Map paths to tour configurations
+  if (path === '/' || path === '/index' || path === '/dashboard') {
+    return 'dashboard';
+  }
+  
+  if (path.includes('/levy-calculator')) {
+    return 'levy-calculation';
+  }
+  
+  if (path.includes('/import') || path.includes('/data-management')) {
+    return 'data_import';
+  }
+  
+  if (path.includes('/property') || path.includes('/search')) {
+    return 'property_search';
+  }
+  
+  if (path.includes('/admin')) {
+    return 'admin-dashboard';
+  }
+  
+  if (path.includes('/public')) {
+    return 'public-lookup';
+  }
+  
+  if (path.includes('/reports')) {
+    return 'reports';
+  }
+  
+  if (path.includes('/historical')) {
+    return 'historical-analysis';
+  }
+  
+  if (path.includes('/compliance')) {
+    return 'compliance';
+  }
+  
+  // Default to dashboard if no match
+  return 'dashboard';
 }
 
 /**
