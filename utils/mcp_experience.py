@@ -14,6 +14,8 @@ from collections import deque
 import threading
 import random
 
+from utils.mcp_army_protocol import Message, get_message_bus, EventType, Priority
+
 logger = logging.getLogger(__name__)
 
 class ExperienceReplayBuffer:
@@ -265,14 +267,14 @@ class MCPCollaborationManager:
     the MCP agent collaboration framework.
     """
     
-    def __init__(self, config: Dict[str, Any] = None):
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
         """
         Initialize the MCP collaboration manager.
         
         Args:
             config: Configuration parameters (optional)
         """
-        self.config = config or {}
+        self.config = config if config is not None else {}
         self.replay_buffer = ExperienceReplayBuffer(
             max_size=self.config.get('replay_buffer_size', 10000),
             alpha=self.config.get('priority_alpha', 0.6),
@@ -346,22 +348,36 @@ class MCPCollaborationManager:
         """
         return list(self.agents.keys())
         
-    def request_help(self, requesting_agent_id: str, task: str, priority: float = 1.0) -> None:
+    def request_help(self, requesting_agent_id: str, task: str, priority_level: Priority = Priority.MEDIUM) -> None:
         """
         Request help from other agents for a specific task.
         
         Args:
             requesting_agent_id: ID of the agent requesting help
             task: Description of the task needing help
-            priority: Priority of the help request (higher = more urgent)
+            priority_level: Priority of the help request
         """
+        # Create a standardized assistance request message
+        message = Message.create_assistance_request(
+            source_agent_id=requesting_agent_id,
+            assistance_type="task",
+            assistance_reason=task,
+            urgency=priority_level,
+            target_agent_id="MCP"  # Send to MCP for routing to appropriate agent
+        )
+        
+        # Publish via the message bus
+        message_bus = get_message_bus()
+        message_bus.publish(message)
+        
+        # Also log to local comms bus for backwards compatibility
         help_message = {
             'agentId': requesting_agent_id,
             'eventType': 'help_request',
             'timestamp': datetime.utcnow().isoformat(),
             'payload': {
                 'task': task,
-                'priority': priority
+                'priority': priority_level
             }
         }
         self.comms_bus.publish(help_message)
@@ -434,10 +450,18 @@ class MCPCollaborationManager:
         for agent_id, metrics in self.performance_metrics.items():
             performance = metrics.get('overall', 0.0)
             if performance < threshold:
+                # Convert performance score to priority level
+                if performance < 0.3:
+                    priority_level = Priority.HIGH
+                elif performance < 0.5:
+                    priority_level = Priority.MEDIUM
+                else:
+                    priority_level = Priority.LOW
+                    
                 self.request_help(
                     agent_id,
                     f"Agent {agent_id} is underperforming (score: {performance})",
-                    priority=1.0 - performance  # Lower performance = higher priority
+                    priority_level=priority_level
                 )
                 help_requested.append(agent_id)
                 
@@ -450,25 +474,26 @@ class MCPCollaborationManager:
         Returns:
             Dictionary with experience replay statistics
         """
-        total_experiences = len(self.replay_buffer.experiences)
+        buffer_data = self.replay_buffer.get_all()
+        total_experiences = len(buffer_data)
         
         # Count by agent
         agent_counts = {}
-        for exp in self.replay_buffer.experiences:
+        for exp in buffer_data:
             agent_id = exp.get('agentId', 'unknown')
             agent_counts[agent_id] = agent_counts.get(agent_id, 0) + 1
             
         # Count by event type
         event_counts = {}
-        for exp in self.replay_buffer.experiences:
+        for exp in buffer_data:
             event_type = exp.get('eventType', 'unknown')
             event_counts[event_type] = event_counts.get(event_type, 0) + 1
             
         # Get most recent experiences timestamp
         most_recent = None
-        if self.replay_buffer.experiences:
+        if buffer_data:
             most_recent = max(
-                [exp.get('timestamp', '2000-01-01T00:00:00') for exp in self.replay_buffer.experiences]
+                [exp.get('timestamp', '2000-01-01T00:00:00') for exp in buffer_data]
             )
             
         return {
@@ -491,8 +516,9 @@ class MCPCollaborationManager:
         Returns:
             List of experience dictionaries
         """
+        buffer_data = self.replay_buffer.get_all()
         agent_experiences = [
-            exp for exp in self.replay_buffer.experiences
+            exp for exp in buffer_data
             if exp.get('agentId') == agent_id
         ]
         
