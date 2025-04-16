@@ -8,7 +8,7 @@ the agent registry, workflow designer, and agent playground.
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for
 
 # Create blueprints for the MCP UI routes
-mcp_ui_bp = Blueprint('mcp_ui', __name__)
+mcp_ui_bp = Blueprint('mcp_ui', __name__, url_prefix='/mcp')
 
 @mcp_ui_bp.route('/agent-registry')
 def agent_registry():

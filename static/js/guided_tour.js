@@ -12,12 +12,20 @@ let currentTourStep = 0;
 let tourSteps = [];
 let currentTourName = '';
 
-// Initialize when the DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("Initializing guided tour...");
+// Initialize when the DOM is fully loaded with all resources
+window.addEventListener('load', function() {
+    console.log("Guided tour - window.load event fired");
     setupTourButtons();
-    setupDemoButton();
-    console.log("Guided tour initialized");
+    // No longer calling setupDemoButton() here since we handle it directly in base.html
+    console.log("Guided tour initialized from window.load");
+});
+
+// Also initialize when the DOM structure is loaded (earlier than window.load)
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Guided tour - DOMContentLoaded event fired");
+    // Attempt to setup early but don't rely on it fully
+    setupTourButtons();
+    console.log("Guided tour initialized from DOMContentLoaded");
 });
 
 /**
@@ -35,19 +43,28 @@ function setupTourButtons() {
             startTour(tourName);
         });
     });
+    
+    // Try to set up demo button here as a fallback
+    setupDemoButton();
 }
 
 /**
- * Set up the demo button click handler
+ * Set up the demo button click handler - this is now primarily handled in base.html
+ * but we keep this as a fallback mechanism
  */
 function setupDemoButton() {
     // Get the demo button from base.html
     const demoButton = document.getElementById('demoModeButton');
     
-    // Replace the onclick with our tour functionality
-    if (demoButton) {
-        // Use a direct approach by overriding onclick property
-        demoButton.onclick = function(event) {
+    // Set up the demo button if it exists and doesn't already have a click handler
+    if (demoButton && !demoButton._hasGuidedTourHandler) {
+        console.log('Setting up demo button handler from guided_tour.js');
+        
+        // Mark this button as having our handler
+        demoButton._hasGuidedTourHandler = true;
+        
+        // Use addEventListener instead of direct onclick override to avoid conflicts
+        demoButton.addEventListener('click', function(event) {
             // Prevent default behavior
             event.preventDefault();
             
@@ -63,12 +80,12 @@ function setupDemoButton() {
                 tourName = 'agent-playground';
             }
             
-            console.log('Starting tour:', tourName);
+            console.log('Starting tour from guided_tour.js handler:', tourName);
             startTour(tourName);
             return false;
-        };
-    } else {
-        console.error('Demo button not found in the DOM');
+        });
+    } else if (!demoButton) {
+        console.error('Demo button not found in the DOM during setupDemoButton()');
     }
 }
 
