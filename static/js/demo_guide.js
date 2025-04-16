@@ -3,7 +3,8 @@
  * Interactive demo mode for the LevyMaster MCP system
  */
 
-document.addEventListener('DOMContentLoaded', function() {
+// Wait for window to load before initializing
+window.addEventListener('load', function() {
     console.log('Demo Guide initialized');
     
     // Add the demo mode toggle button to the page
@@ -11,6 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up page-specific demo content
     setupPageSpecificDemo();
+    
+    // Force log to ensure code is running
+    console.log('Demo mode toggle button should now be visible');
 });
 
 /**
