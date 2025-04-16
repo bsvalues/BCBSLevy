@@ -922,55 +922,22 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
     <script src="{{ url_for('static', filename='js/help_menu.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/guided_tour.js') }}"></script>
+    
+    <!-- Auto Demo System -->
+    <script src="{{ url_for('static', filename='js/fetch_real_data.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auto_demo.js') }}"></script>
     
     {% block extra_js %}{% endblock %}
     
-    <!-- Fixed HTML Demo Button -->
-    <button id="demoModeButton"
-            class="demo-button-pulse"
-            title="Start guided tour"
-            style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; 
-                   color: white; border: none; border-radius: 50%; width: 60px; height: 60px; 
-                   display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-                   cursor: pointer;">
-        <i class="bi bi-play-fill" style="font-size: 1.5rem;"></i>
-    </button>
+    <!-- Auto Demo button is injected by auto_demo.js -->
     
     <script>
-    // This ensures the demo button is initialized after it's in the DOM
-    window.addEventListener('load', function() {
-        const demoButton = document.getElementById('demoModeButton');
-        if (demoButton) {
-            console.log('Demo button found and initialized');
-            demoButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                
-                // Determine which tour to start based on the current page
-                const currentPath = window.location.pathname;
-                let tourName = 'general';
-                
-                if (currentPath.includes('/mcp/agent-registry')) {
-                    tourName = 'agent-registry';
-                } else if (currentPath.includes('/mcp/workflow-designer')) {
-                    tourName = 'workflow-designer';
-                } else if (currentPath.includes('/mcp/agent-playground')) {
-                    tourName = 'agent-playground';
-                }
-                
-                console.log('Starting tour:', tourName);
-                if (typeof startTour === 'function') {
-                    startTour(tourName);
-                } else {
-                    console.error('startTour function not found');
-                    alert('Demo tour system is initializing. Please try again in a moment.');
-                }
-                return false;
-            });
-        } else {
-            console.error('Demo button not found in the DOM on window load');
-        }
-    });
+    // The demo button will be handled by auto_demo.js
+    console.log('Auto Demo System activated');
+    
+    // Keeping guided_tour.js for backward compatibility
+    // but we're now primarily using the comprehensive auto-demo system
+    
     </script>
 </body>
 </html>
