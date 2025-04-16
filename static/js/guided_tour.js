@@ -42,12 +42,15 @@ function setupTourButtons() {
  */
 function setupDemoButton() {
     // Get the demo button from base.html
-    const demoButton = document.querySelector('button[onclick*="Demo Mode Activated"]');
+    const demoButton = document.getElementById('demoModeButton');
     
     // Replace the onclick with our tour functionality
     if (demoButton) {
-        demoButton.removeAttribute('onclick');
-        demoButton.addEventListener('click', function() {
+        // Use a direct approach by overriding onclick property
+        demoButton.onclick = function(event) {
+            // Prevent default behavior
+            event.preventDefault();
+            
             // Determine which tour to start based on the current page
             const currentPath = window.location.pathname;
             let tourName = 'general';
@@ -60,8 +63,12 @@ function setupDemoButton() {
                 tourName = 'agent-playground';
             }
             
+            console.log('Starting tour:', tourName);
             startTour(tourName);
-        });
+            return false;
+        };
+    } else {
+        console.error('Demo button not found in the DOM');
     }
 }
 
@@ -304,7 +311,7 @@ function getTourSteps(tourName) {
         case 'agent-registry':
             return [
                 {
-                    element: '.card-header:contains("Registered Agents")',
+                    element: '.card-header',
                     title: 'Registered Agents',
                     content: 'This table shows all agents currently registered in the system, their types, and statuses.',
                     placement: 'top'
@@ -316,13 +323,13 @@ function getTourSteps(tourName) {
                     placement: 'top'
                 },
                 {
-                    element: '.card-header:contains("Agent Performance")',
+                    element: '.card:nth-child(2) .card-header',
                     title: 'Performance Metrics',
                     content: 'This panel shows real-time performance metrics for each active agent in the system.',
                     placement: 'top'
                 },
                 {
-                    element: '.card-header:contains("Agent Activities")',
+                    element: '.card:nth-child(3) .card-header',
                     title: 'Recent Activities',
                     content: 'Here you can see the most recent activities performed by the agents in the system.',
                     placement: 'left'
@@ -402,7 +409,7 @@ function getTourSteps(tourName) {
                     placement: 'top'
                 },
                 {
-                    element: '.list-group-item:contains("Compare with Previous")',
+                    element: '.list-group-item',
                     title: 'Compare Results',
                     content: 'Use this action to compare the current forecast with previously saved forecasts.',
                     placement: 'left'

@@ -929,12 +929,48 @@
     <!-- Fixed HTML Demo Button -->
     <button id="demoModeButton"
             class="demo-button-pulse"
-            onclick="alert('Demo Mode Activated! This feature will guide you through the LevyMaster MCP system.');"
+            title="Start guided tour"
             style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; 
                    color: white; border: none; border-radius: 50%; width: 60px; height: 60px; 
                    display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
                    cursor: pointer;">
         <i class="bi bi-play-fill" style="font-size: 1.5rem;"></i>
     </button>
+    
+    <script>
+    // This ensures the demo button is initialized after it's in the DOM
+    window.addEventListener('load', function() {
+        const demoButton = document.getElementById('demoModeButton');
+        if (demoButton) {
+            console.log('Demo button found and initialized');
+            demoButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                
+                // Determine which tour to start based on the current page
+                const currentPath = window.location.pathname;
+                let tourName = 'general';
+                
+                if (currentPath.includes('/mcp/agent-registry')) {
+                    tourName = 'agent-registry';
+                } else if (currentPath.includes('/mcp/workflow-designer')) {
+                    tourName = 'workflow-designer';
+                } else if (currentPath.includes('/mcp/agent-playground')) {
+                    tourName = 'agent-playground';
+                }
+                
+                console.log('Starting tour:', tourName);
+                if (typeof startTour === 'function') {
+                    startTour(tourName);
+                } else {
+                    console.error('startTour function not found');
+                    alert('Demo tour system is initializing. Please try again in a moment.');
+                }
+                return false;
+            });
+        } else {
+            console.error('Demo button not found in the DOM on window load');
+        }
+    });
+    </script>
 </body>
 </html>
