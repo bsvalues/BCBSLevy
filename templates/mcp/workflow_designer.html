@@ -76,7 +76,17 @@
         <div class="col-md-9">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Workflow Canvas</h5>
+                    <div class="d-flex align-items-center">
+                        <h5 class="card-title mb-0 me-3">Workflow Canvas</h5>
+                        <div class="complexity-meter-container d-flex align-items-center">
+                            <span class="text-white me-2 small">Complexity:</span>
+                            <div class="progress" style="width: 120px; height: 8px; background-color: rgba(255,255,255,0.2);">
+                                <div id="complexity-meter" class="progress-bar bg-warning" role="progressbar" style="width: 35%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span id="complexity-value" class="text-white ms-2 small">35%</span>
+                            <i class="bi bi-info-circle ms-1 text-white" data-bs-toggle="tooltip" title="Workflow complexity measures the computational and logical intricacy of your design"></i>
+                        </div>
+                    </div>
                     <div>
                         <button class="btn btn-sm btn-light me-2">Save</button>
                         <button class="btn btn-sm btn-light me-2">Validate</button>
@@ -182,11 +192,69 @@ input: Levy Calculation Results
 output: Compliance Report
 parameters: { threshold: 0.95, check_statutory: true }</textarea>
                             </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label d-flex justify-content-between align-items-center">
+                                    <span>Complexity Analysis</span>
+                                    <button id="complexity-refresh-btn" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-arrow-repeat"></i> Analyze
+                                    </button>
+                                </label>
+                                <div class="card">
+                                    <div class="card-body p-3">
+                                        <div class="complexity-details">
+                                            <div class="row mb-2">
+                                                <div class="col-6">Computational Load:</div>
+                                                <div class="col-6">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div id="computational-meter" class="progress-bar bg-primary" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-6">Data Throughput:</div>
+                                                <div class="col-6">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div id="throughput-meter" class="progress-bar bg-success" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-6">Decision Points:</div>
+                                                <div class="col-6">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div id="decision-meter" class="progress-bar bg-info" role="progressbar" style="width: 20%;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <div class="col-6">Agent Coordination:</div>
+                                                <div class="col-6">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div id="coordination-meter" class="progress-bar bg-warning" role="progressbar" style="width: 55%;" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">Error Handling:</div>
+                                                <div class="col-6">
+                                                    <div class="progress" style="height: 8px;">
+                                                        <div id="error-meter" class="progress-bar bg-danger" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    <i class="bi bi-info-circle me-1"></i> Complexity scores help identify potential performance bottlenecks and resource requirements.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm mb-4">
                         <div class="card-header bg-primary text-white">
                             <h5 class="card-title mb-0">Saved Workflows</h5>
                         </div>
@@ -223,6 +291,93 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Performance Impact</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                See how adding different components affects workflow performance and complexity.
+                            </p>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Component</th>
+                                            <th class="text-center">Complexity <i class="bi bi-arrow-up-right text-danger small"></i></th>
+                                            <th class="text-center">Time <i class="bi bi-arrow-up-right text-danger small"></i></th>
+                                            <th class="text-center">Memory <i class="bi bi-arrow-up-right text-danger small"></i></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-primary me-2">&nbsp;</span>
+                                                    Levy Calculator
+                                                </div>
+                                            </td>
+                                            <td class="text-center">+15%</td>
+                                            <td class="text-center">+250ms</td>
+                                            <td class="text-center">+64MB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-success me-2">&nbsp;</span>
+                                                    Compliance Check
+                                                </div>
+                                            </td>
+                                            <td class="text-center">+8%</td>
+                                            <td class="text-center">+120ms</td>
+                                            <td class="text-center">+32MB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-info me-2">&nbsp;</span>
+                                                    Rate Forecaster
+                                                </div>
+                                            </td>
+                                            <td class="text-center">+18%</td>
+                                            <td class="text-center">+450ms</td>
+                                            <td class="text-center">+128MB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-warning me-2">&nbsp;</span>
+                                                    Report Generator
+                                                </div>
+                                            </td>
+                                            <td class="text-center">+5%</td>
+                                            <td class="text-center">+80ms</td>
+                                            <td class="text-center">+16MB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-danger me-2">&nbsp;</span>
+                                                    Budget Analyzer
+                                                </div>
+                                            </td>
+                                            <td class="text-center">+22%</td>
+                                            <td class="text-center">+580ms</td>
+                                            <td class="text-center">+96MB</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="text-end mt-2">
+                                <button id="optimize-workflow-btn" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-lightning-charge"></i> Optimize Workflow
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -234,6 +389,29 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Workflow Designer page initialized');
+        
+        // Initialize complexity calculation system
+        initComplexityMeter();
+        
+        // Set up the optimize workflow button
+        const optimizeBtn = document.getElementById('optimize-workflow-btn');
+        if (optimizeBtn) {
+            optimizeBtn.addEventListener('click', function() {
+                // Show loading state
+                this.disabled = true;
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Optimizing...';
+                
+                // Simulate optimization process
+                setTimeout(() => {
+                    // Create and show the optimization modal
+                    showOptimizationModal();
+                    
+                    // Restore button state
+                    this.disabled = false;
+                    this.innerHTML = '<i class="bi bi-lightning-charge"></i> Optimize Workflow';
+                }, 1500);
+            });
+        }
         
         // Make elements draggable for demonstration
         const draggableElements = document.querySelectorAll('[draggable="true"]');
@@ -248,6 +426,8 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
             
             element.addEventListener('dragend', function() {
                 element.classList.remove('dragging');
+                // Update complexity after drag ends
+                calculateWorkflowComplexity();
             });
         });
         
@@ -262,7 +442,384 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
             e.preventDefault();
             // In a real implementation, we would handle the drop here
             console.log('Element dropped at position', e.clientX, e.clientY);
+            
+            // Recalculate complexity after drop
+            calculateWorkflowComplexity();
         });
+        
+        // Initialize complexity meter functionality
+        function initComplexityMeter() {
+            // Set up the complexity refresh button
+            const refreshBtn = document.getElementById('complexity-refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    // Show a loading spinner
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Analyzing...';
+                    this.disabled = true;
+                    
+                    // Simulate analysis delay (would be an API call in production)
+                    setTimeout(() => {
+                        calculateWorkflowComplexity(true);
+                        
+                        // Restore button state
+                        this.innerHTML = '<i class="bi bi-arrow-repeat"></i> Analyze';
+                        this.disabled = false;
+                    }, 1200);
+                });
+            }
+            
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Calculate initial complexity
+            calculateWorkflowComplexity();
+        }
+        
+        // Complexity calculation function
+        function calculateWorkflowComplexity(animate = false) {
+            // Get all workflow elements on the canvas
+            const workflowElements = canvas.querySelectorAll('.card');
+            const connectors = canvas.querySelectorAll('.bi-arrow-right, .bi-arrow-down, .bi-arrow-left');
+            
+            // Count elements by type for complexity calculation
+            const elementCount = workflowElements.length;
+            const connectorCount = connectors.length;
+            
+            // Count different agent types (by header color)
+            const typeMap = {
+                'bg-primary': 0,
+                'bg-success': 0,
+                'bg-info': 0,
+                'bg-warning': 0,
+                'bg-danger': 0
+            };
+            
+            workflowElements.forEach(el => {
+                const header = el.querySelector('.card-header');
+                if (header) {
+                    Object.keys(typeMap).forEach(className => {
+                        if (header.classList.contains(className)) {
+                            typeMap[className]++;
+                        }
+                    });
+                }
+            });
+            
+            // Calculate complexity factors
+            const uniqueAgentTypes = Object.values(typeMap).filter(v => v > 0).length;
+            
+            // Create complexity profile
+            const computationalLoad = Math.min(100, Math.round((elementCount * 15) + (uniqueAgentTypes * 5)));
+            const dataThroughput = Math.min(100, Math.round((connectorCount * 10) + (elementCount * 5)));
+            const decisionPoints = Math.min(100, Math.round((uniqueAgentTypes * 15) + (connectorCount * 5)));
+            const agentCoordination = Math.min(100, Math.round((uniqueAgentTypes * 20) + (elementCount * 3)));
+            const errorHandling = Math.min(100, Math.round((elementCount * 5) + (uniqueAgentTypes * 10)));
+            
+            // Calculate overall complexity (weighted average)
+            const overallComplexity = Math.round(
+                (computationalLoad * 0.25) + 
+                (dataThroughput * 0.2) + 
+                (decisionPoints * 0.15) + 
+                (agentCoordination * 0.25) + 
+                (errorHandling * 0.15)
+            );
+            
+            // Update the complexity meter
+            updateComplexityMeter('computational-meter', computationalLoad, animate);
+            updateComplexityMeter('throughput-meter', dataThroughput, animate);
+            updateComplexityMeter('decision-meter', decisionPoints, animate);
+            updateComplexityMeter('coordination-meter', agentCoordination, animate);
+            updateComplexityMeter('error-meter', errorHandling, animate);
+            
+            // Update main complexity meter
+            updateComplexityMeter('complexity-meter', overallComplexity, animate);
+            
+            // Update complexity text
+            const complexityValue = document.getElementById('complexity-value');
+            if (complexityValue) {
+                complexityValue.textContent = overallComplexity + '%';
+            }
+            
+            // Update color based on complexity level
+            const complexityMeter = document.getElementById('complexity-meter');
+            if (complexityMeter) {
+                complexityMeter.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+                
+                if (overallComplexity < 40) {
+                    complexityMeter.classList.add('bg-success');
+                } else if (overallComplexity < 70) {
+                    complexityMeter.classList.add('bg-warning');
+                } else {
+                    complexityMeter.classList.add('bg-danger');
+                }
+            }
+            
+            return overallComplexity;
+        }
+        
+        // Helper function to update a meter with optional animation
+        function updateComplexityMeter(id, value, animate) {
+            const meter = document.getElementById(id);
+            if (!meter) return;
+            
+            // Set the ARIA value
+            meter.setAttribute('aria-valuenow', value);
+            
+            // Update the width with or without animation
+            if (animate) {
+                // Start at 0 or current value
+                const startValue = parseInt(meter.style.width) || 0;
+                const duration = 1000; // ms
+                const startTime = performance.now();
+                
+                function animateWidth(timestamp) {
+                    const elapsed = timestamp - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const currentValue = startValue + (progress * (value - startValue));
+                    
+                    meter.style.width = currentValue + '%';
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateWidth);
+                    }
+                }
+                
+                requestAnimationFrame(animateWidth);
+            } else {
+                meter.style.width = value + '%';
+            }
+        }
+        
+        // Function to create and show the optimization modal
+        function showOptimizationModal() {
+            // Check if a modal already exists and remove it
+            let existingModal = document.getElementById('workflow-optimization-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create modal container
+            const modalContainer = document.createElement('div');
+            modalContainer.id = 'workflow-optimization-modal';
+            modalContainer.className = 'modal fade';
+            modalContainer.setAttribute('tabindex', '-1');
+            modalContainer.setAttribute('aria-labelledby', 'optimization-modal-label');
+            modalContainer.setAttribute('aria-hidden', 'true');
+            
+            // Create modal content
+            modalContainer.innerHTML = `
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="optimization-modal-label">Workflow Optimization Results</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="card border-success mb-2">
+                                        <div class="card-body p-3">
+                                            <h6 class="card-title text-success">
+                                                <i class="bi bi-arrow-down"></i> Complexity Reduction
+                                            </h6>
+                                            <div class="display-6 text-center my-3">-27%</div>
+                                            <p class="card-text small text-muted">
+                                                Workflow complexity reduced through optimized agent coordination and data flow restructuring.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-success mb-2">
+                                        <div class="card-body p-3">
+                                            <h6 class="card-title text-success">
+                                                <i class="bi bi-lightning-charge"></i> Performance Improvement
+                                            </h6>
+                                            <div class="display-6 text-center my-3">+45%</div>
+                                            <p class="card-text small text-muted">
+                                                Execution speed improved through parallel processing and memory optimizations.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h6 class="fw-bold mb-3">Optimization Details</h6>
+                            <div class="table-responsive mb-3">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Optimization</th>
+                                            <th>Impact</th>
+                                            <th>Complexity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Parallel agent execution</td>
+                                            <td><span class="badge bg-success">High</span></td>
+                                            <td>-15%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Shared memory allocation</td>
+                                            <td><span class="badge bg-success">High</span></td>
+                                            <td>-12%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Optimized data flow</td>
+                                            <td><span class="badge bg-warning">Medium</span></td>
+                                            <td>-8%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Reduce redundant validations</td>
+                                            <td><span class="badge bg-warning">Medium</span></td>
+                                            <td>-7%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Consolidated error handling</td>
+                                            <td><span class="badge bg-info">Low</span></td>
+                                            <td>-4%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                <div>
+                                    <strong>Performance Recommendation:</strong> Configure Rate Forecaster agent to use incremental updates instead of full recalculation for a potential additional 12% performance gain.
+                                </div>
+                            </div>
+                            
+                            <h6 class="fw-bold mb-2">Before vs After</h6>
+                            <div class="progress mb-1" style="height: 25px;">
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">
+                                    <span class="fw-bold">Before: 68% Complexity</span>
+                                </div>
+                            </div>
+                            <div class="progress mb-3" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100">
+                                    <span class="fw-bold">After: 41% Complexity</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="apply-optimizations-btn">
+                                <i class="bi bi-check2-all"></i> Apply Optimizations
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to document
+            document.body.appendChild(modalContainer);
+            
+            // Initialize the modal
+            const modal = new bootstrap.Modal(modalContainer);
+            
+            // Show the modal
+            modal.show();
+            
+            // Set up the apply optimizations button
+            const applyBtn = document.getElementById('apply-optimizations-btn');
+            if (applyBtn) {
+                applyBtn.addEventListener('click', function() {
+                    // Close the modal
+                    modal.hide();
+                    
+                    // Show a loading spinner overlay
+                    const loadingOverlay = document.createElement('div');
+                    loadingOverlay.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50';
+                    loadingOverlay.style.zIndex = '9999';
+                    loadingOverlay.innerHTML = `
+                        <div class="text-center text-white">
+                            <div class="spinner-border mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <h5>Applying Workflow Optimizations...</h5>
+                            <div class="small mt-2">This may take a few moments</div>
+                        </div>
+                    `;
+                    document.body.appendChild(loadingOverlay);
+                    
+                    // Simulate optimization process
+                    setTimeout(() => {
+                        // Remove the loading overlay
+                        loadingOverlay.remove();
+                        
+                        // Update the complexity meters with the optimized values
+                        updateComplexityMeter('complexity-meter', 41, true);
+                        document.getElementById('complexity-value').textContent = '41%';
+                        
+                        // Change the color based on the new complexity level
+                        const complexityMeter = document.getElementById('complexity-meter');
+                        if (complexityMeter) {
+                            complexityMeter.classList.remove('bg-danger', 'bg-warning');
+                            complexityMeter.classList.add('bg-success');
+                        }
+                        
+                        // Update the detailed complexity meters
+                        updateComplexityMeter('computational-meter', 30, true);
+                        updateComplexityMeter('throughput-meter', 22, true);
+                        updateComplexityMeter('decision-meter', 15, true);
+                        updateComplexityMeter('coordination-meter', 38, true);
+                        updateComplexityMeter('error-meter', 21, true);
+                        
+                        // Show success toast
+                        showToast('Optimizations applied successfully!', 'Workflow complexity reduced by 27%');
+                    }, 2500);
+                });
+            }
+        }
+        
+        // Toast notification helper
+        function showToast(title, message) {
+            // Create toast container if it doesn't exist
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Create toast element
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="toast-header bg-success text-white">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong class="me-auto">${title}</strong>
+                    <small>Just now</small>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            // Add toast to container
+            toastContainer.appendChild(toast);
+            
+            // Initialize and show the toast
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', function() {
+                toast.remove();
+            });
+        }
     });
 </script>
 {% endblock %}
