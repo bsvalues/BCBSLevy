@@ -1,0 +1,64 @@
+/**
+ * guided_tour.css
+ * 
+ * Styles for the guided tour feature
+ */
+
+/* Tour highlight effect */
+.tour-highlight {
+    position: relative;
+    z-index: 9998 !important;
+    box-shadow: 0 0 0 4px rgba(61, 165, 189, 0.5), 0 0 0 8px rgba(61, 165, 189, 0.3) !important;
+    border-radius: 4px;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Tour popover customization */
+.tour-popover {
+    max-width: 330px;
+    z-index: 9999 !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 6px;
+}
+
+.tour-popover .popover-header {
+    background-color: #3DA5BD;
+    color: white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    padding: 10px 15px;
+}
+
+.tour-popover .popover-body {
+    padding: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #495057;
+}
+
+.tour-popover .popover-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 10px 15px !important;
+}
+
+.tour-step-indicator {
+    padding-top: 5px;
+}
+
+/* Demo button pulse effect */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(61, 165, 189, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(61, 165, 189, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(61, 165, 189, 0);
+    }
+}
+
+.demo-button-pulse {
+    animation: pulse 2s infinite;
+}

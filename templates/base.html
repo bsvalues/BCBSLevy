@@ -927,7 +927,9 @@
     {% block extra_js %}{% endblock %}
     
     <!-- Fixed HTML Demo Button -->
-    <button onclick="alert('Demo Mode Activated! This feature will guide you through the LevyMaster MCP system.');"
+    <button id="demoModeButton"
+            class="demo-button-pulse"
+            onclick="alert('Demo Mode Activated! This feature will guide you through the LevyMaster MCP system.');"
             style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; 
                    color: white; border: none; border-radius: 50%; width: 60px; height: 60px; 
                    display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
