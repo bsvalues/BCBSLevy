@@ -390,6 +390,9 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Workflow Designer page initialized');
         
+        // Get canvas reference first
+        const canvas = document.getElementById('workflow-canvas');
+        
         // Initialize complexity calculation system
         initComplexityMeter();
         
@@ -432,7 +435,6 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
         });
         
         // Canvas drag and drop handling
-        const canvas = document.getElementById('workflow-canvas');
         
         canvas.addEventListener('dragover', function(e) {
             e.preventDefault();
