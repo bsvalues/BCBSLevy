@@ -28,6 +28,11 @@
     <!-- Loading Animations CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/animations/loading-animations.css') }}">
     
+    <!-- Animate.css for enhanced animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <!-- Demo Mode CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/demo.css') }}">
     
     <!-- Additional CSS for specific pages -->
     {% block extra_css %}{% endblock %}
@@ -918,6 +923,7 @@
     <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
     <script src="{{ url_for('static', filename='js/help_menu.js') }}"></script>
     <script src="{{ url_for('static', filename='js/guided_tour.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/demo_guide.js') }}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>
