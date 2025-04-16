@@ -15,18 +15,60 @@ let currentTourName = '';
 // Initialize when the DOM is fully loaded with all resources
 window.addEventListener('load', function() {
     console.log("Guided tour - window.load event fired");
+    
+    // Ensure demo button exists by injecting it if needed
+    injectDemoButtonIfNeeded();
+    
     setupTourButtons();
-    // No longer calling setupDemoButton() here since we handle it directly in base.html
     console.log("Guided tour initialized from window.load");
 });
 
 // Also initialize when the DOM structure is loaded (earlier than window.load)
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Guided tour - DOMContentLoaded event fired");
+    
+    // Attempt early injection of demo button
+    injectDemoButtonIfNeeded();
+    
     // Attempt to setup early but don't rely on it fully
     setupTourButtons();
     console.log("Guided tour initialized from DOMContentLoaded");
 });
+
+/**
+ * Injects the demo button into the DOM if it doesn't already exist
+ */
+function injectDemoButtonIfNeeded() {
+    // Check if demo button already exists
+    if (!document.getElementById('demoModeButton')) {
+        console.log('Demo button not found, injecting it now');
+        
+        // Create the button element
+        const demoButton = document.createElement('button');
+        demoButton.id = 'demoModeButton';
+        demoButton.className = 'demo-button-pulse';
+        demoButton.title = 'Start guided tour';
+        demoButton.style.cssText = 'position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; ' +
+                            'color: white; border: none; border-radius: 50%; width: 60px; height: 60px; ' +
+                            'display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15); ' +
+                            'cursor: pointer;';
+        
+        // Create the icon
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-play-fill';
+        icon.style.fontSize = '1.5rem';
+        
+        // Append icon to button
+        demoButton.appendChild(icon);
+        
+        // Append button to body
+        document.body.appendChild(demoButton);
+        
+        console.log('Demo button injected successfully');
+    } else {
+        console.log('Demo button already exists in the DOM');
+    }
+}
 
 /**
  * Set up event listeners for tour-related buttons

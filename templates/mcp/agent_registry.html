@@ -137,12 +137,41 @@
         </div>
     </div>
 </div>
+    <!-- Demo Button - Added directly to the page -->
+    <button id="demoModeButton"
+            class="demo-button-pulse"
+            title="Start guided tour"
+            style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; 
+                   color: white; border: none; border-radius: 50%; width: 60px; height: 60px; 
+                   display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                   cursor: pointer;">
+        <i class="bi bi-play-fill" style="font-size: 1.5rem;"></i>
+    </button>
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Agent Registry page initialized');
+        
+        // Initialize the demo button
+        const demoButton = document.getElementById('demoModeButton');
+        if (demoButton) {
+            console.log('Demo button found in Agent Registry page');
+            demoButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                console.log('Demo button clicked - starting Agent Registry tour');
+                if (typeof startTour === 'function') {
+                    startTour('agent-registry');
+                } else {
+                    console.error('startTour function not found');
+                    alert('Demo tour system is initializing. Please try again in a moment.');
+                }
+                return false;
+            });
+        } else {
+            console.error('Demo button not found in the Agent Registry page DOM');
+        }
         
         // Set up detail buttons to show agent details modal
         const detailButtons = document.querySelectorAll('.btn-outline-primary');

@@ -825,5 +825,39 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
             });
         }
     });
+    
+    // Initialize the demo button
+    document.addEventListener('DOMContentLoaded', function() {
+        const demoButton = document.getElementById('demoModeButton');
+        if (demoButton) {
+            console.log('Demo button found in Workflow Designer page');
+            demoButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                console.log('Demo button clicked - starting Workflow Designer tour');
+                if (typeof startTour === 'function') {
+                    startTour('workflow-designer');
+                } else {
+                    console.error('startTour function not found');
+                    alert('Demo tour system is initializing. Please try again in a moment.');
+                }
+                return false;
+            });
+        } else {
+            console.error('Demo button not found in the Workflow Designer page DOM');
+        }
+    });
 </script>
+{% endblock %}
+
+{% block content_end %}
+    <!-- Demo Button - Added directly to the page -->
+    <button id="demoModeButton"
+            class="demo-button-pulse"
+            title="Start guided tour"
+            style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; 
+                   color: white; border: none; border-radius: 50%; width: 60px; height: 60px; 
+                   display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                   cursor: pointer;">
+        <i class="bi bi-play-fill" style="font-size: 1.5rem;"></i>
+    </button>
 {% endblock %}
