@@ -3,14 +3,7 @@
 {% block title %}Workflow Designer - LevyMaster{% endblock %}
 
 {% block content %}
-<!-- Demo Button - Static Implementation -->
-<button id="staticDemoButton" 
-        style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; 
-               color: white; border: none; border-radius: 50%; width: 60px; height: 60px; 
-               display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-               cursor: pointer;">
-    <i class="bi bi-play-fill" style="font-size: 1.5rem;"></i>
-</button>
+
 
 <div class="container py-4">
     <div class="row mb-4">
@@ -398,14 +391,6 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Workflow Designer page initialized');
-        
-        // Configure static demo button
-        const staticDemoButton = document.getElementById('staticDemoButton');
-        if (staticDemoButton) {
-            staticDemoButton.addEventListener('click', function() {
-                alert('Demo Mode Activated! This feature will guide you through the Workflow Designer with interactive tours and tooltips.');
-            });
-        }
         
         // Get canvas reference first
         const canvas = document.getElementById('workflow-canvas');

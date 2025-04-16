@@ -923,44 +923,16 @@
     <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
     <script src="{{ url_for('static', filename='js/help_menu.js') }}"></script>
     <script src="{{ url_for('static', filename='js/guided_tour.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/demo_guide.js') }}"></script>
-    
-    <script>
-        // Add direct demo mode toggle button
-        window.addEventListener('load', function() {
-            // Create toggle button
-            const toggleButton = document.createElement('button');
-            toggleButton.className = 'demo-mode-toggle';
-            toggleButton.id = 'demoModeToggle';
-            toggleButton.innerHTML = '<i class="bi bi-play-fill"></i>';
-            toggleButton.setAttribute('title', 'Start Demo Mode');
-            toggleButton.style.position = 'fixed';
-            toggleButton.style.bottom = '20px';
-            toggleButton.style.right = '20px';
-            toggleButton.style.zIndex = '9999';
-            toggleButton.style.backgroundColor = '#3DA5BD';
-            toggleButton.style.color = 'white';
-            toggleButton.style.border = 'none';
-            toggleButton.style.borderRadius = '50%';
-            toggleButton.style.width = '60px';
-            toggleButton.style.height = '60px';
-            toggleButton.style.display = 'flex';
-            toggleButton.style.alignItems = 'center';
-            toggleButton.style.justifyContent = 'center';
-            toggleButton.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
-            toggleButton.style.cursor = 'pointer';
-            
-            // Add to document
-            document.body.appendChild(toggleButton);
-            
-            // Set up toggle event
-            toggleButton.addEventListener('click', function() {
-                alert('Demo Mode Activated! This feature will guide you through the LevyMaster MCP system.');
-                // This would normally call the toggleDemoMode function
-            });
-        });
-    </script>
     
     {% block extra_js %}{% endblock %}
+    
+    <!-- Fixed HTML Demo Button -->
+    <button onclick="alert('Demo Mode Activated! This feature will guide you through the LevyMaster MCP system.');"
+            style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #3DA5BD; 
+                   color: white; border: none; border-radius: 50%; width: 60px; height: 60px; 
+                   display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                   cursor: pointer;">
+        <i class="bi bi-play-fill" style="font-size: 1.5rem;"></i>
+    </button>
 </body>
 </html>
