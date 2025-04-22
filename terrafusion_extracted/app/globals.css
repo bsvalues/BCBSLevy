@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base colors */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    /* TerraFusion brand tokens - updated to match the actual brand */
+    --tf-dark-blue: #001529;
+    --tf-medium-blue: #002a4a;
+    --tf-light-blue: #004d7a;
+    --tf-primary: #00e5ff;
+    --tf-secondary: #00b8d4;
+    --tf-accent: #00e5ff;
+
+    /* Typography tokens */
+    --font-family-base: "Inter", sans-serif;
+    --font-size-h1: 48px;
+    --font-size-body: 16px;
+    --weight-bold: 600;
+    --weight-regular: 400;
+
+    /* Spacing tokens */
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 32px;
+
+    /* Shadow tokens */
+    --shadow-light: 0 0 10px rgba(0, 229, 255, 0.2);
+    --shadow-medium: 0 0 20px rgba(0, 229, 255, 0.3);
+    --shadow-strong: 0 0 30px rgba(0, 229, 255, 0.4);
+
+    /* Motion tokens */
+    --elev-quick: cubic-bezier(0.4, 0, 0.2, 1) 160ms;
+    --elev-slow: cubic-bezier(0.4, 0, 0.2, 1) 320ms;
+
+    /* Glassmorphic helpers */
+    --blur-strong: blur(18px);
+    --glass-border: 1px solid rgba(0, 229, 255, 0.2);
+  }
+}
+
+@layer components {
+  /* Splash screen */
+  .tf-splash {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    background: var(--tf-dark-blue);
+  }
+
+  /* Glow effect */
+  .tf-glow {
+    position: relative;
+  }
+
+  .tf-glow::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    background: var(--tf-primary);
+    opacity: 0.5;
+    filter: blur(15px);
+    z-index: -1;
+  }
+
+  /* 3D Glassmorphic effect */
+  .tf-glassmorphic {
+    background: rgba(0, 21, 41, 0.7);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+@keyframes pulse-glow {
+  0% {
+    opacity: 0.5;
+    filter: blur(15px);
+  }
+  50% {
+    opacity: 0.7;
+    filter: blur(20px);
+  }
+  100% {
+    opacity: 0.5;
+    filter: blur(15px);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
