@@ -5,17 +5,20 @@ This directory contains tools and documentation for managing database migrations
 ## Available Migration Tools
 
 1. **Standard Migration Tool (`migrate.py`)**
+
    - Basic Flask-Migrate integration
    - Handles migrations for all database types
    - Used for development environments
 
 2. **Production PostgreSQL Migration Tool (`production_migrate.py`)**
+
    - Enhanced migration capabilities for PostgreSQL
    - Built-in backup and restore functionality
    - Schema comparison and reporting
    - Dry-run capability
 
 3. **Production Setup Tool (`setup_production.py`)**
+
    - Full production environment setup
    - Database backup
    - Migration application
@@ -23,6 +26,7 @@ This directory contains tools and documentation for managing database migrations
    - Application verification
 
 4. **Database CLI Tool (`cli_tool.py`)**
+
    - Standalone database operations without Flask context
    - Quick database backup, verification, and information
    - Compatible with all PostgreSQL versions
@@ -35,11 +39,13 @@ This directory contains tools and documentation for managing database migrations
 ## Documentation
 
 1. [Production Migration Guide](production_migration_guide.md)
+
    - Step-by-step migration instructions
    - Quick reference for common tasks
    - Troubleshooting guide
 
 2. [PostgreSQL Production Migration Guide](postgresql_production_migration.md)
+
    - Detailed PostgreSQL-specific considerations
    - Advanced migration strategies
    - Performance optimization techniques
@@ -117,6 +123,7 @@ python production_migrate.py restore backups/pg_backup_YYYYMMDD_HHMMSS.sql
 ## Best Practices
 
 1. **Always backup before migrating**
+
    ```
    python cli_tool.py backup  # Quick standalone backup
    # OR
@@ -124,21 +131,25 @@ python production_migrate.py restore backups/pg_backup_YYYYMMDD_HHMMSS.sql
    ```
 
 2. **Preview migrations in production**
+
    ```
    python production_migrate.py migrate --dry-run
    ```
 
 3. **Generate reports before and after migrations**
+
    ```
    python production_migrate.py report
    ```
 
 4. **Include descriptive messages with migrations**
+
    ```
    python migrate.py migrate -m "Add tax_district_type column to tax_district table"
    ```
 
 5. **Run regular health checks after migration**
+
    ```
    python cli_tool.py verify  # Quick connectivity check
    # OR

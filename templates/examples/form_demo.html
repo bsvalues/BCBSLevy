@@ -1,481 +1,559 @@
-{% extends "base.html" %}
-
-{% block title %}Interactive Form Elements Demo{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Interactive Form Elements Demo{%
+endblock %} {% block content %}
 <div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-primary text-white">
-                    <h2 class="h4 m-0">Interactive Form Elements Demo</h2>
-                </div>
-                <div class="card-body">
-                    <p class="lead">This page demonstrates all the enhanced form elements with micro-interactions.</p>
-                </div>
-            </div>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white">
+          <h2 class="h4 m-0">Interactive Form Elements Demo</h2>
         </div>
+        <div class="card-body">
+          <p class="lead">
+            This page demonstrates all the enhanced form elements with
+            micro-interactions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header">
+          <h3 class="h5 m-0">Text Inputs with Validation</h3>
+        </div>
+        <div class="card-body">
+          <form class="needs-validation" novalidate>
+            <div class="mb-3">
+              <label for="validationDemo01" class="form-label"
+                >First name</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="validationDemo01"
+                placeholder="Enter first name"
+                required
+              />
+              <div class="valid-feedback">Looks good!</div>
+              <div class="invalid-feedback">Please enter your first name.</div>
+            </div>
+            <div class="mb-3">
+              <label for="validationDemo02" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="validationDemo02"
+                placeholder="Enter email"
+                required
+              />
+              <div class="valid-feedback">Valid email format!</div>
+              <div class="invalid-feedback">
+                Please enter a valid email address.
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="floatingInput"
+                  placeholder="Floating label input"
+                  required
+                />
+                <label for="floatingInput">Floating label</label>
+                <div class="invalid-feedback">This field is required.</div>
+              </div>
+            </div>
+            <div class="loading-button">
+              <button type="submit" class="btn btn-primary">
+                <span class="btn-label"
+                  ><i class="bi bi-check-circle me-1"></i> Submit Form</span
+                >
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <div class="row mb-5">
-        <div class="col-lg-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header">
-                    <h3 class="h5 m-0">Text Inputs with Validation</h3>
-                </div>
-                <div class="card-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label for="validationDemo01" class="form-label">First name</label>
-                            <input type="text" class="form-control" id="validationDemo01" placeholder="Enter first name" required>
-                            <div class="valid-feedback">
-                                Looks good!
-                            </div>
-                            <div class="invalid-feedback">
-                                Please enter your first name.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="validationDemo02" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="validationDemo02" placeholder="Enter email" required>
-                            <div class="valid-feedback">
-                                Valid email format!
-                            </div>
-                            <div class="invalid-feedback">
-                                Please enter a valid email address.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="floatingInput" placeholder="Floating label input" required>
-                                <label for="floatingInput">Floating label</label>
-                                <div class="invalid-feedback">
-                                    This field is required.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="loading-button">
-                            <button type="submit" class="btn btn-primary">
-                                <span class="btn-label"><i class="bi bi-check-circle me-1"></i> Submit Form</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header">
+          <h3 class="h5 m-0">Select and Range Controls</h3>
         </div>
+        <div class="card-body">
+          <form class="needs-validation" novalidate>
+            <div class="mb-3">
+              <label for="validationSelect" class="form-label"
+                >Select option</label
+              >
+              <select
+                class="form-select"
+                id="validationSelect"
+                required
+                aria-describedby="selectFeedback"
+              >
+                <option value="">Choose an option...</option>
+                <option value="1">Option One</option>
+                <option value="2">Option Two</option>
+                <option value="3">Option Three</option>
+              </select>
+              <div class="invalid-feedback" id="selectFeedback">
+                Please select an option.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="rangeDemo" class="form-label">Range control</label>
+              <input
+                type="range"
+                class="form-range"
+                id="rangeDemo"
+                min="0"
+                max="100"
+                value="50"
+                data-value-suffix="%"
+                required
+              />
+              <div class="text-center mt-1">
+                <span id="rangeDemo-value" class="badge bg-primary">50%</span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="numberWithSpinner" class="form-label"
+                >Number with spinner</label
+              >
+              <div class="input-group">
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="btnDecrement"
+                >
+                  <i class="bi bi-dash"></i>
+                </button>
+                <input
+                  type="number"
+                  class="form-control text-center"
+                  id="numberWithSpinner"
+                  value="5"
+                  min="0"
+                  max="10"
+                  required
+                />
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="btnIncrement"
+                >
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="col-lg-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header">
-                    <h3 class="h5 m-0">Select and Range Controls</h3>
-                </div>
-                <div class="card-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label for="validationSelect" class="form-label">Select option</label>
-                            <select class="form-select" id="validationSelect" required aria-describedby="selectFeedback">
-                                <option value="">Choose an option...</option>
-                                <option value="1">Option One</option>
-                                <option value="2">Option Two</option>
-                                <option value="3">Option Three</option>
-                            </select>
-                            <div class="invalid-feedback" id="selectFeedback">
-                                Please select an option.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="rangeDemo" class="form-label">Range control</label>
-                            <input type="range" class="form-range" id="rangeDemo" min="0" max="100" value="50" data-value-suffix="%" required>
-                            <div class="text-center mt-1">
-                                <span id="rangeDemo-value" class="badge bg-primary">50%</span>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="numberWithSpinner" class="form-label">Number with spinner</label>
-                            <div class="input-group">
-                                <button class="btn btn-outline-secondary" type="button" id="btnDecrement">
-                                    <i class="bi bi-dash"></i>
-                                </button>
-                                <input type="number" class="form-control text-center" id="numberWithSpinner" value="5" min="0" max="10" required>
-                                <button class="btn btn-outline-secondary" type="button" id="btnIncrement">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-            </div>
+  <div class="row mb-5">
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header">
+          <h3 class="h5 m-0">File Upload with Preview</h3>
         </div>
+        <div class="card-body">
+          <form class="needs-validation" novalidate>
+            <div class="mb-3">
+              <label for="fileDemo" class="form-label">Choose file</label>
+              <div class="custom-file-container">
+                <input
+                  type="file"
+                  class="form-control"
+                  id="fileDemo"
+                  required
+                />
+                <div class="d-flex align-items-center mt-2">
+                  <span class="file-name text-muted">No file selected</span>
+                  <span class="file-upload-indicator">
+                    <i class="bi bi-check-circle-fill"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-info">
+              <div class="d-flex">
+                <div class="me-2">
+                  <i class="bi bi-info-circle-fill"></i>
+                </div>
+                <div>
+                  File upload includes animated indicator when file is selected.
+                </div>
+              </div>
+            </div>
+            <div class="loading-button">
+              <button type="submit" class="btn btn-primary">
+                <span class="btn-label"
+                  ><i class="bi bi-upload me-1"></i> Upload File</span
+                >
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <div class="row mb-5">
-        <div class="col-lg-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header">
-                    <h3 class="h5 m-0">File Upload with Preview</h3>
-                </div>
-                <div class="card-body">
-                    <form class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label for="fileDemo" class="form-label">Choose file</label>
-                            <div class="custom-file-container">
-                                <input type="file" class="form-control" id="fileDemo" required>
-                                <div class="d-flex align-items-center mt-2">
-                                    <span class="file-name text-muted">No file selected</span>
-                                    <span class="file-upload-indicator">
-                                        <i class="bi bi-check-circle-fill"></i>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="alert alert-info">
-                            <div class="d-flex">
-                                <div class="me-2">
-                                    <i class="bi bi-info-circle-fill"></i>
-                                </div>
-                                <div>
-                                    File upload includes animated indicator when file is selected.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="loading-button">
-                            <button type="submit" class="btn btn-primary">
-                                <span class="btn-label"><i class="bi bi-upload me-1"></i> Upload File</span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header">
+          <h3 class="h5 m-0">Advanced Button States</h3>
         </div>
+        <div class="card-body">
+          <div class="d-flex flex-column gap-3">
+            <div>
+              <h5 class="mb-2">Loading Button</h5>
+              <div class="loading-button mb-3">
+                <button id="demoLoadingBtn" class="btn btn-primary">
+                  <span class="btn-label">Click to Load</span>
+                </button>
+              </div>
+            </div>
 
-        <div class="col-lg-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header">
-                    <h3 class="h5 m-0">Advanced Button States</h3>
+            <div>
+              <h5 class="mb-2">Progress Button</h5>
+              <div class="position-relative mb-3">
+                <button id="demoProgressBtn" class="btn btn-success mb-2">
+                  Start Progress
+                </button>
+                <div class="progress" style="height: 4px">
+                  <div
+                    id="demoProgress"
+                    class="progress-bar"
+                    role="progressbar"
+                    style="width: 0%"
+                  ></div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex flex-column gap-3">
-                        <div>
-                            <h5 class="mb-2">Loading Button</h5>
-                            <div class="loading-button mb-3">
-                                <button id="demoLoadingBtn" class="btn btn-primary">
-                                    <span class="btn-label">Click to Load</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h5 class="mb-2">Progress Button</h5>
-                            <div class="position-relative mb-3">
-                                <button id="demoProgressBtn" class="btn btn-success mb-2">Start Progress</button>
-                                <div class="progress" style="height: 4px;">
-                                    <div id="demoProgress" class="progress-bar" role="progressbar" style="width: 0%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <h5 class="mb-2">Status Change Button</h5>
-                            <button id="demoStatusBtn" class="btn btn-outline-primary">
-                                <i class="bi bi-circle"></i> Click to Change Status
-                            </button>
-                        </div>
-                        
-                        <div>
-                            <h5 class="mb-2">Interactive Checkbox</h5>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="demoSwitch">
-                                <label class="form-check-label" for="demoSwitch">Toggle with animation</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              </div>
             </div>
+
+            <div>
+              <h5 class="mb-2">Status Change Button</h5>
+              <button id="demoStatusBtn" class="btn btn-outline-primary">
+                <i class="bi bi-circle"></i> Click to Change Status
+              </button>
+            </div>
+
+            <div>
+              <h5 class="mb-2">Interactive Checkbox</h5>
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="demoSwitch"
+                />
+                <label class="form-check-label" for="demoSwitch"
+                  >Toggle with animation</label
+                >
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Setup form validation
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(form => {
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-                
-                // Find first invalid input and focus it with animation
-                const firstInvalid = form.querySelector(':invalid');
-                if (firstInvalid) {
-                    firstInvalid.focus();
-                    animateElement(firstInvalid, 'animate-shake');
-                }
-            } else {
-                // If valid, show loading animation on loading buttons
-                const loadingButton = form.querySelector('.loading-button');
-                if (loadingButton) {
-                    loadingButton.classList.add('is-loading');
-                    
-                    // Reset after 2 seconds for demo purposes
-                    setTimeout(() => {
-                        loadingButton.classList.remove('is-loading');
-                        form.reset();
-                        form.classList.remove('was-validated');
-                    }, 2000);
-                }
+    const forms = document.querySelectorAll(".needs-validation");
+    Array.from(forms).forEach((form) => {
+      form.addEventListener(
+        "submit",
+        function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Find first invalid input and focus it with animation
+            const firstInvalid = form.querySelector(":invalid");
+            if (firstInvalid) {
+              firstInvalid.focus();
+              animateElement(firstInvalid, "animate-shake");
             }
-            
-            form.classList.add('was-validated');
-        }, false);
-        
-        // Add real-time validation for fields
-        const inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(input => {
-            input.addEventListener('input', function() {
-                // Mark as dirty (interacted with)
-                this.classList.add('dirty');
-                
-                validateField(this);
-            });
-            
-            input.addEventListener('change', function() {
-                validateField(this);
-            });
+          } else {
+            // If valid, show loading animation on loading buttons
+            const loadingButton = form.querySelector(".loading-button");
+            if (loadingButton) {
+              loadingButton.classList.add("is-loading");
+
+              // Reset after 2 seconds for demo purposes
+              setTimeout(() => {
+                loadingButton.classList.remove("is-loading");
+                form.reset();
+                form.classList.remove("was-validated");
+              }, 2000);
+            }
+          }
+
+          form.classList.add("was-validated");
+        },
+        false,
+      );
+
+      // Add real-time validation for fields
+      const inputs = form.querySelectorAll("input, select, textarea");
+      inputs.forEach((input) => {
+        input.addEventListener("input", function () {
+          // Mark as dirty (interacted with)
+          this.classList.add("dirty");
+
+          validateField(this);
         });
+
+        input.addEventListener("change", function () {
+          validateField(this);
+        });
+      });
     });
-    
+
     // File upload handling
     const fileInputs = document.querySelectorAll('input[type="file"]');
-    fileInputs.forEach(input => {
-        input.addEventListener('change', function() {
-            const fileNameEl = this.closest('.custom-file-container')?.querySelector('.file-name');
-            const indicator = this.closest('.custom-file-container')?.querySelector('.file-upload-indicator');
-            
-            if (this.files && this.files.length > 0) {
-                const fileName = this.files[0].name;
-                
-                if (fileNameEl) {
-                    fileNameEl.textContent = fileName;
-                    fileNameEl.style.animation = 'pulse-animation 1s';
-                    setTimeout(() => { fileNameEl.style.animation = ''; }, 1000);
-                }
-                
-                if (indicator) {
-                    indicator.style.display = 'inline-block';
-                    indicator.style.animation = 'fade-in 0.3s ease-in-out';
-                }
-                
-                this.classList.add('is-valid');
-                this.classList.remove('is-invalid');
-            } else {
-                if (fileNameEl) {
-                    fileNameEl.textContent = 'No file selected';
-                }
-                
-                if (indicator) {
-                    indicator.style.display = 'none';
-                }
-                
-                this.classList.remove('is-valid');
-            }
-        });
+    fileInputs.forEach((input) => {
+      input.addEventListener("change", function () {
+        const fileNameEl = this.closest(
+          ".custom-file-container",
+        )?.querySelector(".file-name");
+        const indicator = this.closest(".custom-file-container")?.querySelector(
+          ".file-upload-indicator",
+        );
+
+        if (this.files && this.files.length > 0) {
+          const fileName = this.files[0].name;
+
+          if (fileNameEl) {
+            fileNameEl.textContent = fileName;
+            fileNameEl.style.animation = "pulse-animation 1s";
+            setTimeout(() => {
+              fileNameEl.style.animation = "";
+            }, 1000);
+          }
+
+          if (indicator) {
+            indicator.style.display = "inline-block";
+            indicator.style.animation = "fade-in 0.3s ease-in-out";
+          }
+
+          this.classList.add("is-valid");
+          this.classList.remove("is-invalid");
+        } else {
+          if (fileNameEl) {
+            fileNameEl.textContent = "No file selected";
+          }
+
+          if (indicator) {
+            indicator.style.display = "none";
+          }
+
+          this.classList.remove("is-valid");
+        }
+      });
     });
-    
+
     // Range slider display
     const rangeSliders = document.querySelectorAll('input[type="range"]');
-    rangeSliders.forEach(slider => {
-        const valueDisplay = document.getElementById(`${slider.id}-value`);
-        if (!valueDisplay) return;
-        
-        const formatValue = (value) => {
-            let result = value;
-            if (slider.dataset.valuePrefix) {
-                result = slider.dataset.valuePrefix + result;
-            }
-            if (slider.dataset.valueSuffix) {
-                result = result + slider.dataset.valueSuffix;
-            }
-            return result;
-        };
-        
-        slider.addEventListener('input', function() {
-            valueDisplay.textContent = formatValue(this.value);
-            valueDisplay.style.animation = 'pulse-animation 0.4s';
-            setTimeout(() => { valueDisplay.style.animation = ''; }, 400);
-        });
-    });
-    
-    // Number input with spinner buttons
-    const numberInput = document.getElementById('numberWithSpinner');
-    const btnDecrement = document.getElementById('btnDecrement');
-    const btnIncrement = document.getElementById('btnIncrement');
-    
-    if (numberInput && btnDecrement && btnIncrement) {
-        btnDecrement.addEventListener('click', function() {
-            const currentValue = parseInt(numberInput.value, 10);
-            const minValue = parseInt(numberInput.min, 10) || 0;
-            
-            if (currentValue > minValue) {
-                numberInput.value = currentValue - 1;
-                animateElement(numberInput, 'pulse-animation');
-                numberInput.dispatchEvent(new Event('change'));
-            } else {
-                animateElement(btnDecrement, 'animate-shake');
-            }
-        });
-        
-        btnIncrement.addEventListener('click', function() {
-            const currentValue = parseInt(numberInput.value, 10);
-            const maxValue = parseInt(numberInput.max, 10) || 100;
-            
-            if (currentValue < maxValue) {
-                numberInput.value = currentValue + 1;
-                animateElement(numberInput, 'pulse-animation');
-                numberInput.dispatchEvent(new Event('change'));
-            } else {
-                animateElement(btnIncrement, 'animate-shake');
-            }
-        });
-    }
-    
-    // Demo loading button
-    const demoLoadingBtn = document.getElementById('demoLoadingBtn');
-    if (demoLoadingBtn) {
-        demoLoadingBtn.addEventListener('click', function() {
-            const loadingButton = this.closest('.loading-button');
-            if (loadingButton) {
-                loadingButton.classList.add('is-loading');
-                
-                // Reset after 2 seconds for demo
-                setTimeout(() => {
-                    loadingButton.classList.remove('is-loading');
-                }, 2000);
-            }
-        });
-    }
-    
-    // Demo progress button
-    const demoProgressBtn = document.getElementById('demoProgressBtn');
-    const demoProgress = document.getElementById('demoProgress');
-    if (demoProgressBtn && demoProgress) {
-        demoProgressBtn.addEventListener('click', function() {
-            let progress = 0;
-            this.disabled = true;
-            
-            const interval = setInterval(() => {
-                progress += 10;
-                demoProgress.style.width = `${progress}%`;
-                
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    this.textContent = 'Completed!';
-                    this.classList.remove('btn-success');
-                    this.classList.add('btn-outline-success');
-                    
-                    // Reset after 3 seconds
-                    setTimeout(() => {
-                        demoProgress.style.width = '0%';
-                        this.textContent = 'Start Progress';
-                        this.disabled = false;
-                        this.classList.add('btn-success');
-                        this.classList.remove('btn-outline-success');
-                    }, 3000);
-                }
-            }, 300);
-        });
-    }
-    
-    // Demo status button
-    const demoStatusBtn = document.getElementById('demoStatusBtn');
-    if (demoStatusBtn) {
-        demoStatusBtn.addEventListener('click', function() {
-            const icon = this.querySelector('i');
-            
-            if (icon.classList.contains('bi-circle')) {
-                // Change to processing
-                icon.classList.remove('bi-circle');
-                icon.classList.add('bi-arrow-repeat');
-                this.classList.remove('btn-outline-primary');
-                this.classList.add('btn-outline-warning');
-                this.querySelector('i').style.animation = 'spin 1s linear infinite';
-                this.textContent = ' Processing...';
-                this.prepend(icon);
-                
-                // Change to success after 1.5 seconds
-                setTimeout(() => {
-                    icon.classList.remove('bi-arrow-repeat');
-                    icon.classList.add('bi-check-circle-fill');
-                    icon.style.animation = '';
-                    this.classList.remove('btn-outline-warning');
-                    this.classList.add('btn-outline-success');
-                    this.textContent = ' Completed';
-                    this.prepend(icon);
-                    
-                    // Reset after 2 more seconds
-                    setTimeout(() => {
-                        icon.classList.remove('bi-check-circle-fill');
-                        icon.classList.add('bi-circle');
-                        this.classList.remove('btn-outline-success');
-                        this.classList.add('btn-outline-primary');
-                        this.textContent = ' Click to Change Status';
-                        this.prepend(icon);
-                    }, 2000);
-                }, 1500);
-            }
-        });
-    }
-    
-    // Interactive switch
-    const demoSwitch = document.getElementById('demoSwitch');
-    if (demoSwitch) {
-        demoSwitch.addEventListener('change', function() {
-            const label = this.nextElementSibling;
-            
-            if (this.checked) {
-                label.textContent = 'Feature enabled';
-                label.style.color = '#198754';
-                label.style.animation = 'pulse-animation 0.5s';
-            } else {
-                label.textContent = 'Toggle with animation';
-                label.style.color = '';
-                label.style.animation = 'shake 0.5s';
-            }
-            
-            setTimeout(() => {
-                label.style.animation = '';
-            }, 500);
-        });
-    }
-});
+    rangeSliders.forEach((slider) => {
+      const valueDisplay = document.getElementById(`${slider.id}-value`);
+      if (!valueDisplay) return;
 
-function validateField(field) {
+      const formatValue = (value) => {
+        let result = value;
+        if (slider.dataset.valuePrefix) {
+          result = slider.dataset.valuePrefix + result;
+        }
+        if (slider.dataset.valueSuffix) {
+          result = result + slider.dataset.valueSuffix;
+        }
+        return result;
+      };
+
+      slider.addEventListener("input", function () {
+        valueDisplay.textContent = formatValue(this.value);
+        valueDisplay.style.animation = "pulse-animation 0.4s";
+        setTimeout(() => {
+          valueDisplay.style.animation = "";
+        }, 400);
+      });
+    });
+
+    // Number input with spinner buttons
+    const numberInput = document.getElementById("numberWithSpinner");
+    const btnDecrement = document.getElementById("btnDecrement");
+    const btnIncrement = document.getElementById("btnIncrement");
+
+    if (numberInput && btnDecrement && btnIncrement) {
+      btnDecrement.addEventListener("click", function () {
+        const currentValue = parseInt(numberInput.value, 10);
+        const minValue = parseInt(numberInput.min, 10) || 0;
+
+        if (currentValue > minValue) {
+          numberInput.value = currentValue - 1;
+          animateElement(numberInput, "pulse-animation");
+          numberInput.dispatchEvent(new Event("change"));
+        } else {
+          animateElement(btnDecrement, "animate-shake");
+        }
+      });
+
+      btnIncrement.addEventListener("click", function () {
+        const currentValue = parseInt(numberInput.value, 10);
+        const maxValue = parseInt(numberInput.max, 10) || 100;
+
+        if (currentValue < maxValue) {
+          numberInput.value = currentValue + 1;
+          animateElement(numberInput, "pulse-animation");
+          numberInput.dispatchEvent(new Event("change"));
+        } else {
+          animateElement(btnIncrement, "animate-shake");
+        }
+      });
+    }
+
+    // Demo loading button
+    const demoLoadingBtn = document.getElementById("demoLoadingBtn");
+    if (demoLoadingBtn) {
+      demoLoadingBtn.addEventListener("click", function () {
+        const loadingButton = this.closest(".loading-button");
+        if (loadingButton) {
+          loadingButton.classList.add("is-loading");
+
+          // Reset after 2 seconds for demo
+          setTimeout(() => {
+            loadingButton.classList.remove("is-loading");
+          }, 2000);
+        }
+      });
+    }
+
+    // Demo progress button
+    const demoProgressBtn = document.getElementById("demoProgressBtn");
+    const demoProgress = document.getElementById("demoProgress");
+    if (demoProgressBtn && demoProgress) {
+      demoProgressBtn.addEventListener("click", function () {
+        let progress = 0;
+        this.disabled = true;
+
+        const interval = setInterval(() => {
+          progress += 10;
+          demoProgress.style.width = `${progress}%`;
+
+          if (progress >= 100) {
+            clearInterval(interval);
+            this.textContent = "Completed!";
+            this.classList.remove("btn-success");
+            this.classList.add("btn-outline-success");
+
+            // Reset after 3 seconds
+            setTimeout(() => {
+              demoProgress.style.width = "0%";
+              this.textContent = "Start Progress";
+              this.disabled = false;
+              this.classList.add("btn-success");
+              this.classList.remove("btn-outline-success");
+            }, 3000);
+          }
+        }, 300);
+      });
+    }
+
+    // Demo status button
+    const demoStatusBtn = document.getElementById("demoStatusBtn");
+    if (demoStatusBtn) {
+      demoStatusBtn.addEventListener("click", function () {
+        const icon = this.querySelector("i");
+
+        if (icon.classList.contains("bi-circle")) {
+          // Change to processing
+          icon.classList.remove("bi-circle");
+          icon.classList.add("bi-arrow-repeat");
+          this.classList.remove("btn-outline-primary");
+          this.classList.add("btn-outline-warning");
+          this.querySelector("i").style.animation = "spin 1s linear infinite";
+          this.textContent = " Processing...";
+          this.prepend(icon);
+
+          // Change to success after 1.5 seconds
+          setTimeout(() => {
+            icon.classList.remove("bi-arrow-repeat");
+            icon.classList.add("bi-check-circle-fill");
+            icon.style.animation = "";
+            this.classList.remove("btn-outline-warning");
+            this.classList.add("btn-outline-success");
+            this.textContent = " Completed";
+            this.prepend(icon);
+
+            // Reset after 2 more seconds
+            setTimeout(() => {
+              icon.classList.remove("bi-check-circle-fill");
+              icon.classList.add("bi-circle");
+              this.classList.remove("btn-outline-success");
+              this.classList.add("btn-outline-primary");
+              this.textContent = " Click to Change Status";
+              this.prepend(icon);
+            }, 2000);
+          }, 1500);
+        }
+      });
+    }
+
+    // Interactive switch
+    const demoSwitch = document.getElementById("demoSwitch");
+    if (demoSwitch) {
+      demoSwitch.addEventListener("change", function () {
+        const label = this.nextElementSibling;
+
+        if (this.checked) {
+          label.textContent = "Feature enabled";
+          label.style.color = "#198754";
+          label.style.animation = "pulse-animation 0.5s";
+        } else {
+          label.textContent = "Toggle with animation";
+          label.style.color = "";
+          label.style.animation = "shake 0.5s";
+        }
+
+        setTimeout(() => {
+          label.style.animation = "";
+        }, 500);
+      });
+    }
+  });
+
+  function validateField(field) {
     // Skip if not marked as dirty yet
-    if (!field.classList.contains('dirty')) return;
-    
+    if (!field.classList.contains("dirty")) return;
+
     // Check validity
     const isValid = field.checkValidity();
-    
-    // Update classes
-    field.classList.remove('is-valid', 'is-invalid');
-    
-    if (field.value !== '') {
-        if (isValid) {
-            field.classList.add('is-valid');
-        } else {
-            field.classList.add('is-invalid');
-        }
-    }
-}
 
-function animateElement(element, animationClass, duration = 400) {
+    // Update classes
+    field.classList.remove("is-valid", "is-invalid");
+
+    if (field.value !== "") {
+      if (isValid) {
+        field.classList.add("is-valid");
+      } else {
+        field.classList.add("is-invalid");
+      }
+    }
+  }
+
+  function animateElement(element, animationClass, duration = 400) {
     element.classList.add(animationClass);
     setTimeout(() => {
-        element.classList.remove(animationClass);
+      element.classList.remove(animationClass);
     }, duration);
-}
+  }
 </script>
 {% endblock %}

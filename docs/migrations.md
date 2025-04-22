@@ -30,11 +30,13 @@ The LevyMaster application uses Alembic via Flask-Migrate to manage database sch
 ### Reverting a Migration
 
 To revert the most recent migration:
+
 ```
 python migrate.py downgrade
 ```
 
 To revert to a specific migration version:
+
 ```
 flask --app migrate db downgrade <revision_id>
 ```
@@ -42,11 +44,13 @@ flask --app migrate db downgrade <revision_id>
 ### Checking Migration Status
 
 To see the current migration version:
+
 ```
 python migrate.py current
 ```
 
 To view migration history:
+
 ```
 python migrate.py history
 ```
@@ -79,16 +83,16 @@ When changing column types or constraints that require data transformation:
 def upgrade():
     # Create a temporary column
     op.add_column('my_table', sa.Column('new_column', sa.String(50)))
-    
+
     # Copy and transform data
     conn = op.get_bind()
     conn.execute(
         """
-        UPDATE my_table 
+        UPDATE my_table
         SET new_column = CAST(old_column AS VARCHAR(50))
         """
     )
-    
+
     # Drop the old column and rename the new one
     op.drop_column('my_table', 'old_column')
     op.alter_column('my_table', 'new_column', new_column_name='old_column')
@@ -143,7 +147,7 @@ op.create_index(op.f('ix_my_table_name'), 'my_table', ['name'])
 
 ```python
 op.create_foreign_key(
-    'fk_my_table_other_table', 
+    'fk_my_table_other_table',
     'my_table', 'other_table',
     ['other_id'], ['id']
 )

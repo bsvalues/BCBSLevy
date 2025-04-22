@@ -1,22 +1,18 @@
-{% extends "base.html" %}
-
-{% block title %}Historical Tax Rates{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}Historical Tax Rates{% endblock %} {%
+block head %} {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   .rate-card {
     background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 20px;
     padding: 20px;
     transition: transform 0.3s ease;
   }
   .rate-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   .rate-value {
     font-size: 2.5rem;
@@ -60,33 +56,35 @@
     color: #212529;
   }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Historical Tax Rates</h1>
     <div>
-      <a href="{{ url_for('historical_analysis.advanced_historical_analysis') }}" class="btn btn-primary">
+      <a
+        href="{{ url_for('historical_analysis.advanced_historical_analysis') }}"
+        class="btn btn-primary"
+      >
         <i class="bi bi-graph-up"></i> Advanced Analysis
       </a>
     </div>
   </div>
-  
+
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Historical Tax Rate Analysis</h5>
           <p class="card-text">
-            View and analyze historical tax rates for tax codes across multiple years. Select a tax code to see 
-            detailed historical trends, statistics, and visualizations.
+            View and analyze historical tax rates for tax codes across multiple
+            years. Select a tax code to see detailed historical trends,
+            statistics, and visualizations.
           </p>
         </div>
       </div>
     </div>
   </div>
-  
+
   <div class="row">
     <div class="col-lg-3">
       <div class="card mb-4">
@@ -94,33 +92,56 @@
           <h5 class="mb-0">Select Tax Code</h5>
         </div>
         <div class="card-body">
-          <form method="GET" action="{{ url_for('historical_analysis.historical_analysis') }}">
+          <form
+            method="GET"
+            action="{{ url_for('historical_analysis.historical_analysis') }}"
+          >
             <div class="mb-3">
               <label for="tax_code" class="form-label">Tax Code</label>
-              <select class="form-select" id="tax_code" name="tax_code" onchange="this.form.submit()">
+              <select
+                class="form-select"
+                id="tax_code"
+                name="tax_code"
+                onchange="this.form.submit()"
+              >
                 <option value="">Select a tax code</option>
                 {% for tax_code in tax_codes %}
-                <option value="{{ tax_code.tax_code }}" {% if tax_code.tax_code == selected_tax_code %}selected{% endif %}>
+                <option
+                  value="{{ tax_code.tax_code }}"
+                  {%
+                  if
+                  tax_code.tax_code=""
+                  ="selected_tax_code"
+                  %}selected{%
+                  endif
+                  %}
+                >
                   {{ tax_code.tax_code }}
                 </option>
                 {% endfor %}
               </select>
             </div>
           </form>
-          
-          <hr>
-          
+
+          <hr />
+
           <div class="d-grid gap-2">
-            <a href="{{ url_for('historical_analysis.advanced_historical_analysis') }}?tax_code={{ selected_tax_code }}" class="btn btn-outline-primary">
+            <a
+              href="{{ url_for('historical_analysis.advanced_historical_analysis') }}?tax_code={{ selected_tax_code }}"
+              class="btn btn-outline-primary"
+            >
               <i class="bi bi-graph-up"></i> Run Advanced Analysis
             </a>
-            <a href="{{ url_for('historical_analysis.compliance') }}?tax_code={{ selected_tax_code }}" class="btn btn-outline-success">
+            <a
+              href="{{ url_for('historical_analysis.compliance') }}?tax_code={{ selected_tax_code }}"
+              class="btn btn-outline-success"
+            >
               <i class="bi bi-check-circle"></i> Check Compliance
             </a>
           </div>
         </div>
       </div>
-      
+
       <div class="card">
         <div class="card-header">
           <h5 class="mb-0">Available Years</h5>
@@ -128,7 +149,10 @@
         <div class="card-body">
           <div class="list-group">
             {% for year in available_years %}
-            <a href="{{ url_for('historical_analysis.historical_analysis', tax_code=selected_tax_code, year=year) }}" class="list-group-item list-group-item-action">
+            <a
+              href="{{ url_for('historical_analysis.historical_analysis', tax_code=selected_tax_code, year=year) }}"
+              class="list-group-item list-group-item-action"
+            >
               {{ year }}
             </a>
             {% endfor %}
@@ -136,12 +160,14 @@
         </div>
       </div>
     </div>
-    
+
     <div class="col-lg-9">
       {% if historical_data and not historical_data.error %}
       <div class="card mb-4">
         <div class="card-header">
-          <h5 class="mb-0">Historical Rates for Tax Code: {{ historical_data.tax_code }}</h5>
+          <h5 class="mb-0">
+            Historical Rates for Tax Code: {{ historical_data.tax_code }}
+          </h5>
         </div>
         <div class="card-body">
           <div class="chart-container">
@@ -149,12 +175,16 @@
           </div>
         </div>
       </div>
-      
+
       <div class="row">
         <div class="col-md-4">
           <div class="rate-card text-center">
-            <div class="rate-title">Current Rate ({{ historical_data.last_year }})</div>
-            <div class="rate-value">{{ historical_data.last_rate|round(2) }}</div>
+            <div class="rate-title">
+              Current Rate ({{ historical_data.last_year }})
+            </div>
+            <div class="rate-value">
+              {{ historical_data.last_rate|round(2) }}
+            </div>
           </div>
         </div>
         <div class="col-md-4">
@@ -167,8 +197,8 @@
           <div class="rate-card text-center">
             <div class="rate-title">Total Change</div>
             <div class="rate-value">
-              {{ historical_data.total_change|round(2) }}
-              {% if historical_data.total_change > 0 %}
+              {{ historical_data.total_change|round(2) }} {% if
+              historical_data.total_change > 0 %}
               <i class="bi bi-arrow-up-right trend-up"></i>
               {% elif historical_data.total_change < 0 %}
               <i class="bi bi-arrow-down-right trend-down"></i>
@@ -179,7 +209,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="row mt-4">
         <div class="col-12">
           <div class="card">
@@ -191,46 +221,51 @@
                 <div class="col-md-4">
                   <div class="stat-card">
                     <div class="stat-title">Median Rate</div>
-                    <div class="stat-value">{{ historical_data.median|round(2) }}</div>
+                    <div class="stat-value">
+                      {{ historical_data.median|round(2) }}
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="stat-card">
                     <div class="stat-title">Minimum Rate</div>
-                    <div class="stat-value">{{ historical_data.min|round(2) }}</div>
+                    <div class="stat-value">
+                      {{ historical_data.min|round(2) }}
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="stat-card">
                     <div class="stat-title">Maximum Rate</div>
-                    <div class="stat-value">{{ historical_data.max|round(2) }}</div>
+                    <div class="stat-value">
+                      {{ historical_data.max|round(2) }}
+                    </div>
                   </div>
                 </div>
               </div>
-              
+
               <div class="row mt-3">
                 <div class="col-md-4">
                   <div class="stat-card">
                     <div class="stat-title">Standard Deviation</div>
-                    <div class="stat-value">{{ historical_data.std_dev|round(2) }}</div>
+                    <div class="stat-value">
+                      {{ historical_data.std_dev|round(2) }}
+                    </div>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="stat-card">
                     <div class="stat-title">Percent Change</div>
                     <div class="stat-value">
-                      {% if historical_data.percent_change is not none %}
-                      {{ historical_data.percent_change|round(2) }}%
-                      {% if historical_data.percent_change > 0 %}
+                      {% if historical_data.percent_change is not none %} {{
+                      historical_data.percent_change|round(2) }}% {% if
+                      historical_data.percent_change > 0 %}
                       <i class="bi bi-arrow-up-right trend-up"></i>
                       {% elif historical_data.percent_change < 0 %}
                       <i class="bi bi-arrow-down-right trend-down"></i>
                       {% else %}
                       <i class="bi bi-dash trend-neutral"></i>
-                      {% endif %}
-                      {% else %}
-                      N/A
-                      {% endif %}
+                      {% endif %} {% else %} N/A {% endif %}
                     </div>
                   </div>
                 </div>
@@ -238,18 +273,15 @@
                   <div class="stat-card">
                     <div class="stat-title">CAGR</div>
                     <div class="stat-value">
-                      {% if historical_data.cagr is not none %}
-                      {{ historical_data.cagr|round(2) }}%
-                      {% if historical_data.cagr > 0 %}
+                      {% if historical_data.cagr is not none %} {{
+                      historical_data.cagr|round(2) }}% {% if
+                      historical_data.cagr > 0 %}
                       <i class="bi bi-arrow-up-right trend-up"></i>
                       {% elif historical_data.cagr < 0 %}
                       <i class="bi bi-arrow-down-right trend-down"></i>
                       {% else %}
                       <i class="bi bi-dash trend-neutral"></i>
-                      {% endif %}
-                      {% else %}
-                      N/A
-                      {% endif %}
+                      {% endif %} {% else %} N/A {% endif %}
                     </div>
                   </div>
                 </div>
@@ -258,7 +290,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="card mt-4">
         <div class="card-header">
           <h5 class="mb-0">Historical Data Table</h5>
@@ -278,41 +310,35 @@
                 {% for i in range(historical_data.historical_data|length) %}
                 <tr>
                   <td>{{ historical_data.historical_data[i].year }}</td>
-                  <td>{{ historical_data.historical_data[i].levy_rate|round(4) }}</td>
                   <td>
-                    {% if i > 0 %}
-                    {% set change = historical_data.historical_data[i].levy_rate - historical_data.historical_data[i-1].levy_rate %}
-                    {{ change|round(4) }}
-                    {% if change > 0 %}
+                    {{ historical_data.historical_data[i].levy_rate|round(4) }}
+                  </td>
+                  <td>
+                    {% if i > 0 %} {% set change =
+                    historical_data.historical_data[i].levy_rate -
+                    historical_data.historical_data[i-1].levy_rate %} {{
+                    change|round(4) }} {% if change > 0 %}
                     <i class="bi bi-arrow-up-right trend-up"></i>
                     {% elif change < 0 %}
                     <i class="bi bi-arrow-down-right trend-down"></i>
                     {% else %}
                     <i class="bi bi-dash trend-neutral"></i>
-                    {% endif %}
-                    {% else %}
-                    -
-                    {% endif %}
+                    {% endif %} {% else %} - {% endif %}
                   </td>
                   <td>
-                    {% if i > 0 %}
-                    {% set prev_rate = historical_data.historical_data[i-1].levy_rate %}
-                    {% if prev_rate != 0 %}
-                    {% set pct_change = (historical_data.historical_data[i].levy_rate - prev_rate) / prev_rate * 100 %}
-                    {{ pct_change|round(2) }}%
-                    {% if pct_change > 0 %}
+                    {% if i > 0 %} {% set prev_rate =
+                    historical_data.historical_data[i-1].levy_rate %} {% if
+                    prev_rate != 0 %} {% set pct_change =
+                    (historical_data.historical_data[i].levy_rate - prev_rate) /
+                    prev_rate * 100 %} {{ pct_change|round(2) }}% {% if
+                    pct_change > 0 %}
                     <i class="bi bi-arrow-up-right trend-up"></i>
                     {% elif pct_change < 0 %}
                     <i class="bi bi-arrow-down-right trend-down"></i>
                     {% else %}
                     <i class="bi bi-dash trend-neutral"></i>
-                    {% endif %}
-                    {% else %}
-                    N/A
-                    {% endif %}
-                    {% else %}
-                    -
-                    {% endif %}
+                    {% endif %} {% else %} N/A {% endif %} {% else %} - {% endif
+                    %}
                   </td>
                 </tr>
                 {% endfor %}
@@ -321,13 +347,13 @@
           </div>
         </div>
       </div>
-      
+
       <script>
         document.addEventListener('DOMContentLoaded', function() {
           const historicalData = {{ historical_data.historical_data|tojson }};
           const years = historicalData.map(item => item.year);
           const rates = historicalData.map(item => item.levy_rate);
-          
+
           const ctx = document.getElementById('rateHistoryChart').getContext('2d');
           new Chart(ctx, {
             type: 'line',
@@ -387,7 +413,10 @@
         <div class="card-body">
           <div class="alert alert-info mb-0">
             <h5><i class="bi bi-info-circle"></i> No data available</h5>
-            <p>Please select a tax code from the dropdown menu to view historical rate data.</p>
+            <p>
+              Please select a tax code from the dropdown menu to view historical
+              rate data.
+            </p>
             {% if historical_data and historical_data.error %}
             <p class="text-danger">Error: {{ historical_data.error }}</p>
             {% endif %}

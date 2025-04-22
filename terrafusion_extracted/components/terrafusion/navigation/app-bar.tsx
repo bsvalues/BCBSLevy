@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Menu, X, Bell, Search, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import Image from "next/image"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Menu, X, Bell, Search, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 interface AppBarProps {
-  title?: string
-  logo?: string
-  onMenuClick?: () => void
-  actions?: React.ReactNode
-  className?: string
-  variant?: "default" | "transparent" | "glassmorphic"
-  position?: "static" | "sticky" | "fixed"
+  title?: string;
+  logo?: string;
+  onMenuClick?: () => void;
+  actions?: React.ReactNode;
+  className?: string;
+  variant?: "default" | "transparent" | "glassmorphic";
+  position?: "static" | "sticky" | "fixed";
 }
 
 export function AppBar({
@@ -28,19 +28,20 @@ export function AppBar({
   variant = "default",
   position = "static",
 }: AppBarProps) {
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const variantStyles = {
     default: "bg-[#001529] border-b border-[#00e5ff]/20",
     transparent: "bg-transparent",
-    glassmorphic: "bg-[#001529]/70 backdrop-blur-xl border-b border-[#00e5ff]/20",
-  }
+    glassmorphic:
+      "bg-[#001529]/70 backdrop-blur-xl border-b border-[#00e5ff]/20",
+  };
 
   const positionStyles = {
     static: "",
     sticky: "sticky top-0 z-40",
     fixed: "fixed top-0 left-0 right-0 z-40",
-  }
+  };
 
   return (
     <header
@@ -63,10 +64,18 @@ export function AppBar({
           <div className="flex items-center gap-3">
             {logo && (
               <div className="w-8 h-8 relative">
-                <Image src={logo || "/placeholder.svg"} alt={title} width={32} height={32} className="object-contain" />
+                <Image
+                  src={logo || "/placeholder.svg"}
+                  alt={title}
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
               </div>
             )}
-            <h1 className="text-lg font-medium text-white hidden sm:block">{title}</h1>
+            <h1 className="text-lg font-medium text-white hidden sm:block">
+              {title}
+            </h1>
           </div>
         </div>
 
@@ -115,7 +124,11 @@ export function AppBar({
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </Button>
 
-          <Button variant="ghost" size="icon" className="text-[#00e5ff]/70 hover:text-[#00e5ff] hover:bg-[#00e5ff]/10">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-[#00e5ff]/70 hover:text-[#00e5ff] hover:bg-[#00e5ff]/10"
+          >
             <User className="h-5 w-5" />
           </Button>
 
@@ -123,5 +136,5 @@ export function AppBar({
         </div>
       </div>
     </header>
-  )
+  );
 }

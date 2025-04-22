@@ -1,373 +1,450 @@
-{% extends "base.html" %}
-
-{% block title %}Admin Dashboard - Levy Calculation System{% endblock %}
-
-{% block page_title %}Admin Dashboard{% endblock %}
-{% block page_subtitle %}Comprehensive System Overview and Management{% endblock %}
-
+{% extends "base.html" %} {% block title %}Admin Dashboard - Levy Calculation
+System{% endblock %} {% block page_title %}Admin Dashboard{% endblock %} {%
+block page_subtitle %}Comprehensive System Overview and Management{% endblock %}
 {% block header_actions %}
 <a href="{{ url_for('public.index') }}" class="btn btn-outline-secondary">
-    <i class="bi bi-eye me-1"></i>Public Portal
+  <i class="bi bi-eye me-1"></i>Public Portal
 </a>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mb-4">
-    <!-- System Status and Quick Stats -->
-    <div class="row g-4 mb-4">
-        <!-- Stats Cards -->
-        <div class="col-md-3">
-            <div class="card bg-primary text-white h-100 border-0 shadow-sm">
-                <div class="card-body d-flex flex-column align-items-center text-center">
-                    <i class="bi bi-houses display-5 mb-3"></i>
-                    <h2 class="display-6">{{ property_count|default(0)|format_number }}</h2>
-                    <p class="mb-0">Total Properties</p>
-                </div>
-                <div class="card-footer bg-primary-dark text-white text-center border-0">
-                    <a href="#" class="stretched-link text-white text-decoration-none small">
-                        View Properties <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div>
+  <!-- System Status and Quick Stats -->
+  <div class="row g-4 mb-4">
+    <!-- Stats Cards -->
+    <div class="col-md-3">
+      <div class="card bg-primary text-white h-100 border-0 shadow-sm">
+        <div
+          class="card-body d-flex flex-column align-items-center text-center"
+        >
+          <i class="bi bi-houses display-5 mb-3"></i>
+          <h2 class="display-6">
+            {{ property_count|default(0)|format_number }}
+          </h2>
+          <p class="mb-0">Total Properties</p>
         </div>
-        
-        <div class="col-md-3">
-            <div class="card bg-info text-white h-100 border-0 shadow-sm">
-                <div class="card-body d-flex flex-column align-items-center text-center">
-                    <i class="bi bi-map display-5 mb-3"></i>
-                    <h2 class="display-6">{{ district_count|default(0)|format_number }}</h2>
-                    <p class="mb-0">Tax Districts</p>
-                </div>
-                <div class="card-footer bg-info-dark text-white text-center border-0">
-                    <a href="#" class="stretched-link text-white text-decoration-none small">
-                        View Districts <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div>
+        <div
+          class="card-footer bg-primary-dark text-white text-center border-0"
+        >
+          <a
+            href="#"
+            class="stretched-link text-white text-decoration-none small"
+          >
+            View Properties <i class="bi bi-arrow-right ms-1"></i>
+          </a>
         </div>
-        
-        <div class="col-md-3">
-            <div class="card bg-success text-white h-100 border-0 shadow-sm">
-                <div class="card-body d-flex flex-column align-items-center text-center">
-                    <i class="bi bi-tag display-5 mb-3"></i>
-                    <h2 class="display-6">{{ tax_code_count|default(0)|format_number }}</h2>
-                    <p class="mb-0">Tax Codes</p>
-                </div>
-                <div class="card-footer bg-success-dark text-white text-center border-0">
-                    <a href="#" class="stretched-link text-white text-decoration-none small">
-                        View Tax Codes <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark h-100 border-0 shadow-sm">
-                <div class="card-body d-flex flex-column align-items-center text-center">
-                    <i class="bi bi-cash-stack display-5 mb-3"></i>
-                    <h2 class="display-6">{{ total_assessed_value|default(0)|format_currency }}</h2>
-                    <p class="mb-0">Total Assessed Value</p>
-                </div>
-                <div class="card-footer bg-warning-dark text-dark text-center border-0">
-                    <a href="#" class="stretched-link text-dark text-decoration-none small">
-                        View Summary <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    
-    <!-- Quick Actions and System Status -->
-    <div class="row g-4 mb-4">
-        <!-- Quick Actions -->
-        <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-header bg-dark">
-                    <h3 class="h5 mb-0"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <a href="#" class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center">
-                                <i class="bi bi-cloud-upload display-6 mb-2"></i>
-                                <span>Import Data</span>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center">
-                                <i class="bi bi-cloud-download display-6 mb-2"></i>
-                                <span>Export Data</span>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center">
-                                <i class="bi bi-calculator display-6 mb-2"></i>
-                                <span>Levy Calculator</span>
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="#" class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center">
-                                <i class="bi bi-file-earmark-text display-6 mb-2"></i>
-                                <span>Generate Reports</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+    <div class="col-md-3">
+      <div class="card bg-info text-white h-100 border-0 shadow-sm">
+        <div
+          class="card-body d-flex flex-column align-items-center text-center"
+        >
+          <i class="bi bi-map display-5 mb-3"></i>
+          <h2 class="display-6">
+            {{ district_count|default(0)|format_number }}
+          </h2>
+          <p class="mb-0">Tax Districts</p>
         </div>
-        
-        <!-- System Status -->
-        <div class="col-md-6">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="card-header bg-dark">
-                    <h3 class="h5 mb-0"><i class="bi bi-info-circle me-2"></i>System Status</h3>
-                </div>
-                <div class="card-body">
-                    <!-- Database Status -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="me-2">
-                                <i class="bi bi-database-check text-success fs-4"></i>
-                            </div>
-                            <div>
-                                <h4 class="h6 mb-0">Database Connection</h4>
-                                <p class="small text-muted mb-0">PostgreSQL - Connected</p>
-                            </div>
-                            <div class="ms-auto">
-                                <span class="badge bg-success">Active</span>
-                            </div>
-                        </div>
-                        <div class="progress" style="height: 5px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- API Status -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="me-2">
-                                <i class="bi bi-robot text-success fs-4"></i>
-                            </div>
-                            <div>
-                                <h4 class="h6 mb-0">Anthropic API</h4>
-                                <p class="small text-muted mb-0">AI Assistance - Connected</p>
-                            </div>
-                            <div class="ms-auto">
-                                <span class="badge bg-success">Active</span>
-                            </div>
-                        </div>
-                        <div class="progress" style="height: 5px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- System Disk -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="me-2">
-                                <i class="bi bi-hdd-stack text-warning fs-4"></i>
-                            </div>
-                            <div>
-                                <h4 class="h6 mb-0">System Storage</h4>
-                                <p class="small text-muted mb-0">{{ disk_usage|default('65%') }} Used</p>
-                            </div>
-                            <div class="ms-auto">
-                                <span class="badge bg-warning text-dark">Monitor</span>
-                            </div>
-                        </div>
-                        <div class="progress" style="height: 5px;">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="card-footer bg-info-dark text-white text-center border-0">
+          <a
+            href="#"
+            class="stretched-link text-white text-decoration-none small"
+          >
+            View Districts <i class="bi bi-arrow-right ms-1"></i>
+          </a>
         </div>
+      </div>
     </div>
-    
-    <!-- Recent Activity and AI Insights -->
-    <div class="row g-4">
-        <!-- Recent Activity -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-dark d-flex justify-content-between align-items-center">
-                    <h3 class="h5 mb-0"><i class="bi bi-clock-history me-2"></i>Recent Activity</h3>
-                    <a href="#" class="text-decoration-none small">View All</a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Description</th>
-                                    <th>User</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if recent_imports %}
-                                    {% for import_log in recent_imports %}
-                                    <tr>
-                                        <td>
-                                            <span class="badge bg-primary"><i class="bi bi-cloud-upload me-1"></i>Import</span>
-                                        </td>
-                                        <td>{{ import_log.file_name }}</td>
-                                        <td>{{ import_log.user.username if import_log.user else 'System' }}</td>
-                                        <td>
-                                            {% if import_log.status == 'completed' %}
-                                            <span class="badge bg-success">Completed</span>
-                                            {% elif import_log.status == 'failed' %}
-                                            <span class="badge bg-danger">Failed</span>
-                                            {% else %}
-                                            <span class="badge bg-warning text-dark">{{ import_log.status|capitalize }}</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ import_log.created_at|format_date }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4">
-                                            <p class="text-muted mb-0">No recent activity to display</p>
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+
+    <div class="col-md-3">
+      <div class="card bg-success text-white h-100 border-0 shadow-sm">
+        <div
+          class="card-body d-flex flex-column align-items-center text-center"
+        >
+          <i class="bi bi-tag display-5 mb-3"></i>
+          <h2 class="display-6">
+            {{ tax_code_count|default(0)|format_number }}
+          </h2>
+          <p class="mb-0">Tax Codes</p>
         </div>
-        
-        <!-- AI Insights Card -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-dark d-flex justify-content-between align-items-center">
-                    <h3 class="h5 mb-0"><i class="bi bi-robot me-2"></i>AI Insights</h3>
-                    <a href="#" class="text-decoration-none small">More Insights</a>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="avatar-icon bg-purple me-3">
-                            <i class="bi bi-stars text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="h6 mb-0">AI-Enhanced Analysis</h4>
-                            <p class="small text-muted mb-0">Powered by Claude 3.5 Sonnet</p>
-                        </div>
-                    </div>
-                    
-                    {% if ai_insights %}
-                        {% for insight in ai_insights %}
-                            <div class="card mb-3 bg-dark">
-                                <div class="card-body py-2 px-3">
-                                    <p class="mb-1 small"><i class="bi bi-lightbulb me-2 text-warning"></i>{{ insight.title }}</p>
-                                    <p class="small text-muted mb-0">{{ insight.description|truncate(100) }}</p>
-                                </div>
-                            </div>
-                        {% endfor %}
+        <div
+          class="card-footer bg-success-dark text-white text-center border-0"
+        >
+          <a
+            href="#"
+            class="stretched-link text-white text-decoration-none small"
+          >
+            View Tax Codes <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card bg-warning text-dark h-100 border-0 shadow-sm">
+        <div
+          class="card-body d-flex flex-column align-items-center text-center"
+        >
+          <i class="bi bi-cash-stack display-5 mb-3"></i>
+          <h2 class="display-6">
+            {{ total_assessed_value|default(0)|format_currency }}
+          </h2>
+          <p class="mb-0">Total Assessed Value</p>
+        </div>
+        <div class="card-footer bg-warning-dark text-dark text-center border-0">
+          <a
+            href="#"
+            class="stretched-link text-dark text-decoration-none small"
+          >
+            View Summary <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions and System Status -->
+  <div class="row g-4 mb-4">
+    <!-- Quick Actions -->
+    <div class="col-md-6">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-dark">
+          <h3 class="h5 mb-0">
+            <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-6">
+              <a
+                href="#"
+                class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center"
+              >
+                <i class="bi bi-cloud-upload display-6 mb-2"></i>
+                <span>Import Data</span>
+              </a>
+            </div>
+            <div class="col-6">
+              <a
+                href="#"
+                class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center"
+              >
+                <i class="bi bi-cloud-download display-6 mb-2"></i>
+                <span>Export Data</span>
+              </a>
+            </div>
+            <div class="col-6">
+              <a
+                href="#"
+                class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center"
+              >
+                <i class="bi bi-calculator display-6 mb-2"></i>
+                <span>Levy Calculator</span>
+              </a>
+            </div>
+            <div class="col-6">
+              <a
+                href="#"
+                class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center"
+              >
+                <i class="bi bi-file-earmark-text display-6 mb-2"></i>
+                <span>Generate Reports</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="col-md-6">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-dark">
+          <h3 class="h5 mb-0">
+            <i class="bi bi-info-circle me-2"></i>System Status
+          </h3>
+        </div>
+        <div class="card-body">
+          <!-- Database Status -->
+          <div class="mb-3">
+            <div class="d-flex align-items-center mb-2">
+              <div class="me-2">
+                <i class="bi bi-database-check text-success fs-4"></i>
+              </div>
+              <div>
+                <h4 class="h6 mb-0">Database Connection</h4>
+                <p class="small text-muted mb-0">PostgreSQL - Connected</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">Active</span>
+              </div>
+            </div>
+            <div class="progress" style="height: 5px">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                style="width: 95%"
+                aria-valuenow="95"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+
+          <!-- API Status -->
+          <div class="mb-3">
+            <div class="d-flex align-items-center mb-2">
+              <div class="me-2">
+                <i class="bi bi-robot text-success fs-4"></i>
+              </div>
+              <div>
+                <h4 class="h6 mb-0">Anthropic API</h4>
+                <p class="small text-muted mb-0">AI Assistance - Connected</p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-success">Active</span>
+              </div>
+            </div>
+            <div class="progress" style="height: 5px">
+              <div
+                class="progress-bar bg-success"
+                role="progressbar"
+                style="width: 90%"
+                aria-valuenow="90"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+
+          <!-- System Disk -->
+          <div class="mb-3">
+            <div class="d-flex align-items-center mb-2">
+              <div class="me-2">
+                <i class="bi bi-hdd-stack text-warning fs-4"></i>
+              </div>
+              <div>
+                <h4 class="h6 mb-0">System Storage</h4>
+                <p class="small text-muted mb-0">
+                  {{ disk_usage|default('65%') }} Used
+                </p>
+              </div>
+              <div class="ms-auto">
+                <span class="badge bg-warning text-dark">Monitor</span>
+              </div>
+            </div>
+            <div class="progress" style="height: 5px">
+              <div
+                class="progress-bar bg-warning"
+                role="progressbar"
+                style="width: 65%"
+                aria-valuenow="65"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity and AI Insights -->
+  <div class="row g-4">
+    <!-- Recent Activity -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div
+          class="card-header bg-dark d-flex justify-content-between align-items-center"
+        >
+          <h3 class="h5 mb-0">
+            <i class="bi bi-clock-history me-2"></i>Recent Activity
+          </h3>
+          <a href="#" class="text-decoration-none small">View All</a>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>User</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if recent_imports %} {% for import_log in recent_imports %}
+                <tr>
+                  <td>
+                    <span class="badge bg-primary"
+                      ><i class="bi bi-cloud-upload me-1"></i>Import</span
+                    >
+                  </td>
+                  <td>{{ import_log.file_name }}</td>
+                  <td>
+                    {{ import_log.user.username if import_log.user else 'System'
+                    }}
+                  </td>
+                  <td>
+                    {% if import_log.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% elif import_log.status == 'failed' %}
+                    <span class="badge bg-danger">Failed</span>
                     {% else %}
-                        <div class="alert alert-secondary">
-                            <h5 class="h6"><i class="bi bi-info-circle me-2"></i>AI Features Available</h5>
-                            <p class="small mb-2">Use AI-enhanced analysis for:</p>
-                            <ul class="small mb-0">
-                                <li>Predictive levy rate forecasting</li>
-                                <li>Anomaly detection in tax data</li>
-                                <li>Compliance monitoring insights</li>
-                                <li>Property value trend analysis</li>
-                            </ul>
-                        </div>
+                    <span class="badge bg-warning text-dark"
+                      >{{ import_log.status|capitalize }}</span
+                    >
                     {% endif %}
-                    
-                    <div class="text-center mt-3">
-                        <a href="#" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-robot me-1"></i>Generate AI Analysis
-                        </a>
-                    </div>
-                </div>
-            </div>
+                  </td>
+                  <td>{{ import_log.created_at|format_date }}</td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="5" class="text-center py-4">
+                    <p class="text-muted mb-0">No recent activity to display</p>
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
+
+    <!-- AI Insights Card -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div
+          class="card-header bg-dark d-flex justify-content-between align-items-center"
+        >
+          <h3 class="h5 mb-0"><i class="bi bi-robot me-2"></i>AI Insights</h3>
+          <a href="#" class="text-decoration-none small">More Insights</a>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-4">
+            <div class="avatar-icon bg-purple me-3">
+              <i class="bi bi-stars text-white"></i>
+            </div>
+            <div>
+              <h4 class="h6 mb-0">AI-Enhanced Analysis</h4>
+              <p class="small text-muted mb-0">Powered by Claude 3.5 Sonnet</p>
+            </div>
+          </div>
+
+          {% if ai_insights %} {% for insight in ai_insights %}
+          <div class="card mb-3 bg-dark">
+            <div class="card-body py-2 px-3">
+              <p class="mb-1 small">
+                <i class="bi bi-lightbulb me-2 text-warning"></i>{{
+                insight.title }}
+              </p>
+              <p class="small text-muted mb-0">
+                {{ insight.description|truncate(100) }}
+              </p>
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <div class="alert alert-secondary">
+            <h5 class="h6">
+              <i class="bi bi-info-circle me-2"></i>AI Features Available
+            </h5>
+            <p class="small mb-2">Use AI-enhanced analysis for:</p>
+            <ul class="small mb-0">
+              <li>Predictive levy rate forecasting</li>
+              <li>Anomaly detection in tax data</li>
+              <li>Compliance monitoring insights</li>
+              <li>Property value trend analysis</li>
+            </ul>
+          </div>
+          {% endif %}
+
+          <div class="text-center mt-3">
+            <a href="#" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-robot me-1"></i>Generate AI Analysis
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}
+{% endblock %} {% block extra_css %}
 <style>
-    .avatar-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
-    
-    .bg-purple {
-        background-color: #6f42c1;
-    }
-    
-    .bg-primary-dark {
-        background-color: rgba(var(--bs-primary-rgb), 0.8);
-    }
-    
-    .bg-info-dark {
-        background-color: rgba(var(--bs-info-rgb), 0.8);
-    }
-    
-    .bg-success-dark {
-        background-color: rgba(var(--bs-success-rgb), 0.8);
-    }
-    
-    .bg-warning-dark {
-        background-color: rgba(var(--bs-warning-rgb), 0.8);
-    }
-    
-    .card .stretched-link:hover {
-        text-decoration: underline !important;
-    }
-    
-    @media (max-width: 767.98px) {
-        .display-6 {
-            font-size: 1.5rem;
-        }
-    }
-</style>
-{% endblock %}
+  .avatar-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
 
-{% block extra_js %}
+  .bg-purple {
+    background-color: #6f42c1;
+  }
+
+  .bg-primary-dark {
+    background-color: rgba(var(--bs-primary-rgb), 0.8);
+  }
+
+  .bg-info-dark {
+    background-color: rgba(var(--bs-info-rgb), 0.8);
+  }
+
+  .bg-success-dark {
+    background-color: rgba(var(--bs-success-rgb), 0.8);
+  }
+
+  .bg-warning-dark {
+    background-color: rgba(var(--bs-warning-rgb), 0.8);
+  }
+
+  .card .stretched-link:hover {
+    text-decoration: underline !important;
+  }
+
+  @media (max-width: 767.98px) {
+    .display-6 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize dashboard
-        console.log('Admin Dashboard initialized');
-        
-        // Make cards the same height in a row (when using col-* grid)
-        function equalizeCardHeights() {
-            const rows = document.querySelectorAll('.row');
-            rows.forEach(row => {
-                const cards = row.querySelectorAll('.card');
-                let maxHeight = 0;
-                
-                // Find the tallest card
-                cards.forEach(card => {
-                    card.style.height = 'auto';
-                    const height = card.offsetHeight;
-                    maxHeight = Math.max(maxHeight, height);
-                });
-                
-                // Set all cards to the height of the tallest
-                if (maxHeight > 0 && window.innerWidth >= 768) {
-                    cards.forEach(card => {
-                        card.style.height = `${maxHeight}px`;
-                    });
-                }
-            });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize dashboard
+    console.log("Admin Dashboard initialized");
+
+    // Make cards the same height in a row (when using col-* grid)
+    function equalizeCardHeights() {
+      const rows = document.querySelectorAll(".row");
+      rows.forEach((row) => {
+        const cards = row.querySelectorAll(".card");
+        let maxHeight = 0;
+
+        // Find the tallest card
+        cards.forEach((card) => {
+          card.style.height = "auto";
+          const height = card.offsetHeight;
+          maxHeight = Math.max(maxHeight, height);
+        });
+
+        // Set all cards to the height of the tallest
+        if (maxHeight > 0 && window.innerWidth >= 768) {
+          cards.forEach((card) => {
+            card.style.height = `${maxHeight}px`;
+          });
         }
-        
-        // Call on page load and resize
-        equalizeCardHeights();
-        window.addEventListener('resize', equalizeCardHeights);
-    });
+      });
+    }
+
+    // Call on page load and resize
+    equalizeCardHeights();
+    window.addEventListener("resize", equalizeCardHeights);
+  });
 </script>
 {% endblock %}

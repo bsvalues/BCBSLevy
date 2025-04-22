@@ -1,0 +1,333 @@
+/* TerraFusion-inspired styles adapted for LevyMaster */
+
+:root {
+  /* TerraFusion Color Palette */
+  --tf-dark-blue: #001529;
+  --tf-medium-blue: #002a4a;
+  --tf-light-blue: #004d7a;
+  --tf-primary: #00e5ff;
+  --tf-secondary: #00b8d4;
+
+  /* Opacity variants */
+  --tf-primary-10: rgba(0, 229, 255, 0.1);
+  --tf-primary-20: rgba(0, 229, 255, 0.2);
+  --tf-primary-70: rgba(0, 229, 255, 0.7);
+
+  /* Text colors */
+  --tf-text-light: #ffffff;
+  --tf-text-dark: #001529;
+}
+
+/* Modern Card Styles */
+.tf-card {
+  background-color: var(--tf-medium-blue);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  padding: 1.5rem;
+  height: 100%;
+}
+
+.tf-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--tf-primary);
+}
+
+.tf-card-title {
+  color: var(--tf-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.tf-card-subtitle {
+  color: var(--tf-primary-70);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.tf-card-value {
+  color: var(--tf-text-light);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.tf-card-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+/* Stat Card */
+.tf-stat-card {
+  background-color: var(--tf-medium-blue);
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.tf-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--tf-primary);
+}
+
+.tf-stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tf-stat-card-title {
+  color: var(--tf-primary-70);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.tf-stat-card-icon {
+  color: var(--tf-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--tf-primary-10);
+}
+
+.tf-stat-card-value {
+  color: var(--tf-text-light);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.tf-stat-card-trend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tf-stat-card-trend-up {
+  color: #4caf50;
+}
+
+.tf-stat-card-trend-down {
+  color: #f44336;
+}
+
+.tf-stat-card-trend-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Dashboard Layout */
+.tf-dashboard-layout {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1199.98px) {
+  .tf-dashboard-layout {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .tf-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Header Styles */
+.tf-header {
+  background: linear-gradient(
+    90deg,
+    var(--tf-dark-blue) 0%,
+    var(--tf-medium-blue) 100%
+  );
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  color: var(--tf-text-light);
+}
+
+.tf-header h1 {
+  color: var(--tf-text-light);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.tf-header p {
+  color: var(--tf-primary-70);
+  margin-bottom: 0;
+}
+
+/* Table Styles */
+.tf-table-container {
+  background-color: var(--tf-medium-blue);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+}
+
+.tf-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.tf-table-title {
+  color: var(--tf-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.tf-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.tf-table th {
+  color: var(--tf-primary-70);
+  font-weight: 500;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+}
+
+.tf-table td {
+  color: var(--tf-text-light);
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tf-table tr:last-child td {
+  border-bottom: none;
+}
+
+.tf-table tr:hover td {
+  background-color: rgba(0, 229, 255, 0.05);
+}
+
+/* Button Styles */
+.tf-button {
+  background-color: var(--tf-primary);
+  color: var(--tf-text-dark);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tf-button:hover {
+  background-color: var(--tf-secondary);
+}
+
+.tf-button-outline {
+  background-color: transparent;
+  color: var(--tf-primary);
+  border: 1px solid var(--tf-primary);
+}
+
+.tf-button-outline:hover {
+  background-color: var(--tf-primary-10);
+}
+
+/* Navigation Styles */
+.tf-navbar {
+  background: linear-gradient(
+    90deg,
+    var(--tf-dark-blue) 0%,
+    var(--tf-medium-blue) 100%
+  );
+  padding: 1rem 1.5rem;
+  color: var(--tf-text-light);
+  margin-bottom: 2rem;
+}
+
+.tf-navbar-brand {
+  color: var(--tf-text-light);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.tf-navbar-menu {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.tf-navbar-item {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tf-navbar-item:hover,
+.tf-navbar-item.active {
+  color: var(--tf-primary);
+}
+
+/* Dark Mode Background */
+.tf-dark-mode {
+  background-color: var(--tf-dark-blue);
+  color: var(--tf-text-light);
+  min-height: 100vh;
+}
+
+/* Progress Indicators */
+.tf-progress-container {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.tf-progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--tf-primary) 0%,
+    var(--tf-secondary) 100%
+  );
+  transition: width 0.5s ease;
+}
+
+/* Animation for cards */
+.tf-animate-in {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glassmorphic effect */
+.tf-glassmorphic {
+  background: rgba(0, 41, 82, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 8px;
+}

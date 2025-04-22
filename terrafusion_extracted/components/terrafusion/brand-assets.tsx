@@ -1,9 +1,9 @@
-import Image from "next/image"
+import Image from "next/image";
 
 interface BrandAssetProps {
-  variant?: "default" | "app" | "seal" | "square"
-  size?: "sm" | "md" | "lg" | "xl"
-  className?: string
+  variant?: "default" | "app" | "seal" | "square";
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
 }
 
 const sizeMap = {
@@ -11,21 +11,30 @@ const sizeMap = {
   md: 96,
   lg: 144,
   xl: 192,
-}
+};
 
-export function TerraFusionLogo({ variant = "default", size = "md", className = "" }: BrandAssetProps) {
-  const dimensions = sizeMap[size]
+export function TerraFusionLogo({
+  variant = "default",
+  size = "md",
+  className = "",
+}: BrandAssetProps) {
+  const dimensions = sizeMap[size];
 
   // URLs for the different logo variants
   const logoUrls = {
-    default: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-kxsGwXzvQnYOMtqRmB0Buf9j7HtSxb.png",
+    default:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-kxsGwXzvQnYOMtqRmB0Buf9j7HtSxb.png",
     app: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-0h7tzBkj83NtRDd6ZwGUXg67nKeW5j.png", // Using the first image as fallback
     seal: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-0h7tzBkj83NtRDd6ZwGUXg67nKeW5j.png", // Using the first image as fallback
-    square: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-0h7tzBkj83NtRDd6ZwGUXg67nKeW5j.png", // Using the first image as fallback
-  }
+    square:
+      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-0h7tzBkj83NtRDd6ZwGUXg67nKeW5j.png", // Using the first image as fallback
+  };
 
   return (
-    <div className={`relative ${className}`} style={{ width: dimensions, height: dimensions }}>
+    <div
+      className={`relative ${className}`}
+      style={{ width: dimensions, height: dimensions }}
+    >
       <Image
         src={logoUrls[variant] || "/placeholder.svg"}
         alt="TerraFusion Logo"
@@ -34,7 +43,7 @@ export function TerraFusionLogo({ variant = "default", size = "md", className = 
         className="object-contain"
       />
     </div>
-  )
+  );
 }
 
 export function TerraFusionLogoSet() {
@@ -50,5 +59,5 @@ export function TerraFusionLogoSet() {
         />
       </div>
     </div>
-  )
+  );
 }

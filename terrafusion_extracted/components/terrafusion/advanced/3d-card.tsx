@@ -1,49 +1,56 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef } from "react"
-import { motion } from "framer-motion"
-import Image from "next/image"
+import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 interface ThreeDCardProps {
-  title: string
-  description: string
-  icon?: React.ReactNode
-  image?: string
-  className?: string
-  children?: React.ReactNode
+  title: string;
+  description: string;
+  icon?: React.ReactNode;
+  image?: string;
+  className?: string;
+  children?: React.ReactNode;
 }
 
-export function ThreeDCard({ title, description, icon, image, className = "", children }: ThreeDCardProps) {
-  const [rotateX, setRotateX] = useState(0)
-  const [rotateY, setRotateY] = useState(0)
-  const [glowX, setGlowX] = useState(0)
-  const [glowY, setGlowY] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
+export function ThreeDCard({
+  title,
+  description,
+  icon,
+  image,
+  className = "",
+  children,
+}: ThreeDCardProps) {
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [glowX, setGlowX] = useState(0);
+  const [glowY, setGlowY] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const cardRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return
+    if (!cardRef.current) return;
 
-    const rect = cardRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
 
     // Calculate distance from center (normalized from -1 to 1)
-    const rotateYValue = ((e.clientX - centerX) / (rect.width / 2)) * 5
-    const rotateXValue = ((e.clientY - centerY) / (rect.height / 2)) * -5
+    const rotateYValue = ((e.clientX - centerX) / (rect.width / 2)) * 5;
+    const rotateXValue = ((e.clientY - centerY) / (rect.height / 2)) * -5;
 
     // Calculate glow position
-    const glowXValue = ((e.clientX - rect.left) / rect.width) * 100
-    const glowYValue = ((e.clientY - rect.top) / rect.height) * 100
+    const glowXValue = ((e.clientX - rect.left) / rect.width) * 100;
+    const glowYValue = ((e.clientY - rect.top) / rect.height) * 100;
 
-    setRotateX(rotateXValue)
-    setRotateY(rotateYValue)
-    setGlowX(glowXValue)
-    setGlowY(glowYValue)
-  }
+    setRotateX(rotateXValue);
+    setRotateY(rotateYValue);
+    setGlowX(glowXValue);
+    setGlowY(glowYValue);
+  };
 
   return (
     <motion.div
@@ -62,9 +69,9 @@ export function ThreeDCard({ title, description, icon, image, className = "", ch
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
-        setIsHovered(false)
-        setRotateX(0)
-        setRotateY(0)
+        setIsHovered(false);
+        setRotateX(0);
+        setRotateY(0);
       }}
     >
       {/* Dynamic glow effect */}
@@ -84,12 +91,22 @@ export function ThreeDCard({ title, description, icon, image, className = "", ch
       <div className="p-6 relative z-10">
         {image && (
           <div className="absolute top-0 right-0 w-24 h-24 opacity-10">
-            <Image src={image || "/placeholder.svg"} alt="" width={96} height={96} className="object-contain" />
+            <Image
+              src={image || "/placeholder.svg"}
+              alt=""
+              width={96}
+              height={96}
+              className="object-contain"
+            />
           </div>
         )}
 
         <div className="flex items-start gap-4">
-          {icon && <div className="text-[#00e5ff] p-2 rounded-lg bg-[#00e5ff]/10">{icon}</div>}
+          {icon && (
+            <div className="text-[#00e5ff] p-2 rounded-lg bg-[#00e5ff]/10">
+              {icon}
+            </div>
+          )}
 
           <div>
             <h3 className="text-lg font-medium text-white mb-2">{title}</h3>
@@ -106,5 +123,5 @@ export function ThreeDCard({ title, description, icon, image, className = "", ch
         style={{ opacity: isHovered ? 1 : 0 }}
       />
     </motion.div>
-  )
+  );
 }

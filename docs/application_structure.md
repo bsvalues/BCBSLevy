@@ -23,7 +23,7 @@ The application is organized into functional blueprints:
 - **routes_historical_analysis.py**: Historical data analysis features.
 - **routes_mcp.py**: Multi-Agent Cognitive Process (MCP) framework integration.
 - **routes_levy_exports.py**: Data export functionality.
-- *Additional specialized blueprints for specific features*
+- _Additional specialized blueprints for specific features_
 
 ## Templates
 

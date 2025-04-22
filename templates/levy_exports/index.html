@@ -1,160 +1,187 @@
-{% extends "levy_exports/base_levy.html" %}
-
-{% block title %}Levy Exports{% endblock %}
-
-{% block content %}
+{% extends "levy_exports/base_levy.html" %} {% block title %}Levy Exports{%
+endblock %} {% block content %}
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h1>Levy Exports Dashboard</h1>
-            <p class="lead">Manage and analyze levy export data from county assessor's office.</p>
+  <div class="row">
+    <div class="col-12">
+      <h1>Levy Exports Dashboard</h1>
+      <p class="lead">
+        Manage and analyze levy export data from county assessor's office.
+      </p>
 
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex flex-wrap gap-2">
-                                <a href="{{ url_for('levy_exports.upload') }}" class="btn btn-primary">
-                                    <i class="bi bi-upload"></i> Upload Levy Export
-                                </a>
-                                <a href="{{ url_for('levy_exports.parse_direct') }}" class="btn btn-info">
-                                    <i class="bi bi-file-earmark-text"></i> Direct File Parser
-                                </a>
-                                <a href="{{ url_for('levy_exports.compare') }}" class="btn btn-secondary">
-                                    <i class="bi bi-bar-chart"></i> Compare Years
-                                </a>
-                                <a href="{{ url_for('levy_exports.export_data') }}" class="btn btn-success">
-                                    <i class="bi bi-download"></i> Export Data
-                                </a>
-                                <a href="{{ url_for('levy_exports.template_manager') }}" class="btn btn-warning">
-                                    <i class="bi bi-file-earmark-plus"></i> Templates
-                                </a>
-                                {% if years_data %}
-                                <a href="{{ url_for('levy_exports.view_year', year=stats.latest_year) }}" class="btn btn-outline-primary">
-                                    <i class="bi bi-eye"></i> View Latest Year ({{ stats.latest_year }})
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Statistics</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="text-center mb-3">
-                                        <h6>Years</h6>
-                                        <h2>{{ stats.total_years }}</h2>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="text-center mb-3">
-                                        <h6>Records</h6>
-                                        <h2>{{ stats.total_records }}</h2>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="text-center">
-                                        <h6>Districts</h6>
-                                        <h2>{{ stats.total_districts }}</h2>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="text-center">
-                                        <h6>Tax Codes</h6>
-                                        <h2>{{ stats.total_tax_codes }}</h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+      <div class="row mb-4">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Quick Actions</h5>
             </div>
-
-            {% if years_data %}
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Available Years</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% for year, count in years_data %}
-                        <div class="col-md-2 col-sm-4 col-6 mb-3">
-                            <div class="card">
-                                <div class="card-body text-center">
-                                    <h5 class="mb-1">{{ year }}</h5>
-                                    <p class="text-muted small mb-2">{{ count }} records</p>
-                                    <a href="{{ url_for('levy_exports.view_year', year=year) }}" class="btn btn-sm btn-outline-primary">View</a>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if recent_imports %}
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Recent Imports</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>File</th>
-                                    <th>Status</th>
-                                    <th>Year</th>
-                                    <th>Records</th>
-                                    <th>Success</th>
-                                    <th>Errors</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for import_log in recent_imports %}
-                                <tr>
-                                    <td>{{ import_log.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td>{{ import_log.filename }}</td>
-                                    <td>
-                                        {% if import_log.status == 'COMPLETED' %}
-                                        <span class="badge bg-success">Completed</span>
-                                        {% elif import_log.status == 'FAILED' %}
-                                        <span class="badge bg-danger">Failed</span>
-                                        {% else %}
-                                        <span class="badge bg-warning">{{ import_log.status }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ import_log.year }}</td>
-                                    <td>{{ import_log.record_count }}</td>
-                                    <td>{{ import_log.success_count }}</td>
-                                    <td>{{ import_log.error_count }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="alert alert-info">
-                <h5>No Import History</h5>
-                <p>You haven't imported any levy export files yet. Get started by uploading a file.</p>
-                <a href="{{ url_for('levy_exports.upload') }}" class="btn btn-primary">
-                    <i class="bi bi-upload"></i> Upload Levy Export
+            <div class="card-body">
+              <div class="d-flex flex-wrap gap-2">
+                <a
+                  href="{{ url_for('levy_exports.upload') }}"
+                  class="btn btn-primary"
+                >
+                  <i class="bi bi-upload"></i> Upload Levy Export
                 </a>
+                <a
+                  href="{{ url_for('levy_exports.parse_direct') }}"
+                  class="btn btn-info"
+                >
+                  <i class="bi bi-file-earmark-text"></i> Direct File Parser
+                </a>
+                <a
+                  href="{{ url_for('levy_exports.compare') }}"
+                  class="btn btn-secondary"
+                >
+                  <i class="bi bi-bar-chart"></i> Compare Years
+                </a>
+                <a
+                  href="{{ url_for('levy_exports.export_data') }}"
+                  class="btn btn-success"
+                >
+                  <i class="bi bi-download"></i> Export Data
+                </a>
+                <a
+                  href="{{ url_for('levy_exports.template_manager') }}"
+                  class="btn btn-warning"
+                >
+                  <i class="bi bi-file-earmark-plus"></i> Templates
+                </a>
+                {% if years_data %}
+                <a
+                  href="{{ url_for('levy_exports.view_year', year=stats.latest_year) }}"
+                  class="btn btn-outline-primary"
+                >
+                  <i class="bi bi-eye"></i> View Latest Year ({{
+                  stats.latest_year }})
+                </a>
+                {% endif %}
+              </div>
             </div>
-            {% endif %}
+          </div>
         </div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title mb-0">Statistics</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-6">
+                  <div class="text-center mb-3">
+                    <h6>Years</h6>
+                    <h2>{{ stats.total_years }}</h2>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="text-center mb-3">
+                    <h6>Records</h6>
+                    <h2>{{ stats.total_records }}</h2>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="text-center">
+                    <h6>Districts</h6>
+                    <h2>{{ stats.total_districts }}</h2>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="text-center">
+                    <h6>Tax Codes</h6>
+                    <h2>{{ stats.total_tax_codes }}</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if years_data %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Available Years</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for year, count in years_data %}
+            <div class="col-md-2 col-sm-4 col-6 mb-3">
+              <div class="card">
+                <div class="card-body text-center">
+                  <h5 class="mb-1">{{ year }}</h5>
+                  <p class="text-muted small mb-2">{{ count }} records</p>
+                  <a
+                    href="{{ url_for('levy_exports.view_year', year=year) }}"
+                    class="btn btn-sm btn-outline-primary"
+                    >View</a
+                  >
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %} {% if recent_imports %}
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Recent Imports</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>File</th>
+                  <th>Status</th>
+                  <th>Year</th>
+                  <th>Records</th>
+                  <th>Success</th>
+                  <th>Errors</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for import_log in recent_imports %}
+                <tr>
+                  <td>
+                    {{ import_log.created_at.strftime('%Y-%m-%d %H:%M') }}
+                  </td>
+                  <td>{{ import_log.filename }}</td>
+                  <td>
+                    {% if import_log.status == 'COMPLETED' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% elif import_log.status == 'FAILED' %}
+                    <span class="badge bg-danger">Failed</span>
+                    {% else %}
+                    <span class="badge bg-warning"
+                      >{{ import_log.status }}</span
+                    >
+                    {% endif %}
+                  </td>
+                  <td>{{ import_log.year }}</td>
+                  <td>{{ import_log.record_count }}</td>
+                  <td>{{ import_log.success_count }}</td>
+                  <td>{{ import_log.error_count }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <h5>No Import History</h5>
+        <p>
+          You haven't imported any levy export files yet. Get started by
+          uploading a file.
+        </p>
+        <a href="{{ url_for('levy_exports.upload') }}" class="btn btn-primary">
+          <i class="bi bi-upload"></i> Upload Levy Export
+        </a>
+      </div>
+      {% endif %}
     </div>
+  </div>
 </div>
 {% endblock %}

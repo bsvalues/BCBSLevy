@@ -1,219 +1,217 @@
-{% extends "base.html" %}
-
-{% block title %}Tax Strategy Analysis{% endblock %}
-
-{% block styles %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}Tax Strategy Analysis{% endblock %}
+{% block styles %} {{ super() }}
 <style>
-    .strategy-path-card {
-        border-left: 4px solid #4e73df;
-        margin-bottom: 25px;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-    
-    .strategy-path-card .card-header {
-        background-color: #fff;
-        border-bottom: 1px solid #e3e6f0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    
-    .path-summary {
-        display: flex;
-        margin-bottom: 15px;
-    }
-    
-    .path-summary-item {
-        flex: 1;
-        padding: 10px;
-        border-right: 1px solid #e3e6f0;
-    }
-    
-    .path-summary-item:last-child {
-        border-right: none;
-    }
-    
-    .path-summary-item h4 {
-        font-size: 0.9rem;
-        color: #4e73df;
-        margin-bottom: 5px;
-        text-transform: uppercase;
-        font-weight: 700;
-    }
-    
-    .path-summary-item p {
-        font-size: 1.1rem;
-        margin-bottom: 0;
-    }
-    
-    .path-viz {
-        display: flex;
-        margin-top: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .path-node {
-        background-color: #e3e6f0;
-        border-radius: 30px;
-        padding: 8px 15px;
-        margin-right: 10px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .path-node:after {
-        content: '\f054';
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        margin-left: 10px;
-        color: #4e73df;
-    }
-    
-    .path-node:last-child {
-        background-color: #1cc88a;
-        color: white;
-    }
-    
-    .path-node:last-child:after {
-        content: none;
-    }
-    
-    .req-list {
-        padding-left: 20px;
-    }
-    
-    .req-list li {
-        margin-bottom: 8px;
-    }
-</style>
-{% endblock %}
+  .strategy-path-card {
+    border-left: 4px solid #4e73df;
+    margin-bottom: 25px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  }
 
-{% block content %}
+  .strategy-path-card .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e3e6f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .path-summary {
+    display: flex;
+    margin-bottom: 15px;
+  }
+
+  .path-summary-item {
+    flex: 1;
+    padding: 10px;
+    border-right: 1px solid #e3e6f0;
+  }
+
+  .path-summary-item:last-child {
+    border-right: none;
+  }
+
+  .path-summary-item h4 {
+    font-size: 0.9rem;
+    color: #4e73df;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .path-summary-item p {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+  }
+
+  .path-viz {
+    display: flex;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .path-node {
+    background-color: #e3e6f0;
+    border-radius: 30px;
+    padding: 8px 15px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .path-node:after {
+    content: "\f054";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-left: 10px;
+    color: #4e73df;
+  }
+
+  .path-node:last-child {
+    background-color: #1cc88a;
+    color: white;
+  }
+
+  .path-node:last-child:after {
+    content: none;
+  }
+
+  .req-list {
+    padding-left: 20px;
+  }
+
+  .req-list li {
+    margin-bottom: 8px;
+  }
+</style>
+{% endblock %} {% block content %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Tax Strategy Analysis</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('tax_strategy.index') }}">Tax Strategy</a></li>
-        <li class="breadcrumb-item active">Analysis</li>
-    </ol>
-    
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Common Strategy Paths
-                </div>
-                <div class="card-body">
-                    <p>Below are common tax strategy approaches that may be applicable to your property tax situation. Each strategy path represents a different approach to optimizing your property taxes based on specific circumstances.</p>
-                    <p>Click on a strategy to see more details and recommendations, or <a href="{{ url_for('tax_strategy.index') }}">explore the interactive decision tree</a> to find custom strategy paths for your unique situation.</p>
-                </div>
+  <h1 class="mt-4">Tax Strategy Analysis</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('tax_strategy.index') }}">Tax Strategy</a>
+    </li>
+    <li class="breadcrumb-item active">Analysis</li>
+  </ol>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-info-circle me-1"></i>
+          Common Strategy Paths
+        </div>
+        <div class="card-body">
+          <p>
+            Below are common tax strategy approaches that may be applicable to
+            your property tax situation. Each strategy path represents a
+            different approach to optimizing your property taxes based on
+            specific circumstances.
+          </p>
+          <p>
+            Click on a strategy to see more details and recommendations, or
+            <a href="{{ url_for('tax_strategy.index') }}"
+              >explore the interactive decision tree</a
+            >
+            to find custom strategy paths for your unique situation.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    {% for path in strategy_paths %}
+    <div class="col-12">
+      <div class="card strategy-path-card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-route me-1"></i>
+            {{ path.name }}
+          </h5>
+          <form
+            action="{{ url_for('tax_strategy.get_recommendation') }}"
+            method="post"
+          >
+            <input
+              type="hidden"
+              name="path"
+              value="{{ path.path|join(',') }}"
+            />
+            <button type="submit" class="btn btn-primary btn-sm">
+              <i class="fas fa-chart-line me-1"></i> Get Detailed Analysis
+            </button>
+          </form>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">{{ path.description }}</p>
+
+          <div class="path-summary">
+            <div class="path-summary-item">
+              <h4>Potential Savings</h4>
+              <p>{{ path.potential_savings }}</p>
             </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        {% for path in strategy_paths %}
-        <div class="col-12">
-            <div class="card strategy-path-card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-route me-1"></i>
-                        {{ path.name }}
-                    </h5>
-                    <form action="{{ url_for('tax_strategy.get_recommendation') }}" method="post">
-                        <input type="hidden" name="path" value="{{ path.path|join(',') }}">
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            <i class="fas fa-chart-line me-1"></i> Get Detailed Analysis
-                        </button>
-                    </form>
-                </div>
-                <div class="card-body">
-                    <p class="mb-3">{{ path.description }}</p>
-                    
-                    <div class="path-summary">
-                        <div class="path-summary-item">
-                            <h4>Potential Savings</h4>
-                            <p>{{ path.potential_savings }}</p>
-                        </div>
-                        <div class="path-summary-item">
-                            <h4>Complexity</h4>
-                            <p>{{ path.complexity }}</p>
-                        </div>
-                        <div class="path-summary-item">
-                            <h4>Requirements</h4>
-                            <p>{{ path.requirements|length }} criteria</p>
-                        </div>
-                    </div>
-                    
-                    <div class="collapse-content">
-                        <hr>
-                        <h6>Strategy Path</h6>
-                        <div class="path-viz">
-                            {% for node_id in path.path %}
-                                <div class="path-node">
-                                    {% if node_id == "root" %}
-                                    Select Tax Strategy Goal
-                                    {% elif node_id == "minimize-current" %}
-                                    Minimize Current Year Liability
-                                    {% elif node_id == "long-term-planning" %}
-                                    Long-term Tax Planning
-                                    {% elif node_id == "special-circumstances" %}
-                                    Special Circumstances
-                                    {% elif node_id == "current-exemptions" %}
-                                    Maximize Exemptions
-                                    {% elif node_id == "valuation-appeal" %}
-                                    Appeal Property Valuation
-                                    {% elif node_id == "phased-improvements" %}
-                                    Phase Property Improvements
-                                    {% elif node_id == "tax-deferral" %}
-                                    Tax Deferral Programs
-                                    {% elif node_id == "historical" %}
-                                    Historical Property
-                                    {% elif node_id == "agricultural" %}
-                                    Agricultural Exemption
-                                    {% elif node_id == "nonprofit" %}
-                                    Non-profit Use
-                                    {% elif node_id == "homestead" %}
-                                    Homestead Exemption
-                                    {% elif node_id == "senior" %}
-                                    Senior/Disabled Exemption
-                                    {% elif node_id == "comparable-sales" %}
-                                    Comparable Sales Approach
-                                    {% elif node_id == "property-issues" %}
-                                    Document Property Issues
-                                    {% elif node_id == "senior-deferral" %}
-                                    Senior Tax Deferral
-                                    {% elif node_id == "hardship-deferral" %}
-                                    Temporary Hardship Deferral
-                                    {% else %}
-                                    {{ node_id }}
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <hr>
-                        <h6>Requirements</h6>
-                        <ul class="req-list">
-                            {% for req in path.requirements %}
-                            <li>{{ req }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+            <div class="path-summary-item">
+              <h4>Complexity</h4>
+              <p>{{ path.complexity }}</p>
             </div>
+            <div class="path-summary-item">
+              <h4>Requirements</h4>
+              <p>{{ path.requirements|length }} criteria</p>
+            </div>
+          </div>
+
+          <div class="collapse-content">
+            <hr />
+            <h6>Strategy Path</h6>
+            <div class="path-viz">
+              {% for node_id in path.path %}
+              <div class="path-node">
+                {% if node_id == "root" %} Select Tax Strategy Goal {% elif
+                node_id == "minimize-current" %} Minimize Current Year Liability
+                {% elif node_id == "long-term-planning" %} Long-term Tax
+                Planning {% elif node_id == "special-circumstances" %} Special
+                Circumstances {% elif node_id == "current-exemptions" %}
+                Maximize Exemptions {% elif node_id == "valuation-appeal" %}
+                Appeal Property Valuation {% elif node_id ==
+                "phased-improvements" %} Phase Property Improvements {% elif
+                node_id == "tax-deferral" %} Tax Deferral Programs {% elif
+                node_id == "historical" %} Historical Property {% elif node_id
+                == "agricultural" %} Agricultural Exemption {% elif node_id ==
+                "nonprofit" %} Non-profit Use {% elif node_id == "homestead" %}
+                Homestead Exemption {% elif node_id == "senior" %}
+                Senior/Disabled Exemption {% elif node_id == "comparable-sales"
+                %} Comparable Sales Approach {% elif node_id ==
+                "property-issues" %} Document Property Issues {% elif node_id ==
+                "senior-deferral" %} Senior Tax Deferral {% elif node_id ==
+                "hardship-deferral" %} Temporary Hardship Deferral {% else %} {{
+                node_id }} {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+
+            <hr />
+            <h6>Requirements</h6>
+            <ul class="req-list">
+              {% for req in path.requirements %}
+              <li>{{ req }}</li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-        {% endfor %}
+      </div>
     </div>
-    
-    <div class="row mt-4 mb-4">
-        <div class="col-12 text-center">
-            <a href="{{ url_for('tax_strategy.index') }}" class="btn btn-success">
-                <i class="fas fa-sitemap me-1"></i> Explore Interactive Decision Tree
-            </a>
-        </div>
+    {% endfor %}
+  </div>
+
+  <div class="row mt-4 mb-4">
+    <div class="col-12 text-center">
+      <a href="{{ url_for('tax_strategy.index') }}" class="btn btn-success">
+        <i class="fas fa-sitemap me-1"></i> Explore Interactive Decision Tree
+      </a>
     </div>
+  </div>
 </div>
 {% endblock %}

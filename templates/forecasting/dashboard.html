@@ -1,500 +1,574 @@
-{% extends "base.html" %}
-
-{% block title %}Property Tax Forecast Dashboard{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Property Tax Forecast Dashboard{%
+endblock %} {% block content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="mb-3">Property Tax Forecast Dashboard</h1>
-            <p class="lead">Use statistical models to forecast future tax levy rates based on historical data.</p>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="mb-3">Property Tax Forecast Dashboard</h1>
+      <p class="lead">
+        Use statistical models to forecast future tax levy rates based on
+        historical data.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Generate Forecast</h5>
         </div>
+        <div class="card-body">
+          <form id="forecast-form">
+            <div class="mb-3">
+              <label for="tax-code" class="form-label">Tax Code</label>
+              <select
+                class="form-select"
+                id="tax-code"
+                name="tax_code"
+                required
+              >
+                <option value="">Select a tax code</option>
+                {% for tax_code in tax_codes %}
+                <option value="{{ tax_code.code }}">{{ tax_code.code }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="model-type" class="form-label">Forecast Model</label>
+              <select class="form-select" id="model-type" name="model_type">
+                <option value="linear">Linear Trend</option>
+                <option value="exponential">Exponential Smoothing</option>
+                <option value="arima">ARIMA</option>
+              </select>
+              <div class="form-text">
+                Choose the statistical model for forecasting.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="years-ahead" class="form-label">Forecast Years</label>
+              <input
+                type="number"
+                class="form-control"
+                id="years-ahead"
+                name="years_ahead"
+                min="1"
+                max="10"
+                value="3"
+              />
+              <div class="form-text">
+                Number of future years to forecast (1-10).
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="scenario" class="form-label">Scenario</label>
+              <select class="form-select" id="scenario" name="scenario">
+                <option value="baseline">Baseline</option>
+                <option value="optimistic">Optimistic</option>
+                <option value="pessimistic">Pessimistic</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              Generate Forecast
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Generate Forecast</h5>
-                </div>
-                <div class="card-body">
-                    <form id="forecast-form">
-                        <div class="mb-3">
-                            <label for="tax-code" class="form-label">Tax Code</label>
-                            <select class="form-select" id="tax-code" name="tax_code" required>
-                                <option value="">Select a tax code</option>
-                                {% for tax_code in tax_codes %}
-                                <option value="{{ tax_code.code }}">{{ tax_code.code }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="model-type" class="form-label">Forecast Model</label>
-                            <select class="form-select" id="model-type" name="model_type">
-                                <option value="linear">Linear Trend</option>
-                                <option value="exponential">Exponential Smoothing</option>
-                                <option value="arima">ARIMA</option>
-                            </select>
-                            <div class="form-text">Choose the statistical model for forecasting.</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="years-ahead" class="form-label">Forecast Years</label>
-                            <input type="number" class="form-control" id="years-ahead" name="years_ahead" min="1" max="10" value="3">
-                            <div class="form-text">Number of future years to forecast (1-10).</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="scenario" class="form-label">Scenario</label>
-                            <select class="form-select" id="scenario" name="scenario">
-                                <option value="baseline">Baseline</option>
-                                <option value="optimistic">Optimistic</option>
-                                <option value="pessimistic">Pessimistic</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Generate Forecast</button>
-                    </form>
-                </div>
-            </div>
+    <div class="col-md-8 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0" id="forecast-title">Forecast Results</h5>
         </div>
+        <div class="card-body">
+          <div id="loading" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Generating forecast...</p>
+          </div>
 
-        <div class="col-md-8 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0" id="forecast-title">Forecast Results</h5>
-                </div>
-                <div class="card-body">
-                    <div id="loading" class="text-center d-none">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2">Generating forecast...</p>
-                    </div>
-                    
-                    <div id="forecast-placeholder" class="text-center">
-                        <div class="mt-5 mb-5">
-                            <i class="bi bi-graph-up text-muted" style="font-size: 4rem;"></i>
-                            <p class="mt-3 text-muted">Select a tax code and configure forecast options to generate predictions.</p>
-                        </div>
-                    </div>
-                    
-                    <div id="forecast-error" class="alert alert-danger mt-3 d-none">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        <span id="error-message"></span>
-                    </div>
-                    
-                    <div id="forecast-chart-container" class="d-none">
-                        <div id="forecast-chart" style="height: 300px;"></div>
-                    </div>
-                    
-                    <div id="forecast-metrics" class="mt-4 d-none">
-                        <h5>Forecast Accuracy Metrics</h5>
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title">RMSE</h6>
-                                        <p class="card-text fs-5" id="metric-rmse">-</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title">MAE</h6>
-                                        <p class="card-text fs-5" id="metric-mae">-</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title">R²</h6>
-                                        <p class="card-text fs-5" id="metric-r2">-</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h6 class="card-title">MAPE</h6>
-                                        <p class="card-text fs-5" id="metric-mape">-</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="forecast-table-container" class="mt-4 d-none">
-                        <h5>Forecast Details</h5>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Year</th>
-                                        <th>Predicted Rate</th>
-                                        <th>Lower Bound (95%)</th>
-                                        <th>Upper Bound (95%)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="forecast-table-body">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+          <div id="forecast-placeholder" class="text-center">
+            <div class="mt-5 mb-5">
+              <i class="bi bi-graph-up text-muted" style="font-size: 4rem"></i>
+              <p class="mt-3 text-muted">
+                Select a tax code and configure forecast options to generate
+                predictions.
+              </p>
             </div>
-        </div>
-    </div>
+          </div>
 
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Forecast Analysis Tools</h5>
+          <div id="forecast-error" class="alert alert-danger mt-3 d-none">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span id="error-message"></span>
+          </div>
+
+          <div id="forecast-chart-container" class="d-none">
+            <div id="forecast-chart" style="height: 300px"></div>
+          </div>
+
+          <div id="forecast-metrics" class="mt-4 d-none">
+            <h5>Forecast Accuracy Metrics</h5>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">RMSE</h6>
+                    <p class="card-text fs-5" id="metric-rmse">-</p>
+                  </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="d-grid gap-2">
-                                <a href="{{ url_for('forecast_comparison') }}" class="btn btn-outline-primary">
-                                    <i class="bi bi-bar-chart-line me-2"></i> Scenario Comparison
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="d-grid gap-2">
-                                <a href="{{ url_for('district_forecasting') }}" class="btn btn-outline-primary">
-                                    <i class="bi bi-geo-alt me-2"></i> District Forecasting
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="d-grid gap-2">
-                                <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exportModal">
-                                    <i class="bi bi-download me-2"></i> Export Forecast
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">MAE</h6>
+                    <p class="card-text fs-5" id="metric-mae">-</p>
+                  </div>
                 </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">R²</h6>
+                    <p class="card-text fs-5" id="metric-r2">-</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">MAPE</h6>
+                    <p class="card-text fs-5" id="metric-mape">-</p>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+
+          <div id="forecast-table-container" class="mt-4 d-none">
+            <h5>Forecast Details</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Predicted Rate</th>
+                    <th>Lower Bound (95%)</th>
+                    <th>Upper Bound (95%)</th>
+                  </tr>
+                </thead>
+                <tbody id="forecast-table-body"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Forecast Analysis Tools</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="d-grid gap-2">
+                <a
+                  href="{{ url_for('forecast_comparison') }}"
+                  class="btn btn-outline-primary"
+                >
+                  <i class="bi bi-bar-chart-line me-2"></i> Scenario Comparison
+                </a>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="d-grid gap-2">
+                <a
+                  href="{{ url_for('district_forecasting') }}"
+                  class="btn btn-outline-primary"
+                >
+                  <i class="bi bi-geo-alt me-2"></i> District Forecasting
+                </a>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="d-grid gap-2">
+                <a
+                  href="#"
+                  class="btn btn-outline-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#exportModal"
+                >
+                  <i class="bi bi-download me-2"></i> Export Forecast
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Export Modal -->
-<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exportModalLabel">Export Forecast</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Export the current forecast data in your preferred format:</p>
-                <div class="list-group mb-3">
-                    <button type="button" class="list-group-item list-group-item-action export-btn" data-format="excel">
-                        <i class="bi bi-file-earmark-excel me-2"></i> Excel Spreadsheet (.xlsx)
-                    </button>
-                    <button type="button" class="list-group-item list-group-item-action export-btn" data-format="csv">
-                        <i class="bi bi-file-earmark-text me-2"></i> CSV File (.csv)
-                    </button>
-                    <button type="button" class="list-group-item list-group-item-action export-btn" data-format="json">
-                        <i class="bi bi-file-earmark-code me-2"></i> JSON Data (.json)
-                    </button>
-                </div>
-                <div id="export-loading" class="text-center d-none">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p class="mt-2">Preparing export...</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+<div
+  class="modal fade"
+  id="exportModal"
+  tabindex="-1"
+  aria-labelledby="exportModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exportModalLabel">Export Forecast</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Export the current forecast data in your preferred format:</p>
+        <div class="list-group mb-3">
+          <button
+            type="button"
+            class="list-group-item list-group-item-action export-btn"
+            data-format="excel"
+          >
+            <i class="bi bi-file-earmark-excel me-2"></i> Excel Spreadsheet
+            (.xlsx)
+          </button>
+          <button
+            type="button"
+            class="list-group-item list-group-item-action export-btn"
+            data-format="csv"
+          >
+            <i class="bi bi-file-earmark-text me-2"></i> CSV File (.csv)
+          </button>
+          <button
+            type="button"
+            class="list-group-item list-group-item-action export-btn"
+            data-format="json"
+          >
+            <i class="bi bi-file-earmark-code me-2"></i> JSON Data (.json)
+          </button>
         </div>
+        <div id="export-loading" class="text-center d-none">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Preparing export...</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const forecastForm = document.getElementById('forecast-form');
-        const loadingElement = document.getElementById('loading');
-        const placeholderElement = document.getElementById('forecast-placeholder');
-        const errorElement = document.getElementById('forecast-error');
-        const errorMessageElement = document.getElementById('error-message');
-        const chartContainer = document.getElementById('forecast-chart-container');
-        const forecastTitle = document.getElementById('forecast-title');
-        const metricsContainer = document.getElementById('forecast-metrics');
-        const tableContainer = document.getElementById('forecast-table-container');
-        const tableBody = document.getElementById('forecast-table-body');
-        
-        // Store the current forecast data for export
-        let currentForecastData = null;
-        
-        forecastForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Show loading state
-            loadingElement.classList.remove('d-none');
-            placeholderElement.classList.add('d-none');
-            errorElement.classList.add('d-none');
-            chartContainer.classList.add('d-none');
-            metricsContainer.classList.add('d-none');
-            tableContainer.classList.add('d-none');
-            
-            // Get form data
-            const formData = new FormData(forecastForm);
-            
-            // Send request
-            fetch('/forecasting/generate', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(data => {
-                        throw new Error(data.error || 'Error generating forecast');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Store forecast data for export
-                currentForecastData = data;
-                
-                // Update title
-                forecastTitle.textContent = `Forecast for Tax Code ${data.tax_code}`;
-                
-                // Display chart
-                displayForecastChart(data);
-                
-                // Display metrics
-                displayMetrics(data.metrics);
-                
-                // Display forecast table
-                displayForecastTable(data.forecast);
-                
-                // Hide loading state
-                loadingElement.classList.add('d-none');
-            })
-            .catch(error => {
-                // Show error message
-                errorMessageElement.textContent = error.message;
-                errorElement.classList.remove('d-none');
-                
-                // Hide loading state
-                loadingElement.classList.add('d-none');
+  document.addEventListener("DOMContentLoaded", function () {
+    const forecastForm = document.getElementById("forecast-form");
+    const loadingElement = document.getElementById("loading");
+    const placeholderElement = document.getElementById("forecast-placeholder");
+    const errorElement = document.getElementById("forecast-error");
+    const errorMessageElement = document.getElementById("error-message");
+    const chartContainer = document.getElementById("forecast-chart-container");
+    const forecastTitle = document.getElementById("forecast-title");
+    const metricsContainer = document.getElementById("forecast-metrics");
+    const tableContainer = document.getElementById("forecast-table-container");
+    const tableBody = document.getElementById("forecast-table-body");
+
+    // Store the current forecast data for export
+    let currentForecastData = null;
+
+    forecastForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Show loading state
+      loadingElement.classList.remove("d-none");
+      placeholderElement.classList.add("d-none");
+      errorElement.classList.add("d-none");
+      chartContainer.classList.add("d-none");
+      metricsContainer.classList.add("d-none");
+      tableContainer.classList.add("d-none");
+
+      // Get form data
+      const formData = new FormData(forecastForm);
+
+      // Send request
+      fetch("/forecasting/generate", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((data) => {
+              throw new Error(data.error || "Error generating forecast");
             });
-        });
-        
-        function displayForecastChart(data) {
-            // Create chart data
-            const historical = {
-                x: data.historical_data.years,
-                y: data.historical_data.rates,
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Historical',
-                line: {
-                    color: 'blue',
-                    width: 2
-                },
-                marker: {
-                    size: 8
-                }
-            };
-            
-            const forecast = {
-                x: data.forecast.years,
-                y: data.forecast.predicted_rates,
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Forecast',
-                line: {
-                    color: 'red',
-                    width: 2,
-                    dash: 'dot'
-                },
-                marker: {
-                    size: 8
-                }
-            };
-            
-            // Add confidence intervals
-            const lowerBounds = data.forecast.confidence_intervals.map(ci => ci[0]);
-            const upperBounds = data.forecast.confidence_intervals.map(ci => ci[1]);
-            
-            const confInterval = {
-                x: data.forecast.years.concat(data.forecast.years.slice().reverse()),
-                y: upperBounds.concat(lowerBounds.slice().reverse()),
-                fill: 'toself',
-                fillcolor: 'rgba(255, 0, 0, 0.2)',
-                line: {
-                    color: 'transparent'
-                },
-                name: '95% Confidence Interval',
-                showlegend: true
-            };
-            
-            const layout = {
-                title: `Tax Rate Forecast for ${data.tax_code}`,
-                xaxis: {
-                    title: 'Year',
-                    tickmode: 'linear'
-                },
-                yaxis: {
-                    title: 'Levy Rate',
-                    tickformat: '.4f'
-                },
-                legend: {
-                    x: 0.01,
-                    y: 0.99,
-                    bgcolor: 'rgba(255, 255, 255, 0.5)'
-                },
-                margin: {
-                    l: 70,
-                    r: 30,
-                    b: 50,
-                    t: 60
-                }
-            };
-            
-            // Create chart
-            Plotly.newPlot('forecast-chart', [historical, forecast, confInterval], layout);
-            
-            // Show chart container
-            chartContainer.classList.remove('d-none');
-        }
-        
-        function displayMetrics(metrics) {
-            // Update metrics
-            document.getElementById('metric-rmse').textContent = metrics.rmse.toFixed(4);
-            document.getElementById('metric-mae').textContent = metrics.mae.toFixed(4);
-            document.getElementById('metric-r2').textContent = metrics.r_squared.toFixed(4);
-            document.getElementById('metric-mape').textContent = metrics.mape.toFixed(2) + '%';
-            
-            // Show metrics container
-            metricsContainer.classList.remove('d-none');
-        }
-        
-        function displayForecastTable(forecast) {
-            // Clear table body
-            tableBody.innerHTML = '';
-            
-            // Add rows for each forecast year
-            for (let i = 0; i < forecast.years.length; i++) {
-                const year = forecast.years[i];
-                const rate = forecast.predicted_rates[i];
-                const interval = forecast.confidence_intervals[i];
-                
-                const row = document.createElement('tr');
-                
-                const yearCell = document.createElement('td');
-                yearCell.textContent = year;
-                row.appendChild(yearCell);
-                
-                const rateCell = document.createElement('td');
-                rateCell.textContent = rate.toFixed(4);
-                row.appendChild(rateCell);
-                
-                const lowerCell = document.createElement('td');
-                lowerCell.textContent = interval[0].toFixed(4);
-                row.appendChild(lowerCell);
-                
-                const upperCell = document.createElement('td');
-                upperCell.textContent = interval[1].toFixed(4);
-                row.appendChild(upperCell);
-                
-                tableBody.appendChild(row);
-            }
-            
-            // Show table container
-            tableContainer.classList.remove('d-none');
-        }
-        
-        // Add export functionality
-        const exportButtons = document.querySelectorAll('.export-btn');
-        const exportLoading = document.getElementById('export-loading');
-        
-        exportButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const format = this.getAttribute('data-format');
-                
-                if (!currentForecastData) {
-                    alert('Please generate a forecast first');
-                    return;
-                }
-                
-                // Show loading
-                exportButtons.forEach(btn => btn.disabled = true);
-                exportLoading.classList.remove('d-none');
-                
-                // Prepare data for export
-                const exportData = {
-                    forecast: currentForecastData.forecast,
-                    historical_data: currentForecastData.historical_data,
-                    tax_code: currentForecastData.tax_code,
-                    metrics: currentForecastData.metrics
-                };
-                
-                // Convert to the selected format
-                let blob, filename;
-                
-                if (format === 'excel') {
-                    // For Excel, we would normally use a server-side route
-                    // For this demo, we'll create a JSON file instead
-                    blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
-                    filename = `forecast_${currentForecastData.tax_code}_${Date.now()}.json`;
-                    
-                    alert('Excel export would be handled server-side in a production environment');
-                } else if (format === 'csv') {
-                    // Create CSV content
-                    let csvContent = 'Year,Rate,Lower Bound,Upper Bound\n';
-                    
-                    // Add historical data
-                    for (let i = 0; i < currentForecastData.historical_data.years.length; i++) {
-                        csvContent += `${currentForecastData.historical_data.years[i]},${currentForecastData.historical_data.rates[i]},,,Historical\n`;
-                    }
-                    
-                    // Add forecast data
-                    for (let i = 0; i < currentForecastData.forecast.years.length; i++) {
-                        csvContent += `${currentForecastData.forecast.years[i]},${currentForecastData.forecast.predicted_rates[i]},${currentForecastData.forecast.confidence_intervals[i][0]},${currentForecastData.forecast.confidence_intervals[i][1]},Forecast\n`;
-                    }
-                    
-                    blob = new Blob([csvContent], {type: 'text/csv'});
-                    filename = `forecast_${currentForecastData.tax_code}_${Date.now()}.csv`;
-                } else if (format === 'json') {
-                    // Create JSON content
-                    blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
-                    filename = `forecast_${currentForecastData.tax_code}_${Date.now()}.json`;
-                }
-                
-                // Create download link
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                
-                // Clean up
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    exportButtons.forEach(btn => btn.disabled = false);
-                    exportLoading.classList.add('d-none');
-                }, 100);
-            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Store forecast data for export
+          currentForecastData = data;
+
+          // Update title
+          forecastTitle.textContent = `Forecast for Tax Code ${data.tax_code}`;
+
+          // Display chart
+          displayForecastChart(data);
+
+          // Display metrics
+          displayMetrics(data.metrics);
+
+          // Display forecast table
+          displayForecastTable(data.forecast);
+
+          // Hide loading state
+          loadingElement.classList.add("d-none");
+        })
+        .catch((error) => {
+          // Show error message
+          errorMessageElement.textContent = error.message;
+          errorElement.classList.remove("d-none");
+
+          // Hide loading state
+          loadingElement.classList.add("d-none");
         });
     });
+
+    function displayForecastChart(data) {
+      // Create chart data
+      const historical = {
+        x: data.historical_data.years,
+        y: data.historical_data.rates,
+        type: "scatter",
+        mode: "lines+markers",
+        name: "Historical",
+        line: {
+          color: "blue",
+          width: 2,
+        },
+        marker: {
+          size: 8,
+        },
+      };
+
+      const forecast = {
+        x: data.forecast.years,
+        y: data.forecast.predicted_rates,
+        type: "scatter",
+        mode: "lines+markers",
+        name: "Forecast",
+        line: {
+          color: "red",
+          width: 2,
+          dash: "dot",
+        },
+        marker: {
+          size: 8,
+        },
+      };
+
+      // Add confidence intervals
+      const lowerBounds = data.forecast.confidence_intervals.map((ci) => ci[0]);
+      const upperBounds = data.forecast.confidence_intervals.map((ci) => ci[1]);
+
+      const confInterval = {
+        x: data.forecast.years.concat(data.forecast.years.slice().reverse()),
+        y: upperBounds.concat(lowerBounds.slice().reverse()),
+        fill: "toself",
+        fillcolor: "rgba(255, 0, 0, 0.2)",
+        line: {
+          color: "transparent",
+        },
+        name: "95% Confidence Interval",
+        showlegend: true,
+      };
+
+      const layout = {
+        title: `Tax Rate Forecast for ${data.tax_code}`,
+        xaxis: {
+          title: "Year",
+          tickmode: "linear",
+        },
+        yaxis: {
+          title: "Levy Rate",
+          tickformat: ".4f",
+        },
+        legend: {
+          x: 0.01,
+          y: 0.99,
+          bgcolor: "rgba(255, 255, 255, 0.5)",
+        },
+        margin: {
+          l: 70,
+          r: 30,
+          b: 50,
+          t: 60,
+        },
+      };
+
+      // Create chart
+      Plotly.newPlot(
+        "forecast-chart",
+        [historical, forecast, confInterval],
+        layout,
+      );
+
+      // Show chart container
+      chartContainer.classList.remove("d-none");
+    }
+
+    function displayMetrics(metrics) {
+      // Update metrics
+      document.getElementById("metric-rmse").textContent =
+        metrics.rmse.toFixed(4);
+      document.getElementById("metric-mae").textContent =
+        metrics.mae.toFixed(4);
+      document.getElementById("metric-r2").textContent =
+        metrics.r_squared.toFixed(4);
+      document.getElementById("metric-mape").textContent =
+        metrics.mape.toFixed(2) + "%";
+
+      // Show metrics container
+      metricsContainer.classList.remove("d-none");
+    }
+
+    function displayForecastTable(forecast) {
+      // Clear table body
+      tableBody.innerHTML = "";
+
+      // Add rows for each forecast year
+      for (let i = 0; i < forecast.years.length; i++) {
+        const year = forecast.years[i];
+        const rate = forecast.predicted_rates[i];
+        const interval = forecast.confidence_intervals[i];
+
+        const row = document.createElement("tr");
+
+        const yearCell = document.createElement("td");
+        yearCell.textContent = year;
+        row.appendChild(yearCell);
+
+        const rateCell = document.createElement("td");
+        rateCell.textContent = rate.toFixed(4);
+        row.appendChild(rateCell);
+
+        const lowerCell = document.createElement("td");
+        lowerCell.textContent = interval[0].toFixed(4);
+        row.appendChild(lowerCell);
+
+        const upperCell = document.createElement("td");
+        upperCell.textContent = interval[1].toFixed(4);
+        row.appendChild(upperCell);
+
+        tableBody.appendChild(row);
+      }
+
+      // Show table container
+      tableContainer.classList.remove("d-none");
+    }
+
+    // Add export functionality
+    const exportButtons = document.querySelectorAll(".export-btn");
+    const exportLoading = document.getElementById("export-loading");
+
+    exportButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const format = this.getAttribute("data-format");
+
+        if (!currentForecastData) {
+          alert("Please generate a forecast first");
+          return;
+        }
+
+        // Show loading
+        exportButtons.forEach((btn) => (btn.disabled = true));
+        exportLoading.classList.remove("d-none");
+
+        // Prepare data for export
+        const exportData = {
+          forecast: currentForecastData.forecast,
+          historical_data: currentForecastData.historical_data,
+          tax_code: currentForecastData.tax_code,
+          metrics: currentForecastData.metrics,
+        };
+
+        // Convert to the selected format
+        let blob, filename;
+
+        if (format === "excel") {
+          // For Excel, we would normally use a server-side route
+          // For this demo, we'll create a JSON file instead
+          blob = new Blob([JSON.stringify(exportData, null, 2)], {
+            type: "application/json",
+          });
+          filename = `forecast_${currentForecastData.tax_code}_${Date.now()}.json`;
+
+          alert(
+            "Excel export would be handled server-side in a production environment",
+          );
+        } else if (format === "csv") {
+          // Create CSV content
+          let csvContent = "Year,Rate,Lower Bound,Upper Bound\n";
+
+          // Add historical data
+          for (
+            let i = 0;
+            i < currentForecastData.historical_data.years.length;
+            i++
+          ) {
+            csvContent += `${currentForecastData.historical_data.years[i]},${currentForecastData.historical_data.rates[i]},,,Historical\n`;
+          }
+
+          // Add forecast data
+          for (let i = 0; i < currentForecastData.forecast.years.length; i++) {
+            csvContent += `${currentForecastData.forecast.years[i]},${currentForecastData.forecast.predicted_rates[i]},${currentForecastData.forecast.confidence_intervals[i][0]},${currentForecastData.forecast.confidence_intervals[i][1]},Forecast\n`;
+          }
+
+          blob = new Blob([csvContent], { type: "text/csv" });
+          filename = `forecast_${currentForecastData.tax_code}_${Date.now()}.csv`;
+        } else if (format === "json") {
+          // Create JSON content
+          blob = new Blob([JSON.stringify(exportData, null, 2)], {
+            type: "application/json",
+          });
+          filename = `forecast_${currentForecastData.tax_code}_${Date.now()}.json`;
+        }
+
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Clean up
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          exportButtons.forEach((btn) => (btn.disabled = false));
+          exportLoading.classList.add("d-none");
+        }, 100);
+      });
+    });
+  });
 </script>
 {% endblock %}

@@ -1,214 +1,276 @@
-{% extends "base.html" %}
-
-{% block title %}Form Micro-Interactions Demo{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Form Micro-Interactions Demo{%
+endblock %} {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-gradient text-white">
-            <h2 class="h4 mb-0">Form Micro-Interactions Demo</h2>
-        </div>
-        <div class="card-body">
-            <div class="row mb-4">
-                <div class="col-md-8 mx-auto">
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle-fill me-2"></i>
-                        This page demonstrates the micro-interactions implemented across form elements in the application.
-                        Try interacting with the form elements below to see the animations and feedback effects.
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card mb-4 h-100 border-primary-light">
-                        <div class="card-header district-header text-white">
-                            <h3 class="h5 mb-0">Text and Selection Inputs</h3>
-                        </div>
-                        <div class="card-body">
-                            <form id="demo-form-1">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Full Name</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="district-type" class="form-label">District Type</label>
-                                    <select class="form-select" id="district-type" name="district_type" required>
-                                        <option value="">Select a district type</option>
-                                        <option value="school">School District</option>
-                                        <option value="fire">Fire District</option>
-                                        <option value="city">City</option>
-                                        <option value="county">County</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="notes" class="form-label">Notes</label>
-                                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-check-circle me-1"></i> Submit Form
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="card mb-4 h-100 border-success-light">
-                        <div class="card-header levy-header text-white">
-                            <h3 class="h5 mb-0">Files and Advanced Inputs</h3>
-                        </div>
-                        <div class="card-body">
-                            <form id="demo-form-2">
-                                <div class="mb-3">
-                                    <label for="file-upload" class="form-label">File Upload</label>
-                                    <input type="file" class="form-control" id="file-upload" name="file">
-                                    <div class="form-text">
-                                        Try selecting a file to see the animated feedback.
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label for="range-slider" class="form-label">Levy Rate (%)</label>
-                                    <input type="range" class="form-range" id="range-slider" name="levy_rate" min="0" max="5" step="0.1" value="1.5">
-                                    <div class="text-center">
-                                        <span id="range-value">1.5%</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">District Status</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="status" id="status-active" value="active" checked>
-                                        <label class="form-check-label" for="status-active">Active</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="status" id="status-inactive" value="inactive">
-                                        <label class="form-check-label" for="status-inactive">Inactive</label>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="agree-terms" name="agree_terms" required>
-                                        <label class="form-check-label" for="agree-terms">
-                                            I agree to the terms and conditions
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="d-flex justify-content-between">
-                                    <button type="reset" class="btn btn-outline-secondary">
-                                        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
-                                    </button>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-upload me-1"></i> Submit
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <div class="card border-info-light">
-                        <div class="card-header bg-gradient-info text-white">
-                            <h3 class="h5 mb-0">Interaction Features</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <h5 class="h6">Input Field Animations</h5>
-                                    <ul class="small">
-                                        <li>Subtle focus animations with label transitions</li>
-                                        <li>Validation indicators showing valid/invalid state</li>
-                                        <li>Error messages appear on validation failures</li>
-                                        <li>Label stays animated when field has content</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <h5 class="h6">Button Interactions</h5>
-                                    <ul class="small">
-                                        <li>Ripple effect on button clicks</li>
-                                        <li>Subtle press effect for tactile feedback</li>
-                                        <li>Hover animations with color transitions</li>
-                                        <li>Focus states for keyboard navigation</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <h5 class="h6">Selection Controls</h5>
-                                    <ul class="small">
-                                        <li>Animated dropdown arrows for select inputs</li>
-                                        <li>Enhanced file input with filename display</li>
-                                        <li>Checkbox/radio animations on state change</li>
-                                        <li>Range slider with value feedback</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-gradient text-white">
+      <h2 class="h4 mb-0">Form Micro-Interactions Demo</h2>
     </div>
-</div>
-{% endblock %}
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            This page demonstrates the micro-interactions implemented across
+            form elements in the application. Try interacting with the form
+            elements below to see the animations and feedback effects.
+          </div>
+        </div>
+      </div>
 
-{% block extra_js %}
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card mb-4 h-100 border-primary-light">
+            <div class="card-header district-header text-white">
+              <h3 class="h5 mb-0">Text and Selection Inputs</h3>
+            </div>
+            <div class="card-body">
+              <form id="demo-form-1">
+                <div class="mb-3">
+                  <label for="name" class="form-label">Full Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    required
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email Address</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    required
+                  />
+                </div>
+
+                <div class="mb-3">
+                  <label for="district-type" class="form-label"
+                    >District Type</label
+                  >
+                  <select
+                    class="form-select"
+                    id="district-type"
+                    name="district_type"
+                    required
+                  >
+                    <option value="">Select a district type</option>
+                    <option value="school">School District</option>
+                    <option value="fire">Fire District</option>
+                    <option value="city">City</option>
+                    <option value="county">County</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="notes" class="form-label">Notes</label>
+                  <textarea
+                    class="form-control"
+                    id="notes"
+                    name="notes"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-check-circle me-1"></i> Submit Form
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card mb-4 h-100 border-success-light">
+            <div class="card-header levy-header text-white">
+              <h3 class="h5 mb-0">Files and Advanced Inputs</h3>
+            </div>
+            <div class="card-body">
+              <form id="demo-form-2">
+                <div class="mb-3">
+                  <label for="file-upload" class="form-label"
+                    >File Upload</label
+                  >
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="file-upload"
+                    name="file"
+                  />
+                  <div class="form-text">
+                    Try selecting a file to see the animated feedback.
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="range-slider" class="form-label"
+                    >Levy Rate (%)</label
+                  >
+                  <input
+                    type="range"
+                    class="form-range"
+                    id="range-slider"
+                    name="levy_rate"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    value="1.5"
+                  />
+                  <div class="text-center">
+                    <span id="range-value">1.5%</span>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">District Status</label>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="status"
+                      id="status-active"
+                      value="active"
+                      checked
+                    />
+                    <label class="form-check-label" for="status-active"
+                      >Active</label
+                    >
+                  </div>
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="status"
+                      id="status-inactive"
+                      value="inactive"
+                    />
+                    <label class="form-check-label" for="status-inactive"
+                      >Inactive</label
+                    >
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="agree-terms"
+                      name="agree_terms"
+                      required
+                    />
+                    <label class="form-check-label" for="agree-terms">
+                      I agree to the terms and conditions
+                    </label>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <button type="reset" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                  </button>
+                  <button type="submit" class="btn btn-success">
+                    <i class="bi bi-upload me-1"></i> Submit
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <div class="card border-info-light">
+            <div class="card-header bg-gradient-info text-white">
+              <h3 class="h5 mb-0">Interaction Features</h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <h5 class="h6">Input Field Animations</h5>
+                  <ul class="small">
+                    <li>Subtle focus animations with label transitions</li>
+                    <li>Validation indicators showing valid/invalid state</li>
+                    <li>Error messages appear on validation failures</li>
+                    <li>Label stays animated when field has content</li>
+                  </ul>
+                </div>
+
+                <div class="col-md-4">
+                  <h5 class="h6">Button Interactions</h5>
+                  <ul class="small">
+                    <li>Ripple effect on button clicks</li>
+                    <li>Subtle press effect for tactile feedback</li>
+                    <li>Hover animations with color transitions</li>
+                    <li>Focus states for keyboard navigation</li>
+                  </ul>
+                </div>
+
+                <div class="col-md-4">
+                  <h5 class="h6">Selection Controls</h5>
+                  <ul class="small">
+                    <li>Animated dropdown arrows for select inputs</li>
+                    <li>Enhanced file input with filename display</li>
+                    <li>Checkbox/radio animations on state change</li>
+                    <li>Range slider with value feedback</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
 <script>
-    // Range slider value display
-    document.addEventListener('DOMContentLoaded', function() {
-        const rangeSlider = document.getElementById('range-slider');
-        const rangeValue = document.getElementById('range-value');
-        
-        if (rangeSlider && rangeValue) {
-            rangeSlider.addEventListener('input', function() {
-                rangeValue.textContent = `${this.value}%`;
-            });
-        }
-        
-        // Prevent form submission for demo
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Show success message
-                const alert = document.createElement('div');
-                alert.className = 'alert alert-success mt-3';
-                alert.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Form submitted successfully! (This is just a demo, no data was sent.)';
-                
-                // Remove any existing alerts
-                this.querySelectorAll('.alert').forEach(a => a.remove());
-                
-                // Add the alert
-                this.appendChild(alert);
-                
-                // Animate the alert
-                setTimeout(() => {
-                    alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    alert.style.opacity = '0';
-                    alert.style.transform = 'translateY(-10px)';
-                    
-                    // Remove after animation
-                    setTimeout(() => {
-                        alert.remove();
-                    }, 500);
-                }, 3000);
-            });
-        });
+  // Range slider value display
+  document.addEventListener("DOMContentLoaded", function () {
+    const rangeSlider = document.getElementById("range-slider");
+    const rangeValue = document.getElementById("range-value");
+
+    if (rangeSlider && rangeValue) {
+      rangeSlider.addEventListener("input", function () {
+        rangeValue.textContent = `${this.value}%`;
+      });
+    }
+
+    // Prevent form submission for demo
+    document.querySelectorAll("form").forEach((form) => {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        // Show success message
+        const alert = document.createElement("div");
+        alert.className = "alert alert-success mt-3";
+        alert.innerHTML =
+          '<i class="bi bi-check-circle-fill me-2"></i> Form submitted successfully! (This is just a demo, no data was sent.)';
+
+        // Remove any existing alerts
+        this.querySelectorAll(".alert").forEach((a) => a.remove());
+
+        // Add the alert
+        this.appendChild(alert);
+
+        // Animate the alert
+        setTimeout(() => {
+          alert.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+          alert.style.opacity = "0";
+          alert.style.transform = "translateY(-10px)";
+
+          // Remove after animation
+          setTimeout(() => {
+            alert.remove();
+          }, 500);
+        }, 3000);
+      });
     });
+  });
 </script>
 {% endblock %}

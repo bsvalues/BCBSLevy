@@ -1,537 +1,615 @@
-{% extends "base.html" %}
-
-{% block title %}Tax Strategy Decision Tree{% endblock %}
-
-{% block styles %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}Tax Strategy Decision Tree{% endblock
+%} {% block styles %} {{ super() }}
 <style>
-    .decision-tree-container {
-        margin: 20px 0;
-        position: relative;
-        overflow: auto;
-        min-height: 600px;
-    }
-    
-    #decision-tree-viz {
-        width: 100%;
-        height: 600px;
-    }
-    
-    .node {
-        cursor: pointer;
-    }
-    
-    .node circle {
-        fill: #fff;
-        stroke: #4e73df;
-        stroke-width: 2px;
-    }
-    
-    .node text {
-        font: 12px sans-serif;
-    }
-    
-    .link {
-        fill: none;
-        stroke: #ccc;
-        stroke-width: 1.5px;
-    }
-    
-    .node--internal circle {
-        fill: #4e73df;
-    }
-    
-    .node--leaf circle {
-        fill: #1cc88a;
-    }
-    
-    .decision-info-panel {
-        background-color: #f8f9fc;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-    
-    .node-detail-card {
-        background-color: #fff;
-        border-left: 4px solid #4e73df;
-        border-radius: 4px;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        padding: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .node-detail-card.strategy {
-        border-left-color: #1cc88a;
-    }
-    
-    .current-path {
-        display: flex;
-        flex-wrap: wrap;
-        padding: 0;
-        margin-bottom: 20px;
-    }
-    
-    .path-node {
-        background-color: #e3e6f0;
-        border-radius: 30px;
-        padding: 8px 15px;
-        margin-right: 10px;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .path-node:after {
-        content: '\f054';
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        margin-left: 10px;
-        color: #4e73df;
-    }
-    
-    .path-node:last-child:after {
-        content: none;
-    }
-    
-    .strategy-btn {
-        margin-top: 15px;
-    }
-    
-    #node-details {
-        min-height: 200px;
-    }
-    
-    .zoom-controls {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        background: rgba(255, 255, 255, 0.8);
-        border-radius: 4px;
-        padding: 5px;
-        z-index: 100;
-    }
-    
-    .zoom-controls button {
-        margin: 2px;
-    }
+  .decision-tree-container {
+    margin: 20px 0;
+    position: relative;
+    overflow: auto;
+    min-height: 600px;
+  }
+
+  #decision-tree-viz {
+    width: 100%;
+    height: 600px;
+  }
+
+  .node {
+    cursor: pointer;
+  }
+
+  .node circle {
+    fill: #fff;
+    stroke: #4e73df;
+    stroke-width: 2px;
+  }
+
+  .node text {
+    font: 12px sans-serif;
+  }
+
+  .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+
+  .node--internal circle {
+    fill: #4e73df;
+  }
+
+  .node--leaf circle {
+    fill: #1cc88a;
+  }
+
+  .decision-info-panel {
+    background-color: #f8f9fc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  }
+
+  .node-detail-card {
+    background-color: #fff;
+    border-left: 4px solid #4e73df;
+    border-radius: 4px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .node-detail-card.strategy {
+    border-left-color: #1cc88a;
+  }
+
+  .current-path {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+
+  .path-node {
+    background-color: #e3e6f0;
+    border-radius: 30px;
+    padding: 8px 15px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .path-node:after {
+    content: "\f054";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-left: 10px;
+    color: #4e73df;
+  }
+
+  .path-node:last-child:after {
+    content: none;
+  }
+
+  .strategy-btn {
+    margin-top: 15px;
+  }
+
+  #node-details {
+    min-height: 200px;
+  }
+
+  .zoom-controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 4px;
+    padding: 5px;
+    z-index: 100;
+  }
+
+  .zoom-controls button {
+    margin: 2px;
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Tax Strategy Decision Tree</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active">Tax Strategy</li>
-    </ol>
-    
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-sitemap me-1"></i>
-                    Interactive Decision Tree
-                </div>
-                <div class="card-body">
-                    <div class="decision-info-panel">
-                        <h5>How to Use This Tool</h5>
-                        <p>Explore different tax strategy options by clicking on nodes in the decision tree. Each path represents a different approach that may apply to your property tax situation.</p>
-                        <p><strong>Click nodes</strong> to expand or collapse branches. <strong>Hover over nodes</strong> to see details about each option.</p>
-                    </div>
-                    
-                    <div class="decision-tree-container">
-                        <div id="decision-tree-viz"></div>
-                        <div class="zoom-controls">
-                            <button class="btn btn-sm btn-outline-primary" id="zoom-in"><i class="fas fa-search-plus"></i></button>
-                            <button class="btn btn-sm btn-outline-primary" id="zoom-out"><i class="fas fa-search-minus"></i></button>
-                            <button class="btn btn-sm btn-outline-primary" id="reset-zoom"><i class="fas fa-undo"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-info-circle me-1"></i>
-                    Strategy Details
-                </div>
-                <div class="card-body">
-                    <div id="node-details">
-                        <h5>Select a node to view details</h5>
-                        <p>Click on any node in the decision tree to see detailed information about that tax strategy option.</p>
-                    </div>
-                    
-                    <hr>
-                    
-                    <h5>Current Path</h5>
-                    <div class="current-path" id="current-path">
-                        <div class="path-node">Select Tax Strategy Goal</div>
-                    </div>
-                    
-                    <form id="strategy-form" action="{{ url_for('tax_strategy.get_recommendation') }}" method="post">
-                        <input type="hidden" id="selected-path" name="path" value="root">
-                        <button type="submit" class="btn btn-primary strategy-btn" id="analyze-btn" disabled>
-                            <i class="fas fa-chart-line me-1"></i> Get Detailed Recommendation
-                        </button>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-lightbulb me-1"></i>
-                    Quick Tips
-                </div>
-                <div class="card-body">
-                    <ul class="fa-ul">
-                        <li><span class="fa-li"><i class="fas fa-check-circle text-success"></i></span>Check application deadlines for all exemptions</li>
-                        <li><span class="fa-li"><i class="fas fa-check-circle text-success"></i></span>Keep documentation of all submitted materials</li>
-                        <li><span class="fa-li"><i class="fas fa-check-circle text-success"></i></span>Review your property assessment annually</li>
-                        <li><span class="fa-li"><i class="fas fa-check-circle text-success"></i></span>Consider long-term planning for significant property changes</li>
-                        <li><span class="fa-li"><i class="fas fa-check-circle text-success"></i></span>Consult with a property tax professional for complex situations</li>
-                    </ul>
-                    
-                    <div class="text-center mt-3">
-                        <a href="{{ url_for('tax_strategy.strategy_analysis') }}" class="btn btn-success btn-sm">
-                            <i class="fas fa-search me-1"></i> Common Strategy Paths
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  <h1 class="mt-4">Tax Strategy Decision Tree</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item active">Tax Strategy</li>
+  </ol>
 
-{% block scripts %}
-{{ super() }}
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-sitemap me-1"></i>
+          Interactive Decision Tree
+        </div>
+        <div class="card-body">
+          <div class="decision-info-panel">
+            <h5>How to Use This Tool</h5>
+            <p>
+              Explore different tax strategy options by clicking on nodes in the
+              decision tree. Each path represents a different approach that may
+              apply to your property tax situation.
+            </p>
+            <p>
+              <strong>Click nodes</strong> to expand or collapse branches.
+              <strong>Hover over nodes</strong> to see details about each
+              option.
+            </p>
+          </div>
+
+          <div class="decision-tree-container">
+            <div id="decision-tree-viz"></div>
+            <div class="zoom-controls">
+              <button class="btn btn-sm btn-outline-primary" id="zoom-in">
+                <i class="fas fa-search-plus"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-primary" id="zoom-out">
+                <i class="fas fa-search-minus"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-primary" id="reset-zoom">
+                <i class="fas fa-undo"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-info-circle me-1"></i>
+          Strategy Details
+        </div>
+        <div class="card-body">
+          <div id="node-details">
+            <h5>Select a node to view details</h5>
+            <p>
+              Click on any node in the decision tree to see detailed information
+              about that tax strategy option.
+            </p>
+          </div>
+
+          <hr />
+
+          <h5>Current Path</h5>
+          <div class="current-path" id="current-path">
+            <div class="path-node">Select Tax Strategy Goal</div>
+          </div>
+
+          <form
+            id="strategy-form"
+            action="{{ url_for('tax_strategy.get_recommendation') }}"
+            method="post"
+          >
+            <input type="hidden" id="selected-path" name="path" value="root" />
+            <button
+              type="submit"
+              class="btn btn-primary strategy-btn"
+              id="analyze-btn"
+              disabled
+            >
+              <i class="fas fa-chart-line me-1"></i> Get Detailed Recommendation
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-lightbulb me-1"></i>
+          Quick Tips
+        </div>
+        <div class="card-body">
+          <ul class="fa-ul">
+            <li>
+              <span class="fa-li"
+                ><i class="fas fa-check-circle text-success"></i></span
+              >Check application deadlines for all exemptions
+            </li>
+            <li>
+              <span class="fa-li"
+                ><i class="fas fa-check-circle text-success"></i></span
+              >Keep documentation of all submitted materials
+            </li>
+            <li>
+              <span class="fa-li"
+                ><i class="fas fa-check-circle text-success"></i></span
+              >Review your property assessment annually
+            </li>
+            <li>
+              <span class="fa-li"
+                ><i class="fas fa-check-circle text-success"></i></span
+              >Consider long-term planning for significant property changes
+            </li>
+            <li>
+              <span class="fa-li"
+                ><i class="fas fa-check-circle text-success"></i></span
+              >Consult with a property tax professional for complex situations
+            </li>
+          </ul>
+
+          <div class="text-center mt-3">
+            <a
+              href="{{ url_for('tax_strategy.strategy_analysis') }}"
+              class="btn btn-success btn-sm"
+            >
+              <i class="fas fa-search me-1"></i> Common Strategy Paths
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %} {{ super() }}
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Fetch the decision tree data
-        fetch('{{ url_for("tax_strategy.api_decision_tree") }}')
-            .then(response => response.json())
-            .then(data => {
-                // Initialize visualization
-                initializeDecisionTree(data);
-            })
-            .catch(error => {
-                console.error('Error loading decision tree data:', error);
-                document.getElementById('decision-tree-viz').innerHTML = 
-                    '<div class="alert alert-danger">Error loading decision tree data. Please try again later.</div>';
-            });
-        
-        // Initialize variables to track the current state
-        let currentPath = ['root'];
-        let selectedNodeId = 'root';
-        let treeData = null;
-        
-        // Function to initialize and render the decision tree
-        function initializeDecisionTree(data) {
-            treeData = data;
-            
-            // Set up SVG dimensions
-            const margin = {top: 20, right: 120, bottom: 20, left: 120};
-            const width = 960 - margin.right - margin.left;
-            const height = 600 - margin.top - margin.bottom;
-            
-            // Set up zoom behavior
-            const zoom = d3.zoom()
-                .scaleExtent([0.5, 2])
-                .on('zoom', (event) => {
-                    svg.attr('transform', event.transform);
-                });
-            
-            // Clear existing SVG if any
-            d3.select('#decision-tree-viz').html('');
-            
-            // Create SVG container
-            const container = d3.select('#decision-tree-viz')
-                .append('svg')
-                .attr('width', '100%')
-                .attr('height', height + margin.top + margin.bottom)
-                .call(zoom)
-                .append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-            
-            // Store the SVG group for zooming
-            const svg = container;
-            
-            // Create the tree layout
-            const treeLayout = d3.tree().size([height, width]);
-            
-            // Create the root node
-            const root = d3.hierarchy(data);
-            
-            // Compute the tree layout
-            treeLayout(root);
-            
-            // Setup zoom control buttons
-            document.getElementById('zoom-in').addEventListener('click', () => {
-                zoom.scaleBy(d3.select('#decision-tree-viz svg'), 1.2);
-            });
-            
-            document.getElementById('zoom-out').addEventListener('click', () => {
-                zoom.scaleBy(d3.select('#decision-tree-viz svg'), 0.8);
-            });
-            
-            document.getElementById('reset-zoom').addEventListener('click', () => {
-                d3.select('#decision-tree-viz svg')
-                    .transition()
-                    .duration(750)
-                    .call(zoom.transform, d3.zoomIdentity.translate(margin.left, margin.top));
-            });
-            
-            // Add links between nodes
-            svg.selectAll('.link')
-                .data(root.links())
-                .enter()
-                .append('path')
-                .attr('class', 'link')
-                .attr('d', d3.linkHorizontal()
-                    .x(d => d.y)
-                    .y(d => d.x));
-            
-            // Create nodes
-            const nodes = svg.selectAll('.node')
-                .data(root.descendants())
-                .enter()
-                .append('g')
-                .attr('class', d => {
-                    return 'node ' + 
-                        (d.children ? 'node--internal' : 'node--leaf') + 
-                        (d.data.id === selectedNodeId ? ' selected' : '');
-                })
-                .attr('transform', d => `translate(${d.y},${d.x})`)
-                .on('click', (event, d) => handleNodeClick(d))
-                .on('mouseover', (event, d) => showNodeDetails(d));
-            
-            // Add circles to nodes
-            nodes.append('circle')
-                .attr('r', 8);
-            
-            // Add labels to nodes
-            nodes.append('text')
-                .attr('dy', '.31em')
-                .attr('x', d => d.children ? -10 : 10)
-                .attr('text-anchor', d => d.children ? 'end' : 'start')
-                .text(d => d.data.name)
-                .style('fill', '#333')
-                .style('font-weight', d => d.data.id === selectedNodeId ? 'bold' : 'normal');
-            
-            // Handle node click
-            function handleNodeClick(d) {
-                // Toggle children visibility (expand/collapse)
-                if (d.children) {
-                    d._children = d.children;
-                    d.children = null;
-                } else if (d._children) {
-                    d.children = d._children;
-                    d._children = null;
-                }
-                
-                // Update the current path
-                updatePath(d);
-                
-                // Update selected node
-                selectedNodeId = d.data.id;
-                
-                // Redraw the tree
-                updateTreeVisualization();
+  document.addEventListener("DOMContentLoaded", function () {
+    // Fetch the decision tree data
+    fetch('{{ url_for("tax_strategy.api_decision_tree") }}')
+      .then((response) => response.json())
+      .then((data) => {
+        // Initialize visualization
+        initializeDecisionTree(data);
+      })
+      .catch((error) => {
+        console.error("Error loading decision tree data:", error);
+        document.getElementById("decision-tree-viz").innerHTML =
+          '<div class="alert alert-danger">Error loading decision tree data. Please try again later.</div>';
+      });
+
+    // Initialize variables to track the current state
+    let currentPath = ["root"];
+    let selectedNodeId = "root";
+    let treeData = null;
+
+    // Function to initialize and render the decision tree
+    function initializeDecisionTree(data) {
+      treeData = data;
+
+      // Set up SVG dimensions
+      const margin = { top: 20, right: 120, bottom: 20, left: 120 };
+      const width = 960 - margin.right - margin.left;
+      const height = 600 - margin.top - margin.bottom;
+
+      // Set up zoom behavior
+      const zoom = d3
+        .zoom()
+        .scaleExtent([0.5, 2])
+        .on("zoom", (event) => {
+          svg.attr("transform", event.transform);
+        });
+
+      // Clear existing SVG if any
+      d3.select("#decision-tree-viz").html("");
+
+      // Create SVG container
+      const container = d3
+        .select("#decision-tree-viz")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", height + margin.top + margin.bottom)
+        .call(zoom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      // Store the SVG group for zooming
+      const svg = container;
+
+      // Create the tree layout
+      const treeLayout = d3.tree().size([height, width]);
+
+      // Create the root node
+      const root = d3.hierarchy(data);
+
+      // Compute the tree layout
+      treeLayout(root);
+
+      // Setup zoom control buttons
+      document.getElementById("zoom-in").addEventListener("click", () => {
+        zoom.scaleBy(d3.select("#decision-tree-viz svg"), 1.2);
+      });
+
+      document.getElementById("zoom-out").addEventListener("click", () => {
+        zoom.scaleBy(d3.select("#decision-tree-viz svg"), 0.8);
+      });
+
+      document.getElementById("reset-zoom").addEventListener("click", () => {
+        d3.select("#decision-tree-viz svg")
+          .transition()
+          .duration(750)
+          .call(
+            zoom.transform,
+            d3.zoomIdentity.translate(margin.left, margin.top),
+          );
+      });
+
+      // Add links between nodes
+      svg
+        .selectAll(".link")
+        .data(root.links())
+        .enter()
+        .append("path")
+        .attr("class", "link")
+        .attr(
+          "d",
+          d3
+            .linkHorizontal()
+            .x((d) => d.y)
+            .y((d) => d.x),
+        );
+
+      // Create nodes
+      const nodes = svg
+        .selectAll(".node")
+        .data(root.descendants())
+        .enter()
+        .append("g")
+        .attr("class", (d) => {
+          return (
+            "node " +
+            (d.children ? "node--internal" : "node--leaf") +
+            (d.data.id === selectedNodeId ? " selected" : "")
+          );
+        })
+        .attr("transform", (d) => `translate(${d.y},${d.x})`)
+        .on("click", (event, d) => handleNodeClick(d))
+        .on("mouseover", (event, d) => showNodeDetails(d));
+
+      // Add circles to nodes
+      nodes.append("circle").attr("r", 8);
+
+      // Add labels to nodes
+      nodes
+        .append("text")
+        .attr("dy", ".31em")
+        .attr("x", (d) => (d.children ? -10 : 10))
+        .attr("text-anchor", (d) => (d.children ? "end" : "start"))
+        .text((d) => d.data.name)
+        .style("fill", "#333")
+        .style("font-weight", (d) =>
+          d.data.id === selectedNodeId ? "bold" : "normal",
+        );
+
+      // Handle node click
+      function handleNodeClick(d) {
+        // Toggle children visibility (expand/collapse)
+        if (d.children) {
+          d._children = d.children;
+          d.children = null;
+        } else if (d._children) {
+          d.children = d._children;
+          d._children = null;
+        }
+
+        // Update the current path
+        updatePath(d);
+
+        // Update selected node
+        selectedNodeId = d.data.id;
+
+        // Redraw the tree
+        updateTreeVisualization();
+      }
+
+      // Function to update the path when a node is clicked
+      function updatePath(d) {
+        // Build the path by traversing up to the root
+        const nodePath = getPathToRoot(d);
+
+        // Update the UI to show the current path
+        updatePathUI(nodePath);
+
+        // Enable or disable the analyze button based on whether we're at a leaf node
+        document.getElementById("analyze-btn").disabled = !d.data.leaf;
+      }
+
+      // Get path from node to root
+      function getPathToRoot(d) {
+        const path = [];
+        let current = d;
+
+        // Add current node and traverse up to root
+        while (current) {
+          path.unshift(current.data.id);
+          current = current.parent;
+        }
+
+        return path;
+      }
+
+      // Update the path UI
+      function updatePathUI(path) {
+        // Update the hidden form field
+        document.getElementById("selected-path").value = path.join(",");
+
+        // Update the current path display
+        const pathContainer = document.getElementById("current-path");
+        pathContainer.innerHTML = "";
+
+        // Add nodes to the path display
+        let currentNode = treeData;
+        path.forEach((nodeId, index) => {
+          // For the root node
+          if (nodeId === "root") {
+            const pathNode = document.createElement("div");
+            pathNode.className = "path-node";
+            pathNode.textContent = currentNode.name;
+            pathContainer.appendChild(pathNode);
+            return;
+          }
+
+          // Find the current node in the tree
+          if (currentNode.children) {
+            for (const child of currentNode.children) {
+              if (child.id === nodeId) {
+                currentNode = child;
+
+                // Add node to path display
+                const pathNode = document.createElement("div");
+                pathNode.className = "path-node";
+                pathNode.textContent = child.name;
+                pathContainer.appendChild(pathNode);
+
+                break;
+              }
             }
-            
-            // Function to update the path when a node is clicked
-            function updatePath(d) {
-                // Build the path by traversing up to the root
-                const nodePath = getPathToRoot(d);
-                
-                // Update the UI to show the current path
-                updatePathUI(nodePath);
-                
-                // Enable or disable the analyze button based on whether we're at a leaf node
-                document.getElementById('analyze-btn').disabled = !d.data.leaf;
-            }
-            
-            // Get path from node to root
-            function getPathToRoot(d) {
-                const path = [];
-                let current = d;
-                
-                // Add current node and traverse up to root
-                while (current) {
-                    path.unshift(current.data.id);
-                    current = current.parent;
-                }
-                
-                return path;
-            }
-            
-            // Update the path UI
-            function updatePathUI(path) {
-                // Update the hidden form field
-                document.getElementById('selected-path').value = path.join(',');
-                
-                // Update the current path display
-                const pathContainer = document.getElementById('current-path');
-                pathContainer.innerHTML = '';
-                
-                // Add nodes to the path display
-                let currentNode = treeData;
-                path.forEach((nodeId, index) => {
-                    // For the root node
-                    if (nodeId === 'root') {
-                        const pathNode = document.createElement('div');
-                        pathNode.className = 'path-node';
-                        pathNode.textContent = currentNode.name;
-                        pathContainer.appendChild(pathNode);
-                        return;
-                    }
-                    
-                    // Find the current node in the tree
-                    if (currentNode.children) {
-                        for (const child of currentNode.children) {
-                            if (child.id === nodeId) {
-                                currentNode = child;
-                                
-                                // Add node to path display
-                                const pathNode = document.createElement('div');
-                                pathNode.className = 'path-node';
-                                pathNode.textContent = child.name;
-                                pathContainer.appendChild(pathNode);
-                                
-                                break;
-                            }
-                        }
-                    }
-                });
-                
-                // Update the currentPath variable
-                currentPath = path;
-            }
-            
-            // Function to show node details in the sidebar
-            function showNodeDetails(d) {
-                const detailsContainer = document.getElementById('node-details');
-                
-                let detailsHTML = `
-                    <div class="node-detail-card ${d.data.leaf ? 'strategy' : ''}">
+          }
+        });
+
+        // Update the currentPath variable
+        currentPath = path;
+      }
+
+      // Function to show node details in the sidebar
+      function showNodeDetails(d) {
+        const detailsContainer = document.getElementById("node-details");
+
+        let detailsHTML = `
+                    <div class="node-detail-card ${d.data.leaf ? "strategy" : ""}">
                         <h5>${d.data.name}</h5>
                         <p>${d.data.description}</p>
                 `;
-                
-                if (d.data.strategy) {
-                    detailsHTML += `
+
+        if (d.data.strategy) {
+          detailsHTML += `
                         <div class="mt-3">
                             <strong>Recommended Action:</strong>
                             <p class="mb-0">${d.data.strategy}</p>
                         </div>
                     `;
-                }
-                
-                detailsHTML += '</div>';
-                
-                detailsContainer.innerHTML = detailsHTML;
-            }
-            
-            // Function to update the tree visualization
-            function updateTreeVisualization() {
-                // Compute the new tree layout
-                treeLayout(root);
-                
-                // Update links
-                const link = svg.selectAll('.link')
-                    .data(root.links());
-                
-                // Enter new links
-                link.enter()
-                    .append('path')
-                    .attr('class', 'link')
-                    .attr('d', d3.linkHorizontal()
-                        .x(d => d.y)
-                        .y(d => d.x));
-                
-                // Update existing links
-                link.transition()
-                    .duration(750)
-                    .attr('d', d3.linkHorizontal()
-                        .x(d => d.y)
-                        .y(d => d.x));
-                
-                // Remove old links
-                link.exit().remove();
-                
-                // Update nodes
-                const node = svg.selectAll('.node')
-                    .data(root.descendants(), d => d.data.id);
-                
-                // Enter new nodes
-                const nodeEnter = node.enter()
-                    .append('g')
-                    .attr('class', d => {
-                        return 'node ' + 
-                            (d.children ? 'node--internal' : 'node--leaf') + 
-                            (d.data.id === selectedNodeId ? ' selected' : '');
-                    })
-                    .attr('transform', d => `translate(${d.y},${d.x})`)
-                    .on('click', (event, d) => handleNodeClick(d))
-                    .on('mouseover', (event, d) => showNodeDetails(d));
-                
-                nodeEnter.append('circle')
-                    .attr('r', 0)
-                    .transition()
-                    .duration(750)
-                    .attr('r', 8);
-                
-                nodeEnter.append('text')
-                    .attr('dy', '.31em')
-                    .attr('x', d => d.children ? -10 : 10)
-                    .attr('text-anchor', d => d.children ? 'end' : 'start')
-                    .text(d => d.data.name)
-                    .style('fill-opacity', 0)
-                    .style('fill', '#333')
-                    .style('font-weight', d => d.data.id === selectedNodeId ? 'bold' : 'normal')
-                    .transition()
-                    .duration(750)
-                    .style('fill-opacity', 1);
-                
-                // Update existing nodes
-                node.transition()
-                    .duration(750)
-                    .attr('transform', d => `translate(${d.y},${d.x})`)
-                    .attr('class', d => {
-                        return 'node ' + 
-                            (d.children ? 'node--internal' : 'node--leaf') + 
-                            (d.data.id === selectedNodeId ? ' selected' : '');
-                    });
-                
-                node.select('circle')
-                    .transition()
-                    .duration(750)
-                    .attr('r', 8);
-                
-                node.select('text')
-                    .transition()
-                    .duration(750)
-                    .attr('x', d => d.children ? -10 : 10)
-                    .attr('text-anchor', d => d.children ? 'end' : 'start')
-                    .style('font-weight', d => d.data.id === selectedNodeId ? 'bold' : 'normal');
-                
-                // Remove old nodes
-                node.exit()
-                    .transition()
-                    .duration(750)
-                    .attr('transform', d => `translate(${d.y},${d.x})`)
-                    .style('opacity', 0)
-                    .remove();
-            }
-            
-            // Initialize with root node details
-            showNodeDetails(root);
         }
-    });
+
+        detailsHTML += "</div>";
+
+        detailsContainer.innerHTML = detailsHTML;
+      }
+
+      // Function to update the tree visualization
+      function updateTreeVisualization() {
+        // Compute the new tree layout
+        treeLayout(root);
+
+        // Update links
+        const link = svg.selectAll(".link").data(root.links());
+
+        // Enter new links
+        link
+          .enter()
+          .append("path")
+          .attr("class", "link")
+          .attr(
+            "d",
+            d3
+              .linkHorizontal()
+              .x((d) => d.y)
+              .y((d) => d.x),
+          );
+
+        // Update existing links
+        link
+          .transition()
+          .duration(750)
+          .attr(
+            "d",
+            d3
+              .linkHorizontal()
+              .x((d) => d.y)
+              .y((d) => d.x),
+          );
+
+        // Remove old links
+        link.exit().remove();
+
+        // Update nodes
+        const node = svg
+          .selectAll(".node")
+          .data(root.descendants(), (d) => d.data.id);
+
+        // Enter new nodes
+        const nodeEnter = node
+          .enter()
+          .append("g")
+          .attr("class", (d) => {
+            return (
+              "node " +
+              (d.children ? "node--internal" : "node--leaf") +
+              (d.data.id === selectedNodeId ? " selected" : "")
+            );
+          })
+          .attr("transform", (d) => `translate(${d.y},${d.x})`)
+          .on("click", (event, d) => handleNodeClick(d))
+          .on("mouseover", (event, d) => showNodeDetails(d));
+
+        nodeEnter
+          .append("circle")
+          .attr("r", 0)
+          .transition()
+          .duration(750)
+          .attr("r", 8);
+
+        nodeEnter
+          .append("text")
+          .attr("dy", ".31em")
+          .attr("x", (d) => (d.children ? -10 : 10))
+          .attr("text-anchor", (d) => (d.children ? "end" : "start"))
+          .text((d) => d.data.name)
+          .style("fill-opacity", 0)
+          .style("fill", "#333")
+          .style("font-weight", (d) =>
+            d.data.id === selectedNodeId ? "bold" : "normal",
+          )
+          .transition()
+          .duration(750)
+          .style("fill-opacity", 1);
+
+        // Update existing nodes
+        node
+          .transition()
+          .duration(750)
+          .attr("transform", (d) => `translate(${d.y},${d.x})`)
+          .attr("class", (d) => {
+            return (
+              "node " +
+              (d.children ? "node--internal" : "node--leaf") +
+              (d.data.id === selectedNodeId ? " selected" : "")
+            );
+          });
+
+        node.select("circle").transition().duration(750).attr("r", 8);
+
+        node
+          .select("text")
+          .transition()
+          .duration(750)
+          .attr("x", (d) => (d.children ? -10 : 10))
+          .attr("text-anchor", (d) => (d.children ? "end" : "start"))
+          .style("font-weight", (d) =>
+            d.data.id === selectedNodeId ? "bold" : "normal",
+          );
+
+        // Remove old nodes
+        node
+          .exit()
+          .transition()
+          .duration(750)
+          .attr("transform", (d) => `translate(${d.y},${d.x})`)
+          .style("opacity", 0)
+          .remove();
+      }
+
+      // Initialize with root node details
+      showNodeDetails(root);
+    }
+  });
 </script>
 {% endblock %}

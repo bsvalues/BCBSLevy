@@ -1,285 +1,324 @@
-{% extends 'base.html' %}
-
-{% block page_title %}Tax Districts{% endblock %}
-{% block page_subtitle %}View and manage tax district relationships{% endblock %}
-
+{% extends 'base.html' %} {% block page_title %}Tax Districts{% endblock %} {%
+block page_subtitle %}View and manage tax district relationships{% endblock %}
 {% block content %}
 <div class="row mb-4">
-    <div class="col-lg-9">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">District Relationships</h5>
-                <span class="badge bg-info text-dark">Total: {{ district_count }}</span>
+  <div class="col-lg-9">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h5 class="mb-0">District Relationships</h5>
+        <span class="badge bg-info text-dark">Total: {{ district_count }}</span>
+      </div>
+      <div class="card-body">
+        <!-- Search and Filters -->
+        <form method="get" class="mb-4">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label for="year" class="form-label">Year</label>
+              <select name="year" id="year" class="form-select">
+                <option value="">All Years</option>
+                {% for year in years %}
+                <option
+                  value="{{ year }}"
+                  {%
+                  if
+                  selected_year=""
+                  ="year"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ year }}
+                </option>
+                {% endfor %}
+              </select>
             </div>
-            <div class="card-body">
-                <!-- Search and Filters -->
-                <form method="get" class="mb-4">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label for="year" class="form-label">Year</label>
-                            <select name="year" id="year" class="form-select">
-                                <option value="">All Years</option>
-                                {% for year in years %}
-                                <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="district_id" class="form-label">District ID</label>
-                            <input type="number" class="form-control" id="district_id" name="district_id" value="{{ district_id or '' }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="levy_code" class="form-label">Levy Code</label>
-                            <input type="text" class="form-control" id="levy_code" name="levy_code" value="{{ levy_code or '' }}" placeholder="e.g. A101">
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <div class="d-grid w-100">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-1"></i> Filter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                
-                <!-- Districts Table -->
-                {% if districts %}
-                <div class="table-responsive">
-                    <table class="table table-hover table-levy">
-                        <thead>
-                            <tr>
-                                <th>District ID</th>
-                                <th>Year</th>
-                                <th>Levy Code</th>
-                                <th>Linked Levy Code</th>
-                                <th>Created</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for district in districts %}
-                            <tr>
-                                <td>{{ district.tax_district_id }}</td>
-                                <td>{{ district.year }}</td>
-                                <td><span class="badge bg-light text-dark">{{ district.levy_code }}</span></td>
-                                <td><span class="badge bg-info text-dark">{{ district.linked_levy_code }}</span></td>
-                                <td>{{ district.created_at.strftime('%Y-%m-%d') }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Pagination -->
-                <nav aria-label="District pagination">
-                    <ul class="pagination justify-content-center">
-                        {% if pagination.has_prev %}
-                        <li class="page-item">
-                            <a class="page-link" href="{{ url_for('districts', page=pagination.prev_num, year=selected_year, district_id=district_id, levy_code=levy_code) }}">
-                                Previous
-                            </a>
-                        </li>
-                        {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">Previous</span>
-                        </li>
-                        {% endif %}
-                        
-                        {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                            {% if page_num %}
-                                {% if page_num == pagination.page %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ page_num }}</span>
-                                </li>
-                                {% else %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('districts', page=page_num, year=selected_year, district_id=district_id, levy_code=levy_code) }}">
-                                        {{ page_num }}
-                                    </a>
-                                </li>
-                                {% endif %}
-                            {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% if pagination.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="{{ url_for('districts', page=pagination.next_num, year=selected_year, district_id=district_id, levy_code=levy_code) }}">
-                                Next
-                            </a>
-                        </li>
-                        {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">Next</span>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                {% else %}
-                <div class="alert alert-secondary text-center">
-                    <p class="mb-0">No district relationships found</p>
-                    {% if selected_year or district_id or levy_code %}
-                    <p class="mb-0">Try adjusting your search filters</p>
-                    {% else %}
-                    <p class="mb-0">Import district data to get started</p>
-                    {% endif %}
-                </div>
-                {% endif %}
+            <div class="col-md-3">
+              <label for="district_id" class="form-label">District ID</label>
+              <input
+                type="number"
+                class="form-control"
+                id="district_id"
+                name="district_id"
+                value="{{ district_id or '' }}"
+              />
             </div>
+            <div class="col-md-4">
+              <label for="levy_code" class="form-label">Levy Code</label>
+              <input
+                type="text"
+                class="form-control"
+                id="levy_code"
+                name="levy_code"
+                value="{{ levy_code or '' }}"
+                placeholder="e.g. A101"
+              />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <div class="d-grid w-100">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-search me-1"></i> Filter
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <!-- Districts Table -->
+        {% if districts %}
+        <div class="table-responsive">
+          <table class="table table-hover table-levy">
+            <thead>
+              <tr>
+                <th>District ID</th>
+                <th>Year</th>
+                <th>Levy Code</th>
+                <th>Linked Levy Code</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for district in districts %}
+              <tr>
+                <td>{{ district.tax_district_id }}</td>
+                <td>{{ district.year }}</td>
+                <td>
+                  <span class="badge bg-light text-dark"
+                    >{{ district.levy_code }}</span
+                  >
+                </td>
+                <td>
+                  <span class="badge bg-info text-dark"
+                    >{{ district.linked_levy_code }}</span
+                  >
+                </td>
+                <td>{{ district.created_at.strftime('%Y-%m-%d') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+
+        <!-- Pagination -->
+        <nav aria-label="District pagination">
+          <ul class="pagination justify-content-center">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="{{ url_for('districts', page=pagination.prev_num, year=selected_year, district_id=district_id, levy_code=levy_code) }}"
+              >
+                Previous
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Previous</span>
+            </li>
+            {% endif %} {% for page_num in pagination.iter_pages(left_edge=1,
+            right_edge=1, left_current=2, right_current=2) %} {% if page_num %}
+            {% if page_num == pagination.page %}
+            <li class="page-item active">
+              <span class="page-link">{{ page_num }}</span>
+            </li>
+            {% else %}
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="{{ url_for('districts', page=page_num, year=selected_year, district_id=district_id, levy_code=levy_code) }}"
+              >
+                {{ page_num }}
+              </a>
+            </li>
+            {% endif %} {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">...</span>
+            </li>
+            {% endif %} {% endfor %} {% if pagination.has_next %}
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="{{ url_for('districts', page=pagination.next_num, year=selected_year, district_id=district_id, levy_code=levy_code) }}"
+              >
+                Next
+              </a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">Next</span>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% else %}
+        <div class="alert alert-secondary text-center">
+          <p class="mb-0">No district relationships found</p>
+          {% if selected_year or district_id or levy_code %}
+          <p class="mb-0">Try adjusting your search filters</p>
+          {% else %}
+          <p class="mb-0">Import district data to get started</p>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
     </div>
-    
-    <div class="col-lg-3">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Quick Actions</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid mb-3">
-                    <a href="{{ url_for('district_import') }}" class="btn btn-primary">
-                        <i class="fas fa-upload me-1"></i> Import District Data
-                    </a>
-                </div>
-                
-                <div class="alert alert-info p-2">
-                    <p class="small mb-0">
-                        <i class="fas fa-info-circle me-1"></i>
-                        District relationships link levy codes to provide a complete picture of taxing jurisdictions.
-                    </p>
-                </div>
-            </div>
+  </div>
+
+  <div class="col-lg-3">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid mb-3">
+          <a href="{{ url_for('district_import') }}" class="btn btn-primary">
+            <i class="fas fa-upload me-1"></i> Import District Data
+          </a>
         </div>
-        
-        <div class="card mt-3">
-            <div class="card-header">
-                <h5 class="mb-0">Tips</h5>
-            </div>
-            <div class="card-body">
-                <div class="small">
-                    <ul class="mb-0 ps-3">
-                        <li class="mb-2">Use filters to narrow down results</li>
-                        <li class="mb-2">Levy codes connect properties to districts</li>
-                        <li class="mb-2">Each district can have multiple levy codes</li>
-                        <li>Import district data annually to maintain historical records</li>
-                    </ul>
-                </div>
-            </div>
+
+        <div class="alert alert-info p-2">
+          <p class="small mb-0">
+            <i class="fas fa-info-circle me-1"></i>
+            District relationships link levy codes to provide a complete picture
+            of taxing jurisdictions.
+          </p>
         </div>
+      </div>
     </div>
+
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0">Tips</h5>
+      </div>
+      <div class="card-body">
+        <div class="small">
+          <ul class="mb-0 ps-3">
+            <li class="mb-2">Use filters to narrow down results</li>
+            <li class="mb-2">Levy codes connect properties to districts</li>
+            <li class="mb-2">Each district can have multiple levy codes</li>
+            <li>
+              Import district data annually to maintain historical records
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- District Chart -->
 <div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">District Data Visualization</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <canvas id="districtYearChart" height="250"></canvas>
-                    </div>
-                    <div class="col-md-6">
-                        <canvas id="levyCodeDistributionChart" height="250"></canvas>
-                    </div>
-                </div>
-            </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">District Data Visualization</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <canvas id="districtYearChart" height="250"></canvas>
+          </div>
+          <div class="col-md-6">
+            <canvas id="levyCodeDistributionChart" height="250"></canvas>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_scripts %}
+{% endblock %} {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Fetch district summary data
-    fetch('/api/district-summary')
-        .then(response => response.json())
-        .then(data => {
-            initializeDistrictCharts(data);
-        })
-        .catch(error => console.error('Error loading district data:', error));
-});
+    fetch("/api/district-summary")
+      .then((response) => response.json())
+      .then((data) => {
+        initializeDistrictCharts(data);
+      })
+      .catch((error) => console.error("Error loading district data:", error));
+  });
 
-function initializeDistrictCharts(data) {
+  function initializeDistrictCharts(data) {
     // District by Year Chart
-    const yearLabels = data.year_counts.map(item => item.year);
-    const yearCounts = data.year_counts.map(item => item.count);
-    
-    new Chart(document.getElementById('districtYearChart'), {
-        type: 'bar',
-        data: {
-            labels: yearLabels,
-            datasets: [{
-                label: 'Districts by Year',
-                data: yearCounts,
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
+    const yearLabels = data.year_counts.map((item) => item.year);
+    const yearCounts = data.year_counts.map((item) => item.count);
+
+    new Chart(document.getElementById("districtYearChart"), {
+      type: "bar",
+      data: {
+        labels: yearLabels,
+        datasets: [
+          {
+            label: "Districts by Year",
+            data: yearCounts,
+            backgroundColor: "rgba(75, 192, 192, 0.6)",
+            borderColor: "rgba(75, 192, 192, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: "Districts by Year",
+          },
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Districts by Year'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
     });
-    
+
     // Levy Code Distribution Chart
-    const codeLabels = data.levy_code_counts.map(item => item.code);
-    const codeCounts = data.levy_code_counts.map(item => item.count);
-    
-    new Chart(document.getElementById('levyCodeDistributionChart'), {
-        type: 'pie',
-        data: {
-            labels: codeLabels,
-            datasets: [{
-                label: 'Levy Code Distribution',
-                data: codeCounts,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)',
-                    'rgba(54, 162, 235, 0.6)',
-                    'rgba(255, 206, 86, 0.6)',
-                    'rgba(75, 192, 192, 0.6)',
-                    'rgba(153, 102, 255, 0.6)',
-                    'rgba(255, 159, 64, 0.6)',
-                    'rgba(199, 199, 199, 0.6)',
-                    'rgba(83, 102, 255, 0.6)',
-                    'rgba(40, 159, 64, 0.6)',
-                    'rgba(210, 210, 210, 0.6)'
-                ],
-                borderWidth: 1
-            }]
+    const codeLabels = data.levy_code_counts.map((item) => item.code);
+    const codeCounts = data.levy_code_counts.map((item) => item.count);
+
+    new Chart(document.getElementById("levyCodeDistributionChart"), {
+      type: "pie",
+      data: {
+        labels: codeLabels,
+        datasets: [
+          {
+            label: "Levy Code Distribution",
+            data: codeCounts,
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.6)",
+              "rgba(54, 162, 235, 0.6)",
+              "rgba(255, 206, 86, 0.6)",
+              "rgba(75, 192, 192, 0.6)",
+              "rgba(153, 102, 255, 0.6)",
+              "rgba(255, 159, 64, 0.6)",
+              "rgba(199, 199, 199, 0.6)",
+              "rgba(83, 102, 255, 0.6)",
+              "rgba(40, 159, 64, 0.6)",
+              "rgba(210, 210, 210, 0.6)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "right",
+          },
+          title: {
+            display: true,
+            text: "Top Levy Codes",
+          },
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'right',
-                },
-                title: {
-                    display: true,
-                    text: 'Top Levy Codes'
-                }
-            }
-        }
+      },
     });
-}
+  }
 </script>
 {% endblock %}

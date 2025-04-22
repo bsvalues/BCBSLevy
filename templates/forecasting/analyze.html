@@ -1,301 +1,325 @@
-{% extends "base.html" %}
-
-{% block title %}{{ page_title }}{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}{{ page_title }}{% endblock %} {%
+block head %} {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('forecasting.index') }}">Forecasting</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Analysis: {{ tax_code.code }}</li>
-        </ol>
-    </nav>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('forecasting.index') }}">Forecasting</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        Analysis: {{ tax_code.code }}
+      </li>
+    </ol>
+  </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Tax Code Analysis <small class="text-muted">{{ tax_code.code }}</small></h1>
-        <div class="d-flex gap-2">
-            <a href="{{ url_for('forecasting.forecast') }}?tax_code_id={{ tax_code.id }}" class="btn btn-primary">
-                <i class="bi bi-graph-up me-2"></i>Generate Forecast
-            </a>
-        </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>
+      Tax Code Analysis <small class="text-muted">{{ tax_code.code }}</small>
+    </h1>
+    <div class="d-flex gap-2">
+      <a
+        href="{{ url_for('forecasting.forecast') }}?tax_code_id={{ tax_code.id }}"
+        class="btn btn-primary"
+      >
+        <i class="bi bi-graph-up me-2"></i>Generate Forecast
+      </a>
     </div>
-    
-    <div class="row mb-4">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Historical Levy Rates</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="ratesChart" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Summary</h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-5">Tax Code</dt>
-                        <dd class="col-sm-7">{{ tax_code.code }}</dd>
-                        
-                        {% if tax_code.description %}
-                        <dt class="col-sm-5">Description</dt>
-                        <dd class="col-sm-7">{{ tax_code.description }}</dd>
-                        {% endif %}
-                        
-                        <dt class="col-sm-5">Years of Data</dt>
-                        <dd class="col-sm-7">{{ historical_rates|length }}</dd>
-                        
-                        <dt class="col-sm-5">Current Rate</dt>
-                        <dd class="col-sm-7">{{ '%.4f'|format(rates[-1]) }}</dd>
-                        
-                        <dt class="col-sm-5">Average Rate</dt>
-                        <dd class="col-sm-7">{{ '%.4f'|format(rates|sum / rates|length) }}</dd>
-                        
-                        <dt class="col-sm-5">Min Rate</dt>
-                        <dd class="col-sm-7">{{ '%.4f'|format(rates|min) }} ({{ years[rates.index(rates|min)] }})</dd>
-                        
-                        <dt class="col-sm-5">Max Rate</dt>
-                        <dd class="col-sm-7">{{ '%.4f'|format(rates|max) }} ({{ years[rates.index(rates|max)] }})</dd>
-                    </dl>
-                    
-                    <hr>
-                    
-                    <h6>Year-over-Year Change</h6>
-                    {% if rates|length > 1 %}
-                        {% set prev_rate = rates[-2] %}
-                        {% set curr_rate = rates[-1] %}
-                        {% set change = ((curr_rate - prev_rate) / prev_rate * 100) if prev_rate > 0 else 0 %}
-                        {% set change_class = 'text-danger' if change > 0 else 'text-success' %}
-                        
-                        <p class="mb-1">From {{ years[-2] }} to {{ years[-1] }}:</p>
-                        <p class="h4 {{ change_class }}">
-                            {{ '%+.2f'|format(change) }}%
-                            <i class="bi {{ 'bi-arrow-up' if change > 0 else 'bi-arrow-down' }}"></i>
-                        </p>
-                    {% else %}
-                        <p class="text-muted">Insufficient data to calculate year-over-year change.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row mb-4">
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Levy Amounts</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="amountsChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Assessed Values</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="valuesChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="card shadow-sm mb-4">
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Historical Data</h5>
+          <h5 class="mb-0">Historical Levy Rates</h5>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Year</th>
-                            <th class="text-end">Levy Rate</th>
-                            <th class="text-end">Levy Amount</th>
-                            <th class="text-end">Assessed Value</th>
-                            <th class="text-end">Year-over-Year Change</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in range(historical_rates|length - 1, -1, -1) %}
-                        <tr>
-                            <td>{{ historical_rates[i].year }}</td>
-                            <td class="text-end">{{ '%.4f'|format(historical_rates[i].levy_rate) }}</td>
-                            <td class="text-end">${{ '{:,.2f}'.format(historical_rates[i].levy_amount) }}</td>
-                            <td class="text-end">${{ '{:,.2f}'.format(historical_rates[i].total_assessed_value) }}</td>
-                            <td class="text-end">
-                                {% if i < historical_rates|length - 1 %}
-                                    {% set prev_rate = historical_rates[i+1].levy_rate %}
-                                    {% set curr_rate = historical_rates[i].levy_rate %}
-                                    {% set change = ((curr_rate - prev_rate) / prev_rate * 100) if prev_rate > 0 else 0 %}
-                                    {% set change_class = 'text-danger' if change > 0 else 'text-success' %}
-                                    
-                                    <span class="{{ change_class }}">
-                                        {{ '%+.2f'|format(change) }}%
-                                        <i class="bi {{ 'bi-arrow-up' if change > 0 else 'bi-arrow-down' }}"></i>
-                                    </span>
-                                {% else %}
-                                    <span class="text-muted">--</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="card-body">
+          <canvas id="ratesChart" height="300"></canvas>
         </div>
+      </div>
     </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Summary</h5>
+        </div>
+        <div class="card-body">
+          <dl class="row">
+            <dt class="col-sm-5">Tax Code</dt>
+            <dd class="col-sm-7">{{ tax_code.code }}</dd>
+
+            {% if tax_code.description %}
+            <dt class="col-sm-5">Description</dt>
+            <dd class="col-sm-7">{{ tax_code.description }}</dd>
+            {% endif %}
+
+            <dt class="col-sm-5">Years of Data</dt>
+            <dd class="col-sm-7">{{ historical_rates|length }}</dd>
+
+            <dt class="col-sm-5">Current Rate</dt>
+            <dd class="col-sm-7">{{ '%.4f'|format(rates[-1]) }}</dd>
+
+            <dt class="col-sm-5">Average Rate</dt>
+            <dd class="col-sm-7">
+              {{ '%.4f'|format(rates|sum / rates|length) }}
+            </dd>
+
+            <dt class="col-sm-5">Min Rate</dt>
+            <dd class="col-sm-7">
+              {{ '%.4f'|format(rates|min) }} ({{ years[rates.index(rates|min)]
+              }})
+            </dd>
+
+            <dt class="col-sm-5">Max Rate</dt>
+            <dd class="col-sm-7">
+              {{ '%.4f'|format(rates|max) }} ({{ years[rates.index(rates|max)]
+              }})
+            </dd>
+          </dl>
+
+          <hr />
+
+          <h6>Year-over-Year Change</h6>
+          {% if rates|length > 1 %} {% set prev_rate = rates[-2] %} {% set
+          curr_rate = rates[-1] %} {% set change = ((curr_rate - prev_rate) /
+          prev_rate * 100) if prev_rate > 0 else 0 %} {% set change_class =
+          'text-danger' if change > 0 else 'text-success' %}
+
+          <p class="mb-1">From {{ years[-2] }} to {{ years[-1] }}:</p>
+          <p class="h4 {{ change_class }}">
+            {{ '%+.2f'|format(change) }}%
+            <i
+              class="bi {{ 'bi-arrow-up' if change > 0 else 'bi-arrow-down' }}"
+            ></i>
+          </p>
+          {% else %}
+          <p class="text-muted">
+            Insufficient data to calculate year-over-year change.
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Levy Amounts</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="amountsChart" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Assessed Values</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="valuesChart" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+      <h5 class="mb-0">Historical Data</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>Year</th>
+              <th class="text-end">Levy Rate</th>
+              <th class="text-end">Levy Amount</th>
+              <th class="text-end">Assessed Value</th>
+              <th class="text-end">Year-over-Year Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in range(historical_rates|length - 1, -1, -1) %}
+            <tr>
+              <td>{{ historical_rates[i].year }}</td>
+              <td class="text-end">
+                {{ '%.4f'|format(historical_rates[i].levy_rate) }}
+              </td>
+              <td class="text-end">
+                ${{ '{:,.2f}'.format(historical_rates[i].levy_amount) }}
+              </td>
+              <td class="text-end">
+                ${{ '{:,.2f}'.format(historical_rates[i].total_assessed_value)
+                }}
+              </td>
+              <td class="text-end">
+                {% if i < historical_rates|length - 1 %} {% set prev_rate =
+                historical_rates[i+1].levy_rate %} {% set curr_rate =
+                historical_rates[i].levy_rate %} {% set change = ((curr_rate -
+                prev_rate) / prev_rate * 100) if prev_rate > 0 else 0 %} {% set
+                change_class = 'text-danger' if change > 0 else 'text-success'
+                %}
+
+                <span class="{{ change_class }}">
+                  {{ '%+.2f'|format(change) }}%
+                  <i
+                    class="bi {{ 'bi-arrow-up' if change > 0 else 'bi-arrow-down' }}"
+                  ></i>
+                </span>
+                {% else %}
+                <span class="text-muted">--</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Common chart options
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-            }
-        }
-    };
-    
-    // Chart colors
-    const colors = {
-        rate: {
-            border: 'rgba(54, 162, 235, 1)',
-            background: 'rgba(54, 162, 235, 0.2)'
-        },
-        amount: {
-            border: 'rgba(75, 192, 192, 1)',
-            background: 'rgba(75, 192, 192, 0.2)'
-        },
-        value: {
-            border: 'rgba(255, 99, 132, 1)',
-            background: 'rgba(255, 99, 132, 0.2)'
-        }
-    };
-    
-    // Rates chart
-    const ratesCtx = document.getElementById('ratesChart').getContext('2d');
-    new Chart(ratesCtx, {
-        type: 'line',
-        data: {
-            labels: {{ years_json|safe }},
-            datasets: [{
-                label: 'Levy Rate',
-                data: {{ rates_json|safe }},
-                borderColor: colors.rate.border,
-                backgroundColor: colors.rate.background,
-                tension: 0.1,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                fill: true
-            }]
-        },
-        options: {
-            ...chartOptions,
-            plugins: {
-                ...chartOptions.plugins,
-                title: {
-                    display: true,
-                    text: 'Historical Levy Rates ({{ years[0] }} - {{ years[-1] }})'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Levy Rate: ${context.parsed.y.toFixed(4)}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    // Amounts chart
-    const amountsCtx = document.getElementById('amountsChart').getContext('2d');
-    new Chart(amountsCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ years_json|safe }},
-            datasets: [{
-                label: 'Levy Amount',
-                data: {{ levy_amounts_json|safe }},
-                borderColor: colors.amount.border,
-                backgroundColor: colors.amount.background,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            ...chartOptions,
-            plugins: {
-                ...chartOptions.plugins,
-                title: {
-                    display: true,
-                    text: 'Historical Levy Amounts'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Levy Amount: $${context.parsed.y.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-    
-    // Values chart
-    const valuesCtx = document.getElementById('valuesChart').getContext('2d');
-    new Chart(valuesCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ years_json|safe }},
-            datasets: [{
-                label: 'Assessed Value',
-                data: {{ assessed_values_json|safe }},
-                borderColor: colors.value.border,
-                backgroundColor: colors.value.background,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            ...chartOptions,
-            plugins: {
-                ...chartOptions.plugins,
-                title: {
-                    display: true,
-                    text: 'Historical Assessed Values'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `Assessed Value: $${context.parsed.y.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-});
+  document.addEventListener('DOMContentLoaded', function() {
+      // Common chart options
+      const chartOptions = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+              legend: {
+                  position: 'top',
+              }
+          },
+          scales: {
+              y: {
+                  beginAtZero: false,
+              }
+          }
+      };
+
+      // Chart colors
+      const colors = {
+          rate: {
+              border: 'rgba(54, 162, 235, 1)',
+              background: 'rgba(54, 162, 235, 0.2)'
+          },
+          amount: {
+              border: 'rgba(75, 192, 192, 1)',
+              background: 'rgba(75, 192, 192, 0.2)'
+          },
+          value: {
+              border: 'rgba(255, 99, 132, 1)',
+              background: 'rgba(255, 99, 132, 0.2)'
+          }
+      };
+
+      // Rates chart
+      const ratesCtx = document.getElementById('ratesChart').getContext('2d');
+      new Chart(ratesCtx, {
+          type: 'line',
+          data: {
+              labels: {{ years_json|safe }},
+              datasets: [{
+                  label: 'Levy Rate',
+                  data: {{ rates_json|safe }},
+                  borderColor: colors.rate.border,
+                  backgroundColor: colors.rate.background,
+                  tension: 0.1,
+                  pointRadius: 4,
+                  pointHoverRadius: 6,
+                  fill: true
+              }]
+          },
+          options: {
+              ...chartOptions,
+              plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                      display: true,
+                      text: 'Historical Levy Rates ({{ years[0] }} - {{ years[-1] }})'
+                  },
+                  tooltip: {
+                      callbacks: {
+                          label: function(context) {
+                              return `Levy Rate: ${context.parsed.y.toFixed(4)}`;
+                          }
+                      }
+                  }
+              }
+          }
+      });
+
+      // Amounts chart
+      const amountsCtx = document.getElementById('amountsChart').getContext('2d');
+      new Chart(amountsCtx, {
+          type: 'bar',
+          data: {
+              labels: {{ years_json|safe }},
+              datasets: [{
+                  label: 'Levy Amount',
+                  data: {{ levy_amounts_json|safe }},
+                  borderColor: colors.amount.border,
+                  backgroundColor: colors.amount.background,
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              ...chartOptions,
+              plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                      display: true,
+                      text: 'Historical Levy Amounts'
+                  },
+                  tooltip: {
+                      callbacks: {
+                          label: function(context) {
+                              return `Levy Amount: $${context.parsed.y.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+                          }
+                      }
+                  }
+              }
+          }
+      });
+
+      // Values chart
+      const valuesCtx = document.getElementById('valuesChart').getContext('2d');
+      new Chart(valuesCtx, {
+          type: 'bar',
+          data: {
+              labels: {{ years_json|safe }},
+              datasets: [{
+                  label: 'Assessed Value',
+                  data: {{ assessed_values_json|safe }},
+                  borderColor: colors.value.border,
+                  backgroundColor: colors.value.background,
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              ...chartOptions,
+              plugins: {
+                  ...chartOptions.plugins,
+                  title: {
+                      display: true,
+                      text: 'Historical Assessed Values'
+                  },
+                  tooltip: {
+                      callbacks: {
+                          label: function(context) {
+                              return `Assessed Value: $${context.parsed.y.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+                          }
+                      }
+                  }
+              }
+          }
+      });
+  });
 </script>
 {% endblock %}

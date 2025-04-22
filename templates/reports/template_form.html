@@ -1,416 +1,746 @@
-{% extends "base.html" %}
-
-{% block title %}
-{% if action == 'create' %}New Report Template{% else %}Edit Report Template{% endif %}
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %} {% if action == 'create' %}New
+Report Template{% else %}Edit Report Template{% endif %} {% endblock %} {% block
+content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('reports_dashboard') }}">Reports</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('report_templates') }}">Templates</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">
-                        {% if action == 'create' %}New Template{% else %}Edit Template{% endif %}
-                    </li>
-                </ol>
-            </nav>
-            <h1 class="mb-3">
-                {% if action == 'create' %}Create New Report Template{% else %}Edit Report Template{% endif %}
-            </h1>
-            <p class="lead">Define the structure and content of your custom report.</p>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('reports_dashboard') }}">Reports</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('report_templates') }}">Templates</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {% if action == 'create' %}New Template{% else %}Edit Template{%
+            endif %}
+          </li>
+        </ol>
+      </nav>
+      <h1 class="mb-3">
+        {% if action == 'create' %}Create New Report Template{% else %}Edit
+        Report Template{% endif %}
+      </h1>
+      <p class="lead">
+        Define the structure and content of your custom report.
+      </p>
     </div>
+  </div>
 
-    <form id="template-form" method="post" action="{{ url_for('create_report_template') if action == 'create' else url_for('update_report_template', template_id=template.id) }}">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Template Details</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Template Name</label>
-                            <input type="text" class="form-control" id="name" name="name" value="{{ template.name if template else '' }}" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="type" class="form-label">Template Type</label>
-                            <select class="form-select" id="type" name="type" required>
-                                <option value="">Select a type</option>
-                                <option value="property" {% if template and template.type == 'property' %}selected{% endif %}>Property</option>
-                                <option value="tax_code" {% if template and template.type == 'tax_code' %}selected{% endif %}>Tax Code</option>
-                                <option value="district" {% if template and template.type == 'district' %}selected{% endif %}>District</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="3">{{ template.description if template else '' }}</textarea>
-                        </div>
-                        
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="is_public" name="is_public" {% if template and template.is_public %}checked{% endif %}>
-                            <label class="form-check-label" for="is_public">
-                                Make this template available to all users
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Sections</h5>
-                        <button type="button" class="btn btn-sm btn-primary" id="add-section-btn">
-                            <i class="bi bi-plus-circle me-1"></i> Add Section
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div id="sections-container">
-                            {% if template and template.sections %}
-                                {% for section in template.sections %}
-                                <div class="section-item card mb-3">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h6 class="mb-0">Section {{ loop.index }}</h6>
-                                        <button type="button" class="btn btn-sm btn-outline-danger remove-section-btn">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Section Title</label>
-                                            <input type="text" class="form-control section-title" name="section_{{ loop.index }}_title" value="{{ section.title }}" required>
-                                        </div>
-                                        
-                                        <div class="mb-3">
-                                            <label class="form-label">Fields</label>
-                                            <div class="input-group">
-                                                <input type="text" class="form-control section-fields" name="section_{{ loop.index }}_fields" value="{{ section.fields|selectattr('formula', 'undefined')|list|join(', ') }}">
-                                                <button class="btn btn-outline-secondary field-selector-btn" type="button" data-bs-toggle="modal" data-bs-target="#fieldSelectorModal" data-section-index="{{ loop.index }}">
-                                                    <i class="bi bi-list-check"></i>
-                                                </button>
-                                            </div>
-                                            <div class="form-text">Comma-separated list of fields to include.</div>
-                                        </div>
-                                        
-                                        <div class="calculated-fields-container">
-                                            {% set calc_fields = section.fields|selectattr('formula', 'defined')|list %}
-                                            {% if calc_fields %}
-                                                {% for calc_field in calc_fields %}
-                                                <div class="calculated-field card mb-2">
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="col-md-4">
-                                                                <div class="mb-2">
-                                                                    <label class="form-label">Field Name</label>
-                                                                    <input type="text" class="form-control calc-field-name" name="section_{{ loop.parent.index }}_calc_{{ loop.index }}_name" value="{{ calc_field.name }}">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-8">
-                                                                <div class="mb-2">
-                                                                    <label class="form-label">Formula</label>
-                                                                    <div class="input-group">
-                                                                        <input type="text" class="form-control calc-field-formula" name="section_{{ loop.parent.index }}_calc_{{ loop.index }}_formula" value="{{ calc_field.formula }}">
-                                                                        <button type="button" class="btn btn-outline-danger remove-calc-field-btn">
-                                                                            <i class="bi bi-trash"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {% endfor %}
-                                            {% endif %}
-                                            <input type="hidden" name="section_{{ loop.index }}_calc_field_count" value="{{ calc_fields|length }}" class="calc-field-count">
-                                        </div>
-                                        
-                                        <div class="mt-3">
-                                            <button type="button" class="btn btn-sm btn-outline-primary add-calc-field-btn" data-section-index="{{ loop.index }}">
-                                                <i class="bi bi-plus-circle me-1"></i> Add Calculated Field
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div id="no-sections-message" class="text-center py-4 {% if template and template.sections %}d-none{% endif %}">
-                            <i class="bi bi-layout-text-window text-muted" style="font-size: 3rem;"></i>
-                            <p class="mt-3 text-muted">No sections added yet. Add a section to define the structure of your report.</p>
-                        </div>
-                        
-                        <input type="hidden" id="section-count" name="section_count" value="{{ template.sections|length if template and template.sections else 0 }}">
-                    </div>
-                </div>
+  <form
+    id="template-form"
+    method="post"
+    action="{{ url_for('create_report_template') if action == 'create' else url_for('update_report_template', template_id=template.id) }}"
+  >
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Template Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="name" class="form-label">Template Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                value="{{ template.name if template else '' }}"
+                required
+              />
             </div>
 
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Sorting</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="sort-field" class="form-label">Sort By</label>
-                            <input type="text" class="form-control" id="sort-field" name="sort_field" value="{{ template.sorting.field if template and template.sorting else '' }}">
-                            <div class="form-text">Enter a field name to sort by.</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="sort-direction" class="form-label">Sort Direction</label>
-                            <select class="form-select" id="sort-direction" name="sort_direction">
-                                <option value="asc" {% if template and template.sorting and template.sorting.direction == 'asc' %}selected{% endif %}>Ascending</option>
-                                <option value="desc" {% if template and template.sorting and template.sorting.direction == 'desc' %}selected{% endif %}>Descending</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Filters</h5>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-filter-btn">
-                            <i class="bi bi-plus-circle me-1"></i> Add Filter
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div id="filters-container">
-                            {% if template and template.filters %}
-                                {% for filter in template.filters %}
-                                <div class="filter-item card mb-2">
-                                    <div class="card-body">
-                                        <div class="mb-2">
-                                            <label class="form-label">Field</label>
-                                            <input type="text" class="form-control filter-field" name="filter_{{ loop.index }}_field" value="{{ filter.field }}">
-                                        </div>
-                                        <div class="mb-2">
-                                            <label class="form-label">Operator</label>
-                                            <select class="form-control filter-operator" name="filter_{{ loop.index }}_operator">
-                                                <option value="==" {% if filter.operator == '==' %}selected{% endif %}>==</option>
-                                                <option value="!=" {% if filter.operator == '!=' %}selected{% endif %}>!=</option>
-                                                <option value=">" {% if filter.operator == '>' %}selected{% endif %}>&gt;</option>
-                                                <option value="<" {% if filter.operator == '<' %}selected{% endif %}>&lt;</option>
-                                                <option value=">=" {% if filter.operator == '>=' %}selected{% endif %}>&gt;=</option>
-                                                <option value="<=" {% if filter.operator == '<=' %}selected{% endif %}>&lt;=</option>
-                                                <option value="contains" {% if filter.operator == 'contains' %}selected{% endif %}>Contains</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-2">
-                                            <label class="form-label">Value</label>
-                                            <div class="input-group">
-                                                <input type="text" class="form-control filter-value" name="filter_{{ loop.index }}_value" value="{{ filter.value }}">
-                                                <button type="button" class="btn btn-outline-danger remove-filter-btn">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        
-                        <div id="no-filters-message" class="text-center py-4 {% if template and template.filters %}d-none{% endif %}">
-                            <i class="bi bi-funnel text-muted" style="font-size: 2rem;"></i>
-                            <p class="mt-3 text-muted">No filters added yet. Add filters to limit the data included in your report.</p>
-                        </div>
-                        
-                        <input type="hidden" id="filter-count" name="filter_count" value="{{ template.filters|length if template and template.filters else 0 }}">
-                    </div>
-                </div>
-
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Examples</h5>
-                    </div>
-                    <div class="card-body">
-                        <h6>Calculated Field Examples</h6>
-                        <div class="list-group">
-                            {% for example in calculated_field_examples %}
-                            <a href="#" class="list-group-item list-group-item-action calc-field-example" data-name="{{ example.name }}" data-formula="{{ example.formula }}">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">{{ example.name }}</h6>
-                                </div>
-                                <small class="text-muted">{{ example.formula }}</small>
-                            </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        {% if action == 'create' %}Create Template{% else %}Update Template{% endif %}
-                    </button>
-                    <a href="{{ url_for('report_templates') }}" class="btn btn-secondary">Cancel</a>
-                </div>
+            <div class="mb-3">
+              <label for="type" class="form-label">Template Type</label>
+              <select class="form-select" id="type" name="type" required>
+                <option value="">Select a type</option>
+                <option
+                  value="property"
+                  {%
+                  if
+                  template
+                  and
+                  template.type=""
+                  ="property"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Property
+                </option>
+                <option
+                  value="tax_code"
+                  {%
+                  if
+                  template
+                  and
+                  template.type=""
+                  ="tax_code"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Tax Code
+                </option>
+                <option
+                  value="district"
+                  {%
+                  if
+                  template
+                  and
+                  template.type=""
+                  ="district"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  District
+                </option>
+              </select>
             </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea
+                class="form-control"
+                id="description"
+                name="description"
+                rows="3"
+              >
+{{ template.description if template else '' }}</textarea
+              >
+            </div>
+
+            <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="is_public"
+                name="is_public"
+                {%
+                if
+                template
+                and
+                template.is_public
+                %}checked{%
+                endif
+                %}
+              />
+              <label class="form-check-label" for="is_public">
+                Make this template available to all users
+              </label>
+            </div>
+          </div>
         </div>
-    </form>
+
+        <div class="card mb-4">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <h5 class="card-title mb-0">Sections</h5>
+            <button
+              type="button"
+              class="btn btn-sm btn-primary"
+              id="add-section-btn"
+            >
+              <i class="bi bi-plus-circle me-1"></i> Add Section
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="sections-container">
+              {% if template and template.sections %} {% for section in
+              template.sections %}
+              <div class="section-item card mb-3">
+                <div
+                  class="card-header d-flex justify-content-between align-items-center"
+                >
+                  <h6 class="mb-0">Section {{ loop.index }}</h6>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger remove-section-btn"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="form-label">Section Title</label>
+                    <input
+                      type="text"
+                      class="form-control section-title"
+                      name="section_{{ loop.index }}_title"
+                      value="{{ section.title }}"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Fields</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control section-fields"
+                        name="section_{{ loop.index }}_fields"
+                        value="{{ section.fields|selectattr('formula', 'undefined')|list|join(', ') }}"
+                      />
+                      <button
+                        class="btn btn-outline-secondary field-selector-btn"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#fieldSelectorModal"
+                        data-section-index="{{ loop.index }}"
+                      >
+                        <i class="bi bi-list-check"></i>
+                      </button>
+                    </div>
+                    <div class="form-text">
+                      Comma-separated list of fields to include.
+                    </div>
+                  </div>
+
+                  <div class="calculated-fields-container">
+                    {% set calc_fields = section.fields|selectattr('formula',
+                    'defined')|list %} {% if calc_fields %} {% for calc_field in
+                    calc_fields %}
+                    <div class="calculated-field card mb-2">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <div class="mb-2">
+                              <label class="form-label">Field Name</label>
+                              <input
+                                type="text"
+                                class="form-control calc-field-name"
+                                name="section_{{ loop.parent.index }}_calc_{{ loop.index }}_name"
+                                value="{{ calc_field.name }}"
+                              />
+                            </div>
+                          </div>
+                          <div class="col-md-8">
+                            <div class="mb-2">
+                              <label class="form-label">Formula</label>
+                              <div class="input-group">
+                                <input
+                                  type="text"
+                                  class="form-control calc-field-formula"
+                                  name="section_{{ loop.parent.index }}_calc_{{ loop.index }}_formula"
+                                  value="{{ calc_field.formula }}"
+                                />
+                                <button
+                                  type="button"
+                                  class="btn btn-outline-danger remove-calc-field-btn"
+                                >
+                                  <i class="bi bi-trash"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %} {% endif %}
+                    <input
+                      type="hidden"
+                      name="section_{{ loop.index }}_calc_field_count"
+                      value="{{ calc_fields|length }}"
+                      class="calc-field-count"
+                    />
+                  </div>
+
+                  <div class="mt-3">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-primary add-calc-field-btn"
+                      data-section-index="{{ loop.index }}"
+                    >
+                      <i class="bi bi-plus-circle me-1"></i> Add Calculated
+                      Field
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {% endfor %} {% endif %}
+            </div>
+
+            <div
+              id="no-sections-message"
+              class="text-center py-4 {% if template and template.sections %}d-none{% endif %}"
+            >
+              <i
+                class="bi bi-layout-text-window text-muted"
+                style="font-size: 3rem"
+              ></i>
+              <p class="mt-3 text-muted">
+                No sections added yet. Add a section to define the structure of
+                your report.
+              </p>
+            </div>
+
+            <input
+              type="hidden"
+              id="section-count"
+              name="section_count"
+              value="{{ template.sections|length if template and template.sections else 0 }}"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Sorting</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="sort-field" class="form-label">Sort By</label>
+              <input
+                type="text"
+                class="form-control"
+                id="sort-field"
+                name="sort_field"
+                value="{{ template.sorting.field if template and template.sorting else '' }}"
+              />
+              <div class="form-text">Enter a field name to sort by.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="sort-direction" class="form-label"
+                >Sort Direction</label
+              >
+              <select
+                class="form-select"
+                id="sort-direction"
+                name="sort_direction"
+              >
+                <option
+                  value="asc"
+                  {%
+                  if
+                  template
+                  and
+                  template.sorting
+                  and
+                  template.sorting.direction=""
+                  ="asc"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Ascending
+                </option>
+                <option
+                  value="desc"
+                  {%
+                  if
+                  template
+                  and
+                  template.sorting
+                  and
+                  template.sorting.direction=""
+                  ="desc"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Descending
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <h5 class="card-title mb-0">Filters</h5>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              id="add-filter-btn"
+            >
+              <i class="bi bi-plus-circle me-1"></i> Add Filter
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="filters-container">
+              {% if template and template.filters %} {% for filter in
+              template.filters %}
+              <div class="filter-item card mb-2">
+                <div class="card-body">
+                  <div class="mb-2">
+                    <label class="form-label">Field</label>
+                    <input
+                      type="text"
+                      class="form-control filter-field"
+                      name="filter_{{ loop.index }}_field"
+                      value="{{ filter.field }}"
+                    />
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label">Operator</label>
+                    <select
+                      class="form-control filter-operator"
+                      name="filter_{{ loop.index }}_operator"
+                    >
+                      <option
+                        value="=="
+                        {%
+                        if
+                        filter.operator=""
+                        ="=="
+                        %}selected{%
+                        endif
+                        %}
+                      >
+                        ==
+                      </option>
+                      <option
+                        value="!="
+                        {%
+                        if
+                        filter.operator=""
+                        ="!="
+                        %}selected{%
+                        endif
+                        %}
+                      >
+                        !=
+                      </option>
+                      <option
+                        value=">"
+                        {%
+                        if
+                        filter.operator=""
+                        =">"
+                        %}selected{%
+                        endif
+                        %}
+                      >
+                        &gt;
+                      </option>
+                      <option
+                        value="<"
+                        {%
+                        if
+                        filter.operator=""
+                        ="<"
+                        %}selected{%
+                        endif
+                        %}
+                      >
+                        &lt;
+                      </option>
+                      <option
+                        value=">="
+                        {%
+                        if
+                        filter.operator=""
+                        =">="
+                        %}selected{%
+                        endif
+                        %}
+                      >
+                        &gt;=
+                      </option>
+                      <option
+                        value="<="
+                        {%
+                        if
+                        filter.operator=""
+                        ="<="
+                        %}selected{%
+                        endif
+                        %}
+                      >
+                        &lt;=
+                      </option>
+                      <option
+                        value="contains"
+                        {%
+                        if
+                        filter.operator=""
+                        ="contains"
+                        %}selected{%
+                        endif
+                        %}
+                      >
+                        Contains
+                      </option>
+                    </select>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label">Value</label>
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        class="form-control filter-value"
+                        name="filter_{{ loop.index }}_value"
+                        value="{{ filter.value }}"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger remove-filter-btn"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %} {% endif %}
+            </div>
+
+            <div
+              id="no-filters-message"
+              class="text-center py-4 {% if template and template.filters %}d-none{% endif %}"
+            >
+              <i class="bi bi-funnel text-muted" style="font-size: 2rem"></i>
+              <p class="mt-3 text-muted">
+                No filters added yet. Add filters to limit the data included in
+                your report.
+              </p>
+            </div>
+
+            <input
+              type="hidden"
+              id="filter-count"
+              name="filter_count"
+              value="{{ template.filters|length if template and template.filters else 0 }}"
+            />
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Examples</h5>
+          </div>
+          <div class="card-body">
+            <h6>Calculated Field Examples</h6>
+            <div class="list-group">
+              {% for example in calculated_field_examples %}
+              <a
+                href="#"
+                class="list-group-item list-group-item-action calc-field-example"
+                data-name="{{ example.name }}"
+                data-formula="{{ example.formula }}"
+              >
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">{{ example.name }}</h6>
+                </div>
+                <small class="text-muted">{{ example.formula }}</small>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2">
+          <button type="submit" class="btn btn-primary">
+            {% if action == 'create' %}Create Template{% else %}Update
+            Template{% endif %}
+          </button>
+          <a href="{{ url_for('report_templates') }}" class="btn btn-secondary"
+            >Cancel</a
+          >
+        </div>
+      </div>
+    </div>
+  </form>
 </div>
 
 <!-- Field Selector Modal -->
-<div class="modal fade" id="fieldSelectorModal" tabindex="-1" aria-labelledby="fieldSelectorModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="fieldSelectorModalLabel">Select Fields</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0">Property Fields</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="list-group">
-                                    {% for field in property_fields %}
-                                    <button type="button" class="list-group-item list-group-item-action field-option" data-field="{{ field }}">
-                                        {{ field }}
-                                    </button>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-header">
-                                <h6 class="mb-0">Tax Code Fields</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="list-group">
-                                    {% for field in tax_code_fields %}
-                                    <button type="button" class="list-group-item list-group-item-action field-option" data-field="{{ field }}">
-                                        {{ field }}
-                                    </button>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div
+  class="modal fade"
+  id="fieldSelectorModal"
+  tabindex="-1"
+  aria-labelledby="fieldSelectorModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fieldSelectorModalLabel">Select Fields</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h6 class="mb-0">Property Fields</h6>
+              </div>
+              <div class="card-body">
+                <div class="list-group">
+                  {% for field in property_fields %}
+                  <button
+                    type="button"
+                    class="list-group-item list-group-item-action field-option"
+                    data-field="{{ field }}"
+                  >
+                    {{ field }}
+                  </button>
+                  {% endfor %}
                 </div>
-                <input type="hidden" id="current-section-index" value="">
+              </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="apply-fields-btn" data-bs-dismiss="modal">Apply Selected</button>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h6 class="mb-0">Tax Code Fields</h6>
+              </div>
+              <div class="card-body">
+                <div class="list-group">
+                  {% for field in tax_code_fields %}
+                  <button
+                    type="button"
+                    class="list-group-item list-group-item-action field-option"
+                    data-field="{{ field }}"
+                  >
+                    {{ field }}
+                  </button>
+                  {% endfor %}
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+        <input type="hidden" id="current-section-index" value="" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="apply-fields-btn"
+          data-bs-dismiss="modal"
+        >
+          Apply Selected
+        </button>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Section counter for generating unique IDs
-        let sectionCounter = parseInt(document.getElementById('section-count').value) || 0;
-        
-        // Filter counter
-        let filterCounter = parseInt(document.getElementById('filter-count').value) || 0;
-        
-        // Function to update section count
-        function updateSectionCount() {
-            const sections = document.querySelectorAll('.section-item');
-            document.getElementById('section-count').value = sections.length;
-            
-            // Update section numbers
-            sections.forEach((section, index) => {
-                section.querySelector('h6').textContent = `Section ${index + 1}`;
-                
-                // Update input names
-                const titleInput = section.querySelector('.section-title');
-                titleInput.name = `section_${index + 1}_title`;
-                
-                const fieldsInput = section.querySelector('.section-fields');
-                fieldsInput.name = `section_${index + 1}_fields`;
-                
-                // Update calculated fields
-                const calcFields = section.querySelectorAll('.calculated-field');
-                calcFields.forEach((calcField, calcIndex) => {
-                    const nameInput = calcField.querySelector('.calc-field-name');
-                    nameInput.name = `section_${index + 1}_calc_${calcIndex + 1}_name`;
-                    
-                    const formulaInput = calcField.querySelector('.calc-field-formula');
-                    formulaInput.name = `section_${index + 1}_calc_${calcIndex + 1}_formula`;
-                });
-                
-                // Update calculated field count
-                const calcFieldCount = section.querySelector('.calc-field-count');
-                calcFieldCount.name = `section_${index + 1}_calc_field_count`;
-                calcFieldCount.value = calcFields.length;
-                
-                // Update add calculated field button
-                const addCalcBtn = section.querySelector('.add-calc-field-btn');
-                addCalcBtn.dataset.sectionIndex = index + 1;
-            });
-            
-            // Show/hide no sections message
-            const noSectionsMessage = document.getElementById('no-sections-message');
-            if (sections.length === 0) {
-                noSectionsMessage.classList.remove('d-none');
-            } else {
-                noSectionsMessage.classList.add('d-none');
-            }
-        }
-        
-        // Function to update filter count
-        function updateFilterCount() {
-            const filters = document.querySelectorAll('.filter-item');
-            document.getElementById('filter-count').value = filters.length;
-            
-            // Update filter input names
-            filters.forEach((filter, index) => {
-                const fieldInput = filter.querySelector('.filter-field');
-                fieldInput.name = `filter_${index + 1}_field`;
-                
-                const operatorSelect = filter.querySelector('.filter-operator');
-                operatorSelect.name = `filter_${index + 1}_operator`;
-                
-                const valueInput = filter.querySelector('.filter-value');
-                valueInput.name = `filter_${index + 1}_value`;
-            });
-            
-            // Show/hide no filters message
-            const noFiltersMessage = document.getElementById('no-filters-message');
-            if (filters.length === 0) {
-                noFiltersMessage.classList.remove('d-none');
-            } else {
-                noFiltersMessage.classList.add('d-none');
-            }
-        }
-        
-        // Function to update calculated field count for a section
-        function updateCalcFieldCount(section) {
-            const calcFields = section.querySelectorAll('.calculated-field');
-            const calcFieldCount = section.querySelector('.calc-field-count');
-            calcFieldCount.value = calcFields.length;
-            
-            // Update calculated field names
-            calcFields.forEach((calcField, calcIndex) => {
-                const sectionIndex = parseInt(section.querySelector('.add-calc-field-btn').dataset.sectionIndex);
-                
-                const nameInput = calcField.querySelector('.calc-field-name');
-                nameInput.name = `section_${sectionIndex}_calc_${calcIndex + 1}_name`;
-                
-                const formulaInput = calcField.querySelector('.calc-field-formula');
-                formulaInput.name = `section_${sectionIndex}_calc_${calcIndex + 1}_formula`;
-            });
-        }
-        
-        // Add section button
-        document.getElementById('add-section-btn').addEventListener('click', function() {
-            sectionCounter++;
-            
-            const sectionHtml = `
+  document.addEventListener("DOMContentLoaded", function () {
+    // Section counter for generating unique IDs
+    let sectionCounter =
+      parseInt(document.getElementById("section-count").value) || 0;
+
+    // Filter counter
+    let filterCounter =
+      parseInt(document.getElementById("filter-count").value) || 0;
+
+    // Function to update section count
+    function updateSectionCount() {
+      const sections = document.querySelectorAll(".section-item");
+      document.getElementById("section-count").value = sections.length;
+
+      // Update section numbers
+      sections.forEach((section, index) => {
+        section.querySelector("h6").textContent = `Section ${index + 1}`;
+
+        // Update input names
+        const titleInput = section.querySelector(".section-title");
+        titleInput.name = `section_${index + 1}_title`;
+
+        const fieldsInput = section.querySelector(".section-fields");
+        fieldsInput.name = `section_${index + 1}_fields`;
+
+        // Update calculated fields
+        const calcFields = section.querySelectorAll(".calculated-field");
+        calcFields.forEach((calcField, calcIndex) => {
+          const nameInput = calcField.querySelector(".calc-field-name");
+          nameInput.name = `section_${index + 1}_calc_${calcIndex + 1}_name`;
+
+          const formulaInput = calcField.querySelector(".calc-field-formula");
+          formulaInput.name = `section_${index + 1}_calc_${calcIndex + 1}_formula`;
+        });
+
+        // Update calculated field count
+        const calcFieldCount = section.querySelector(".calc-field-count");
+        calcFieldCount.name = `section_${index + 1}_calc_field_count`;
+        calcFieldCount.value = calcFields.length;
+
+        // Update add calculated field button
+        const addCalcBtn = section.querySelector(".add-calc-field-btn");
+        addCalcBtn.dataset.sectionIndex = index + 1;
+      });
+
+      // Show/hide no sections message
+      const noSectionsMessage = document.getElementById("no-sections-message");
+      if (sections.length === 0) {
+        noSectionsMessage.classList.remove("d-none");
+      } else {
+        noSectionsMessage.classList.add("d-none");
+      }
+    }
+
+    // Function to update filter count
+    function updateFilterCount() {
+      const filters = document.querySelectorAll(".filter-item");
+      document.getElementById("filter-count").value = filters.length;
+
+      // Update filter input names
+      filters.forEach((filter, index) => {
+        const fieldInput = filter.querySelector(".filter-field");
+        fieldInput.name = `filter_${index + 1}_field`;
+
+        const operatorSelect = filter.querySelector(".filter-operator");
+        operatorSelect.name = `filter_${index + 1}_operator`;
+
+        const valueInput = filter.querySelector(".filter-value");
+        valueInput.name = `filter_${index + 1}_value`;
+      });
+
+      // Show/hide no filters message
+      const noFiltersMessage = document.getElementById("no-filters-message");
+      if (filters.length === 0) {
+        noFiltersMessage.classList.remove("d-none");
+      } else {
+        noFiltersMessage.classList.add("d-none");
+      }
+    }
+
+    // Function to update calculated field count for a section
+    function updateCalcFieldCount(section) {
+      const calcFields = section.querySelectorAll(".calculated-field");
+      const calcFieldCount = section.querySelector(".calc-field-count");
+      calcFieldCount.value = calcFields.length;
+
+      // Update calculated field names
+      calcFields.forEach((calcField, calcIndex) => {
+        const sectionIndex = parseInt(
+          section.querySelector(".add-calc-field-btn").dataset.sectionIndex,
+        );
+
+        const nameInput = calcField.querySelector(".calc-field-name");
+        nameInput.name = `section_${sectionIndex}_calc_${calcIndex + 1}_name`;
+
+        const formulaInput = calcField.querySelector(".calc-field-formula");
+        formulaInput.name = `section_${sectionIndex}_calc_${calcIndex + 1}_formula`;
+      });
+    }
+
+    // Add section button
+    document
+      .getElementById("add-section-btn")
+      .addEventListener("click", function () {
+        sectionCounter++;
+
+        const sectionHtml = `
                 <div class="section-item card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6 class="mb-0">Section ${sectionCounter}</h6>
@@ -447,31 +777,48 @@
                     </div>
                 </div>
             `;
-            
-            document.getElementById('sections-container').insertAdjacentHTML('beforeend', sectionHtml);
-            updateSectionCount();
-        });
-        
-        // Remove section button
-        document.getElementById('sections-container').addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-section-btn') || e.target.closest('.remove-section-btn')) {
-                const section = e.target.closest('.section-item');
-                section.remove();
-                updateSectionCount();
-            }
-        });
-        
-        // Add calculated field button
-        document.getElementById('sections-container').addEventListener('click', function(e) {
-            if (e.target.classList.contains('add-calc-field-btn') || e.target.closest('.add-calc-field-btn')) {
-                const button = e.target.classList.contains('add-calc-field-btn') ? e.target : e.target.closest('.add-calc-field-btn');
-                const section = button.closest('.section-item');
-                const sectionIndex = button.dataset.sectionIndex;
-                const container = section.querySelector('.calculated-fields-container');
-                const calcFieldCount = parseInt(section.querySelector('.calc-field-count').value) || 0;
-                const newCalcIndex = calcFieldCount + 1;
-                
-                const calcFieldHtml = `
+
+        document
+          .getElementById("sections-container")
+          .insertAdjacentHTML("beforeend", sectionHtml);
+        updateSectionCount();
+      });
+
+    // Remove section button
+    document
+      .getElementById("sections-container")
+      .addEventListener("click", function (e) {
+        if (
+          e.target.classList.contains("remove-section-btn") ||
+          e.target.closest(".remove-section-btn")
+        ) {
+          const section = e.target.closest(".section-item");
+          section.remove();
+          updateSectionCount();
+        }
+      });
+
+    // Add calculated field button
+    document
+      .getElementById("sections-container")
+      .addEventListener("click", function (e) {
+        if (
+          e.target.classList.contains("add-calc-field-btn") ||
+          e.target.closest(".add-calc-field-btn")
+        ) {
+          const button = e.target.classList.contains("add-calc-field-btn")
+            ? e.target
+            : e.target.closest(".add-calc-field-btn");
+          const section = button.closest(".section-item");
+          const sectionIndex = button.dataset.sectionIndex;
+          const container = section.querySelector(
+            ".calculated-fields-container",
+          );
+          const calcFieldCount =
+            parseInt(section.querySelector(".calc-field-count").value) || 0;
+          const newCalcIndex = calcFieldCount + 1;
+
+          const calcFieldHtml = `
                     <div class="calculated-field card mb-2">
                         <div class="card-body">
                             <div class="row">
@@ -496,27 +843,34 @@
                         </div>
                     </div>
                 `;
-                
-                container.insertAdjacentHTML('beforeend', calcFieldHtml);
-                updateCalcFieldCount(section);
-            }
-        });
-        
-        // Remove calculated field button
-        document.getElementById('sections-container').addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-calc-field-btn') || e.target.closest('.remove-calc-field-btn')) {
-                const calcField = e.target.closest('.calculated-field');
-                const section = e.target.closest('.section-item');
-                calcField.remove();
-                updateCalcFieldCount(section);
-            }
-        });
-        
-        // Add filter button
-        document.getElementById('add-filter-btn').addEventListener('click', function() {
-            filterCounter++;
-            
-            const filterHtml = `
+
+          container.insertAdjacentHTML("beforeend", calcFieldHtml);
+          updateCalcFieldCount(section);
+        }
+      });
+
+    // Remove calculated field button
+    document
+      .getElementById("sections-container")
+      .addEventListener("click", function (e) {
+        if (
+          e.target.classList.contains("remove-calc-field-btn") ||
+          e.target.closest(".remove-calc-field-btn")
+        ) {
+          const calcField = e.target.closest(".calculated-field");
+          const section = e.target.closest(".section-item");
+          calcField.remove();
+          updateCalcFieldCount(section);
+        }
+      });
+
+    // Add filter button
+    document
+      .getElementById("add-filter-btn")
+      .addEventListener("click", function () {
+        filterCounter++;
+
+        const filterHtml = `
                 <div class="filter-item card mb-2">
                     <div class="card-body">
                         <div class="mb-2">
@@ -547,97 +901,128 @@
                     </div>
                 </div>
             `;
-            
-            document.getElementById('filters-container').insertAdjacentHTML('beforeend', filterHtml);
-            updateFilterCount();
-        });
-        
-        // Remove filter button
-        document.getElementById('filters-container').addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-filter-btn') || e.target.closest('.remove-filter-btn')) {
-                const filter = e.target.closest('.filter-item');
-                filter.remove();
-                updateFilterCount();
-            }
-        });
-        
-        // Field selector buttons
-        document.querySelectorAll('.field-selector-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                document.getElementById('current-section-index').value = this.dataset.sectionIndex;
-            });
-        });
-        
-        // Field option buttons
-        const selectedFields = new Set();
-        document.querySelectorAll('.field-option').forEach(option => {
-            option.addEventListener('click', function() {
-                const field = this.dataset.field;
-                
-                if (this.classList.contains('active')) {
-                    this.classList.remove('active');
-                    selectedFields.delete(field);
-                } else {
-                    this.classList.add('active');
-                    selectedFields.add(field);
-                }
-            });
-        });
-        
-        // Apply fields button
-        document.getElementById('apply-fields-btn').addEventListener('click', function() {
-            const sectionIndex = document.getElementById('current-section-index').value;
-            const sectionFields = document.querySelector(`input[name="section_${sectionIndex}_fields"]`);
-            
-            if (sectionFields) {
-                const currentFields = sectionFields.value.split(',').map(f => f.trim()).filter(f => f);
-                const newFields = Array.from(selectedFields);
-                
-                // Combine fields, remove duplicates
-                const combinedFields = [...new Set([...currentFields, ...newFields])].join(', ');
-                sectionFields.value = combinedFields;
-                
-                // Clear selection
-                selectedFields.clear();
-                document.querySelectorAll('.field-option.active').forEach(option => {
-                    option.classList.remove('active');
-                });
-            }
-        });
-        
-        // Calculated field examples
-        document.querySelectorAll('.calc-field-example').forEach(example => {
-            example.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const name = this.dataset.name;
-                const formula = this.dataset.formula;
-                
-                // Find the first visible add calc field button
-                const addCalcBtn = document.querySelector('.add-calc-field-btn:not([style*="display: none"])');
-                if (addCalcBtn) {
-                    addCalcBtn.click();
-                    
-                    // Get the newly added field
-                    const section = addCalcBtn.closest('.section-item');
-                    const calcFields = section.querySelectorAll('.calculated-field');
-                    const newCalcField = calcFields[calcFields.length - 1];
-                    
-                    if (newCalcField) {
-                        newCalcField.querySelector('.calc-field-name').value = name;
-                        newCalcField.querySelector('.calc-field-formula').value = formula;
-                    }
-                }
-            });
-        });
-        
-        // Dynamic binding for field selector buttons added after page load
-        document.getElementById('sections-container').addEventListener('click', function(e) {
-            if (e.target.classList.contains('field-selector-btn') || e.target.closest('.field-selector-btn')) {
-                const button = e.target.classList.contains('field-selector-btn') ? e.target : e.target.closest('.field-selector-btn');
-                document.getElementById('current-section-index').value = button.dataset.sectionIndex;
-            }
-        });
+
+        document
+          .getElementById("filters-container")
+          .insertAdjacentHTML("beforeend", filterHtml);
+        updateFilterCount();
+      });
+
+    // Remove filter button
+    document
+      .getElementById("filters-container")
+      .addEventListener("click", function (e) {
+        if (
+          e.target.classList.contains("remove-filter-btn") ||
+          e.target.closest(".remove-filter-btn")
+        ) {
+          const filter = e.target.closest(".filter-item");
+          filter.remove();
+          updateFilterCount();
+        }
+      });
+
+    // Field selector buttons
+    document.querySelectorAll(".field-selector-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        document.getElementById("current-section-index").value =
+          this.dataset.sectionIndex;
+      });
     });
+
+    // Field option buttons
+    const selectedFields = new Set();
+    document.querySelectorAll(".field-option").forEach((option) => {
+      option.addEventListener("click", function () {
+        const field = this.dataset.field;
+
+        if (this.classList.contains("active")) {
+          this.classList.remove("active");
+          selectedFields.delete(field);
+        } else {
+          this.classList.add("active");
+          selectedFields.add(field);
+        }
+      });
+    });
+
+    // Apply fields button
+    document
+      .getElementById("apply-fields-btn")
+      .addEventListener("click", function () {
+        const sectionIndex = document.getElementById(
+          "current-section-index",
+        ).value;
+        const sectionFields = document.querySelector(
+          `input[name="section_${sectionIndex}_fields"]`,
+        );
+
+        if (sectionFields) {
+          const currentFields = sectionFields.value
+            .split(",")
+            .map((f) => f.trim())
+            .filter((f) => f);
+          const newFields = Array.from(selectedFields);
+
+          // Combine fields, remove duplicates
+          const combinedFields = [
+            ...new Set([...currentFields, ...newFields]),
+          ].join(", ");
+          sectionFields.value = combinedFields;
+
+          // Clear selection
+          selectedFields.clear();
+          document
+            .querySelectorAll(".field-option.active")
+            .forEach((option) => {
+              option.classList.remove("active");
+            });
+        }
+      });
+
+    // Calculated field examples
+    document.querySelectorAll(".calc-field-example").forEach((example) => {
+      example.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const name = this.dataset.name;
+        const formula = this.dataset.formula;
+
+        // Find the first visible add calc field button
+        const addCalcBtn = document.querySelector(
+          '.add-calc-field-btn:not([style*="display: none"])',
+        );
+        if (addCalcBtn) {
+          addCalcBtn.click();
+
+          // Get the newly added field
+          const section = addCalcBtn.closest(".section-item");
+          const calcFields = section.querySelectorAll(".calculated-field");
+          const newCalcField = calcFields[calcFields.length - 1];
+
+          if (newCalcField) {
+            newCalcField.querySelector(".calc-field-name").value = name;
+            newCalcField.querySelector(".calc-field-formula").value = formula;
+          }
+        }
+      });
+    });
+
+    // Dynamic binding for field selector buttons added after page load
+    document
+      .getElementById("sections-container")
+      .addEventListener("click", function (e) {
+        if (
+          e.target.classList.contains("field-selector-btn") ||
+          e.target.closest(".field-selector-btn")
+        ) {
+          const button = e.target.classList.contains("field-selector-btn")
+            ? e.target
+            : e.target.closest(".field-selector-btn");
+          document.getElementById("current-section-index").value =
+            button.dataset.sectionIndex;
+        }
+      });
+  });
 </script>
 {% endblock %}

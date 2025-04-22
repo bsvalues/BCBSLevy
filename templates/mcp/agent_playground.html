@@ -1,125 +1,160 @@
-{% extends "base.html" %}
-
-{% block title %}Agent Playground - LevyMaster{% endblock %}
-
-{% block content %}
-
+{% extends "base.html" %} {% block title %}Agent Playground - LevyMaster{%
+endblock %} {% block content %}
 
 <div class="container py-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-5 fw-bold">Agent Playground</h1>
-            <p class="lead text-secondary">Test and interact with AI agents in a sandbox environment</p>
-            <hr class="my-4">
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="display-5 fw-bold">Agent Playground</h1>
+      <p class="lead text-secondary">
+        Test and interact with AI agents in a sandbox environment
+      </p>
+      <hr class="my-4" />
     </div>
+  </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Select Agent</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label for="agent-select" class="form-label">Agent Type</label>
-                        <select class="form-select" id="agent-select">
-                            <option value="levy-analysis">Levy Analysis Agent</option>
-                            <option value="compliance">Compliance Checker</option>
-                            <option value="forecasting" selected>Forecasting Agent</option>
-                            <option value="data-quality">Data Quality Agent</option>
-                            <option value="audit">Levy Audit Agent</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="agent-mode" class="form-label">Mode</label>
-                        <select class="form-select" id="agent-mode">
-                            <option value="interactive" selected>Interactive</option>
-                            <option value="batch">Batch Processing</option>
-                            <option value="evaluation">Evaluation Mode</option>
-                        </select>
-                    </div>
-                    
-                    <hr>
-                    
-                    <div class="mb-3">
-                        <label for="agent-parameters" class="form-label">Agent Parameters</label>
-                        <textarea class="form-control" id="agent-parameters" rows="6">{
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Select Agent</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="agent-select" class="form-label">Agent Type</label>
+            <select class="form-select" id="agent-select">
+              <option value="levy-analysis">Levy Analysis Agent</option>
+              <option value="compliance">Compliance Checker</option>
+              <option value="forecasting" selected>Forecasting Agent</option>
+              <option value="data-quality">Data Quality Agent</option>
+              <option value="audit">Levy Audit Agent</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="agent-mode" class="form-label">Mode</label>
+            <select class="form-select" id="agent-mode">
+              <option value="interactive" selected>Interactive</option>
+              <option value="batch">Batch Processing</option>
+              <option value="evaluation">Evaluation Mode</option>
+            </select>
+          </div>
+
+          <hr />
+
+          <div class="mb-3">
+            <label for="agent-parameters" class="form-label"
+              >Agent Parameters</label
+            >
+            <textarea class="form-control" id="agent-parameters" rows="6">
+{
   "district_ids": ["BC001", "BC002"],
   "tax_year": 2025,
   "baseline_year": 2024,
   "include_confidence_intervals": true,
   "forecast_years": 3,
   "growth_assumptions": "moderate"
-}</textarea>
-                    </div>
-                    
-                    <div class="d-grid">
-                        <button id="execute-btn" class="btn btn-primary">Execute Agent</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Agent Information</h5>
-                </div>
-                <div class="card-body">
-                    <h6 class="fw-bold">Forecasting Agent</h6>
-                    <p class="text-muted">Specialized agent for predicting future levy rates and assessed values based on historical trends and configurable growth assumptions.</p>
-                    
-                    <h6 class="fw-bold mt-3">Capabilities</h6>
-                    <ul class="mb-0">
-                        <li>Multi-year forecasting (1-5 years)</li>
-                        <li>Confidence interval generation</li>
-                        <li>Scenario comparison analysis</li>
-                        <li>Growth trend visualization</li>
-                        <li>Budget impact projections</li>
-                    </ul>
-                </div>
-            </div>
+}</textarea
+            >
+          </div>
+
+          <div class="d-grid">
+            <button id="execute-btn" class="btn btn-primary">
+              Execute Agent
+            </button>
+          </div>
         </div>
-        
-        <div class="col-md-8 mb-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Agent Execution</h5>
-                    <div>
-                        <button class="btn btn-sm btn-light me-2">Save Output</button>
-                        <button class="btn btn-sm btn-light">Clear</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div id="agent-output" style="min-height: 400px; max-height: 500px; overflow-y: auto; font-family: monospace; padding: 10px; background-color: #f8f9fa;">
-                        <div class="text-muted">/* Agent output will appear here */</div>
-                        <div id="execution-log">
-                            <div class="mb-2">
-                                <span class="text-primary">[SYSTEM] </span> Initializing Forecasting Agent...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[SYSTEM] </span> Loading district data for BC001, BC002...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[SYSTEM] </span> Retrieving historical rates for 2020-2024...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[AGENT] </span> Analyzing historical trends for Benton County districts...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[AGENT] </span> Computing growth rates with moderate assumptions...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[AGENT] </span> Generating forecast for 2025-2027...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[AGENT] </span> Calculating confidence intervals (95%)...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-success">[RESULT] </span> Forecast complete! Results:
-                            </div>
-                            <div class="mb-2 ms-4">
-                                <pre style="margin: 0; padding: 10px; background-color: #e9ecef; border-radius: 4px;">
+      </div>
+
+      <div class="card shadow-sm mt-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Agent Information</h5>
+        </div>
+        <div class="card-body">
+          <h6 class="fw-bold">Forecasting Agent</h6>
+          <p class="text-muted">
+            Specialized agent for predicting future levy rates and assessed
+            values based on historical trends and configurable growth
+            assumptions.
+          </p>
+
+          <h6 class="fw-bold mt-3">Capabilities</h6>
+          <ul class="mb-0">
+            <li>Multi-year forecasting (1-5 years)</li>
+            <li>Confidence interval generation</li>
+            <li>Scenario comparison analysis</li>
+            <li>Growth trend visualization</li>
+            <li>Budget impact projections</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+      <div class="card shadow-sm mb-4">
+        <div
+          class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+        >
+          <h5 class="card-title mb-0">Agent Execution</h5>
+          <div>
+            <button class="btn btn-sm btn-light me-2">Save Output</button>
+            <button class="btn btn-sm btn-light">Clear</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div
+            id="agent-output"
+            style="
+              min-height: 400px;
+              max-height: 500px;
+              overflow-y: auto;
+              font-family: monospace;
+              padding: 10px;
+              background-color: #f8f9fa;
+            "
+          >
+            <div class="text-muted">/* Agent output will appear here */</div>
+            <div id="execution-log">
+              <div class="mb-2">
+                <span class="text-primary">[SYSTEM] </span> Initializing
+                Forecasting Agent...
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[SYSTEM] </span> Loading district
+                data for BC001, BC002...
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[SYSTEM] </span> Retrieving
+                historical rates for 2020-2024...
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[AGENT] </span> Analyzing historical
+                trends for Benton County districts...
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[AGENT] </span> Computing growth
+                rates with moderate assumptions...
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[AGENT] </span> Generating forecast
+                for 2025-2027...
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[AGENT] </span> Calculating
+                confidence intervals (95%)...
+              </div>
+              <div class="mb-2">
+                <span class="text-success">[RESULT] </span> Forecast complete!
+                Results:
+              </div>
+              <div class="mb-2 ms-4">
+                <pre
+                  style="
+                    margin: 0;
+                    padding: 10px;
+                    background-color: #e9ecef;
+                    border-radius: 4px;
+                  "
+                >
 {
   "district_id": "BC001",
   "name": "Benton County General",
@@ -153,94 +188,126 @@
     }
   ]
 }
-                                </pre>
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[AGENT] </span> Creating visualization of forecast trends...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-primary">[AGENT] </span> Preparing forecast report...
-                            </div>
-                            <div class="mb-2">
-                                <span class="text-success">[COMPLETE] </span> Forecast execution finished successfully.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                </pre
+                >
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[AGENT] </span> Creating
+                visualization of forecast trends...
+              </div>
+              <div class="mb-2">
+                <span class="text-primary">[AGENT] </span> Preparing forecast
+                report...
+              </div>
+              <div class="mb-2">
+                <span class="text-success">[COMPLETE] </span> Forecast execution
+                finished successfully.
+              </div>
             </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="card-title mb-0">Visualizations</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <div class="mb-3">
-                                <h6 class="fw-bold">Levy Rate Forecast with Confidence Intervals</h6>
-                                <div style="width: 100%; height: 200px; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-bar-chart-line-fill" style="font-size: 3rem; color: #6c757d;"></i>
-                                </div>
-                                <small class="text-muted">Click to expand visualization</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="card-title mb-0">Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    Save Forecast
-                                    <i class="bi bi-save"></i>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    Export as PDF
-                                    <i class="bi bi-file-earmark-pdf"></i>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    Compare with Previous Forecast
-                                    <i class="bi bi-arrow-left-right"></i>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    Run Budget Impact Analysis
-                                    <i class="bi bi-cash-stack"></i>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    Adjust Parameters and Re-run
-                                    <i class="bi bi-arrow-repeat"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+      </div>
 
-{% block extra_js %}
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h5 class="card-title mb-0">Visualizations</h5>
+            </div>
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <h6 class="fw-bold">
+                  Levy Rate Forecast with Confidence Intervals
+                </h6>
+                <div
+                  style="
+                    width: 100%;
+                    height: 200px;
+                    background-color: #f8f9fa;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <i
+                    class="bi bi-bar-chart-line-fill"
+                    style="font-size: 3rem; color: #6c757d"
+                  ></i>
+                </div>
+                <small class="text-muted">Click to expand visualization</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h5 class="card-title mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+              <div class="list-group">
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                >
+                  Save Forecast
+                  <i class="bi bi-save"></i>
+                </a>
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                >
+                  Export as PDF
+                  <i class="bi bi-file-earmark-pdf"></i>
+                </a>
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                >
+                  Compare with Previous Forecast
+                  <i class="bi bi-arrow-left-right"></i>
+                </a>
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                >
+                  Run Budget Impact Analysis
+                  <i class="bi bi-cash-stack"></i>
+                </a>
+                <a
+                  href="#"
+                  class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                >
+                  Adjust Parameters and Re-run
+                  <i class="bi bi-arrow-repeat"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Agent Playground page initialized');
-        
-        // Simulation of agent execution
-        const executeBtn = document.getElementById('execute-btn');
-        const executionLog = document.getElementById('execution-log');
-        
-        if (executeBtn && executionLog) {
-            executeBtn.addEventListener('click', function() {
-                // Clear existing output and show loading
-                executionLog.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted">Executing agent...</p></div>';
-                
-                // Simulate delay
-                setTimeout(() => {
-                    // Reload the original content after "processing"
-                    executionLog.innerHTML = `
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Agent Playground page initialized");
+
+    // Simulation of agent execution
+    const executeBtn = document.getElementById("execute-btn");
+    const executionLog = document.getElementById("execution-log");
+
+    if (executeBtn && executionLog) {
+      executeBtn.addEventListener("click", function () {
+        // Clear existing output and show loading
+        executionLog.innerHTML =
+          '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2 text-muted">Executing agent...</p></div>';
+
+        // Simulate delay
+        setTimeout(() => {
+          // Reload the original content after "processing"
+          executionLog.innerHTML = `
                         <div class="mb-2">
                             <span class="text-primary">[SYSTEM] </span> Initializing Forecasting Agent...
                         </div>
@@ -312,9 +379,9 @@
                             <span class="text-success">[COMPLETE] </span> Forecast execution finished successfully.
                         </div>
                     `;
-                }, 2000);
-            });
-        }
-    });
+        }, 2000);
+      });
+    }
+  });
 </script>
 {% endblock %}

@@ -1,6 +1,7 @@
 # Technical Debt Remediation Report
 
 ## Project: Levy Calculation System
+
 ## Date: April 11, 2025
 
 ## Executive Summary
@@ -10,6 +11,7 @@ This report documents the successful remediation of technical debt related to le
 ## Background
 
 The Levy Calculation System underwent a previous migration from an older data model to a new one, but some foreign key references to the legacy `tax_district_old` table remained in three tables:
+
 - `levy_rate`
 - `forecast`
 - `compliance_issue`
@@ -21,6 +23,7 @@ This inconsistency increased the risk of data integrity issues and complicated f
 ### 1. Foreign Key Constraint Migration
 
 A script was developed to:
+
 - Create backup tables before making changes
 - Drop existing foreign key constraints to the legacy table
 - Create new foreign key constraints to the current table
@@ -35,6 +38,7 @@ The codebase was scanned for any references to the legacy table in Python code. 
 ### 3. Documentation
 
 Documentation was created to record the changes made, including:
+
 - Migration summary document
 - Model scan completion log
 - This comprehensive remediation report
@@ -44,6 +48,7 @@ Documentation was created to record the changes made, including:
 The following verification steps were completed:
 
 ### Database Schema Verification
+
 ```sql
 SELECT t.relname AS table_name, c.conname AS constraint_name, pg_get_constraintdef(c.oid) AS constraint_definition
 FROM pg_constraint c
@@ -56,6 +61,7 @@ WHERE c.confrelid = (SELECT oid FROM pg_class WHERE relname = 'tax_district')
 Results confirmed all three tables now have proper foreign key constraints to `tax_district`.
 
 ### Legacy Reference Verification
+
 ```sql
 SELECT COUNT(*)
 FROM pg_constraint c

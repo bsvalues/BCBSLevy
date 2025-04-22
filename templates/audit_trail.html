@@ -1,362 +1,438 @@
-{% extends 'base.html' %}
-
-{% block title %}Audit Trail{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Audit Trail{% endblock %} {% block
+content %}
 <div class="container my-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="mb-3"><i class="bi bi-journal-text"></i> Audit Trail</h1>
-            <p class="lead">Track all changes made to data in the system.</p>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="mb-3"><i class="bi bi-journal-text"></i> Audit Trail</h1>
+      <p class="lead">Track all changes made to data in the system.</p>
     </div>
-    
-    <!-- Audit Summary Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Audit Summary</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 text-center mb-3">
-                            <h2>{{ summary.total_logs }}</h2>
-                            <p class="text-muted">Total Changes</p>
-                        </div>
-                        <div class="col-md-3 text-center mb-3">
-                            <h2>{{ summary.create_count }}</h2>
-                            <p class="text-muted text-success">Created</p>
-                        </div>
-                        <div class="col-md-3 text-center mb-3">
-                            <h2>{{ summary.update_count }}</h2>
-                            <p class="text-muted text-warning">Updated</p>
-                        </div>
-                        <div class="col-md-3 text-center mb-3">
-                            <h2>{{ summary.delete_count }}</h2>
-                            <p class="text-muted text-danger">Deleted</p>
-                        </div>
-                    </div>
-                    
-                    <div class="row mt-2">
-                        <div class="col-12">
-                            <h6>Changes by Table</h6>
-                            <div class="row">
-                                {% for table, count in summary.tables.items() %}
-                                <div class="col-md-3 mb-2">
-                                    <a href="{{ url_for('audit_trail', table=table) }}" class="text-decoration-none">
-                                        <span class="badge bg-secondary rounded-pill">{{ count }}</span>
-                                        {{ table }}
-                                    </a>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  </div>
+
+  <!-- Audit Summary Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Audit Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 text-center mb-3">
+              <h2>{{ summary.total_logs }}</h2>
+              <p class="text-muted">Total Changes</p>
             </div>
-        </div>
-    </div>
-    
-    <!-- Filters -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters</h5>
-                </div>
-                <div class="card-body">
-                    <form method="GET" action="{{ url_for('audit_trail') }}">
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <label for="table" class="form-label">Table</label>
-                                <select name="table" id="table" class="form-select">
-                                    <option value="">All Tables</option>
-                                    {% for table_name in tables %}
-                                    <option value="{{ table_name }}" {% if selected_table == table_name %}selected{% endif %}>
-                                        {{ table_name }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label for="record_id" class="form-label">Record ID</label>
-                                <input type="number" name="record_id" id="record_id" class="form-control" value="{{ selected_record_id or '' }}">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label for="action" class="form-label">Action</label>
-                                <select name="action" id="action" class="form-select">
-                                    <option value="">All Actions</option>
-                                    {% for action_type in actions %}
-                                    <option value="{{ action_type }}" {% if selected_action == action_type %}selected{% endif %}>
-                                        {{ action_type }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <label for="start_date" class="form-label">Start Date</label>
-                                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ start_date }}">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label for="end_date" class="form-label">End Date</label>
-                                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ end_date }}">
-                            </div>
-                            <div class="col-md-3 mb-3 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary">Apply Filters</button>
-                                <a href="{{ url_for('audit_trail') }}" class="btn btn-secondary ms-2">Reset</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <div class="col-md-3 text-center mb-3">
+              <h2>{{ summary.create_count }}</h2>
+              <p class="text-muted text-success">Created</p>
             </div>
-        </div>
-    </div>
-    
-    <!-- Audit Logs Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Audit Logs</h5>
+            <div class="col-md-3 text-center mb-3">
+              <h2>{{ summary.update_count }}</h2>
+              <p class="text-muted text-warning">Updated</p>
+            </div>
+            <div class="col-md-3 text-center mb-3">
+              <h2>{{ summary.delete_count }}</h2>
+              <p class="text-muted text-danger">Deleted</p>
+            </div>
+          </div>
+
+          <div class="row mt-2">
+            <div class="col-12">
+              <h6>Changes by Table</h6>
+              <div class="row">
+                {% for table, count in summary.tables.items() %}
+                <div class="col-md-3 mb-2">
+                  <a
+                    href="{{ url_for('audit_trail', table=table) }}"
+                    class="text-decoration-none"
+                  >
+                    <span class="badge bg-secondary rounded-pill"
+                      >{{ count }}</span
+                    >
+                    {{ table }}
+                  </a>
                 </div>
-                <div class="card-body">
-                    {% if logs %}
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Table</th>
-                                    <th>Record ID</th>
-                                    <th>Action</th>
-                                    <th>Changes</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for log in logs %}
-                                <tr>
-                                    <td>{{ log.timestamp }}</td>
-                                    <td>{{ log.table }}</td>
-                                    <td>
-                                        <a href="{{ url_for('audit_trail_entity', table_name=log.table, record_id=log.record_id) }}">
-                                            {{ log.record_id }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {% if log.action == 'CREATE' %}
-                                        <span class="badge bg-success">{{ log.action }}</span>
-                                        {% elif log.action == 'UPDATE' %}
-                                        <span class="badge bg-warning">{{ log.action }}</span>
-                                        {% elif log.action == 'DELETE' %}
-                                        <span class="badge bg-danger">{{ log.action }}</span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">{{ log.action }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if log.changes %}
-                                        <span class="badge bg-info rounded-pill">{{ log.changes|length }}</span>
-                                        <small>{{ log.changes[0].field }}</small>
-                                        {% if log.changes|length > 1 %}
-                                        <small>...</small>
-                                        {% endif %}
-                                        {% else %}
-                                        <span class="text-muted">No changes</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary view-details" 
-                                                data-log-id="{{ log.id }}">
-                                            View
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Pagination -->
-                    <nav aria-label="Audit trail pagination">
-                        <ul class="pagination justify-content-center">
-                            {% if pagination.has_prev %}
-                            <li class="page-item">
-                                <a class="page-link" href="{{ url_for('audit_trail', page=pagination.prev_num, table=selected_table, record_id=selected_record_id, action=selected_action, start_date=start_date, end_date=end_date) }}">
-                                    Previous
-                                </a>
-                            </li>
-                            {% else %}
-                            <li class="page-item disabled">
-                                <span class="page-link">Previous</span>
-                            </li>
-                            {% endif %}
-                            
-                            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-                                {% if page_num %}
-                                    {% if page_num == pagination.page %}
-                                    <li class="page-item active">
-                                        <span class="page-link">{{ page_num }}</span>
-                                    </li>
-                                    {% else %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ url_for('audit_trail', page=page_num, table=selected_table, record_id=selected_record_id, action=selected_action, start_date=start_date, end_date=end_date) }}">
-                                            {{ page_num }}
-                                        </a>
-                                    </li>
-                                    {% endif %}
-                                {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                                {% endif %}
-                            {% endfor %}
-                            
-                            {% if pagination.has_next %}
-                            <li class="page-item">
-                                <a class="page-link" href="{{ url_for('audit_trail', page=pagination.next_num, table=selected_table, record_id=selected_record_id, action=selected_action, start_date=start_date, end_date=end_date) }}">
-                                    Next
-                                </a>
-                            </li>
-                            {% else %}
-                            <li class="page-item disabled">
-                                <span class="page-link">Next</span>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-funnel"></i> Filters</h5>
+        </div>
+        <div class="card-body">
+          <form method="GET" action="{{ url_for('audit_trail') }}">
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label for="table" class="form-label">Table</label>
+                <select name="table" id="table" class="form-select">
+                  <option value="">All Tables</option>
+                  {% for table_name in tables %}
+                  <option
+                    value="{{ table_name }}"
+                    {%
+                    if
+                    selected_table=""
+                    ="table_name"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ table_name }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="record_id" class="form-label">Record ID</label>
+                <input
+                  type="number"
+                  name="record_id"
+                  id="record_id"
+                  class="form-control"
+                  value="{{ selected_record_id or '' }}"
+                />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="action" class="form-label">Action</label>
+                <select name="action" id="action" class="form-select">
+                  <option value="">All Actions</option>
+                  {% for action_type in actions %}
+                  <option
+                    value="{{ action_type }}"
+                    {%
+                    if
+                    selected_action=""
+                    ="action_type"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ action_type }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input
+                  type="date"
+                  name="start_date"
+                  id="start_date"
+                  class="form-control"
+                  value="{{ start_date }}"
+                />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="end_date" class="form-label">End Date</label>
+                <input
+                  type="date"
+                  name="end_date"
+                  id="end_date"
+                  class="form-control"
+                  value="{{ end_date }}"
+                />
+              </div>
+              <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">
+                  Apply Filters
+                </button>
+                <a
+                  href="{{ url_for('audit_trail') }}"
+                  class="btn btn-secondary ms-2"
+                  >Reset</a
+                >
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audit Logs Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-list-ul"></i> Audit Logs</h5>
+        </div>
+        <div class="card-body">
+          {% if logs %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Table</th>
+                  <th>Record ID</th>
+                  <th>Action</th>
+                  <th>Changes</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in logs %}
+                <tr>
+                  <td>{{ log.timestamp }}</td>
+                  <td>{{ log.table }}</td>
+                  <td>
+                    <a
+                      href="{{ url_for('audit_trail_entity', table_name=log.table, record_id=log.record_id) }}"
+                    >
+                      {{ log.record_id }}
+                    </a>
+                  </td>
+                  <td>
+                    {% if log.action == 'CREATE' %}
+                    <span class="badge bg-success">{{ log.action }}</span>
+                    {% elif log.action == 'UPDATE' %}
+                    <span class="badge bg-warning">{{ log.action }}</span>
+                    {% elif log.action == 'DELETE' %}
+                    <span class="badge bg-danger">{{ log.action }}</span>
                     {% else %}
-                    <div class="alert alert-info">
-                        No audit logs found matching the specified criteria.
-                    </div>
+                    <span class="badge bg-secondary">{{ log.action }}</span>
                     {% endif %}
-                </div>
-            </div>
+                  </td>
+                  <td>
+                    {% if log.changes %}
+                    <span class="badge bg-info rounded-pill"
+                      >{{ log.changes|length }}</span
+                    >
+                    <small>{{ log.changes[0].field }}</small>
+                    {% if log.changes|length > 1 %}
+                    <small>...</small>
+                    {% endif %} {% else %}
+                    <span class="text-muted">No changes</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary view-details"
+                      data-log-id="{{ log.id }}"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <nav aria-label="Audit trail pagination">
+            <ul class="pagination justify-content-center">
+              {% if pagination.has_prev %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="{{ url_for('audit_trail', page=pagination.prev_num, table=selected_table, record_id=selected_record_id, action=selected_action, start_date=start_date, end_date=end_date) }}"
+                >
+                  Previous
+                </a>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Previous</span>
+              </li>
+              {% endif %} {% for page_num in pagination.iter_pages(left_edge=1,
+              right_edge=1, left_current=1, right_current=2) %} {% if page_num
+              %} {% if page_num == pagination.page %}
+              <li class="page-item active">
+                <span class="page-link">{{ page_num }}</span>
+              </li>
+              {% else %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="{{ url_for('audit_trail', page=page_num, table=selected_table, record_id=selected_record_id, action=selected_action, start_date=start_date, end_date=end_date) }}"
+                >
+                  {{ page_num }}
+                </a>
+              </li>
+              {% endif %} {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">...</span>
+              </li>
+              {% endif %} {% endfor %} {% if pagination.has_next %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="{{ url_for('audit_trail', page=pagination.next_num, table=selected_table, record_id=selected_record_id, action=selected_action, start_date=start_date, end_date=end_date) }}"
+                >
+                  Next
+                </a>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">Next</span>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% else %}
+          <div class="alert alert-info">
+            No audit logs found matching the specified criteria.
+          </div>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Modal for Log Details -->
-<div class="modal fade" id="logDetailsModal" tabindex="-1" aria-labelledby="logDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="logDetailsModalLabel">Audit Log Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <p><strong>Timestamp:</strong> <span id="modal-timestamp"></span></p>
-                        <p><strong>Table:</strong> <span id="modal-table"></span></p>
-                        <p><strong>Record ID:</strong> <span id="modal-record-id"></span></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Action:</strong> <span id="modal-action"></span></p>
-                        <p><strong>User:</strong> <span id="modal-user"></span></p>
-                        <p><strong>IP Address:</strong> <span id="modal-ip"></span></p>
-                    </div>
-                </div>
-                
-                <h6>Changes</h6>
-                <div class="table-responsive">
-                    <table class="table table-hover table-sm" id="changes-table">
-                        <thead>
-                            <tr>
-                                <th>Field</th>
-                                <th>Old Value</th>
-                                <th>New Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="changes-body">
-                            <!-- Changes will be inserted here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+<div
+  class="modal fade"
+  id="logDetailsModal"
+  tabindex="-1"
+  aria-labelledby="logDetailsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logDetailsModalLabel">Audit Log Details</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p>
+              <strong>Timestamp:</strong> <span id="modal-timestamp"></span>
+            </p>
+            <p><strong>Table:</strong> <span id="modal-table"></span></p>
+            <p>
+              <strong>Record ID:</strong> <span id="modal-record-id"></span>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Action:</strong> <span id="modal-action"></span></p>
+            <p><strong>User:</strong> <span id="modal-user"></span></p>
+            <p><strong>IP Address:</strong> <span id="modal-ip"></span></p>
+          </div>
         </div>
-    </div>
-</div>
-{% endblock %}
 
-{% block scripts %}
+        <h6>Changes</h6>
+        <div class="table-responsive">
+          <table class="table table-hover table-sm" id="changes-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Old Value</th>
+                <th>New Value</th>
+              </tr>
+            </thead>
+            <tbody id="changes-body">
+              <!-- Changes will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle View Details button clicks
-        const viewDetailsBtns = document.querySelectorAll('.view-details');
-        viewDetailsBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const logId = this.getAttribute('data-log-id');
-                fetchLogDetails(logId);
-            });
-        });
-        
-        // Function to fetch log details
-        function fetchLogDetails(logId) {
-            fetch(`/api/audit-trail/log/${logId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Populate modal with data
-                    document.getElementById('modal-timestamp').textContent = data.timestamp;
-                    document.getElementById('modal-table').textContent = data.table;
-                    document.getElementById('modal-record-id').textContent = data.record_id;
-                    document.getElementById('modal-action').textContent = data.action;
-                    document.getElementById('modal-user').textContent = data.user_id || 'System';
-                    document.getElementById('modal-ip').textContent = data.ip_address || 'Unknown';
-                    
-                    // Populate changes table
-                    const changesBody = document.getElementById('changes-body');
-                    changesBody.innerHTML = '';
-                    
-                    if (data.changes && data.changes.length > 0) {
-                        data.changes.forEach(change => {
-                            const row = document.createElement('tr');
-                            
-                            const fieldCell = document.createElement('td');
-                            fieldCell.textContent = change.field;
-                            row.appendChild(fieldCell);
-                            
-                            const oldCell = document.createElement('td');
-                            oldCell.textContent = change.old_value !== null ? change.old_value : '(none)';
-                            if (change.old_value === null) {
-                                oldCell.classList.add('text-muted');
-                            }
-                            row.appendChild(oldCell);
-                            
-                            const newCell = document.createElement('td');
-                            newCell.textContent = change.new_value !== null ? change.new_value : '(none)';
-                            if (change.new_value === null) {
-                                newCell.classList.add('text-muted');
-                            }
-                            row.appendChild(newCell);
-                            
-                            changesBody.appendChild(row);
-                        });
-                    } else {
-                        const row = document.createElement('tr');
-                        const cell = document.createElement('td');
-                        cell.colSpan = 3;
-                        cell.textContent = 'No changes found';
-                        cell.classList.add('text-center', 'text-muted');
-                        row.appendChild(cell);
-                        changesBody.appendChild(row);
-                    }
-                    
-                    // Show the modal
-                    const modal = new bootstrap.Modal(document.getElementById('logDetailsModal'));
-                    modal.show();
-                })
-                .catch(error => {
-                    console.error('Error fetching log details:', error);
-                    alert('Error fetching log details. Please try again.');
-                });
-        }
+  document.addEventListener("DOMContentLoaded", function () {
+    // Handle View Details button clicks
+    const viewDetailsBtns = document.querySelectorAll(".view-details");
+    viewDetailsBtns.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const logId = this.getAttribute("data-log-id");
+        fetchLogDetails(logId);
+      });
     });
+
+    // Function to fetch log details
+    function fetchLogDetails(logId) {
+      fetch(`/api/audit-trail/log/${logId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          // Populate modal with data
+          document.getElementById("modal-timestamp").textContent =
+            data.timestamp;
+          document.getElementById("modal-table").textContent = data.table;
+          document.getElementById("modal-record-id").textContent =
+            data.record_id;
+          document.getElementById("modal-action").textContent = data.action;
+          document.getElementById("modal-user").textContent =
+            data.user_id || "System";
+          document.getElementById("modal-ip").textContent =
+            data.ip_address || "Unknown";
+
+          // Populate changes table
+          const changesBody = document.getElementById("changes-body");
+          changesBody.innerHTML = "";
+
+          if (data.changes && data.changes.length > 0) {
+            data.changes.forEach((change) => {
+              const row = document.createElement("tr");
+
+              const fieldCell = document.createElement("td");
+              fieldCell.textContent = change.field;
+              row.appendChild(fieldCell);
+
+              const oldCell = document.createElement("td");
+              oldCell.textContent =
+                change.old_value !== null ? change.old_value : "(none)";
+              if (change.old_value === null) {
+                oldCell.classList.add("text-muted");
+              }
+              row.appendChild(oldCell);
+
+              const newCell = document.createElement("td");
+              newCell.textContent =
+                change.new_value !== null ? change.new_value : "(none)";
+              if (change.new_value === null) {
+                newCell.classList.add("text-muted");
+              }
+              row.appendChild(newCell);
+
+              changesBody.appendChild(row);
+            });
+          } else {
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+            cell.colSpan = 3;
+            cell.textContent = "No changes found";
+            cell.classList.add("text-center", "text-muted");
+            row.appendChild(cell);
+            changesBody.appendChild(row);
+          }
+
+          // Show the modal
+          const modal = new bootstrap.Modal(
+            document.getElementById("logDetailsModal"),
+          );
+          modal.show();
+        })
+        .catch((error) => {
+          console.error("Error fetching log details:", error);
+          alert("Error fetching log details. Please try again.");
+        });
+    }
+  });
 </script>
 {% endblock %}

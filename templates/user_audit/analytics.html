@@ -1,433 +1,454 @@
-{% extends "base.html" %}
-
-{% block title %}User Analytics Dashboard{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}User Analytics Dashboard{% endblock
+%} {% block content %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">User Analytics Dashboard</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('user_audit.index') }}">User Audit</a></li>
-        <li class="breadcrumb-item active">Analytics</li>
-    </ol>
-    
-    <!-- Time Range Selector -->
-    <div class="row mb-4">
-        <div class="col-12 text-end">
-            <form method="get" action="{{ url_for('user_audit.analytics') }}" class="d-inline-flex">
-                <label for="days" class="form-label me-2 align-self-center mb-0">Time Period:</label>
-                <select class="form-select me-2" id="days" name="days" style="width: auto;" onchange="this.form.submit()">
-                    <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 Days</option>
-                    <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 Days</option>
-                    <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 Days</option>
-                    <option value="365" {% if days == 365 %}selected{% endif %}>Last Year</option>
-                </select>
-            </form>
-        </div>
+  <h1 class="mt-4">User Analytics Dashboard</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('user_audit.index') }}">User Audit</a>
+    </li>
+    <li class="breadcrumb-item active">Analytics</li>
+  </ol>
+
+  <!-- Time Range Selector -->
+  <div class="row mb-4">
+    <div class="col-12 text-end">
+      <form
+        method="get"
+        action="{{ url_for('user_audit.analytics') }}"
+        class="d-inline-flex"
+      >
+        <label for="days" class="form-label me-2 align-self-center mb-0"
+          >Time Period:</label
+        >
+        <select
+          class="form-select me-2"
+          id="days"
+          name="days"
+          style="width: auto"
+          onchange="this.form.submit()"
+        >
+          <option value="7" {% if days="" ="7" %}selected{% endif %}>
+            Last 7 Days
+          </option>
+          <option value="30" {% if days="" ="30" %}selected{% endif %}>
+            Last 30 Days
+          </option>
+          <option value="90" {% if days="" ="90" %}selected{% endif %}>
+            Last 90 Days
+          </option>
+          <option value="365" {% if days="" ="365" %}selected{% endif %}>
+            Last Year
+          </option>
+        </select>
+      </form>
     </div>
-    
-    <!-- Chart Cards Row -->
-    <div class="row">
-        <!-- Daily Activity Chart -->
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-line me-1"></i>
-                    Daily User Activity
-                </div>
-                <div class="card-body">
-                    <canvas id="dailyActivityChart" width="100%" height="300"></canvas>
-                </div>
-            </div>
+  </div>
+
+  <!-- Chart Cards Row -->
+  <div class="row">
+    <!-- Daily Activity Chart -->
+    <div class="col-xl-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-line me-1"></i>
+          Daily User Activity
         </div>
-        
-        <!-- Module Activity Chart -->
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-pie me-1"></i>
-                    Activity by Module
-                </div>
-                <div class="card-body">
-                    <canvas id="moduleActivityChart" width="100%" height="300"></canvas>
-                </div>
-            </div>
+        <div class="card-body">
+          <canvas id="dailyActivityChart" width="100%" height="300"></canvas>
         </div>
+      </div>
     </div>
-    
-    <!-- Second Row Charts -->
-    <div class="row">
-        <!-- Action Type Chart -->
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar me-1"></i>
-                    Activity by Action Type
-                </div>
-                <div class="card-body">
-                    <canvas id="actionTypeChart" width="100%" height="300"></canvas>
-                </div>
-            </div>
+
+    <!-- Module Activity Chart -->
+    <div class="col-xl-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-pie me-1"></i>
+          Activity by Module
         </div>
-        
-        <!-- Error Rates Chart -->
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-exclamation-triangle me-1"></i>
-                    Error Rates by Module
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Module</th>
-                                    <th>Total Actions</th>
-                                    <th>Errors</th>
-                                    <th>Error Rate</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for module in error_rates %}
-                                <tr>
-                                    <td>{{ module.module }}</td>
-                                    <td>{{ module.total }}</td>
-                                    <td>{{ module.errors }}</td>
-                                    <td>
-                                        {% if module.total > 0 %}
-                                        {% set error_rate = (module.errors / module.total * 100) %}
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-2">{{ "%.2f"|format(error_rate) }}%</div>
-                                            <div class="progress flex-grow-1" style="height: 8px;">
-                                                <div class="progress-bar bg-danger" style="width: {{ error_rate }}%"></div>
-                                            </div>
-                                        </div>
-                                        {% else %}
-                                        N/A
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="4" class="text-center">No data available</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+        <div class="card-body">
+          <canvas id="moduleActivityChart" width="100%" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Second Row Charts -->
+  <div class="row">
+    <!-- Action Type Chart -->
+    <div class="col-xl-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-chart-bar me-1"></i>
+          Activity by Action Type
+        </div>
+        <div class="card-body">
+          <canvas id="actionTypeChart" width="100%" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Rates Chart -->
+    <div class="col-xl-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-exclamation-triangle me-1"></i>
+          Error Rates by Module
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Module</th>
+                  <th>Total Actions</th>
+                  <th>Errors</th>
+                  <th>Error Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for module in error_rates %}
+                <tr>
+                  <td>{{ module.module }}</td>
+                  <td>{{ module.total }}</td>
+                  <td>{{ module.errors }}</td>
+                  <td>
+                    {% if module.total > 0 %} {% set error_rate = (module.errors
+                    / module.total * 100) %}
+                    <div class="d-flex align-items-center">
+                      <div class="me-2">{{ "%.2f"|format(error_rate) }}%</div>
+                      <div class="progress flex-grow-1" style="height: 8px">
+                        <div
+                          class="progress-bar bg-danger"
+                          style="width: {{ error_rate }}%"
+                        ></div>
+                      </div>
                     </div>
-                </div>
-            </div>
+                    {% else %} N/A {% endif %}
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="4" class="text-center">No data available</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-    
-    <!-- Active Users and Insights Row -->
-    <div class="row">
-        <!-- Most Active Users -->
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-users me-1"></i>
-                    Most Active Users
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Activity Count</th>
-                                    <th>Activity Level</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in active_users %}
-                                <tr>
-                                    <td>
-                                        <a href="{{ url_for('user_audit.user_detail', user_id=user.user_id) }}">
-                                            {{ user.username }}
-                                        </a>
-                                    </td>
-                                    <td>{{ user.count }}</td>
-                                    <td>
-                                        {% set max_count = active_users[0].count if active_users|length > 0 else 0 %}
-                                        {% if max_count > 0 %}
-                                        {% set activity_level = (user.count / max_count * 100) %}
-                                        <div class="progress">
-                                            <div class="progress-bar bg-success" style="width: {{ activity_level }}%">
-                                                {{ "%.1f"|format(activity_level) }}%
-                                            </div>
-                                        </div>
-                                        {% else %}
-                                        N/A
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="3" class="text-center">No active users found</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+  </div>
+
+  <!-- Active Users and Insights Row -->
+  <div class="row">
+    <!-- Most Active Users -->
+    <div class="col-xl-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-users me-1"></i>
+          Most Active Users
         </div>
-        
-        <!-- Analytics Insights -->
-        <div class="col-xl-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-lightbulb me-1"></i>
-                    Usage Insights
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Peak Usage Time -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-left-primary h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Most Used Feature
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                {% if module_chart_data.labels|length > 0 %}
-                                                {{ module_chart_data.labels[0] }}
-                                                {% else %}
-                                                N/A
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-star fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Most Common Action -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-left-success h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Most Common Action
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                {% if action_chart_data.labels|length > 0 %}
-                                                {{ action_chart_data.labels[0] }}
-                                                {% else %}
-                                                N/A
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-bolt fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Average Error Rate -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-left-warning h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                System Error Rate
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                {% set total_errors = 0 %}
-                                                {% set total_actions = 0 %}
-                                                {% for module in error_rates %}
-                                                    {% set total_errors = total_errors + module.errors %}
-                                                    {% set total_actions = total_actions + module.total %}
-                                                {% endfor %}
-                                                {% if total_actions > 0 %}
-                                                    {{ "%.2f"|format(total_errors / total_actions * 100) }}%
-                                                {% else %}
-                                                    N/A
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Highest Activity Day -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-left-info h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                Highest Activity Day
-                                            </div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                {% if daily_chart_data.labels|length > 0 %}
-                                                    {% set max_index = 0 %}
-                                                    {% set max_value = daily_chart_data.values[0] %}
-                                                    {% for i in range(1, daily_chart_data.values|length) %}
-                                                        {% if daily_chart_data.values[i] > max_value %}
-                                                            {% set max_index = i %}
-                                                            {% set max_value = daily_chart_data.values[i] %}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                    {{ daily_chart_data.labels[max_index] }}
-                                                {% else %}
-                                                    N/A
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Activity Count</th>
+                  <th>Activity Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for user in active_users %}
+                <tr>
+                  <td>
+                    <a
+                      href="{{ url_for('user_audit.user_detail', user_id=user.user_id) }}"
+                    >
+                      {{ user.username }}
+                    </a>
+                  </td>
+                  <td>{{ user.count }}</td>
+                  <td>
+                    {% set max_count = active_users[0].count if
+                    active_users|length > 0 else 0 %} {% if max_count > 0 %} {%
+                    set activity_level = (user.count / max_count * 100) %}
+                    <div class="progress">
+                      <div
+                        class="progress-bar bg-success"
+                        style="width: {{ activity_level }}%"
+                      >
+                        {{ "%.1f"|format(activity_level) }}%
+                      </div>
                     </div>
-                </div>
-            </div>
+                    {% else %} N/A {% endif %}
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="3" class="text-center">No active users found</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
+
+    <!-- Analytics Insights -->
+    <div class="col-xl-6">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-lightbulb me-1"></i>
+          Usage Insights
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Peak Usage Time -->
+            <div class="col-md-6 mb-4">
+              <div class="card border-left-primary h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div
+                        class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                      >
+                        Most Used Feature
+                      </div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">
+                        {% if module_chart_data.labels|length > 0 %} {{
+                        module_chart_data.labels[0] }} {% else %} N/A {% endif
+                        %}
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-star fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Most Common Action -->
+            <div class="col-md-6 mb-4">
+              <div class="card border-left-success h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div
+                        class="text-xs font-weight-bold text-success text-uppercase mb-1"
+                      >
+                        Most Common Action
+                      </div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">
+                        {% if action_chart_data.labels|length > 0 %} {{
+                        action_chart_data.labels[0] }} {% else %} N/A {% endif
+                        %}
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-bolt fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Average Error Rate -->
+            <div class="col-md-6 mb-4">
+              <div class="card border-left-warning h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div
+                        class="text-xs font-weight-bold text-warning text-uppercase mb-1"
+                      >
+                        System Error Rate
+                      </div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">
+                        {% set total_errors = 0 %} {% set total_actions = 0 %}
+                        {% for module in error_rates %} {% set total_errors =
+                        total_errors + module.errors %} {% set total_actions =
+                        total_actions + module.total %} {% endfor %} {% if
+                        total_actions > 0 %} {{ "%.2f"|format(total_errors /
+                        total_actions * 100) }}% {% else %} N/A {% endif %}
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i
+                        class="fas fa-exclamation-circle fa-2x text-gray-300"
+                      ></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Highest Activity Day -->
+            <div class="col-md-6 mb-4">
+              <div class="card border-left-info h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div
+                        class="text-xs font-weight-bold text-info text-uppercase mb-1"
+                      >
+                        Highest Activity Day
+                      </div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">
+                        {% if daily_chart_data.labels|length > 0 %} {% set
+                        max_index = 0 %} {% set max_value =
+                        daily_chart_data.values[0] %} {% for i in range(1,
+                        daily_chart_data.values|length) %} {% if
+                        daily_chart_data.values[i] > max_value %} {% set
+                        max_index = i %} {% set max_value =
+                        daily_chart_data.values[i] %} {% endif %} {% endfor %}
+                        {{ daily_chart_data.labels[max_index] }} {% else %} N/A
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Daily Activity Chart
-        var dailyCtx = document.getElementById('dailyActivityChart').getContext('2d');
-        var dailyChart = new Chart(dailyCtx, {
-            type: 'line',
-            data: {
-                labels: {{ daily_chart_data.labels | tojson }},
-                datasets: [{
-                    label: 'User Activity',
-                    data: {{ daily_chart_data.values | tojson }},
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: function(context) {
-                                return context[0].label;
-                            },
-                            label: function(context) {
-                                return 'Activities: ' + context.raw;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Module Activity Chart
-        var moduleCtx = document.getElementById('moduleActivityChart').getContext('2d');
-        var moduleChart = new Chart(moduleCtx, {
-            type: 'doughnut',
-            data: {
-                labels: {{ module_chart_data.labels | tojson }},
-                datasets: [{
-                    data: {{ module_chart_data.values | tojson }},
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(153, 102, 255, 0.7)',
-                        'rgba(255, 159, 64, 0.7)',
-                        'rgba(199, 199, 199, 0.7)',
-                        'rgba(83, 102, 255, 0.7)',
-                        'rgba(40, 159, 64, 0.7)',
-                        'rgba(210, 60, 180, 0.7)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                var label = context.label || '';
-                                var value = context.raw;
-                                var total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                var percentage = Math.round((value / total) * 100);
-                                return label + ': ' + value + ' (' + percentage + '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Action Type Chart
-        var actionCtx = document.getElementById('actionTypeChart').getContext('2d');
-        var actionChart = new Chart(actionCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ action_chart_data.labels | tojson }},
-                datasets: [{
-                    label: 'Actions',
-                    data: {{ action_chart_data.values | tojson }},
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      // Daily Activity Chart
+      var dailyCtx = document.getElementById('dailyActivityChart').getContext('2d');
+      var dailyChart = new Chart(dailyCtx, {
+          type: 'line',
+          data: {
+              labels: {{ daily_chart_data.labels | tojson }},
+              datasets: [{
+                  label: 'User Activity',
+                  data: {{ daily_chart_data.values | tojson }},
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 2,
+                  tension: 0.4,
+                  fill: true
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: {
+                          precision: 0
+                      }
+                  }
+              },
+              plugins: {
+                  legend: {
+                      display: false
+                  },
+                  tooltip: {
+                      callbacks: {
+                          title: function(context) {
+                              return context[0].label;
+                          },
+                          label: function(context) {
+                              return 'Activities: ' + context.raw;
+                          }
+                      }
+                  }
+              }
+          }
+      });
+
+      // Module Activity Chart
+      var moduleCtx = document.getElementById('moduleActivityChart').getContext('2d');
+      var moduleChart = new Chart(moduleCtx, {
+          type: 'doughnut',
+          data: {
+              labels: {{ module_chart_data.labels | tojson }},
+              datasets: [{
+                  data: {{ module_chart_data.values | tojson }},
+                  backgroundColor: [
+                      'rgba(54, 162, 235, 0.7)',
+                      'rgba(255, 99, 132, 0.7)',
+                      'rgba(255, 206, 86, 0.7)',
+                      'rgba(75, 192, 192, 0.7)',
+                      'rgba(153, 102, 255, 0.7)',
+                      'rgba(255, 159, 64, 0.7)',
+                      'rgba(199, 199, 199, 0.7)',
+                      'rgba(83, 102, 255, 0.7)',
+                      'rgba(40, 159, 64, 0.7)',
+                      'rgba(210, 60, 180, 0.7)'
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'right'
+                  },
+                  tooltip: {
+                      callbacks: {
+                          label: function(context) {
+                              var label = context.label || '';
+                              var value = context.raw;
+                              var total = context.dataset.data.reduce((a, b) => a + b, 0);
+                              var percentage = Math.round((value / total) * 100);
+                              return label + ': ' + value + ' (' + percentage + '%)';
+                          }
+                      }
+                  }
+              }
+          }
+      });
+
+      // Action Type Chart
+      var actionCtx = document.getElementById('actionTypeChart').getContext('2d');
+      var actionChart = new Chart(actionCtx, {
+          type: 'bar',
+          data: {
+              labels: {{ action_chart_data.labels | tojson }},
+              datasets: [{
+                  label: 'Actions',
+                  data: {{ action_chart_data.values | tojson }},
+                  backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: {
+                          precision: 0
+                      }
+                  }
+              },
+              plugins: {
+                  legend: {
+                      display: false
+                  }
+              }
+          }
+      });
+  });
 </script>
-{% endblock %}
-{% endblock %}
+{% endblock %} {% endblock %}

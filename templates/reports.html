@@ -1,530 +1,651 @@
-{% extends "base.html" %}
-
-{% block title %}Reports - Benton County Levy Calculator{% endblock %}
-
-{% block page_title %}Advanced Reports{% endblock %}
-{% block page_subtitle %}Generate comprehensive tax rolls and statutory compliance reports{% endblock %}
-
-{% block extra_css %}
+{% extends "base.html" %} {% block title %}Reports - Benton County Levy
+Calculator{% endblock %} {% block page_title %}Advanced Reports{% endblock %} {%
+block page_subtitle %}Generate comprehensive tax rolls and statutory compliance
+reports{% endblock %} {% block extra_css %}
 <style>
-    .nav-pills .nav-link.active {
-        background-color: var(--bs-primary);
-    }
-    
-    .compliance-highlight {
-        font-weight: bold;
-    }
-    
-    .compliance-compliant {
-        color: var(--bs-success);
-    }
-    
-    .compliance-warning {
-        color: var(--bs-warning);
-    }
-    
-    .compliance-danger {
-        color: var(--bs-danger);
-    }
-    
-    .metric-card {
-        transition: all 0.3s;
-    }
-    
-    .metric-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .chart-container {
-        height: 300px;
-    }
-    
-    .property-impact-table {
-        font-size: 0.875rem;
-    }
-</style>
-{% endblock %}
+  .nav-pills .nav-link.active {
+    background-color: var(--bs-primary);
+  }
 
-{% block content %}
+  .compliance-highlight {
+    font-weight: bold;
+  }
+
+  .compliance-compliant {
+    color: var(--bs-success);
+  }
+
+  .compliance-warning {
+    color: var(--bs-warning);
+  }
+
+  .compliance-danger {
+    color: var(--bs-danger);
+  }
+
+  .metric-card {
+    transition: all 0.3s;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+
+  .property-impact-table {
+    font-size: 0.875rem;
+  }
+</style>
+{% endblock %} {% block content %}
 <!-- Report Type Selector -->
 <div class="mb-4">
-    <ul class="nav nav-pills" role="tablist">
-        <li class="nav-item" role="presentation">
-            <a class="nav-link {% if report_type == 'tax_roll' %}active{% endif %}" 
-               href="{{ url_for('reports', report_type='tax_roll') }}">
-                <i class="fas fa-file-invoice me-2"></i>Tax Roll Reports
-            </a>
-        </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link {% if report_type == 'compliance' %}active{% endif %}" 
-               href="{{ url_for('reports', report_type='compliance') }}">
-                <i class="fas fa-check-square me-2"></i>Statutory Compliance
-            </a>
-        </li>
-    </ul>
+  <ul class="nav nav-pills" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link {% if report_type == 'tax_roll' %}active{% endif %}"
+        href="{{ url_for('reports', report_type='tax_roll') }}"
+      >
+        <i class="fas fa-file-invoice me-2"></i>Tax Roll Reports
+      </a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a
+        class="nav-link {% if report_type == 'compliance' %}active{% endif %}"
+        href="{{ url_for('reports', report_type='compliance') }}"
+      >
+        <i class="fas fa-check-square me-2"></i>Statutory Compliance
+      </a>
+    </li>
+  </ul>
 </div>
 
 {% if report_type == 'tax_roll' %}
 <!-- Tax Roll Content -->
 <div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Generate Tax Roll</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info mb-4">
-                    <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Tax Roll Report Information</h6>
-                    <p class="mb-0">
-                        This report generates a comprehensive tax roll CSV file containing all properties with their
-                        assessed values, tax codes, levy rates, and calculated tax amounts. The report will only include
-                        properties in tax code areas where a levy rate has been calculated.
-                    </p>
-                </div>
-                
-                <form action="{{ url_for('reports') }}" method="post">
-                    <div class="text-center py-4">
-                        <i class="fas fa-file-csv fa-4x text-secondary mb-3"></i>
-                        <h5>Tax Roll Export</h5>
-                        <p class="text-muted">
-                            The CSV file will include the following columns:
-                        </p>
-                        <ul class="list-unstyled">
-                            <li><strong>Property ID</strong> - Unique identifier for each property</li>
-                            <li><strong>Assessed Value</strong> - Assessed value in dollars</li>
-                            <li><strong>Tax Code</strong> - Tax district code</li>
-                            <li><strong>Levy Rate</strong> - Calculated levy rate per $1,000</li>
-                            <li><strong>Calculated Tax</strong> - Property tax amount in dollars</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="d-grid gap-2 col-lg-6 mx-auto">
-                        <button type="submit" name="generate_tax_roll" class="btn btn-primary btn-lg">
-                            <i class="fas fa-file-export me-2"></i> Generate Tax Roll CSV
-                        </button>
-                    </div>
-                </form>
-            </div>
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Generate Tax Roll</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info mb-4">
+          <h6 class="mb-2">
+            <i class="fas fa-info-circle me-2"></i>Tax Roll Report Information
+          </h6>
+          <p class="mb-0">
+            This report generates a comprehensive tax roll CSV file containing
+            all properties with their assessed values, tax codes, levy rates,
+            and calculated tax amounts. The report will only include properties
+            in tax code areas where a levy rate has been calculated.
+          </p>
         </div>
-        
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">Sample Tax Roll Format</h5>
-            </div>
-            <div class="card-body">
-                <pre class="bg-dark text-light p-3 rounded"><code>Property ID,Assessed Value,Tax Code,Levy Rate,Calculated Tax
+
+        <form action="{{ url_for('reports') }}" method="post">
+          <div class="text-center py-4">
+            <i class="fas fa-file-csv fa-4x text-secondary mb-3"></i>
+            <h5>Tax Roll Export</h5>
+            <p class="text-muted">
+              The CSV file will include the following columns:
+            </p>
+            <ul class="list-unstyled">
+              <li>
+                <strong>Property ID</strong> - Unique identifier for each
+                property
+              </li>
+              <li>
+                <strong>Assessed Value</strong> - Assessed value in dollars
+              </li>
+              <li><strong>Tax Code</strong> - Tax district code</li>
+              <li>
+                <strong>Levy Rate</strong> - Calculated levy rate per $1,000
+              </li>
+              <li>
+                <strong>Calculated Tax</strong> - Property tax amount in dollars
+              </li>
+            </ul>
+          </div>
+
+          <div class="d-grid gap-2 col-lg-6 mx-auto">
+            <button
+              type="submit"
+              name="generate_tax_roll"
+              class="btn btn-primary btn-lg"
+            >
+              <i class="fas fa-file-export me-2"></i> Generate Tax Roll CSV
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0">Sample Tax Roll Format</h5>
+      </div>
+      <div class="card-body">
+        <pre
+          class="bg-dark text-light p-3 rounded"
+        ><code>Property ID,Assessed Value,Tax Code,Levy Rate,Calculated Tax
 1001,250000.00,A101,3.5000,875.00
 1002,325000.00,A101,3.5000,1137.50
 1003,175000.00,B202,4.2500,743.75
 1004,450000.00,C303,2.9500,1327.50
 1005,275000.00,B202,4.2500,1168.75</code></pre>
-                
-                <div class="mt-4">
-                    <h6>Calculation Method</h6>
-                    <div class="alert alert-secondary">
-                        <p class="mb-0">
-                            Individual property tax is calculated using the formula:
-                        </p>
-                        <pre class="bg-dark text-light p-2 rounded my-2"><code>calculated_tax = (assessed_value / 1000) * levy_rate</code></pre>
-                        <p class="mb-0">
-                            Where levy_rate is the rate per $1,000 of assessed value.
-                        </p>
-                    </div>
-                </div>
-            </div>
+
+        <div class="mt-4">
+          <h6>Calculation Method</h6>
+          <div class="alert alert-secondary">
+            <p class="mb-0">
+              Individual property tax is calculated using the formula:
+            </p>
+            <pre
+              class="bg-dark text-light p-2 rounded my-2"
+            ><code>calculated_tax = (assessed_value / 1000) * levy_rate</code></pre>
+            <p class="mb-0">
+              Where levy_rate is the rate per $1,000 of assessed value.
+            </p>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 {% elif report_type == 'compliance' %}
 <!-- Statutory Compliance Content -->
 <div class="row">
-    <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">Statutory Compliance Report</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info mb-4">
-                    <h6 class="mb-2"><i class="fas fa-info-circle me-2"></i>Compliance Report Information</h6>
-                    <p class="mb-0">
-                        This comprehensive report analyzes property tax levy compliance with statutory requirements,
-                        including maximum levy rates, annual increase limits, consolidated levy rate checks, filing 
-                        deadline compliance, and banked capacity analysis.
-                    </p>
-                </div>
-                
-                {% if compliance_report %}
-                    <!-- Compliance Summary Cards -->
-                    <div class="row mb-4">
-                        <div class="col-md-3 mb-3">
-                            <div class="card metric-card h-100 {% if compliance_report.overall_compliant %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Overall Compliance</h6>
-                                    <h2 class="mb-0">{{ "Yes" if compliance_report.overall_compliant else "No" }}</h2>
-                                    <small>{{ compliance_report.levy_rate_compliance.summary.compliant_tax_codes }} of {{ compliance_report.levy_rate_compliance.summary.total_tax_codes }} tax codes compliant</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card metric-card h-100 
-                            {% if compliance_report.compliance_percentage >= 95 %}bg-success text-white
-                            {% elif compliance_report.compliance_percentage >= 80 %}bg-warning
-                            {% else %}bg-danger text-white{% endif %}">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Compliance Score</h6>
-                                    <h2 class="mb-0">{{ "%.1f"|format(compliance_report.compliance_percentage) }}%</h2>
-                                    <small>Based on {{ compliance_report.levy_rate_compliance.summary.total_tax_codes * 2 }} compliance checks</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card metric-card h-100 
-                            {% if compliance_report.filing_deadline_compliance.status == 'compliant' %}bg-success text-white
-                            {% else %}bg-warning{% endif %}">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Filing Deadline</h6>
-                                    <h2 class="mb-0">{{ compliance_report.filing_deadline_compliance.days_remaining }}</h2>
-                                    <small>Days remaining until {{ compliance_report.filing_deadline_compliance.deadline_date }}</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card metric-card h-100 bg-info text-white">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Banked Capacity</h6>
-                                    <h2 class="mb-0">${{ "{:,.0f}".format(compliance_report.banked_capacity_compliance.total_banked_capacity) }}</h2>
-                                    <small>Potential unused levy capacity</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Critical Issues Section -->
-                    {% if compliance_report.critical_issues %}
-                    <div class="card mb-4 border-danger">
-                        <div class="card-header bg-danger text-white">
-                            <h5 class="mb-0">Critical Compliance Issues</h5>
-                        </div>
-                        <div class="card-body">
-                            <ul class="list-group">
-                                {% for issue in compliance_report.critical_issues %}
-                                <li class="list-group-item list-group-item-danger">{{ issue }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Levy Rate Compliance Details -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Levy Rate Compliance Details</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Tax Code</th>
-                                            <th>Current Rate</th>
-                                            <th>Previous Rate</th>
-                                            <th>Regular Levy Compliant</th>
-                                            <th>Annual Increase Compliant</th>
-                                            <th>Issues</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for code_data in compliance_report.levy_rate_compliance.regular_levy_compliance %}
-                                        <tr {% if not code_data.compliant %}class="table-danger"{% endif %}>
-                                            <td>{{ code_data.code }}</td>
-                                            <td>{{ "%.4f"|format(code_data.levy_rate) }}</td>
-                                            <td>{{ "%.4f"|format(code_data.previous_rate) if code_data.previous_rate else "N/A" }}</td>
-                                            <td>
-                                                {% if code_data.regular_levy_compliant %}
-                                                <span class="badge bg-success">Yes</span>
-                                                {% else %}
-                                                <span class="badge bg-danger">No</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if code_data.annual_increase_compliant %}
-                                                <span class="badge bg-success">Yes</span>
-                                                {% else %}
-                                                <span class="badge bg-danger">No</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if code_data.issues %}
-                                                <ul class="mb-0 ps-3">
-                                                    {% for issue in code_data.issues %}
-                                                    <li class="text-danger small">{{ issue }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                                {% else %}
-                                                <span class="text-success">No issues</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Filing Deadline Compliance -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Filing Deadline Compliance</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6 class="card-title">Filing Status</h6>
-                                            <table class="table">
-                                                <tr>
-                                                    <th>Deadline Date:</th>
-                                                    <td>{{ compliance_report.filing_deadline_compliance.deadline_date }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Days Remaining:</th>
-                                                    <td>{{ compliance_report.filing_deadline_compliance.days_remaining }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Status:</th>
-                                                    <td>
-                                                        {% if compliance_report.filing_deadline_compliance.status == 'compliant' %}
-                                                        <span class="badge bg-success">Compliant</span>
-                                                        {% else %}
-                                                        <span class="badge bg-warning">At Risk</span>
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Data Complete:</th>
-                                                    <td>
-                                                        {% if compliance_report.filing_deadline_compliance.data_complete %}
-                                                        <span class="badge bg-success">Yes</span>
-                                                        {% else %}
-                                                        <span class="badge bg-danger">No</span>
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6 class="card-title">Data Status</h6>
-                                            <table class="table">
-                                                <tr>
-                                                    <th>Tax Codes:</th>
-                                                    <td>{{ compliance_report.filing_deadline_compliance.tax_codes_count }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Properties:</th>
-                                                    <td>{{ compliance_report.filing_deadline_compliance.properties_count }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Tax Districts:</th>
-                                                    <td>{{ compliance_report.filing_deadline_compliance.tax_districts_count }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Recent Imports:</th>
-                                                    <td>
-                                                        {% if compliance_report.filing_deadline_compliance.data_recent %}
-                                                        <span class="badge bg-success">Current</span>
-                                                        {% else %}
-                                                        <span class="badge bg-warning">Outdated</span>
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {% if compliance_report.filing_deadline_compliance.warnings %}
-                            <div class="alert alert-warning mt-3">
-                                <h6 class="alert-heading">Warnings:</h6>
-                                <ul class="mb-0">
-                                    {% for warning in compliance_report.filing_deadline_compliance.warnings %}
-                                    <li>{{ warning }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Banked Capacity Analysis -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Banked Capacity Analysis</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-info mb-3">
-                                <p class="mb-0">
-                                    <strong>Banked Capacity:</strong> Unused levy capacity that can be "banked" for future use. 
-                                    When a taxing district increases its levy by less than the allowed 1% limit,
-                                    the difference can be saved and used in future years (typically within 5 years).
-                                </p>
-                            </div>
-                            
-                            <div class="row mb-4">
-                                <div class="col-md-4">
-                                    <div class="card bg-light">
-                                        <div class="card-body text-center">
-                                            <h6 class="card-title">Total Potential Banked Capacity</h6>
-                                            <h3 class="mb-0">${{ "{:,.2f}".format(compliance_report.banked_capacity_compliance.total_banked_capacity) }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card bg-light">
-                                        <div class="card-body text-center">
-                                            <h6 class="card-title">Tax Codes with Banked Capacity</h6>
-                                            <h3 class="mb-0">{{ compliance_report.banked_capacity_compliance.tax_codes_with_banked_capacity|length }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card bg-light">
-                                        <div class="card-body text-center">
-                                            <h6 class="card-title">Expiring Capacity</h6>
-                                            <h3 class="mb-0">{{ compliance_report.banked_capacity_compliance.expiring_capacity|length }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            {% if compliance_report.banked_capacity_compliance.tax_codes_with_banked_capacity %}
-                            <h6>Tax Codes with Potential Banked Capacity</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Tax Code</th>
-                                            <th>Actual Increase</th>
-                                            <th>Banked Rate</th>
-                                            <th>Banked Amount</th>
-                                            <th>Expires</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for bc in compliance_report.banked_capacity_compliance.tax_codes_with_banked_capacity %}
-                                        <tr>
-                                            <td>{{ bc.code }}</td>
-                                            <td>{{ "%.2f"|format((bc.actual_increase_ratio - 1) * 100) }}%</td>
-                                            <td>{{ "%.4f"|format(bc.potential_banked_capacity_rate) }}</td>
-                                            <td>${{ "{:,.2f}".format(bc.potential_banked_amount) }}</td>
-                                            <td>{{ bc.expiration_year }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% else %}
-                            <div class="alert alert-secondary">
-                                <p class="mb-0">No tax codes with banked capacity detected.</p>
-                            </div>
-                            {% endif %}
-                            
-                            {% if compliance_report.banked_capacity_compliance.recommendations %}
-                            <div class="alert alert-info mt-3">
-                                <h6 class="alert-heading">Recommendations:</h6>
-                                <ul class="mb-0">
-                                    {% for rec in compliance_report.banked_capacity_compliance.recommendations %}
-                                    <li>{{ rec }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Recommendations Section -->
-                    <div class="card mb-4 border-primary">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">Recommendations</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if compliance_report.recommendations %}
-                            <ul class="list-group">
-                                {% for recommendation in compliance_report.recommendations %}
-                                <li class="list-group-item list-group-item-action">{{ recommendation }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% else %}
-                            <p>No specific recommendations at this time.</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Download Report -->
-                    <form action="{{ url_for('reports') }}" method="post">
-                        <div class="d-grid gap-2 col-lg-6 mx-auto">
-                            <button type="submit" name="generate_compliance_report" class="btn btn-primary btn-lg">
-                                <i class="fas fa-file-export me-2"></i> Download Compliance Report CSV
-                            </button>
-                        </div>
-                    </form>
-                {% else %}
-                    <div class="alert alert-warning">
-                        <h5 class="alert-heading">Compliance Report Not Available</h5>
-                        <p>
-                            There was an error generating the compliance report. Please ensure you have imported
-                            property data and calculated levy rates before running this report.
-                        </p>
-                        <a href="{{ url_for('levy_calculator') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-calculator me-2"></i> Go to Levy Calculator
-                        </a>
-                    </div>
-                {% endif %}
-            </div>
+  <div class="col-12">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Statutory Compliance Report</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info mb-4">
+          <h6 class="mb-2">
+            <i class="fas fa-info-circle me-2"></i>Compliance Report Information
+          </h6>
+          <p class="mb-0">
+            This comprehensive report analyzes property tax levy compliance with
+            statutory requirements, including maximum levy rates, annual
+            increase limits, consolidated levy rate checks, filing deadline
+            compliance, and banked capacity analysis.
+          </p>
         </div>
+
+        {% if compliance_report %}
+        <!-- Compliance Summary Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3 mb-3">
+            <div
+              class="card metric-card h-100 {% if compliance_report.overall_compliant %}bg-success text-white{% else %}bg-danger text-white{% endif %}"
+            >
+              <div class="card-body text-center">
+                <h6 class="card-title">Overall Compliance</h6>
+                <h2 class="mb-0">
+                  {{ "Yes" if compliance_report.overall_compliant else "No" }}
+                </h2>
+                <small
+                  >{{
+                  compliance_report.levy_rate_compliance.summary.compliant_tax_codes
+                  }} of {{
+                  compliance_report.levy_rate_compliance.summary.total_tax_codes
+                  }} tax codes compliant</small
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div
+              class="card metric-card h-100 {% if compliance_report.compliance_percentage >= 95 %}bg-success text-white {% elif compliance_report.compliance_percentage >= 80 %}bg-warning {% else %}bg-danger text-white{% endif %}"
+            >
+              <div class="card-body text-center">
+                <h6 class="card-title">Compliance Score</h6>
+                <h2 class="mb-0">
+                  {{ "%.1f"|format(compliance_report.compliance_percentage) }}%
+                </h2>
+                <small
+                  >Based on {{
+                  compliance_report.levy_rate_compliance.summary.total_tax_codes
+                  * 2 }} compliance checks</small
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div
+              class="card metric-card h-100 {% if compliance_report.filing_deadline_compliance.status == 'compliant' %}bg-success text-white {% else %}bg-warning{% endif %}"
+            >
+              <div class="card-body text-center">
+                <h6 class="card-title">Filing Deadline</h6>
+                <h2 class="mb-0">
+                  {{ compliance_report.filing_deadline_compliance.days_remaining
+                  }}
+                </h2>
+                <small
+                  >Days remaining until {{
+                  compliance_report.filing_deadline_compliance.deadline_date
+                  }}</small
+                >
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card metric-card h-100 bg-info text-white">
+              <div class="card-body text-center">
+                <h6 class="card-title">Banked Capacity</h6>
+                <h2 class="mb-0">
+                  ${{
+                  "{:,.0f}".format(compliance_report.banked_capacity_compliance.total_banked_capacity)
+                  }}
+                </h2>
+                <small>Potential unused levy capacity</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Critical Issues Section -->
+        {% if compliance_report.critical_issues %}
+        <div class="card mb-4 border-danger">
+          <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Critical Compliance Issues</h5>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              {% for issue in compliance_report.critical_issues %}
+              <li class="list-group-item list-group-item-danger">
+                {{ issue }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Levy Rate Compliance Details -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Levy Rate Compliance Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Tax Code</th>
+                    <th>Current Rate</th>
+                    <th>Previous Rate</th>
+                    <th>Regular Levy Compliant</th>
+                    <th>Annual Increase Compliant</th>
+                    <th>Issues</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for code_data in
+                  compliance_report.levy_rate_compliance.regular_levy_compliance
+                  %}
+                  <tr
+                    {%
+                    if
+                    not
+                    code_data.compliant
+                    %}class="table-danger"
+                    {%
+                    endif
+                    %}
+                  >
+                    <td>{{ code_data.code }}</td>
+                    <td>{{ "%.4f"|format(code_data.levy_rate) }}</td>
+                    <td>
+                      {{ "%.4f"|format(code_data.previous_rate) if
+                      code_data.previous_rate else "N/A" }}
+                    </td>
+                    <td>
+                      {% if code_data.regular_levy_compliant %}
+                      <span class="badge bg-success">Yes</span>
+                      {% else %}
+                      <span class="badge bg-danger">No</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if code_data.annual_increase_compliant %}
+                      <span class="badge bg-success">Yes</span>
+                      {% else %}
+                      <span class="badge bg-danger">No</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if code_data.issues %}
+                      <ul class="mb-0 ps-3">
+                        {% for issue in code_data.issues %}
+                        <li class="text-danger small">{{ issue }}</li>
+                        {% endfor %}
+                      </ul>
+                      {% else %}
+                      <span class="text-success">No issues</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filing Deadline Compliance -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Filing Deadline Compliance</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="card-title">Filing Status</h6>
+                    <table class="table">
+                      <tr>
+                        <th>Deadline Date:</th>
+                        <td>
+                          {{
+                          compliance_report.filing_deadline_compliance.deadline_date
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Days Remaining:</th>
+                        <td>
+                          {{
+                          compliance_report.filing_deadline_compliance.days_remaining
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Status:</th>
+                        <td>
+                          {% if
+                          compliance_report.filing_deadline_compliance.status ==
+                          'compliant' %}
+                          <span class="badge bg-success">Compliant</span>
+                          {% else %}
+                          <span class="badge bg-warning">At Risk</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Data Complete:</th>
+                        <td>
+                          {% if
+                          compliance_report.filing_deadline_compliance.data_complete
+                          %}
+                          <span class="badge bg-success">Yes</span>
+                          {% else %}
+                          <span class="badge bg-danger">No</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-body">
+                    <h6 class="card-title">Data Status</h6>
+                    <table class="table">
+                      <tr>
+                        <th>Tax Codes:</th>
+                        <td>
+                          {{
+                          compliance_report.filing_deadline_compliance.tax_codes_count
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Properties:</th>
+                        <td>
+                          {{
+                          compliance_report.filing_deadline_compliance.properties_count
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Tax Districts:</th>
+                        <td>
+                          {{
+                          compliance_report.filing_deadline_compliance.tax_districts_count
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Recent Imports:</th>
+                        <td>
+                          {% if
+                          compliance_report.filing_deadline_compliance.data_recent
+                          %}
+                          <span class="badge bg-success">Current</span>
+                          {% else %}
+                          <span class="badge bg-warning">Outdated</span>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {% if compliance_report.filing_deadline_compliance.warnings %}
+            <div class="alert alert-warning mt-3">
+              <h6 class="alert-heading">Warnings:</h6>
+              <ul class="mb-0">
+                {% for warning in
+                compliance_report.filing_deadline_compliance.warnings %}
+                <li>{{ warning }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Banked Capacity Analysis -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Banked Capacity Analysis</h5>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info mb-3">
+              <p class="mb-0">
+                <strong>Banked Capacity:</strong> Unused levy capacity that can
+                be "banked" for future use. When a taxing district increases its
+                levy by less than the allowed 1% limit, the difference can be
+                saved and used in future years (typically within 5 years).
+              </p>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Total Potential Banked Capacity</h6>
+                    <h3 class="mb-0">
+                      ${{
+                      "{:,.2f}".format(compliance_report.banked_capacity_compliance.total_banked_capacity)
+                      }}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Tax Codes with Banked Capacity</h6>
+                    <h3 class="mb-0">
+                      {{
+                      compliance_report.banked_capacity_compliance.tax_codes_with_banked_capacity|length
+                      }}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Expiring Capacity</h6>
+                    <h3 class="mb-0">
+                      {{
+                      compliance_report.banked_capacity_compliance.expiring_capacity|length
+                      }}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {% if
+            compliance_report.banked_capacity_compliance.tax_codes_with_banked_capacity
+            %}
+            <h6>Tax Codes with Potential Banked Capacity</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-hover">
+                <thead>
+                  <tr>
+                    <th>Tax Code</th>
+                    <th>Actual Increase</th>
+                    <th>Banked Rate</th>
+                    <th>Banked Amount</th>
+                    <th>Expires</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for bc in
+                  compliance_report.banked_capacity_compliance.tax_codes_with_banked_capacity
+                  %}
+                  <tr>
+                    <td>{{ bc.code }}</td>
+                    <td>
+                      {{ "%.2f"|format((bc.actual_increase_ratio - 1) * 100) }}%
+                    </td>
+                    <td>
+                      {{ "%.4f"|format(bc.potential_banked_capacity_rate) }}
+                    </td>
+                    <td>${{ "{:,.2f}".format(bc.potential_banked_amount) }}</td>
+                    <td>{{ bc.expiration_year }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="alert alert-secondary">
+              <p class="mb-0">No tax codes with banked capacity detected.</p>
+            </div>
+            {% endif %} {% if
+            compliance_report.banked_capacity_compliance.recommendations %}
+            <div class="alert alert-info mt-3">
+              <h6 class="alert-heading">Recommendations:</h6>
+              <ul class="mb-0">
+                {% for rec in
+                compliance_report.banked_capacity_compliance.recommendations %}
+                <li>{{ rec }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="card mb-4 border-primary">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Recommendations</h5>
+          </div>
+          <div class="card-body">
+            {% if compliance_report.recommendations %}
+            <ul class="list-group">
+              {% for recommendation in compliance_report.recommendations %}
+              <li class="list-group-item list-group-item-action">
+                {{ recommendation }}
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p>No specific recommendations at this time.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Download Report -->
+        <form action="{{ url_for('reports') }}" method="post">
+          <div class="d-grid gap-2 col-lg-6 mx-auto">
+            <button
+              type="submit"
+              name="generate_compliance_report"
+              class="btn btn-primary btn-lg"
+            >
+              <i class="fas fa-file-export me-2"></i> Download Compliance Report
+              CSV
+            </button>
+          </div>
+        </form>
+        {% else %}
+        <div class="alert alert-warning">
+          <h5 class="alert-heading">Compliance Report Not Available</h5>
+          <p>
+            There was an error generating the compliance report. Please ensure
+            you have imported property data and calculated levy rates before
+            running this report.
+          </p>
+          <a
+            href="{{ url_for('levy_calculator') }}"
+            class="btn btn-outline-primary"
+          >
+            <i class="fas fa-calculator me-2"></i> Go to Levy Calculator
+          </a>
+        </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 {% endif %}
 
 <!-- Recent Exports -->
 {% if recent_exports %}
 <div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Recent Exports</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Filename</th>
-                                <th>Rows Exported</th>
-                                <th>Export Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for export in recent_exports %}
-                            <tr>
-                                <td>{{ export.filename }}</td>
-                                <td>{{ export.rows_exported }}</td>
-                                <td>{{ export.export_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Recent Exports</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Filename</th>
+                <th>Rows Exported</th>
+                <th>Export Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for export in recent_exports %}
+              <tr>
+                <td>{{ export.filename }}</td>
+                <td>{{ export.rows_exported }}</td>
+                <td>{{ export.export_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endif %}
-{% endblock %}
+{% endif %} {% endblock %}

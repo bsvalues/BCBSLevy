@@ -4,181 +4,184 @@
 */
 
 :root {
-    /* Lighter Benton County Colors */
-    --primary-color: #1a7b92;   /* Teal Blue - Primary Brand Color */
-    --secondary-color: #4d7c2d; /* Green - Secondary Brand Color */
-    --accent-color: #5da2b3;    /* Light Teal - Accent Color */
-    --bg-dark: #ffffff;         /* White background instead of dark navy */
-    --text-dark: #333333;       /* Dark text for light backgrounds */
-    --text-medium: #555555;     /* Medium text for light backgrounds */
-    --bg-light: #f8f9fa;        /* Very light gray for subtle contrasts */
-    --border-color: #e0e0e0;    /* Light gray for borders */
-    --accent-yellow: #e3b23c;   /* Yellow accent for special highlights */
+  /* Lighter Benton County Colors */
+  --primary-color: #1a7b92; /* Teal Blue - Primary Brand Color */
+  --secondary-color: #4d7c2d; /* Green - Secondary Brand Color */
+  --accent-color: #5da2b3; /* Light Teal - Accent Color */
+  --bg-dark: #ffffff; /* White background instead of dark navy */
+  --text-dark: #333333; /* Dark text for light backgrounds */
+  --text-medium: #555555; /* Medium text for light backgrounds */
+  --bg-light: #f8f9fa; /* Very light gray for subtle contrasts */
+  --border-color: #e0e0e0; /* Light gray for borders */
+  --accent-yellow: #e3b23c; /* Yellow accent for special highlights */
 }
 
 /* Overall body background */
 body {
-    background-color: var(--bg-light);
-    color: var(--text-dark);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
 }
 
 /* Page header styling - lighter version */
 .page-header {
-    background-color: var(--bg-light);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-dark);
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-dark);
 }
 
 /* Modern gradient header styling for interior pages */
 .app-header-bg {
-    background: linear-gradient(135deg, var(--primary-color), #3498db);
-    color: white;
+  background: linear-gradient(135deg, var(--primary-color), #3498db);
+  color: white;
 }
 
 /* Card customizations */
 .card {
-    background-color: white;
-    border: 1px solid var(--border-color);
+  background-color: white;
+  border: 1px solid var(--border-color);
 }
 
 /* Navigation bar */
 .navbar {
-    background-color: white !important;
-    border-bottom: 1px solid var(--border-color);
+  background-color: white !important;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .navbar-dark .navbar-nav .nav-link {
-    color: var(--text-dark) !important;
+  color: var(--text-dark) !important;
 }
 
 /* Sidebar if present */
 .sidebar {
-    background-color: white;
-    border-right: 1px solid var(--border-color);
+  background-color: white;
+  border-right: 1px solid var(--border-color);
 }
 
 .sidebar .nav-link {
-    color: var(--text-dark);
+  color: var(--text-dark);
 }
 
 .sidebar .nav-link:hover {
-    background-color: var(--bg-light);
+  background-color: var(--bg-light);
 }
 
 /* Help menu styling - lighter version */
 .help-menu {
-    background-color: white;
-    color: var(--text-dark);
-    border-left: 1px solid var(--border-color);
+  background-color: white;
+  color: var(--text-dark);
+  border-left: 1px solid var(--border-color);
 }
 
 .tooltip.introjs-tooltip {
-    background-color: white;
-    color: var(--text-dark);
-    border: 1px solid var(--border-color);
+  background-color: white;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
 }
 
 /* Tables */
 .table thead {
-    background-color: var(--bg-light);
+  background-color: var(--bg-light);
 }
 
 /* Form elements */
 .form-container {
-    background-color: white;
-    border: 1px solid var(--border-color);
+  background-color: white;
+  border: 1px solid var(--border-color);
 }
 
 /* Dashboard specific cards */
 .dashboard-stats .card {
-    background-color: white;
+  background-color: white;
 }
 
 /* Footer */
 .footer {
-    background-color: var(--bg-light);
-    border-top: 1px solid var(--border-color);
-    color: var(--text-medium);
+  background-color: var(--bg-light);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-medium);
 }
 
 /* Additional contrast improvements */
 .text-light {
-    color: var(--text-dark) !important;
+  color: var(--text-dark) !important;
 }
 
 .bg-dark {
-    background-color: white !important;
-    color: var(--text-dark) !important;
+  background-color: white !important;
+  color: var(--text-dark) !important;
 }
 
 /* Buttons with better contrast */
 .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
 }
 
 /* Table improvements */
 .table {
-    color: var(--text-dark);
+  color: var(--text-dark);
 }
 
 /* Form controls */
-.form-control, .form-select {
-    background-color: white;
-    color: var(--text-dark);
-    border: 1px solid var(--border-color);
+.form-control,
+.form-select {
+  background-color: white;
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
 }
 
-.form-control:focus, .form-select:focus {
-    background-color: white;
+.form-control:focus,
+.form-select:focus {
+  background-color: white;
 }
 
 /* Input groups */
 .input-group-text {
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-    border: 1px solid var(--border-color);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
 }
 
 /* File upload container */
 .file-upload-container {
-    background-color: white;
-    border: 2px dashed var(--border-color);
+  background-color: white;
+  border: 2px dashed var(--border-color);
 }
 
 /* Modals */
 .modal-content {
-    background-color: white;
-    color: var(--text-dark);
+  background-color: white;
+  color: var(--text-dark);
 }
 
 .modal-header {
-    border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .modal-footer {
-    border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
 }
 
 /* Progress bars */
 .progress {
-    background-color: var(--bg-light);
+  background-color: var(--bg-light);
 }
 
 /* Alerts */
 .alert {
-    background-color: white;
-    border: 1px solid var(--border-color);
+  background-color: white;
+  border: 1px solid var(--border-color);
 }
 
 /* Code blocks */
-pre, code {
-    background-color: var(--bg-light);
-    color: var(--text-dark);
-    border: 1px solid var(--border-color);
+pre,
+code {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
 }

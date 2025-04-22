@@ -1,9 +1,5 @@
-{% extends "base.html" %}
-
-{% block title %}Levy Compliance Check{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}Levy Compliance Check{% endblock %}
+{% block head %} {{ super() }}
 <style>
   .compliance-card {
     border-radius: 8px;
@@ -60,33 +56,35 @@
     margin-right: 10px;
   }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Levy Compliance Check</h1>
     <div>
-      <a href="{{ url_for('historical_analysis.advanced_historical_analysis') }}" class="btn btn-primary">
+      <a
+        href="{{ url_for('historical_analysis.advanced_historical_analysis') }}"
+        class="btn btn-primary"
+      >
         <i class="bi bi-graph-up"></i> Advanced Analysis
       </a>
     </div>
   </div>
-  
+
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Compliance Verification Tool</h5>
           <p class="card-text">
-            Verify that your levy rates comply with statutory limits and requirements. This tool checks for compliance with 
-            maximum rates, annual increase limits, and other statutory requirements.
+            Verify that your levy rates comply with statutory limits and
+            requirements. This tool checks for compliance with maximum rates,
+            annual increase limits, and other statutory requirements.
           </p>
         </div>
       </div>
     </div>
   </div>
-  
+
   <div class="row">
     <div class="col-lg-4">
       <div class="card mb-4">
@@ -94,31 +92,57 @@
           <h5 class="mb-0">Select Parameters</h5>
         </div>
         <div class="card-body">
-          <form method="POST" action="{{ url_for('historical_analysis.compliance') }}">
+          <form
+            method="POST"
+            action="{{ url_for('historical_analysis.compliance') }}"
+          >
             <div class="mb-3">
               <label for="tax_code" class="form-label">Tax Code</label>
-              <select class="form-select" id="tax_code" name="tax_code" required>
+              <select
+                class="form-select"
+                id="tax_code"
+                name="tax_code"
+                required
+              >
                 <option value="">Select a tax code</option>
                 {% for tax_code in tax_codes %}
-                <option value="{{ tax_code.tax_code }}" {% if tax_code.tax_code == selected_tax_code %}selected{% endif %}>
+                <option
+                  value="{{ tax_code.tax_code }}"
+                  {%
+                  if
+                  tax_code.tax_code=""
+                  ="selected_tax_code"
+                  %}selected{%
+                  endif
+                  %}
+                >
                   {{ tax_code.tax_code }}
                 </option>
                 {% endfor %}
               </select>
             </div>
-            
+
             <div class="mb-3">
               <label for="year" class="form-label">Year</label>
               <select class="form-select" id="year" name="year" required>
                 <option value="">Select a year</option>
                 {% for year in available_years %}
-                <option value="{{ year }}" {% if year|string == selected_year|string %}selected{% endif %}>
+                <option
+                  value="{{ year }}"
+                  {%
+                  if
+                  year|string=""
+                  ="selected_year|string"
+                  %}selected{%
+                  endif
+                  %}
+                >
                   {{ year }}
                 </option>
                 {% endfor %}
               </select>
             </div>
-            
+
             <div class="d-grid">
               <button type="submit" class="btn btn-success">
                 <i class="bi bi-check-circle"></i> Check Compliance
@@ -127,7 +151,7 @@
           </form>
         </div>
       </div>
-      
+
       <div class="card">
         <div class="card-header">
           <h5 class="mb-0">Compliance Standards</h5>
@@ -136,24 +160,32 @@
           <ul class="list-group">
             <li class="list-group-item">
               <h6 class="mb-1">Statutory Maximum</h6>
-              <p class="mb-0 text-muted small">The maximum allowed levy rate is 5.90.</p>
+              <p class="mb-0 text-muted small">
+                The maximum allowed levy rate is 5.90.
+              </p>
             </li>
             <li class="list-group-item">
               <h6 class="mb-1">Annual Increase Limit</h6>
-              <p class="mb-0 text-muted small">Year-over-year increase cannot exceed 1% without voter approval.</p>
+              <p class="mb-0 text-muted small">
+                Year-over-year increase cannot exceed 1% without voter approval.
+              </p>
             </li>
             <li class="list-group-item">
               <h6 class="mb-1">Assessment Ratio</h6>
-              <p class="mb-0 text-muted small">Assessments must be at 100% of fair market value.</p>
+              <p class="mb-0 text-muted small">
+                Assessments must be at 100% of fair market value.
+              </p>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    
+
     <div class="col-lg-8">
       {% if compliance_results %}
-      <div class="compliance-card {% if compliance_results.overall_compliance %}compliant{% else %}non-compliant{% endif %}">
+      <div
+        class="compliance-card {% if compliance_results.overall_compliance %}compliant{% else %}non-compliant{% endif %}"
+      >
         <div class="d-flex align-items-center">
           {% if compliance_results.overall_compliance %}
           <i class="bi bi-check-circle-fill text-success status-icon"></i>
@@ -162,60 +194,71 @@
           {% endif %}
           <div>
             <h2 class="mb-0">Compliance Check Results</h2>
-            <p class="mb-0">Tax Code: {{ compliance_results.tax_code }} | Year: {{ compliance_results.year }}</p>
+            <p class="mb-0">
+              Tax Code: {{ compliance_results.tax_code }} | Year: {{
+              compliance_results.year }}
+            </p>
           </div>
           <div class="ms-auto">
-            <span class="compliance-badge {% if compliance_results.overall_compliance %}bg-success{% else %}bg-danger{% endif %} text-white">
-              {% if compliance_results.overall_compliance %}
-              Compliant
-              {% else %}
-              Non-Compliant
-              {% endif %}
+            <span
+              class="compliance-badge {% if compliance_results.overall_compliance %}bg-success{% else %}bg-danger{% endif %} text-white"
+            >
+              {% if compliance_results.overall_compliance %} Compliant {% else
+              %} Non-Compliant {% endif %}
             </span>
           </div>
         </div>
-        
+
         <div class="compliance-detail">
           <h4>Levy Rate: {{ compliance_results.levy_rate|round(4) }}</h4>
-          
+
           <div class="row mt-4">
             <div class="col-12">
               <h5>Compliance Checks</h5>
-              
-              <div class="check-item {% if compliance_results.is_compliant %}passed{% else %}failed{% endif %}">
+
+              <div
+                class="check-item {% if compliance_results.is_compliant %}passed{% else %}failed{% endif %}"
+              >
                 <div class="check-title">
                   {% if compliance_results.is_compliant %}
                   <i class="bi bi-check-circle-fill text-success me-2"></i>
                   {% else %}
                   <i class="bi bi-x-circle-fill text-danger me-2"></i>
-                  {% endif %}
-                  Statutory Maximum Rate Check
+                  {% endif %} Statutory Maximum Rate Check
                 </div>
                 <div class="check-description">
-                  The levy rate must not exceed the statutory maximum of {{ compliance_results.statutory_max }}.
+                  The levy rate must not exceed the statutory maximum of {{
+                  compliance_results.statutory_max }}.
                 </div>
                 <div class="mt-2">
-                  <strong>Current Rate:</strong> {{ compliance_results.levy_rate|round(4) }} |
-                  <strong>Maximum Rate:</strong> {{ compliance_results.statutory_max }}
+                  <strong>Current Rate:</strong> {{
+                  compliance_results.levy_rate|round(4) }} |
+                  <strong>Maximum Rate:</strong> {{
+                  compliance_results.statutory_max }}
                 </div>
               </div>
-              
+
               {% if compliance_results.yoy_increase is not none %}
-              <div class="check-item {% if compliance_results.yoy_compliant %}passed{% else %}failed{% endif %}">
+              <div
+                class="check-item {% if compliance_results.yoy_compliant %}passed{% else %}failed{% endif %}"
+              >
                 <div class="check-title">
                   {% if compliance_results.yoy_compliant %}
                   <i class="bi bi-check-circle-fill text-success me-2"></i>
                   {% else %}
                   <i class="bi bi-x-circle-fill text-danger me-2"></i>
-                  {% endif %}
-                  Year-Over-Year Increase Check
+                  {% endif %} Year-Over-Year Increase Check
                 </div>
                 <div class="check-description">
-                  The annual increase in levy rate must not exceed {{ (compliance_results.yoy_limit * 100)|round(2) }}% without voter approval.
+                  The annual increase in levy rate must not exceed {{
+                  (compliance_results.yoy_limit * 100)|round(2) }}% without
+                  voter approval.
                 </div>
                 <div class="mt-2">
-                  <strong>Annual Increase:</strong> {{ (compliance_results.yoy_increase * 100)|round(2) }}% |
-                  <strong>Maximum Allowed:</strong> {{ (compliance_results.yoy_limit * 100)|round(2) }}%
+                  <strong>Annual Increase:</strong> {{
+                  (compliance_results.yoy_increase * 100)|round(2) }}% |
+                  <strong>Maximum Allowed:</strong> {{
+                  (compliance_results.yoy_limit * 100)|round(2) }}%
                 </div>
               </div>
               {% else %}
@@ -231,25 +274,49 @@
               {% endif %}
             </div>
           </div>
-          
+
           <div class="mt-4">
             <h5>Recommendation</h5>
-            <div class="alert {% if compliance_results.overall_compliance %}alert-success{% else %}alert-danger{% endif %}">
+            <div
+              class="alert {% if compliance_results.overall_compliance %}alert-success{% else %}alert-danger{% endif %}"
+            >
               {% if compliance_results.overall_compliance %}
-              <p><strong>The levy rate is compliant with all statutory requirements.</strong></p>
-              <p>No adjustments are needed. You may proceed with the current levy rate.</p>
+              <p>
+                <strong
+                  >The levy rate is compliant with all statutory
+                  requirements.</strong
+                >
+              </p>
+              <p>
+                No adjustments are needed. You may proceed with the current levy
+                rate.
+              </p>
               {% else %}
-              <p><strong>The levy rate is non-compliant with one or more statutory requirements.</strong></p>
-              <p>Please review the failed checks above and adjust the levy rate to ensure compliance.</p>
-              
+              <p>
+                <strong
+                  >The levy rate is non-compliant with one or more statutory
+                  requirements.</strong
+                >
+              </p>
+              <p>
+                Please review the failed checks above and adjust the levy rate
+                to ensure compliance.
+              </p>
+
               {% if not compliance_results.is_compliant %}
-              <p>To comply with the statutory maximum, the levy rate should be reduced to {{ compliance_results.statutory_max }} or less.</p>
-              {% endif %}
-              
-              {% if compliance_results.yoy_increase is not none and not compliance_results.yoy_compliant %}
-              <p>To comply with the annual increase limit, the levy rate should be reduced to {{ ((1 + compliance_results.yoy_limit) * (1 - compliance_results.yoy_increase) * compliance_results.levy_rate)|round(4) }} or less.</p>
-              {% endif %}
-              {% endif %}
+              <p>
+                To comply with the statutory maximum, the levy rate should be
+                reduced to {{ compliance_results.statutory_max }} or less.
+              </p>
+              {% endif %} {% if compliance_results.yoy_increase is not none and
+              not compliance_results.yoy_compliant %}
+              <p>
+                To comply with the annual increase limit, the levy rate should
+                be reduced to {{ ((1 + compliance_results.yoy_limit) * (1 -
+                compliance_results.yoy_increase) *
+                compliance_results.levy_rate)|round(4) }} or less.
+              </p>
+              {% endif %} {% endif %}
             </div>
           </div>
         </div>
@@ -258,26 +325,42 @@
       <div class="card">
         <div class="card-body">
           <div class="alert alert-info mb-0">
-            <h5><i class="bi bi-info-circle"></i> No compliance data available</h5>
-            <p>Please select a tax code and year to perform a compliance check.</p>
+            <h5>
+              <i class="bi bi-info-circle"></i> No compliance data available
+            </h5>
+            <p>
+              Please select a tax code and year to perform a compliance check.
+            </p>
           </div>
         </div>
       </div>
       {% endif %}
-      
+
       <div class="card mt-4">
         <div class="card-header">
           <h5 class="mb-0">Understanding Compliance Requirements</h5>
         </div>
         <div class="card-body">
           <h6>Statutory Maximum Rates</h6>
-          <p>The statutory maximum levy rate is established by state law and may vary based on the type of district. The default maximum rate of 5.90 is used for demonstration purposes. Actual rates may differ.</p>
-          
+          <p>
+            The statutory maximum levy rate is established by state law and may
+            vary based on the type of district. The default maximum rate of 5.90
+            is used for demonstration purposes. Actual rates may differ.
+          </p>
+
           <h6>Annual Increase Limits</h6>
-          <p>Most taxing districts are limited to a 1% annual increase in their levy amount over the highest lawful levy since 1985. This "101% limit" applies unless voters approve an excess levy.</p>
-          
+          <p>
+            Most taxing districts are limited to a 1% annual increase in their
+            levy amount over the highest lawful levy since 1985. This "101%
+            limit" applies unless voters approve an excess levy.
+          </p>
+
           <h6>Additional Compliance Factors</h6>
-          <p>The complete compliance check would also include assessment ratio validation, levy certification requirements, and special statutory limits applicable to specific districts or funds.</p>
+          <p>
+            The complete compliance check would also include assessment ratio
+            validation, levy certification requirements, and special statutory
+            limits applicable to specific districts or funds.
+          </p>
         </div>
       </div>
     </div>

@@ -1,162 +1,219 @@
-{% extends "public/base_public.html" %}
-
-{% block title %}Home - Benton County Property Tax Portal{% endblock %}
-
-{% block content %}
+{% extends "public/base_public.html" %} {% block title %}Home - Benton County
+Property Tax Portal{% endblock %} {% block content %}
 <div class="row mb-5">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-body">
-                <h1 class="card-title mb-4">Welcome to the Benton County Property Tax Portal</h1>
-                <p class="lead">The official resource for property owners to access information about property taxes in Benton County, Washington.</p>
-                <p>This portal provides easy access to property tax information, levy rates, and resources to help you understand your property taxes.</p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
-                    <a href="{{ url_for('public_property_lookup') }}" class="btn btn-primary btn-lg px-4 me-md-2">
-                        <i class="bi bi-search me-2"></i>Look Up Your Property
-                    </a>
-                    <a href="{{ url_for('public_tax_resources') }}" class="btn btn-outline-secondary btn-lg px-4">
-                        <i class="bi bi-info-circle me-2"></i>Tax Resources
-                    </a>
-                </div>
-            </div>
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h1 class="card-title mb-4">
+          Welcome to the Benton County Property Tax Portal
+        </h1>
+        <p class="lead">
+          The official resource for property owners to access information about
+          property taxes in Benton County, Washington.
+        </p>
+        <p>
+          This portal provides easy access to property tax information, levy
+          rates, and resources to help you understand your property taxes.
+        </p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+          <a
+            href="{{ url_for('public_property_lookup') }}"
+            class="btn btn-primary btn-lg px-4 me-md-2"
+          >
+            <i class="bi bi-search me-2"></i>Look Up Your Property
+          </a>
+          <a
+            href="{{ url_for('public_tax_resources') }}"
+            class="btn btn-outline-secondary btn-lg px-4"
+          >
+            <i class="bi bi-info-circle me-2"></i>Tax Resources
+          </a>
         </div>
-        
-        <div class="card mb-4">
-            <div class="card-body">
-                <h2 class="card-title mb-3">Understanding Property Taxes</h2>
-                <p>{{ "Property taxes are the primary funding source for local government services and schools. Your property tax is calculated based on the Assessed Value of your property and the Levy Rate for your tax code area."|add_tooltips|safe }}</p>
-                <p>{{ "The Levy Rate is expressed in dollars per $1,000 of assessed value. For example, if your property's assessed value is $300,000 and your levy rate is $10.50 per $1,000, your property tax would be $3,150 ($300,000 ÷ $1,000 × $10.50)."|add_tooltips|safe }}</p>
-                <div class="alert alert-info">
-                    <i class="bi bi-lightbulb me-2"></i>
-                    <strong>Did You Know?</strong> {{ "Washington state has statutory limits that restrict how much property tax levy rates can increase from year to year."|add_tooltips|safe }}
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="bi bi-calculator me-2"></i>Quick Tax Lookup</h4>
-            </div>
-            <div class="card-body">
-                <form action="{{ url_for('public_property_lookup') }}" method="post">
-                    <div class="mb-3">
-                        <label for="property_id" class="form-label">Property ID</label>
-                        <input type="text" class="form-control" id="property_id" name="property_id" 
-                               placeholder="Enter your property ID">
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Look Up Property</button>
-                    </div>
-                </form>
-            </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="card-title mb-3">Understanding Property Taxes</h2>
+        <p>
+          {{ "Property taxes are the primary funding source for local government
+          services and schools. Your property tax is calculated based on the
+          Assessed Value of your property and the Levy Rate for your tax code
+          area."|add_tooltips|safe }}
+        </p>
+        <p>
+          {{ "The Levy Rate is expressed in dollars per $1,000 of assessed
+          value. For example, if your property's assessed value is $300,000 and
+          your levy rate is $10.50 per $1,000, your property tax would be $3,150
+          ($300,000 ÷ $1,000 × $10.50)."|add_tooltips|safe }}
+        </p>
+        <div class="alert alert-info">
+          <i class="bi bi-lightbulb me-2"></i>
+          <strong>Did You Know?</strong> {{ "Washington state has statutory
+          limits that restrict how much property tax levy rates can increase
+          from year to year."|add_tooltips|safe }}
         </div>
-        
-        <div class="card mb-4">
-            <div class="card-header">
-                <h4 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Property Tax Statistics</h4>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Properties in Database:</span>
-                    <span class="fw-bold">{{ property_count }}</span>
-                </div>
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Tax Code Areas:</span>
-                    <span class="fw-bold">{{ tax_code_count }}</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Important Dates</h4>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-2">
-                    <span>First Half Taxes Due:</span>
-                    <span class="fw-bold">April 30, 2025</span>
-                </div>
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Second Half Taxes Due:</span>
-                    <span class="fw-bold">October 31, 2025</span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span>Tax Statements Mailed:</span>
-                    <span class="fw-bold">February 15, 2025</span>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+          <i class="bi bi-calculator me-2"></i>Quick Tax Lookup
+        </h4>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('public_property_lookup') }}" method="post">
+          <div class="mb-3">
+            <label for="property_id" class="form-label">Property ID</label>
+            <input
+              type="text"
+              class="form-control"
+              id="property_id"
+              name="property_id"
+              placeholder="Enter your property ID"
+            />
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary">
+              Look Up Property
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4 class="mb-0">
+          <i class="bi bi-bar-chart me-2"></i>Property Tax Statistics
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+          <span>Properties in Database:</span>
+          <span class="fw-bold">{{ property_count }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span>Tax Code Areas:</span>
+          <span class="fw-bold">{{ tax_code_count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h4 class="mb-0">
+          <i class="bi bi-calendar-event me-2"></i>Important Dates
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-2">
+          <span>First Half Taxes Due:</span>
+          <span class="fw-bold">April 30, 2025</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span>Second Half Taxes Due:</span>
+          <span class="fw-bold">October 31, 2025</span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span>Tax Statements Mailed:</span>
+          <span class="fw-bold">February 15, 2025</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-4 mb-4 mb-md-0">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-search fs-1 text-primary mb-3"></i>
-                <h3>Property Lookup</h3>
-                <p>Find your property's assessed value, tax code, and estimated tax amount.</p>
-                <div class="d-grid mt-auto">
-                    <a href="{{ url_for('public_property_lookup') }}" class="btn btn-outline-primary mt-3">Look Up Property</a>
-                </div>
-            </div>
+  <div class="col-md-4 mb-4 mb-md-0">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <i class="bi bi-search fs-1 text-primary mb-3"></i>
+        <h3>Property Lookup</h3>
+        <p>
+          Find your property's assessed value, tax code, and estimated tax
+          amount.
+        </p>
+        <div class="d-grid mt-auto">
+          <a
+            href="{{ url_for('public_property_lookup') }}"
+            class="btn btn-outline-primary mt-3"
+            >Look Up Property</a
+          >
         </div>
+      </div>
     </div>
-    
-    <div class="col-md-4 mb-4 mb-md-0">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-info-circle fs-1 text-primary mb-3"></i>
-                <h3>Tax Resources</h3>
-                <p>Access information about levy rates, exemptions, and tax calculation methods.</p>
-                <div class="d-grid mt-auto">
-                    <a href="{{ url_for('public_tax_resources') }}" class="btn btn-outline-primary mt-3">View Resources</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-book fs-1 text-primary mb-3"></i>
-                <h3>Tax Glossary</h3>
-                <p>Learn about common property tax terms and what they mean for property owners.</p>
-                <div class="d-grid mt-auto">
-                    <a href="{{ url_for('public_glossary') }}" class="btn btn-outline-primary mt-3">View Glossary</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  </div>
 
-{% block scripts %}
+  <div class="col-md-4 mb-4 mb-md-0">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <i class="bi bi-info-circle fs-1 text-primary mb-3"></i>
+        <h3>Tax Resources</h3>
+        <p>
+          Access information about levy rates, exemptions, and tax calculation
+          methods.
+        </p>
+        <div class="d-grid mt-auto">
+          <a
+            href="{{ url_for('public_tax_resources') }}"
+            class="btn btn-outline-primary mt-3"
+            >View Resources</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body text-center">
+        <i class="bi bi-book fs-1 text-primary mb-3"></i>
+        <h3>Tax Glossary</h3>
+        <p>
+          Learn about common property tax terms and what they mean for property
+          owners.
+        </p>
+        <div class="d-grid mt-auto">
+          <a
+            href="{{ url_for('public_glossary') }}"
+            class="btn btn-outline-primary mt-3"
+            >View Glossary</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-    $(document).ready(function() {
-        // Property ID autocomplete
-        $('#property_id').autocomplete({
-            source: function(request, response) {
-                $.ajax({
-                    url: "{{ url_for('api_public_property_search') }}",
-                    dataType: "json",
-                    data: {
-                        term: request.term
-                    },
-                    success: function(data) {
-                        response($.map(data, function(item) {
-                            return {
-                                label: item.id,
-                                value: item.id
-                            }
-                        }));
-                    }
-                });
-            },
-            minLength: 3
+  $(document).ready(function () {
+    // Property ID autocomplete
+    $("#property_id").autocomplete({
+      source: function (request, response) {
+        $.ajax({
+          url: "{{ url_for('api_public_property_search') }}",
+          dataType: "json",
+          data: {
+            term: request.term,
+          },
+          success: function (data) {
+            response(
+              $.map(data, function (item) {
+                return {
+                  label: item.id,
+                  value: item.id,
+                };
+              }),
+            );
+          },
         });
+      },
+      minLength: 3,
     });
+  });
 </script>
 {% endblock %}

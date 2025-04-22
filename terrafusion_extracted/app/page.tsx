@@ -1,28 +1,32 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { SplashScreen } from "@/components/terrafusion/splash-screen"
-import { AuthModal } from "@/components/terrafusion/auth-modal"
-import { NotificationToast } from "@/components/terrafusion/notification-toast"
-import { DashboardCard } from "@/components/terrafusion/dashboard-card"
-import Image from "next/image"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { SplashScreen } from "@/components/terrafusion/splash-screen";
+import { AuthModal } from "@/components/terrafusion/auth-modal";
+import { NotificationToast } from "@/components/terrafusion/notification-toast";
+import { DashboardCard } from "@/components/terrafusion/dashboard-card";
+import Image from "next/image";
 
 export default function TerraFusionShowcase() {
-  const [showSplash, setShowSplash] = useState(false)
-  const [showAuth, setShowAuth] = useState(false)
-  const [showToast, setShowToast] = useState(false)
-  const [activeTab, setActiveTab] = useState<string>("brand")
+  const [showSplash, setShowSplash] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("brand");
 
   const renderComponent = () => {
     switch (activeTab) {
       case "brand":
         return (
           <div className="flex flex-col items-center justify-center p-8 bg-[#001529] rounded-lg">
-            <h2 className="text-xl font-bold mb-8 text-white">TerraFusion Brand Assets</h2>
+            <h2 className="text-xl font-bold mb-8 text-white">
+              TerraFusion Brand Assets
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col items-center">
-                <h3 className="text-lg font-medium mb-4 text-[#00e5ff]">Primary Logo</h3>
+                <h3 className="text-lg font-medium mb-4 text-[#00e5ff]">
+                  Primary Logo
+                </h3>
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-kxsGwXzvQnYOMtqRmB0Buf9j7HtSxb.png"
                   alt="TerraFusion Logo"
@@ -32,7 +36,9 @@ export default function TerraFusionShowcase() {
                 />
               </div>
               <div className="flex flex-col items-center">
-                <h3 className="text-lg font-medium mb-4 text-[#00e5ff]">Logo Variations</h3>
+                <h3 className="text-lg font-medium mb-4 text-[#00e5ff]">
+                  Logo Variations
+                </h3>
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-0h7tzBkj83NtRDd6ZwGUXg67nKeW5j.png"
                   alt="TerraFusion Logo Variations"
@@ -43,51 +49,78 @@ export default function TerraFusionShowcase() {
               </div>
             </div>
           </div>
-        )
+        );
       case "splash":
         return showSplash ? (
-          <SplashScreen moduleName="Analytics Module" onComplete={() => setShowSplash(false)} />
+          <SplashScreen
+            moduleName="Analytics Module"
+            onComplete={() => setShowSplash(false)}
+          />
         ) : (
           <div className="flex flex-col items-center justify-center p-8 bg-[#001529] rounded-lg">
-            <h2 className="text-xl font-bold mb-4 text-white">Module Splash Screen</h2>
-            <Button onClick={() => setShowSplash(true)} className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#001529]">
+            <h2 className="text-xl font-bold mb-4 text-white">
+              Module Splash Screen
+            </h2>
+            <Button
+              onClick={() => setShowSplash(true)}
+              className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#001529]"
+            >
               Show Splash Screen
             </Button>
           </div>
-        )
+        );
       case "auth":
         return (
           <div className="flex flex-col items-center justify-center p-8 bg-[#001529] rounded-lg">
-            <h2 className="text-xl font-bold mb-4 text-white">Auth / Login Modal</h2>
-            <Button onClick={() => setShowAuth(true)} className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#001529]">
+            <h2 className="text-xl font-bold mb-4 text-white">
+              Auth / Login Modal
+            </h2>
+            <Button
+              onClick={() => setShowAuth(true)}
+              className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#001529]"
+            >
               Show Auth Modal
             </Button>
             <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
           </div>
-        )
+        );
       case "toast":
         return (
           <div className="flex flex-col items-center justify-center p-8 bg-[#001529] rounded-lg">
-            <h2 className="text-xl font-bold mb-4 text-white">Notification Toast</h2>
-            <Button onClick={() => setShowToast(true)} className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#001529]">
+            <h2 className="text-xl font-bold mb-4 text-white">
+              Notification Toast
+            </h2>
+            <Button
+              onClick={() => setShowToast(true)}
+              className="bg-[#00e5ff] hover:bg-[#00b8d4] text-[#001529]"
+            >
               Show Toast Notification
             </Button>
             {showToast && (
-              <NotificationToast message="Operation completed successfully!" onClose={() => setShowToast(false)} />
+              <NotificationToast
+                message="Operation completed successfully!"
+                onClose={() => setShowToast(false)}
+              />
             )}
           </div>
-        )
+        );
       case "dashboard":
         return (
           <div className="flex flex-col items-center justify-center p-8 bg-[#001529] rounded-lg">
-            <h2 className="text-xl font-bold mb-4 text-white">Analytics Dashboard Card</h2>
-            <DashboardCard title="System Uptime" metric="98%" description="Last 30 days performance" />
+            <h2 className="text-xl font-bold mb-4 text-white">
+              Analytics Dashboard Card
+            </h2>
+            <DashboardCard
+              title="System Uptime"
+              metric="98%"
+              description="Last 30 days performance"
+            />
           </div>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#001529]">
@@ -101,7 +134,9 @@ export default function TerraFusionShowcase() {
             className="object-contain"
           />
         </div>
-        <h1 className="text-2xl font-bold text-white">TerraFusion Design System</h1>
+        <h1 className="text-2xl font-bold text-white">
+          TerraFusion Design System
+        </h1>
       </header>
 
       <main className="container mx-auto py-8 px-4">
@@ -131,5 +166,5 @@ export default function TerraFusionShowcase() {
         <div className="mt-8">{renderComponent()}</div>
       </main>
     </div>
-  )
+  );
 }

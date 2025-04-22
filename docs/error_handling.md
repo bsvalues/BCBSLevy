@@ -60,8 +60,8 @@ from utils.error_handling import check_required_fields, check_resource_exists
 # Check for required fields
 def process_district_request(request_data):
     check_required_fields(
-        request_data, 
-        ['name', 'code', 'year'], 
+        request_data,
+        ['name', 'code', 'year'],
         entity_name="tax district"
     )
     # Process valid request...
@@ -132,15 +132,15 @@ All error responses follow this JSON structure:
 
 Common error codes used in the application:
 
-| Error Code | Description | HTTP Status |
-|------------|-------------|-------------|
-| VALIDATION_ERROR | Input validation error | 400 |
-| NOT_FOUND | Resource not found | 404 |
-| AUTHORIZATION_ERROR | Not authorized for the operation | 403 |
-| DATA_ACCESS_ERROR | Database access error | 500 |
-| API_ERROR | External API error | 502 |
-| SYSTEM_ERROR | General system error | 500 |
-| UNEXPECTED_ERROR | Unhandled exception | 500 |
+| Error Code          | Description                      | HTTP Status |
+| ------------------- | -------------------------------- | ----------- |
+| VALIDATION_ERROR    | Input validation error           | 400         |
+| NOT_FOUND           | Resource not found               | 404         |
+| AUTHORIZATION_ERROR | Not authorized for the operation | 403         |
+| DATA_ACCESS_ERROR   | Database access error            | 500         |
+| API_ERROR           | External API error               | 502         |
+| SYSTEM_ERROR        | General system error             | 500         |
+| UNEXPECTED_ERROR    | Unhandled exception              | 500         |
 
 ## Best Practices
 

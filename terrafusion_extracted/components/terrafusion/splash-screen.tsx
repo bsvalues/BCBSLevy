@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useRef } from "react"
-import Image from "next/image"
+import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 
 interface SplashScreenProps {
-  moduleName: string
-  onComplete?: () => void
+  moduleName: string;
+  onComplete?: () => void;
 }
 
 export function SplashScreen({ moduleName, onComplete }: SplashScreenProps) {
-  const [progress, setProgress] = useState(0)
-  const completedRef = useRef(false)
+  const [progress, setProgress] = useState(0);
+  const completedRef = useRef(false);
 
   // Effect for progress animation
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(timer)
-          return 100
+          clearInterval(timer);
+          return 100;
         }
-        return prev + 5
-      })
-    }, 100)
+        return prev + 5;
+      });
+    }, 100);
 
-    return () => clearInterval(timer)
-  }, [])
+    return () => clearInterval(timer);
+  }, []);
 
   // Separate effect to handle completion
   useEffect(() => {
     if (progress === 100 && onComplete && !completedRef.current) {
-      completedRef.current = true
+      completedRef.current = true;
       // Add a small delay before calling onComplete
       const timeout = setTimeout(() => {
-        onComplete()
-      }, 500)
+        onComplete();
+      }, 500);
 
-      return () => clearTimeout(timeout)
+      return () => clearTimeout(timeout);
     }
-  }, [progress, onComplete])
+  }, [progress, onComplete]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#001529] relative overflow-hidden">
@@ -60,7 +60,9 @@ export function SplashScreen({ moduleName, onComplete }: SplashScreenProps) {
         </div>
 
         {/* Module name */}
-        <h1 className="text-4xl font-bold text-white text-shadow-[0_0_10px_rgba(0,229,255,0.5)]">{moduleName}</h1>
+        <h1 className="text-4xl font-bold text-white text-shadow-[0_0_10px_rgba(0,229,255,0.5)]">
+          {moduleName}
+        </h1>
       </div>
 
       {/* Progress bar */}
@@ -73,5 +75,5 @@ export function SplashScreen({ moduleName, onComplete }: SplashScreenProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

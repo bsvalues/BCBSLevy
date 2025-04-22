@@ -51,5 +51,5 @@ export function FaviconComponent() {
         </pre>
       </div>
     </div>
-  )
+  );
 }

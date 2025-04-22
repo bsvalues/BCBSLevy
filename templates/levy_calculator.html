@@ -1,934 +1,1245 @@
-{% extends "base.html" %}
-
-{% block title %}Levy Calculator - Levy Calculation System{% endblock %}
-
-{% block page_title %}Levy Calculator{% endblock %}
-{% block page_subtitle %}Calculate property tax levy rates and amounts{% endblock %}
-
-{% block header_actions %}
+{% extends "base.html" %} {% block title %}Levy Calculator - Levy Calculation
+System{% endblock %} {% block page_title %}Levy Calculator{% endblock %} {%
+block page_subtitle %}Calculate property tax levy rates and amounts{% endblock
+%} {% block header_actions %}
 <div class="d-flex gap-2">
-    <button type="button" class="btn btn-primary" id="saveScenarioBtn">
-        <i class="bi bi-save me-1"></i>Save Scenario
-    </button>
-    <button type="button" class="btn btn-outline-secondary" data-tour="levyCalculator">
-        <i class="bi bi-info-circle me-1"></i>Tour
-    </button>
+  <button type="button" class="btn btn-primary" id="saveScenarioBtn">
+    <i class="bi bi-save me-1"></i>Save Scenario
+  </button>
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    data-tour="levyCalculator"
+  >
+    <i class="bi bi-info-circle me-1"></i>Tour
+  </button>
 </div>
-{% endblock %}
-
-{% block extra_css %}
+{% endblock %} {% block extra_css %}
 <style>
-    .calculator-section {
-        background-color: var(--bs-body-bg);
-        border-radius: 0.5rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    }
-    
-    .calculator-header {
-        padding: 1.25rem;
-        border-bottom: 1px solid var(--bs-border-color);
-    }
-    
-    .calculator-body {
-        padding: 1.25rem;
-    }
-    
-    .result-section {
-        background-color: rgba(var(--bs-success-rgb), 0.05);
-        border-radius: 0.5rem;
-        padding: 1.25rem;
-        margin-top: 1.5rem;
-        border: 1px solid rgba(var(--bs-success-rgb), 0.2);
-    }
-    
-    .result-warning {
-        background-color: rgba(var(--bs-warning-rgb), 0.05);
-        border: 1px solid rgba(var(--bs-warning-rgb), 0.2);
-    }
-    
-    .result-danger {
-        background-color: rgba(var(--bs-danger-rgb), 0.05);
-        border: 1px solid rgba(var(--bs-danger-rgb), 0.2);
-    }
-    
-    .input-group-text {
-        min-width: 3rem;
-        justify-content: center;
-    }
-    
-    .scenario-card {
-        transition: transform 0.2s;
-    }
-    
-    .scenario-card:hover {
-        transform: translateY(-2px);
-    }
-    
-    #calculatorResultsSection {
-        display: none;
-    }
-    
-    .form-label {
-        font-weight: 500;
-    }
-    
-    .calculation-steps {
-        border-left: 2px dashed var(--bs-border-color);
-        padding-left: 1.5rem;
-        position: relative;
-    }
-    
-    .calculation-step {
-        position: relative;
-        padding-bottom: 1.5rem;
-    }
-    
-    .calculation-step::before {
-        content: '';
-        position: absolute;
-        left: -1.625rem;
-        top: 0.25rem;
-        width: 0.75rem;
-        height: 0.75rem;
-        border-radius: 50%;
-        background-color: var(--bs-primary);
-    }
-    
-    .calculation-step:last-child {
-        padding-bottom: 0;
-    }
-    
-    .calculation-formula {
-        padding: 0.5rem;
-        border-radius: 0.25rem;
-        background-color: rgba(var(--bs-secondary-rgb), 0.1);
-        font-family: monospace;
-    }
-</style>
-{% endblock %}
+  .calculator-section {
+    background-color: var(--bs-body-bg);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
 
-{% block content %}
+  .calculator-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color);
+  }
+
+  .calculator-body {
+    padding: 1.25rem;
+  }
+
+  .result-section {
+    background-color: rgba(var(--bs-success-rgb), 0.05);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    border: 1px solid rgba(var(--bs-success-rgb), 0.2);
+  }
+
+  .result-warning {
+    background-color: rgba(var(--bs-warning-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-warning-rgb), 0.2);
+  }
+
+  .result-danger {
+    background-color: rgba(var(--bs-danger-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-danger-rgb), 0.2);
+  }
+
+  .input-group-text {
+    min-width: 3rem;
+    justify-content: center;
+  }
+
+  .scenario-card {
+    transition: transform 0.2s;
+  }
+
+  .scenario-card:hover {
+    transform: translateY(-2px);
+  }
+
+  #calculatorResultsSection {
+    display: none;
+  }
+
+  .form-label {
+    font-weight: 500;
+  }
+
+  .calculation-steps {
+    border-left: 2px dashed var(--bs-border-color);
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  .calculation-step {
+    position: relative;
+    padding-bottom: 1.5rem;
+  }
+
+  .calculation-step::before {
+    content: "";
+    position: absolute;
+    left: -1.625rem;
+    top: 0.25rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+  }
+
+  .calculation-step:last-child {
+    padding-bottom: 0;
+  }
+
+  .calculation-formula {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    background-color: rgba(var(--bs-secondary-rgb), 0.1);
+    font-family: monospace;
+  }
+</style>
+{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-lg-8">
-        <!-- Main Calculator -->
-        <div class="calculator-section mb-4">
-            <div class="calculator-header">
-                <h5 class="mb-0">Tax Levy Calculator</h5>
+  <div class="col-lg-8">
+    <!-- Main Calculator -->
+    <div class="calculator-section mb-4">
+      <div class="calculator-header">
+        <h5 class="mb-0">Tax Levy Calculator</h5>
+      </div>
+      <div class="calculator-body">
+        <form id="levyCalculatorForm">
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3">
+              <label for="taxDistrict" class="form-label">Tax District</label>
+              <select
+                class="form-select"
+                id="taxDistrict"
+                name="district_id"
+                required
+              >
+                <option value="">Select a tax district</option>
+                {% for district in districts %}
+                <option value="{{ district.id }}">
+                  {{ district.district_name }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="form-text">
+                The taxing district for this calculation
+              </div>
             </div>
-            <div class="calculator-body">
-                <form id="levyCalculatorForm">
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3">
-                            <label for="taxDistrict" class="form-label">Tax District</label>
-                            <select class="form-select" id="taxDistrict" name="district_id" required>
-                                <option value="">Select a tax district</option>
-                                {% for district in districts %}
-                                <option value="{{ district.id }}">{{ district.district_name }}</option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-text">The taxing district for this calculation</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="taxYear" class="form-label">Tax Year</label>
-                            <select class="form-select" id="taxYear" name="year">
-                                <option value="{{ current_year }}">{{ current_year }}</option>
-                                <option value="{{ current_year - 1 }}">{{ current_year - 1 }}</option>
-                                <option value="{{ current_year - 2 }}">{{ current_year - 2 }}</option>
-                            </select>
-                            <div class="form-text">The tax year for this calculation</div>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <label for="levyAmount" class="form-label">Levy Amount</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="levyAmount" name="levy_amount" step="0.01" min="0" required>
-                            </div>
-                            <div class="form-text">The total levy amount requested by the district</div>
-                        </div>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary" id="calculateBtn">
-                            <i class="bi bi-calculator me-1"></i>Calculate Levy Rate
-                        </button>
-                    </div>
-                </form>
-                
-                <!-- Results Section (hidden initially) -->
-                <div id="calculatorResultsSection" class="result-section mt-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">Calculation Results</h5>
-                        <span class="badge bg-success px-3 py-2" id="resultStatus">Valid</span>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <p class="mb-1 text-muted">District</p>
-                            <h6 id="resultDistrict" class="mb-3">--</h6>
-                            <p class="mb-1 text-muted">Tax Year</p>
-                            <h6 id="resultYear" class="mb-0">--</h6>
-                        </div>
-                        <div class="col-md-6">
-                            <p class="mb-1 text-muted">Total Assessed Value</p>
-                            <h6 id="resultAssessedValue" class="mb-3">--</h6>
-                            <p class="mb-1 text-muted">Statutory Limit</p>
-                            <h6 id="resultStatutoryLimit" class="mb-0">--</h6>
-                        </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="card bg-light">
-                                <div class="card-body p-3">
-                                    <p class="text-muted mb-1">Levy Amount</p>
-                                    <h4 id="resultLevyAmount" class="mb-0 text-primary">--</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card bg-light">
-                                <div class="card-body p-3">
-                                    <p class="text-muted mb-1">Levy Rate (per $1,000)</p>
-                                    <h4 id="resultLevyRate" class="mb-0 text-primary">--</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Calculation method -->
-                    <div class="calculation-steps mb-4">
-                        <h6 class="mb-3">Calculation Method</h6>
-                        <div class="calculation-step">
-                            <p class="mb-1">Step 1: Gather the total assessed value of all properties in the district</p>
-                            <div class="calculation-formula mb-2">Assessed Value = <span id="formulaAssessedValue">$0</span></div>
-                        </div>
-                        <div class="calculation-step">
-                            <p class="mb-1">Step 2: Determine the requested levy amount</p>
-                            <div class="calculation-formula mb-2">Levy Amount = <span id="formulaLevyAmount">$0</span></div>
-                        </div>
-                        <div class="calculation-step">
-                            <p class="mb-1">Step 3: Calculate the levy rate per $1,000 of assessed value</p>
-                            <div class="calculation-formula mb-2">Levy Rate = (Levy Amount / Assessed Value) × 1,000</div>
-                            <div class="calculation-formula">= (<span id="formulaLevyAmountFinal">$0</span> / <span id="formulaAssessedValueFinal">$0</span>) × 1,000 = <span id="formulaLevyRate">0.000</span></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Compliance Issues -->
-                    <div id="complianceIssuesSection" class="mb-4 d-none">
-                        <div class="alert alert-warning">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <i class="bi bi-exclamation-triangle-fill fs-3"></i>
-                                </div>
-                                <div>
-                                    <h5 class="alert-heading">Statutory Compliance Issues</h5>
-                                    <ul id="complianceIssuesList" class="mb-0">
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Adjusted Rate (shown when over limit) -->
-                    <div id="adjustedRateSection" class="mb-4 d-none">
-                        <div class="card border-warning">
-                            <div class="card-header bg-warning text-dark">
-                                <h6 class="mb-0">Adjusted Levy (to comply with statutory limit)</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p class="mb-1 text-muted">Adjusted Levy Rate</p>
-                                        <h5 id="adjustedLevyRate" class="mb-3">--</h5>
-                                        <p class="mb-1 text-muted">Original Levy Rate</p>
-                                        <p id="originalLevyRate" class="mb-0 text-decoration-line-through">--</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p class="mb-1 text-muted">Adjusted Levy Amount</p>
-                                        <h5 id="adjustedLevyAmount" class="mb-3">--</h5>
-                                        <p class="mb-1 text-muted">Levy Reduction</p>
-                                        <p id="levyReduction" class="mb-0 text-danger">--</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-primary" id="saveResultBtn">
-                            <i class="bi bi-save me-1"></i>Save Scenario
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" id="analyzeBillImpactBtn">
-                            <i class="bi bi-calculator me-1"></i>Analyze Bill Impact
-                        </button>
-                    </div>
+            <div class="col-md-6 mb-3">
+              <label for="taxYear" class="form-label">Tax Year</label>
+              <select class="form-select" id="taxYear" name="year">
+                <option value="{{ current_year }}">{{ current_year }}</option>
+                <option value="{{ current_year - 1 }}">
+                  {{ current_year - 1 }}
+                </option>
+                <option value="{{ current_year - 2 }}">
+                  {{ current_year - 2 }}
+                </option>
+              </select>
+              <div class="form-text">The tax year for this calculation</div>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <label for="levyAmount" class="form-label">Levy Amount</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="levyAmount"
+                  name="levy_amount"
+                  step="0.01"
+                  min="0"
+                  required
+                />
+              </div>
+              <div class="form-text">
+                The total levy amount requested by the district
+              </div>
+            </div>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary" id="calculateBtn">
+              <i class="bi bi-calculator me-1"></i>Calculate Levy Rate
+            </button>
+          </div>
+        </form>
+
+        <!-- Results Section (hidden initially) -->
+        <div id="calculatorResultsSection" class="result-section mt-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Calculation Results</h5>
+            <span class="badge bg-success px-3 py-2" id="resultStatus"
+              >Valid</span
+            >
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <p class="mb-1 text-muted">District</p>
+              <h6 id="resultDistrict" class="mb-3">--</h6>
+              <p class="mb-1 text-muted">Tax Year</p>
+              <h6 id="resultYear" class="mb-0">--</h6>
+            </div>
+            <div class="col-md-6">
+              <p class="mb-1 text-muted">Total Assessed Value</p>
+              <h6 id="resultAssessedValue" class="mb-3">--</h6>
+              <p class="mb-1 text-muted">Statutory Limit</p>
+              <h6 id="resultStatutoryLimit" class="mb-0">--</h6>
+            </div>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="card bg-light">
+                <div class="card-body p-3">
+                  <p class="text-muted mb-1">Levy Amount</p>
+                  <h4 id="resultLevyAmount" class="mb-0 text-primary">--</h4>
                 </div>
+              </div>
             </div>
+            <div class="col-md-6">
+              <div class="card bg-light">
+                <div class="card-body p-3">
+                  <p class="text-muted mb-1">Levy Rate (per $1,000)</p>
+                  <h4 id="resultLevyRate" class="mb-0 text-primary">--</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calculation method -->
+          <div class="calculation-steps mb-4">
+            <h6 class="mb-3">Calculation Method</h6>
+            <div class="calculation-step">
+              <p class="mb-1">
+                Step 1: Gather the total assessed value of all properties in the
+                district
+              </p>
+              <div class="calculation-formula mb-2">
+                Assessed Value = <span id="formulaAssessedValue">$0</span>
+              </div>
+            </div>
+            <div class="calculation-step">
+              <p class="mb-1">Step 2: Determine the requested levy amount</p>
+              <div class="calculation-formula mb-2">
+                Levy Amount = <span id="formulaLevyAmount">$0</span>
+              </div>
+            </div>
+            <div class="calculation-step">
+              <p class="mb-1">
+                Step 3: Calculate the levy rate per $1,000 of assessed value
+              </p>
+              <div class="calculation-formula mb-2">
+                Levy Rate = (Levy Amount / Assessed Value) × 1,000
+              </div>
+              <div class="calculation-formula">
+                = (<span id="formulaLevyAmountFinal">$0</span> /
+                <span id="formulaAssessedValueFinal">$0</span>) × 1,000 =
+                <span id="formulaLevyRate">0.000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Compliance Issues -->
+          <div id="complianceIssuesSection" class="mb-4 d-none">
+            <div class="alert alert-warning">
+              <div class="d-flex">
+                <div class="me-3">
+                  <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+                </div>
+                <div>
+                  <h5 class="alert-heading">Statutory Compliance Issues</h5>
+                  <ul id="complianceIssuesList" class="mb-0"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Adjusted Rate (shown when over limit) -->
+          <div id="adjustedRateSection" class="mb-4 d-none">
+            <div class="card border-warning">
+              <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">
+                  Adjusted Levy (to comply with statutory limit)
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p class="mb-1 text-muted">Adjusted Levy Rate</p>
+                    <h5 id="adjustedLevyRate" class="mb-3">--</h5>
+                    <p class="mb-1 text-muted">Original Levy Rate</p>
+                    <p
+                      id="originalLevyRate"
+                      class="mb-0 text-decoration-line-through"
+                    >
+                      --
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <p class="mb-1 text-muted">Adjusted Levy Amount</p>
+                    <h5 id="adjustedLevyAmount" class="mb-3">--</h5>
+                    <p class="mb-1 text-muted">Levy Reduction</p>
+                    <p id="levyReduction" class="mb-0 text-danger">--</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-primary" id="saveResultBtn">
+              <i class="bi bi-save me-1"></i>Save Scenario
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              id="analyzeBillImpactBtn"
+            >
+              <i class="bi bi-calculator me-1"></i>Analyze Bill Impact
+            </button>
+          </div>
         </div>
-        
-        <!-- Next year forecast -->
-        <div class="calculator-section mb-4">
-            <div class="calculator-header">
-                <h5 class="mb-0">Next Year Forecast</h5>
-            </div>
-            <div class="calculator-body">
-                <div class="row mb-3">
-                    <div class="col-md-12 mb-3">
-                        <p>Forecast how a levy amount will change based on property value changes and new construction:</p>
-                    </div>
-                </div>
-                <form id="forecastForm" class="mb-4">
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <label for="assessedValueChange" class="form-label">Estimated Assessed Value Change</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="assessedValueChange" name="assessed_value_change" step="0.1" value="2.0">
-                                <span class="input-group-text">%</span>
-                            </div>
-                            <div class="form-text">Expected change in total assessed value</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="newConstructionValue" class="form-label">New Construction Value</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="newConstructionValue" name="new_construction_value" step="1000" value="0">
-                            </div>
-                            <div class="form-text">Value of new construction in district</div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <label for="annexationValue" class="form-label">Annexation Value</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" id="annexationValue" name="annexation_value" step="1000" value="0">
-                            </div>
-                            <div class="form-text">Value of annexed property</div>
-                        </div>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary" id="calculateForecastBtn">
-                            <i class="bi bi-graph-up me-1"></i>Calculate Forecast
-                        </button>
-                    </div>
-                </form>
-                
-                <!-- Forecast Results (hidden initially) -->
-                <div id="forecastResultsSection" class="d-none">
-                    <div class="alert alert-info">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6 class="alert-heading">Next Year ({{ current_year + 1 }}) Forecast</h6>
-                                <p class="mb-1 text-muted">Projected Assessed Value</p>
-                                <h5 id="forecastAssessedValue" class="mb-3">--</h5>
-                                <p class="mb-1 text-muted">Projected Levy Rate</p>
-                                <h5 id="forecastLevyRate" class="mb-0">--</h5>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="alert-heading">Impact Summary</h6>
-                                <p class="mb-1 text-muted">Maximum Allowable Levy Increase</p>
-                                <h5 id="forecastMaxIncrease" class="mb-3">--</h5>
-                                <p class="mb-1 text-muted">Levy Rate Change</p>
-                                <h5 id="forecastRateChange" class="mb-0">--</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    <div class="col-lg-4">
-        <!-- Saved Scenarios -->
-        <div class="calculator-section mb-4" id="scenariosSection">
-            <div class="calculator-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">My Saved Scenarios</h5>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshScenariosBtn">
-                    <i class="bi bi-arrow-clockwise"></i>
-                </button>
-            </div>
-            <div class="calculator-body">
-                <div id="scenariosList">
-                    <!-- Scenarios will be loaded dynamically via JavaScript -->
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2 text-muted">Loading scenarios...</p>
-                    </div>
-                </div>
-            </div>
+
+    <!-- Next year forecast -->
+    <div class="calculator-section mb-4">
+      <div class="calculator-header">
+        <h5 class="mb-0">Next Year Forecast</h5>
+      </div>
+      <div class="calculator-body">
+        <div class="row mb-3">
+          <div class="col-md-12 mb-3">
+            <p>
+              Forecast how a levy amount will change based on property value
+              changes and new construction:
+            </p>
+          </div>
         </div>
-        
-        <!-- Help & Resources -->
-        <div class="calculator-section">
-            <div class="calculator-header">
-                <h5 class="mb-0">Help & Resources</h5>
+        <form id="forecastForm" class="mb-4">
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3 mb-md-0">
+              <label for="assessedValueChange" class="form-label"
+                >Estimated Assessed Value Change</label
+              >
+              <div class="input-group">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="assessedValueChange"
+                  name="assessed_value_change"
+                  step="0.1"
+                  value="2.0"
+                />
+                <span class="input-group-text">%</span>
+              </div>
+              <div class="form-text">
+                Expected change in total assessed value
+              </div>
             </div>
-            <div class="calculator-body">
-                <div class="accordion" id="helpAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                How is the levy rate calculated?
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
-                            <div class="accordion-body">
-                                <p>The levy rate is calculated by dividing the total levy amount by the total assessed value of all taxable property in the district, then multiplying by 1,000 to get the rate per $1,000 of assessed value.</p>
-                                <div class="calculation-formula">
-                                    Levy Rate = (Levy Amount / Total Assessed Value) × 1,000
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                What are statutory limits?
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
-                            <div class="accordion-body">
-                                <p>Statutory limits are maximum levy rates established by state law for different types of taxing districts. If a calculated rate exceeds the statutory limit, the levy must be reduced to comply with the law.</p>
-                                <p>Common statutory limits in Washington state:</p>
-                                <ul>
-                                    <li>Counties: $1.80 per $1,000</li>
-                                    <li>Cities: $3.375 per $1,000</li>
-                                    <li>Fire Districts: $1.50 per $1,000</li>
-                                    <li>School Districts: varies by type</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                What is the 1% annual increase limit?
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
-                            <div class="accordion-body">
-                                <p>Washington state law limits annual increases in regular property tax levies to 1% plus new construction, unless voters approve a higher amount. This is sometimes called the "levy lid."</p>
-                                <p>The formula for the maximum allowable levy is:</p>
-                                <div class="calculation-formula">
-                                    Max Levy = (Previous Year's Levy × 1.01) + (New Construction Value × Previous Levy Rate)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                What is banked capacity?
-                            </button>
-                        </h2>
-                        <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
-                            <div class="accordion-body">
-                                <p>Banked capacity occurs when a taxing district does not levy the maximum amount allowed by law. The difference between the maximum allowed and the actual levy can be "banked" and used in future years.</p>
-                                <p>This allows districts to levy more than the 1% limit in a future year by using previously unused capacity.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <a href="{{ url_for('glossary.glossary') }}" class="btn btn-outline-primary w-100">
-                        <i class="bi bi-book me-1"></i>View Tax Terms Glossary
-                    </a>
-                </div>
+            <div class="col-md-6">
+              <label for="newConstructionValue" class="form-label"
+                >New Construction Value</label
+              >
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="newConstructionValue"
+                  name="new_construction_value"
+                  step="1000"
+                  value="0"
+                />
+              </div>
+              <div class="form-text">Value of new construction in district</div>
             </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12">
+              <label for="annexationValue" class="form-label"
+                >Annexation Value</label
+              >
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="annexationValue"
+                  name="annexation_value"
+                  step="1000"
+                  value="0"
+                />
+              </div>
+              <div class="form-text">Value of annexed property</div>
+            </div>
+          </div>
+          <div class="d-grid">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="calculateForecastBtn"
+            >
+              <i class="bi bi-graph-up me-1"></i>Calculate Forecast
+            </button>
+          </div>
+        </form>
+
+        <!-- Forecast Results (hidden initially) -->
+        <div id="forecastResultsSection" class="d-none">
+          <div class="alert alert-info">
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="alert-heading">
+                  Next Year ({{ current_year + 1 }}) Forecast
+                </h6>
+                <p class="mb-1 text-muted">Projected Assessed Value</p>
+                <h5 id="forecastAssessedValue" class="mb-3">--</h5>
+                <p class="mb-1 text-muted">Projected Levy Rate</p>
+                <h5 id="forecastLevyRate" class="mb-0">--</h5>
+              </div>
+              <div class="col-md-6">
+                <h6 class="alert-heading">Impact Summary</h6>
+                <p class="mb-1 text-muted">Maximum Allowable Levy Increase</p>
+                <h5 id="forecastMaxIncrease" class="mb-3">--</h5>
+                <p class="mb-1 text-muted">Levy Rate Change</p>
+                <h5 id="forecastRateChange" class="mb-0">--</h5>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+  <div class="col-lg-4">
+    <!-- Saved Scenarios -->
+    <div class="calculator-section mb-4" id="scenariosSection">
+      <div
+        class="calculator-header d-flex justify-content-between align-items-center"
+      >
+        <h5 class="mb-0">My Saved Scenarios</h5>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          id="refreshScenariosBtn"
+        >
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <div class="calculator-body">
+        <div id="scenariosList">
+          <!-- Scenarios will be loaded dynamically via JavaScript -->
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading scenarios...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Help & Resources -->
+    <div class="calculator-section">
+      <div class="calculator-header">
+        <h5 class="mb-0">Help & Resources</h5>
+      </div>
+      <div class="calculator-body">
+        <div class="accordion" id="helpAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseOne"
+                aria-expanded="false"
+                aria-controls="collapseOne"
+              >
+                How is the levy rate calculated?
+              </button>
+            </h2>
+            <div
+              id="collapseOne"
+              class="accordion-collapse collapse"
+              data-bs-parent="#helpAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  The levy rate is calculated by dividing the total levy amount
+                  by the total assessed value of all taxable property in the
+                  district, then multiplying by 1,000 to get the rate per $1,000
+                  of assessed value.
+                </p>
+                <div class="calculation-formula">
+                  Levy Rate = (Levy Amount / Total Assessed Value) × 1,000
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo"
+                aria-expanded="false"
+                aria-controls="collapseTwo"
+              >
+                What are statutory limits?
+              </button>
+            </h2>
+            <div
+              id="collapseTwo"
+              class="accordion-collapse collapse"
+              data-bs-parent="#helpAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Statutory limits are maximum levy rates established by state
+                  law for different types of taxing districts. If a calculated
+                  rate exceeds the statutory limit, the levy must be reduced to
+                  comply with the law.
+                </p>
+                <p>Common statutory limits in Washington state:</p>
+                <ul>
+                  <li>Counties: $1.80 per $1,000</li>
+                  <li>Cities: $3.375 per $1,000</li>
+                  <li>Fire Districts: $1.50 per $1,000</li>
+                  <li>School Districts: varies by type</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseThree"
+                aria-expanded="false"
+                aria-controls="collapseThree"
+              >
+                What is the 1% annual increase limit?
+              </button>
+            </h2>
+            <div
+              id="collapseThree"
+              class="accordion-collapse collapse"
+              data-bs-parent="#helpAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Washington state law limits annual increases in regular
+                  property tax levies to 1% plus new construction, unless voters
+                  approve a higher amount. This is sometimes called the "levy
+                  lid."
+                </p>
+                <p>The formula for the maximum allowable levy is:</p>
+                <div class="calculation-formula">
+                  Max Levy = (Previous Year's Levy × 1.01) + (New Construction
+                  Value × Previous Levy Rate)
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseFour"
+                aria-expanded="false"
+                aria-controls="collapseFour"
+              >
+                What is banked capacity?
+              </button>
+            </h2>
+            <div
+              id="collapseFour"
+              class="accordion-collapse collapse"
+              data-bs-parent="#helpAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Banked capacity occurs when a taxing district does not levy
+                  the maximum amount allowed by law. The difference between the
+                  maximum allowed and the actual levy can be "banked" and used
+                  in future years.
+                </p>
+                <p>
+                  This allows districts to levy more than the 1% limit in a
+                  future year by using previously unused capacity.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <a
+            href="{{ url_for('glossary.glossary') }}"
+            class="btn btn-outline-primary w-100"
+          >
+            <i class="bi bi-book me-1"></i>View Tax Terms Glossary
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Save Scenario Modal -->
-<div class="modal fade" id="saveScenarioModal" tabindex="-1" aria-labelledby="saveScenarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="saveScenarioModalLabel">Save Levy Scenario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="saveScenarioForm">
-                    <input type="hidden" id="saveScenarioId" name="scenario_id">
-                    <input type="hidden" id="saveDistrictId" name="district_id">
-                    <input type="hidden" id="saveBaseYear" name="base_year">
-                    <input type="hidden" id="saveTargetYear" name="target_year">
-                    <input type="hidden" id="saveLevyAmount" name="levy_amount">
-                    <input type="hidden" id="saveAssessedValueChange" name="assessed_value_change" value="0">
-                    <input type="hidden" id="saveNewConstructionValue" name="new_construction_value" value="0">
-                    <input type="hidden" id="saveAnnexationValue" name="annexation_value" value="0">
-                    
-                    <div class="mb-3">
-                        <label for="scenarioName" class="form-label">Scenario Name</label>
-                        <input type="text" class="form-control" id="scenarioName" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="scenarioDescription" class="form-label">Description (Optional)</label>
-                        <textarea class="form-control" id="scenarioDescription" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="isPublic" name="is_public">
-                        <label class="form-check-label" for="isPublic">Make this scenario visible to other users</label>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmSaveScenario">Save Scenario</button>
-            </div>
-        </div>
+<div
+  class="modal fade"
+  id="saveScenarioModal"
+  tabindex="-1"
+  aria-labelledby="saveScenarioModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saveScenarioModalLabel">
+          Save Levy Scenario
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="saveScenarioForm">
+          <input type="hidden" id="saveScenarioId" name="scenario_id" />
+          <input type="hidden" id="saveDistrictId" name="district_id" />
+          <input type="hidden" id="saveBaseYear" name="base_year" />
+          <input type="hidden" id="saveTargetYear" name="target_year" />
+          <input type="hidden" id="saveLevyAmount" name="levy_amount" />
+          <input
+            type="hidden"
+            id="saveAssessedValueChange"
+            name="assessed_value_change"
+            value="0"
+          />
+          <input
+            type="hidden"
+            id="saveNewConstructionValue"
+            name="new_construction_value"
+            value="0"
+          />
+          <input
+            type="hidden"
+            id="saveAnnexationValue"
+            name="annexation_value"
+            value="0"
+          />
+
+          <div class="mb-3">
+            <label for="scenarioName" class="form-label">Scenario Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="scenarioName"
+              name="name"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="scenarioDescription" class="form-label"
+              >Description (Optional)</label
+            >
+            <textarea
+              class="form-control"
+              id="scenarioDescription"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
+          <div class="mb-3 form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="isPublic"
+              name="is_public"
+            />
+            <label class="form-check-label" for="isPublic"
+              >Make this scenario visible to other users</label
+            >
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="confirmSaveScenario">
+          Save Scenario
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteScenarioModal" tabindex="-1" aria-labelledby="deleteScenarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteScenarioModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this scenario? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteScenario">Delete Scenario</button>
-            </div>
-        </div>
+<div
+  class="modal fade"
+  id="deleteScenarioModal"
+  tabindex="-1"
+  aria-labelledby="deleteScenarioModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteScenarioModalLabel">
+          Confirm Deletion
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Are you sure you want to delete this scenario? This action cannot be
+          undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteScenario">
+          Delete Scenario
+        </button>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script src="{{ url_for('static', filename='js/levy_calculator_updated.js') }}"></script>
 <script>
-// Additional page-specific JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Levy Calculator JS loaded successfully');
-    
+  // Additional page-specific JavaScript
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Levy Calculator JS loaded successfully");
+
     // DOM elements - safely reference them with null checks
-    const levyCalculatorForm = document.getElementById('levyCalculatorForm');
-    const forecastForm = document.getElementById('forecastForm');
-    const calculatorResultsSection = document.getElementById('calculatorResultsSection');
-    const forecastResultsSection = document.getElementById('forecastResultsSection');
-    const complianceIssuesSection = document.getElementById('complianceIssuesSection');
-    const adjustedRateSection = document.getElementById('adjustedRateSection');
-    const saveScenarioBtn = document.getElementById('saveScenarioBtn');
-    const saveResultBtn = document.getElementById('saveResultBtn');
-    
+    const levyCalculatorForm = document.getElementById("levyCalculatorForm");
+    const forecastForm = document.getElementById("forecastForm");
+    const calculatorResultsSection = document.getElementById(
+      "calculatorResultsSection",
+    );
+    const forecastResultsSection = document.getElementById(
+      "forecastResultsSection",
+    );
+    const complianceIssuesSection = document.getElementById(
+      "complianceIssuesSection",
+    );
+    const adjustedRateSection = document.getElementById("adjustedRateSection");
+    const saveScenarioBtn = document.getElementById("saveScenarioBtn");
+    const saveResultBtn = document.getElementById("saveResultBtn");
+
     // Initialize modals if they exist
-    const saveScenarioModalEl = document.getElementById('saveScenarioModal');
-    const deleteScenarioModalEl = document.getElementById('deleteScenarioModal');
-    const saveScenarioModal = saveScenarioModalEl ? new bootstrap.Modal(saveScenarioModalEl) : null;
-    const deleteScenarioModal = deleteScenarioModalEl ? new bootstrap.Modal(deleteScenarioModalEl) : null;
-    
+    const saveScenarioModalEl = document.getElementById("saveScenarioModal");
+    const deleteScenarioModalEl = document.getElementById(
+      "deleteScenarioModal",
+    );
+    const saveScenarioModal = saveScenarioModalEl
+      ? new bootstrap.Modal(saveScenarioModalEl)
+      : null;
+    const deleteScenarioModal = deleteScenarioModalEl
+      ? new bootstrap.Modal(deleteScenarioModalEl)
+      : null;
+
     // State
     let currentDistrict = null;
     let currentCalculation = null;
     let currentScenarioId = null;
-    
+
     // Initialize tooltips
     const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
-    
+    tooltips.forEach((tooltip) => new bootstrap.Tooltip(tooltip));
+
     // Form submission handler
     if (levyCalculatorForm) {
-        levyCalculatorForm.addEventListener('submit', function(e) {
+      levyCalculatorForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        
-        const districtId = document.getElementById('taxDistrict').value;
-        const levyAmount = document.getElementById('levyAmount').value;
-        
+
+        const districtId = document.getElementById("taxDistrict").value;
+        const levyAmount = document.getElementById("levyAmount").value;
+
         if (!districtId || !levyAmount) {
-            alert('Please provide tax district and levy amount');
-            return;
+          alert("Please provide tax district and levy amount");
+          return;
         }
-        
+
         // Get current district assessed value (in a real scenario, this would come from the database)
         // For now, we'll use a placeholder value that would normally come from the district data
         const assessedValue = 500000000; // This would normally be retrieved from the server
-        
+
         // Call our API endpoint
-        fetch('/levy-calculator/api/calculate-rate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                district_id: districtId,
-                levy_amount: parseFloat(levyAmount),
-                assessed_value: assessedValue
-            })
+        fetch("/levy-calculator/api/calculate-rate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            district_id: districtId,
+            levy_amount: parseFloat(levyAmount),
+            assessed_value: assessedValue,
+          }),
         })
-        .then(response => response.json())
-        .then(data => {
+          .then((response) => response.json())
+          .then((data) => {
             if (!data.error) {
-                // Display results
-                displayResults(data);
-                currentCalculation = data;
-                
-                // Show results section
-                calculatorResultsSection.style.display = 'block';
-                
-                // Scroll to results
-                calculatorResultsSection.scrollIntoView({ behavior: 'smooth' });
+              // Display results
+              displayResults(data);
+              currentCalculation = data;
+
+              // Show results section
+              calculatorResultsSection.style.display = "block";
+
+              // Scroll to results
+              calculatorResultsSection.scrollIntoView({ behavior: "smooth" });
             } else {
-                alert('Error: ' + data.error);
+              alert("Error: " + data.error);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while calculating the levy rate.');
-        });
-    });
-    
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while calculating the levy rate.");
+          });
+      });
     }
 
     // Tax district change handler
-    const taxDistrictSelect = document.getElementById('taxDistrict');
+    const taxDistrictSelect = document.getElementById("taxDistrict");
     if (taxDistrictSelect) {
-        taxDistrictSelect.addEventListener('change', function(e) {
+      taxDistrictSelect.addEventListener("change", function (e) {
         const districtId = e.target.value;
         if (districtId) {
-            fetch(`/levy-calculator/district/${districtId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    currentDistrict = data.district;
-                    
-                    // Pre-fill some form values if available
-                    if (data.district && data.levy_rates && data.levy_rates.length > 0) {
-                        const latestRate = data.levy_rates[0];
-                        document.getElementById('levyAmount').value = latestRate.levy_amount.toFixed(2);
-                    }
+          fetch(`/levy-calculator/district/${districtId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === "success") {
+                currentDistrict = data.district;
+
+                // Pre-fill some form values if available
+                if (
+                  data.district &&
+                  data.levy_rates &&
+                  data.levy_rates.length > 0
+                ) {
+                  const latestRate = data.levy_rates[0];
+                  document.getElementById("levyAmount").value =
+                    latestRate.levy_amount.toFixed(2);
                 }
+              }
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch((error) => {
+              console.error("Error:", error);
             });
         }
-    });
-    
+      });
     }
-    
+
     // Forecast form submission handler
     if (forecastForm) {
-        forecastForm.addEventListener('submit', function(e) {
+      forecastForm.addEventListener("submit", function (e) {
         e.preventDefault();
-        
+
         if (!currentCalculation) {
-            alert('Please calculate a levy first.');
-            return;
+          alert("Please calculate a levy first.");
+          return;
         }
-        
-        const assessedValueChange = parseFloat(document.getElementById('assessedValueChange').value) / 100;
-        const newConstructionValue = parseFloat(document.getElementById('newConstructionValue').value);
-        const annexationValue = parseFloat(document.getElementById('annexationValue').value);
-        
+
+        const assessedValueChange =
+          parseFloat(document.getElementById("assessedValueChange").value) /
+          100;
+        const newConstructionValue = parseFloat(
+          document.getElementById("newConstructionValue").value,
+        );
+        const annexationValue = parseFloat(
+          document.getElementById("annexationValue").value,
+        );
+
         // Calculate forecast
         const currentLevyAmount = currentCalculation.levy_amount;
         const currentAssessedValue = currentCalculation.assessed_value;
         const currentLevyRate = currentCalculation.levy_rate;
         const currentYear = currentCalculation.year;
-        
+
         // Calculate next year's values
-        const nextYearAssessedValue = currentAssessedValue * (1 + assessedValueChange) + newConstructionValue + annexationValue;
-        const maxAllowableIncrease = (currentLevyAmount * 0.01) + ((newConstructionValue + annexationValue) * (currentLevyRate / 1000));
+        const nextYearAssessedValue =
+          currentAssessedValue * (1 + assessedValueChange) +
+          newConstructionValue +
+          annexationValue;
+        const maxAllowableIncrease =
+          currentLevyAmount * 0.01 +
+          (newConstructionValue + annexationValue) * (currentLevyRate / 1000);
         const nextYearLevyAmount = currentLevyAmount + maxAllowableIncrease;
-        const nextYearLevyRate = (nextYearLevyAmount / nextYearAssessedValue) * 1000;
+        const nextYearLevyRate =
+          (nextYearLevyAmount / nextYearAssessedValue) * 1000;
         const levyRateChange = nextYearLevyRate - currentLevyRate;
         const levyRateChangePercent = (levyRateChange / currentLevyRate) * 100;
-        
+
         // Display forecast results
-        document.getElementById('forecastAssessedValue').textContent = formatCurrency(nextYearAssessedValue);
-        document.getElementById('forecastLevyRate').textContent = formatNumber(nextYearLevyRate) + ' per $1,000';
-        document.getElementById('forecastMaxIncrease').textContent = formatCurrency(maxAllowableIncrease);
-        
-        const rateChangeText = formatNumber(levyRateChange) + ' per $1,000 (' + 
-            (levyRateChangePercent >= 0 ? '+' : '') + formatNumber(levyRateChangePercent) + '%)';
-        document.getElementById('forecastRateChange').textContent = rateChangeText;
-        
+        document.getElementById("forecastAssessedValue").textContent =
+          formatCurrency(nextYearAssessedValue);
+        document.getElementById("forecastLevyRate").textContent =
+          formatNumber(nextYearLevyRate) + " per $1,000";
+        document.getElementById("forecastMaxIncrease").textContent =
+          formatCurrency(maxAllowableIncrease);
+
+        const rateChangeText =
+          formatNumber(levyRateChange) +
+          " per $1,000 (" +
+          (levyRateChangePercent >= 0 ? "+" : "") +
+          formatNumber(levyRateChangePercent) +
+          "%)";
+        document.getElementById("forecastRateChange").textContent =
+          rateChangeText;
+
         // Show forecast results
-        forecastResultsSection.classList.remove('d-none');
-        
+        forecastResultsSection.classList.remove("d-none");
+
         // Update save form hidden fields
-        document.getElementById('saveAssessedValueChange').value = assessedValueChange * 100;
-        document.getElementById('saveNewConstructionValue').value = newConstructionValue;
-        document.getElementById('saveAnnexationValue').value = annexationValue;
-        document.getElementById('saveTargetYear').value = currentYear + 1;
-    });
-    
+        document.getElementById("saveAssessedValueChange").value =
+          assessedValueChange * 100;
+        document.getElementById("saveNewConstructionValue").value =
+          newConstructionValue;
+        document.getElementById("saveAnnexationValue").value = annexationValue;
+        document.getElementById("saveTargetYear").value = currentYear + 1;
+      });
     }
-    
+
     // Save scenario button click
     if (saveScenarioBtn) {
-        saveScenarioBtn.addEventListener('click', function() {
+      saveScenarioBtn.addEventListener("click", function () {
         if (!currentCalculation) {
-            alert('Please calculate a levy first.');
-            return;
+          alert("Please calculate a levy first.");
+          return;
         }
-        
+
         // Pre-fill form
-        document.getElementById('saveDistrictId').value = currentCalculation.district_id;
-        document.getElementById('saveBaseYear').value = currentCalculation.year;
-        document.getElementById('saveTargetYear').value = currentCalculation.year;
-        document.getElementById('saveLevyAmount').value = currentCalculation.levy_amount;
-        
+        document.getElementById("saveDistrictId").value =
+          currentCalculation.district_id;
+        document.getElementById("saveBaseYear").value = currentCalculation.year;
+        document.getElementById("saveTargetYear").value =
+          currentCalculation.year;
+        document.getElementById("saveLevyAmount").value =
+          currentCalculation.levy_amount;
+
         // Generate a default name
         const districtName = currentCalculation.district_name;
         const year = currentCalculation.year;
-        document.getElementById('scenarioName').value = `${districtName} Levy ${year}`;
-        
+        document.getElementById("scenarioName").value =
+          `${districtName} Levy ${year}`;
+
         // Show modal
         saveScenarioModal.show();
-    });
-    
+      });
     }
-    
+
     // Save result button also opens save modal
     if (saveResultBtn) {
-        saveResultBtn.addEventListener('click', function() {
-            saveScenarioBtn.click();
-        });
+      saveResultBtn.addEventListener("click", function () {
+        saveScenarioBtn.click();
+      });
     }
-    
+
     // Confirm save button
-    const confirmSaveScenarioBtn = document.getElementById('confirmSaveScenario');
+    const confirmSaveScenarioBtn = document.getElementById(
+      "confirmSaveScenario",
+    );
     if (confirmSaveScenarioBtn) {
-        confirmSaveScenarioBtn.addEventListener('click', function() {
-            const form = document.getElementById('saveScenarioForm');
-            const formData = new FormData(form);
-            
-            fetch('/levy-calculator/save-scenario', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    saveScenarioModal.hide();
-                    alert('Scenario saved successfully.');
-                    
-                    // Refresh scenarios list
-                    loadSavedScenarios();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while saving the scenario.');
-            });
-        });
-    }
-    
-    // Refresh scenarios button
-    const refreshScenariosBtn = document.getElementById('refreshScenariosBtn');
-    if (refreshScenariosBtn) {
-        refreshScenariosBtn.addEventListener('click', function() {
-            loadSavedScenarios();
-        });
-    }
-    
-    // Bill impact button
-    const analyzeBillImpactBtn = document.getElementById('analyzeBillImpactBtn');
-    if (analyzeBillImpactBtn) {
-        analyzeBillImpactBtn.addEventListener('click', function() {
-            if (!currentCalculation) {
-                alert('Please calculate a levy first.');
-                return;
+      confirmSaveScenarioBtn.addEventListener("click", function () {
+        const form = document.getElementById("saveScenarioForm");
+        const formData = new FormData(form);
+
+        fetch("/levy-calculator/save-scenario", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              saveScenarioModal.hide();
+              alert("Scenario saved successfully.");
+
+              // Refresh scenarios list
+              loadSavedScenarios();
+            } else {
+              alert("Error: " + data.message);
             }
-            
-            // Redirect to bill impact calculator with pre-filled values
-            window.location.href = `/levy-calculator/bill-impact?district_id=${currentCalculation.district_id}&levy_rate=${currentCalculation.levy_rate}`;
-        });
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while saving the scenario.");
+          });
+      });
     }
-    
+
+    // Refresh scenarios button
+    const refreshScenariosBtn = document.getElementById("refreshScenariosBtn");
+    if (refreshScenariosBtn) {
+      refreshScenariosBtn.addEventListener("click", function () {
+        loadSavedScenarios();
+      });
+    }
+
+    // Bill impact button
+    const analyzeBillImpactBtn = document.getElementById(
+      "analyzeBillImpactBtn",
+    );
+    if (analyzeBillImpactBtn) {
+      analyzeBillImpactBtn.addEventListener("click", function () {
+        if (!currentCalculation) {
+          alert("Please calculate a levy first.");
+          return;
+        }
+
+        // Redirect to bill impact calculator with pre-filled values
+        window.location.href = `/levy-calculator/bill-impact?district_id=${currentCalculation.district_id}&levy_rate=${currentCalculation.levy_rate}`;
+      });
+    }
+
     // Event delegation for dynamic buttons
-    document.addEventListener('click', function(e) {
-        // Load scenario button
-        if (e.target.closest('.load-scenario-btn')) {
-            const button = e.target.closest('.load-scenario-btn');
-            const scenarioId = button.dataset.scenarioId;
-            loadScenario(scenarioId);
-        }
-        
-        // Delete scenario button
-        if (e.target.closest('.delete-scenario-btn')) {
-            const button = e.target.closest('.delete-scenario-btn');
-            const scenarioId = button.dataset.scenarioId;
-            currentScenarioId = scenarioId;
-            deleteScenarioModal.show();
-        }
+    document.addEventListener("click", function (e) {
+      // Load scenario button
+      if (e.target.closest(".load-scenario-btn")) {
+        const button = e.target.closest(".load-scenario-btn");
+        const scenarioId = button.dataset.scenarioId;
+        loadScenario(scenarioId);
+      }
+
+      // Delete scenario button
+      if (e.target.closest(".delete-scenario-btn")) {
+        const button = e.target.closest(".delete-scenario-btn");
+        const scenarioId = button.dataset.scenarioId;
+        currentScenarioId = scenarioId;
+        deleteScenarioModal.show();
+      }
     });
-    
+
     // Confirm delete button
-    const confirmDeleteScenarioBtn = document.getElementById('confirmDeleteScenario');
+    const confirmDeleteScenarioBtn = document.getElementById(
+      "confirmDeleteScenario",
+    );
     if (confirmDeleteScenarioBtn) {
-        confirmDeleteScenarioBtn.addEventListener('click', function() {
-            if (!currentScenarioId) return;
-            
-            fetch(`/levy-calculator/delete-scenario/${currentScenarioId}`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    deleteScenarioModal.hide();
-                    loadSavedScenarios();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while deleting the scenario.');
-            });
-        });
+      confirmDeleteScenarioBtn.addEventListener("click", function () {
+        if (!currentScenarioId) return;
+
+        fetch(`/levy-calculator/delete-scenario/${currentScenarioId}`, {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              deleteScenarioModal.hide();
+              loadSavedScenarios();
+            } else {
+              alert("Error: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("An error occurred while deleting the scenario.");
+          });
+      });
     }
-    
+
     // Helper functions
     function displayResults(result) {
-        // Set default year if not provided
-        const currentYear = new Date().getFullYear();
-        result.year = result.year || currentYear;
-        
-        // Update result fields
-        document.getElementById('resultDistrict').textContent = result.district_name;
-        document.getElementById('resultYear').textContent = result.year;
-        document.getElementById('resultAssessedValue').textContent = formatCurrency(result.assessed_value);
-        document.getElementById('resultStatutoryLimit').textContent = result.statutory_limit ? 
-            formatNumber(result.statutory_limit) + ' per $1,000' : 'Not specified';
-        document.getElementById('resultLevyAmount').textContent = formatCurrency(result.levy_amount);
-        document.getElementById('resultLevyRate').textContent = formatNumber(result.levy_rate) + ' per $1,000';
-        
-        // Update formula values
-        document.getElementById('formulaAssessedValue').textContent = formatCurrency(result.assessed_value);
-        document.getElementById('formulaLevyAmount').textContent = formatCurrency(result.levy_amount);
-        document.getElementById('formulaAssessedValueFinal').textContent = formatCurrency(result.assessed_value);
-        document.getElementById('formulaLevyAmountFinal').textContent = formatCurrency(result.levy_amount);
-        document.getElementById('formulaLevyRate').textContent = formatNumber(result.levy_rate);
-        
-        // Set status based on within_limit property
-        const withinLimit = result.within_limit !== undefined ? result.within_limit : true;
-        if (!withinLimit) {
-            const issuesList = document.getElementById('complianceIssuesList');
-            issuesList.innerHTML = '';
-            
-            const li = document.createElement('li');
-            li.textContent = `Levy rate exceeds statutory limit of ${result.statutory_limit} per $1,000`;
-            issuesList.appendChild(li);
-            
-            complianceIssuesSection.classList.remove('d-none');
-            document.getElementById('resultStatus').className = 'badge bg-warning px-3 py-2';
-            document.getElementById('resultStatus').textContent = 'Warning';
-        } else if (result.compliance_issues && result.compliance_issues.length > 0) {
-            const issuesList = document.getElementById('complianceIssuesList');
-            issuesList.innerHTML = '';
-            
-            result.compliance_issues.forEach(issue => {
-                const li = document.createElement('li');
-                li.textContent = issue.message;
-                issuesList.appendChild(li);
-            });
-            
-            complianceIssuesSection.classList.remove('d-none');
-            document.getElementById('resultStatus').className = 'badge bg-warning px-3 py-2';
-            document.getElementById('resultStatus').textContent = 'Warning';
-        } else {
-            complianceIssuesSection.classList.add('d-none');
-            document.getElementById('resultStatus').className = 'badge bg-success px-3 py-2';
-            document.getElementById('resultStatus').textContent = 'Valid';
-        }
-        
-        // Show/hide adjusted rate section when over the limit
-        if (!withinLimit && result.adjusted_levy_amount) {
-            document.getElementById('adjustedLevyRate').textContent = formatNumber(result.adjusted_levy_rate) + ' per $1,000';
-            document.getElementById('originalLevyRate').textContent = formatNumber(result.levy_rate) + ' per $1,000';
-            document.getElementById('adjustedLevyAmount').textContent = formatCurrency(result.adjusted_levy_amount);
-            document.getElementById('levyReduction').textContent = formatCurrency(result.levy_reduction);
-            
-            adjustedRateSection.classList.remove('d-none');
-        } else if (result.adjustment_data) {
-            document.getElementById('adjustedLevyRate').textContent = formatNumber(result.adjustment_data.adjusted_rate) + ' per $1,000';
-            document.getElementById('originalLevyRate').textContent = formatNumber(result.adjustment_data.original_rate) + ' per $1,000';
-            document.getElementById('adjustedLevyAmount').textContent = formatCurrency(result.adjustment_data.adjusted_amount);
-            document.getElementById('levyReduction').textContent = formatCurrency(result.adjustment_data.difference);
-            
-            adjustedRateSection.classList.remove('d-none');
-        } else {
-            adjustedRateSection.classList.add('d-none');
-        }
+      // Set default year if not provided
+      const currentYear = new Date().getFullYear();
+      result.year = result.year || currentYear;
+
+      // Update result fields
+      document.getElementById("resultDistrict").textContent =
+        result.district_name;
+      document.getElementById("resultYear").textContent = result.year;
+      document.getElementById("resultAssessedValue").textContent =
+        formatCurrency(result.assessed_value);
+      document.getElementById("resultStatutoryLimit").textContent =
+        result.statutory_limit
+          ? formatNumber(result.statutory_limit) + " per $1,000"
+          : "Not specified";
+      document.getElementById("resultLevyAmount").textContent = formatCurrency(
+        result.levy_amount,
+      );
+      document.getElementById("resultLevyRate").textContent =
+        formatNumber(result.levy_rate) + " per $1,000";
+
+      // Update formula values
+      document.getElementById("formulaAssessedValue").textContent =
+        formatCurrency(result.assessed_value);
+      document.getElementById("formulaLevyAmount").textContent = formatCurrency(
+        result.levy_amount,
+      );
+      document.getElementById("formulaAssessedValueFinal").textContent =
+        formatCurrency(result.assessed_value);
+      document.getElementById("formulaLevyAmountFinal").textContent =
+        formatCurrency(result.levy_amount);
+      document.getElementById("formulaLevyRate").textContent = formatNumber(
+        result.levy_rate,
+      );
+
+      // Set status based on within_limit property
+      const withinLimit =
+        result.within_limit !== undefined ? result.within_limit : true;
+      if (!withinLimit) {
+        const issuesList = document.getElementById("complianceIssuesList");
+        issuesList.innerHTML = "";
+
+        const li = document.createElement("li");
+        li.textContent = `Levy rate exceeds statutory limit of ${result.statutory_limit} per $1,000`;
+        issuesList.appendChild(li);
+
+        complianceIssuesSection.classList.remove("d-none");
+        document.getElementById("resultStatus").className =
+          "badge bg-warning px-3 py-2";
+        document.getElementById("resultStatus").textContent = "Warning";
+      } else if (
+        result.compliance_issues &&
+        result.compliance_issues.length > 0
+      ) {
+        const issuesList = document.getElementById("complianceIssuesList");
+        issuesList.innerHTML = "";
+
+        result.compliance_issues.forEach((issue) => {
+          const li = document.createElement("li");
+          li.textContent = issue.message;
+          issuesList.appendChild(li);
+        });
+
+        complianceIssuesSection.classList.remove("d-none");
+        document.getElementById("resultStatus").className =
+          "badge bg-warning px-3 py-2";
+        document.getElementById("resultStatus").textContent = "Warning";
+      } else {
+        complianceIssuesSection.classList.add("d-none");
+        document.getElementById("resultStatus").className =
+          "badge bg-success px-3 py-2";
+        document.getElementById("resultStatus").textContent = "Valid";
+      }
+
+      // Show/hide adjusted rate section when over the limit
+      if (!withinLimit && result.adjusted_levy_amount) {
+        document.getElementById("adjustedLevyRate").textContent =
+          formatNumber(result.adjusted_levy_rate) + " per $1,000";
+        document.getElementById("originalLevyRate").textContent =
+          formatNumber(result.levy_rate) + " per $1,000";
+        document.getElementById("adjustedLevyAmount").textContent =
+          formatCurrency(result.adjusted_levy_amount);
+        document.getElementById("levyReduction").textContent = formatCurrency(
+          result.levy_reduction,
+        );
+
+        adjustedRateSection.classList.remove("d-none");
+      } else if (result.adjustment_data) {
+        document.getElementById("adjustedLevyRate").textContent =
+          formatNumber(result.adjustment_data.adjusted_rate) + " per $1,000";
+        document.getElementById("originalLevyRate").textContent =
+          formatNumber(result.adjustment_data.original_rate) + " per $1,000";
+        document.getElementById("adjustedLevyAmount").textContent =
+          formatCurrency(result.adjustment_data.adjusted_amount);
+        document.getElementById("levyReduction").textContent = formatCurrency(
+          result.adjustment_data.difference,
+        );
+
+        adjustedRateSection.classList.remove("d-none");
+      } else {
+        adjustedRateSection.classList.add("d-none");
+      }
     }
-    
+
     function loadScenario(scenarioId) {
-        fetch(`/levy-calculator/scenario/${scenarioId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                const scenario = data.scenario;
-                
-                // Fill form with scenario data
-                document.getElementById('taxDistrict').value = scenario.district_id;
-                document.getElementById('taxYear').value = scenario.base_year;
-                document.getElementById('levyAmount').value = scenario.levy_amount;
-                
-                // Trigger calculation
-                levyCalculatorForm.dispatchEvent(new Event('submit'));
-                
-                // Fill forecast form if applicable
-                document.getElementById('assessedValueChange').value = scenario.assessed_value_change;
-                document.getElementById('newConstructionValue').value = scenario.new_construction_value;
-                document.getElementById('annexationValue').value = scenario.annexation_value;
-                
-                // Set current scenario ID for updates
-                currentScenarioId = scenario.id;
-                document.getElementById('scenarioId').value = scenario.id;
-                
-                // Pre-fill save form
-                document.getElementById('scenarioName').value = scenario.name;
-                document.getElementById('scenarioDescription').value = scenario.description;
-                document.getElementById('isPublic').checked = scenario.is_public;
-            } else {
-                alert('Error: ' + data.message);
-            }
+      fetch(`/levy-calculator/scenario/${scenarioId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            const scenario = data.scenario;
+
+            // Fill form with scenario data
+            document.getElementById("taxDistrict").value = scenario.district_id;
+            document.getElementById("taxYear").value = scenario.base_year;
+            document.getElementById("levyAmount").value = scenario.levy_amount;
+
+            // Trigger calculation
+            levyCalculatorForm.dispatchEvent(new Event("submit"));
+
+            // Fill forecast form if applicable
+            document.getElementById("assessedValueChange").value =
+              scenario.assessed_value_change;
+            document.getElementById("newConstructionValue").value =
+              scenario.new_construction_value;
+            document.getElementById("annexationValue").value =
+              scenario.annexation_value;
+
+            // Set current scenario ID for updates
+            currentScenarioId = scenario.id;
+            document.getElementById("scenarioId").value = scenario.id;
+
+            // Pre-fill save form
+            document.getElementById("scenarioName").value = scenario.name;
+            document.getElementById("scenarioDescription").value =
+              scenario.description;
+            document.getElementById("isPublic").checked = scenario.is_public;
+          } else {
+            alert("Error: " + data.message);
+          }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while loading the scenario.');
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred while loading the scenario.");
         });
     }
-    
+
     function loadSavedScenarios() {
-        fetch('/levy-calculator/scenarios')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                const container = document.getElementById('scenariosContainer');
-                
-                if (data.scenarios.length === 0) {
-                    container.innerHTML = `
+      fetch("/levy-calculator/scenarios")
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            const container = document.getElementById("scenariosContainer");
+
+            if (data.scenarios.length === 0) {
+              container.innerHTML = `
                         <div class="text-center py-4">
                             <i class="bi bi-folder text-muted display-5"></i>
                             <p class="mt-3 mb-0 text-muted">No saved scenarios yet</p>
                             <p class="small text-muted">Calculate a levy and save it to see it here</p>
                         </div>
                     `;
-                    return;
-                }
-                
-                container.innerHTML = '';
-                
-                data.scenarios.forEach(scenario => {
-                    const card = document.createElement('div');
-                    card.className = 'card scenario-card mb-3';
-                    card.innerHTML = `
+              return;
+            }
+
+            container.innerHTML = "";
+
+            data.scenarios.forEach((scenario) => {
+              const card = document.createElement("div");
+              card.className = "card scenario-card mb-3";
+              card.innerHTML = `
                         <div class="card-body p-3">
                             <h6 class="card-title mb-1">${scenario.name}</h6>
-                            <p class="text-muted small mb-2">${scenario.description || ''}</p>
+                            <p class="text-muted small mb-2">${scenario.description || ""}</p>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="badge bg-light text-dark">${scenario.district_name}</span>
                                 <span class="badge bg-primary">${scenario.target_year}</span>
@@ -953,36 +1264,36 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
-                    container.appendChild(card);
-                });
-            } else {
-                console.error('Error loading scenarios:', data.message);
-            }
+              container.appendChild(card);
+            });
+          } else {
+            console.error("Error loading scenarios:", data.message);
+          }
         })
-        .catch(error => {
-            console.error('Error:', error);
+        .catch((error) => {
+          console.error("Error:", error);
         });
     }
-    
+
     // Formatting functions
     function formatCurrency(value) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(value);
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(value);
     }
-    
+
     function formatNumber(value) {
-        return new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 4
-        }).format(value);
+      return new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 4,
+        maximumFractionDigits: 4,
+      }).format(value);
     }
-    
+
     // Load scenarios on page load
     loadSavedScenarios();
-});
+  });
 </script>
 {% endblock %}

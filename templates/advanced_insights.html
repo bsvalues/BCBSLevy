@@ -1,735 +1,891 @@
-{% extends 'base.html' %}
-
-{% block title %}Advanced AI Insights - SaaS Levy Calculation Application{% endblock %}
-
-{% block extra_css %}
+{% extends 'base.html' %} {% block title %}Advanced AI Insights - SaaS Levy
+Calculation Application{% endblock %} {% block extra_css %}
 <style>
-    /* Advanced Insights Cards */
-    .advanced-insight-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        height: 100%;
-        overflow: hidden;
-        border-top: 4px solid #4d74e0;
-    }
-    
-    .advanced-insight-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    }
-    
-    /* Badge for AI-powered components */
-    .badge-ai {
-        background-color: rgba(77, 116, 224, 0.1);
-        color: #4d74e0;
-        font-weight: 600;
-        border-radius: 4px;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-    }
-    
-    /* Enhanced Data Analysis Cards */
-    .data-card {
-        transition: all 0.3s ease-in-out;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-    
-    .data-card:hover {
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-        transform: translateY(-5px);
-    }
-    
-    .data-card .card-body {
-        padding: 1.5rem;
-    }
-    
-    .data-card h5 {
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: #333;
-    }
-    
-    .data-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
-    
-    .data-header i {
-        font-size: 1.8rem;
-        margin-right: 1rem;
-        color: #4d74e0;
-    }
-    
-    .data-card .list-unstyled {
-        margin-bottom: 0;
-    }
-    
-    .list-unstyled li {
-        padding: 8px 0;
-        position: relative;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-    
-    .list-unstyled li:last-child {
-        border-bottom: none;
-    }
-    
-    /* Natural Language Query Interface */
-    .query-interface {
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-    }
-    
-    .query-header {
-        background-color: #4d74e0;
-        color: white;
-        padding: 1rem 1.5rem;
-    }
-    
-    .query-body {
-        padding: 1.5rem;
-        background-color: #f9f9f9;
-    }
-    
-    .query-input {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .query-input input {
-        flex-grow: 1;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-        padding: 0.75rem 1rem;
-        font-size: 1rem;
-    }
-    
-    .query-history {
-        margin-top: 1.5rem;
-        max-height: 300px;
-        overflow-y: auto;
-    }
-    
-    .query-message {
-        margin-bottom: 1rem;
-        padding: 1rem;
-        border-radius: 8px;
-    }
-    
-    .query-user {
-        background-color: #e6f1ff;
-        margin-left: 2rem;
-        margin-right: 0;
-    }
-    
-    .query-assistant {
-        background-color: #f0f0f0;
-        margin-right: 2rem;
-        margin-left: 0;
-    }
-    
-    /* Capability Cards */
-    .capability-card {
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        height: 100%;
-        border-left: 3px solid #4d74e0;
-        transition: all 0.3s ease;
-    }
-    
-    .capability-card:hover {
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        transform: translateY(-3px);
-    }
-    
-    .capability-icon {
-        color: #4d74e0;
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        display: inline-block;
-        background-color: rgba(77, 116, 224, 0.1);
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 60px;
-    }
-</style>
-{% endblock %}
+  /* Advanced Insights Cards */
+  .advanced-insight-card {
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    overflow: hidden;
+    border-top: 4px solid #4d74e0;
+  }
 
-{% block content %}
+  .advanced-insight-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Badge for AI-powered components */
+  .badge-ai {
+    background-color: rgba(77, 116, 224, 0.1);
+    color: #4d74e0;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Enhanced Data Analysis Cards */
+  .data-card {
+    transition: all 0.3s ease-in-out;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .data-card:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+  }
+
+  .data-card .card-body {
+    padding: 1.5rem;
+  }
+
+  .data-card h5 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .data-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .data-header i {
+    font-size: 1.8rem;
+    margin-right: 1rem;
+    color: #4d74e0;
+  }
+
+  .data-card .list-unstyled {
+    margin-bottom: 0;
+  }
+
+  .list-unstyled li {
+    padding: 8px 0;
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .list-unstyled li:last-child {
+    border-bottom: none;
+  }
+
+  /* Natural Language Query Interface */
+  .query-interface {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+  }
+
+  .query-header {
+    background-color: #4d74e0;
+    color: white;
+    padding: 1rem 1.5rem;
+  }
+
+  .query-body {
+    padding: 1.5rem;
+    background-color: #f9f9f9;
+  }
+
+  .query-input {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .query-input input {
+    flex-grow: 1;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+  }
+
+  .query-history {
+    margin-top: 1.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .query-message {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .query-user {
+    background-color: #e6f1ff;
+    margin-left: 2rem;
+    margin-right: 0;
+  }
+
+  .query-assistant {
+    background-color: #f0f0f0;
+    margin-right: 2rem;
+    margin-left: 0;
+  }
+
+  /* Capability Cards */
+  .capability-card {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    height: 100%;
+    border-left: 3px solid #4d74e0;
+    transition: all 0.3s ease;
+  }
+
+  .capability-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+  }
+
+  .capability-icon {
+    color: #4d74e0;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    background-color: rgba(77, 116, 224, 0.1);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+  }
+</style>
+{% endblock %} {% block content %}
 <div class="row mb-4">
-    <div class="col">
-        <h1>Advanced AI Insights</h1>
-        <p class="lead">Enhanced analysis capabilities powered by advanced AI agents</p>
-    </div>
-    <div class="col-auto">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#apiKeyModal">
-            <i class="bi bi-key me-1"></i> Configure API Key
-        </button>
-    </div>
+  <div class="col">
+    <h1>Advanced AI Insights</h1>
+    <p class="lead">
+      Enhanced analysis capabilities powered by advanced AI agents
+    </p>
+  </div>
+  <div class="col-auto">
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-bs-toggle="modal"
+      data-bs-target="#apiKeyModal"
+    >
+      <i class="bi bi-key me-1"></i> Configure API Key
+    </button>
+  </div>
 </div>
 
 <!-- API Key Status Alerts -->
 {% if insights.data.api_status and insights.data.api_status.status == 'valid' %}
-    <div class="alert alert-success mb-4 d-flex align-items-center">
-        <i class="bi bi-check-circle-fill fs-4 me-3"></i>
-        <div>
-            <h5 class="alert-heading mb-1">Advanced AI Active</h5>
-            <p class="mb-0">Your Anthropic API key is valid and has sufficient credits. Advanced AI insights are enabled.</p>
-        </div>
-    </div>
-{% elif insights.data.api_status and insights.data.api_status.status == 'no_credits' %}
-    <div class="alert alert-warning mb-4 d-flex align-items-center">
-        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-        <div>
-            <h5 class="alert-heading mb-1">API Credit Issue Detected</h5>
-            <p class="mb-0">Your Anthropic API key has insufficient credits. Enhanced statistical analysis is being used as a fallback. <a href="#" data-bs-toggle="modal" data-bs-target="#apiKeyModal" class="alert-link">Update your API key</a> to restore full AI-powered insights.</p>
-        </div>
-    </div>
+<div class="alert alert-success mb-4 d-flex align-items-center">
+  <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+  <div>
+    <h5 class="alert-heading mb-1">Advanced AI Active</h5>
+    <p class="mb-0">
+      Your Anthropic API key is valid and has sufficient credits. Advanced AI
+      insights are enabled.
+    </p>
+  </div>
+</div>
+{% elif insights.data.api_status and insights.data.api_status.status ==
+'no_credits' %}
+<div class="alert alert-warning mb-4 d-flex align-items-center">
+  <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+  <div>
+    <h5 class="alert-heading mb-1">API Credit Issue Detected</h5>
+    <p class="mb-0">
+      Your Anthropic API key has insufficient credits. Enhanced statistical
+      analysis is being used as a fallback.
+      <a
+        href="#"
+        data-bs-toggle="modal"
+        data-bs-target="#apiKeyModal"
+        class="alert-link"
+        >Update your API key</a
+      >
+      to restore full AI-powered insights.
+    </p>
+  </div>
+</div>
 {% else %}
-    <div class="alert alert-info mb-4 d-flex align-items-center">
-        <i class="bi bi-info-circle-fill fs-4 me-3"></i>
-        <div>
-            <h5 class="alert-heading mb-1">API Key Required</h5>
-            <p class="mb-0">To enable advanced AI-powered insights, please <a href="#" data-bs-toggle="modal" data-bs-target="#apiKeyModal" class="alert-link">configure your Anthropic API key</a>. Statistical insights are being displayed as a fallback.</p>
-        </div>
-    </div>
+<div class="alert alert-info mb-4 d-flex align-items-center">
+  <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+  <div>
+    <h5 class="alert-heading mb-1">API Key Required</h5>
+    <p class="mb-0">
+      To enable advanced AI-powered insights, please
+      <a
+        href="#"
+        data-bs-toggle="modal"
+        data-bs-target="#apiKeyModal"
+        class="alert-link"
+        >configure your Anthropic API key</a
+      >. Statistical insights are being displayed as a fallback.
+    </p>
+  </div>
+</div>
 {% endif %}
 
 <!-- Natural Language Query Interface -->
 <div class="row mb-5">
-    <div class="col-md-12">
-        <div class="query-interface">
-            <div class="query-header">
-                <h4 class="mb-0"><i class="bi bi-chat-dots me-2"></i> Natural Language Query</h4>
-                <p class="mb-0 mt-1 opacity-75">Ask questions about your tax data in plain English</p>
-            </div>
-            <div class="query-body">
-                <div class="query-input">
-                    <input type="text" id="nlQuery" placeholder="Ask a question about your tax data..." class="form-control">
-                    <button class="btn btn-primary" id="submitQuery">
-                        <i class="bi bi-search me-1"></i> Ask
-                    </button>
-                    <button class="btn btn-outline-secondary" id="clearHistory">
-                        <i class="bi bi-trash me-1"></i> Clear
-                    </button>
-                </div>
-                
-                <div class="query-history" id="queryHistory">
-                    <!-- Query history will be populated here -->
-                    <div class="text-center text-muted my-4">
-                        <i class="bi bi-chat-dots d-block mb-2" style="font-size: 2rem;"></i>
-                        <p>Start a conversation by typing a question above.</p>
-                        <p class="small">Example: "What tax codes have the highest levy rates?" or "Show trends in assessed values for the past 3 years"</p>
-                    </div>
-                </div>
-            </div>
+  <div class="col-md-12">
+    <div class="query-interface">
+      <div class="query-header">
+        <h4 class="mb-0">
+          <i class="bi bi-chat-dots me-2"></i> Natural Language Query
+        </h4>
+        <p class="mb-0 mt-1 opacity-75">
+          Ask questions about your tax data in plain English
+        </p>
+      </div>
+      <div class="query-body">
+        <div class="query-input">
+          <input
+            type="text"
+            id="nlQuery"
+            placeholder="Ask a question about your tax data..."
+            class="form-control"
+          />
+          <button class="btn btn-primary" id="submitQuery">
+            <i class="bi bi-search me-1"></i> Ask
+          </button>
+          <button class="btn btn-outline-secondary" id="clearHistory">
+            <i class="bi bi-trash me-1"></i> Clear
+          </button>
         </div>
+
+        <div class="query-history" id="queryHistory">
+          <!-- Query history will be populated here -->
+          <div class="text-center text-muted my-4">
+            <i class="bi bi-chat-dots d-block mb-2" style="font-size: 2rem"></i>
+            <p>Start a conversation by typing a question above.</p>
+            <p class="small">
+              Example: "What tax codes have the highest levy rates?" or "Show
+              trends in assessed values for the past 3 years"
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Main Insights Card -->
 <div class="row mb-5">
-    <div class="col-md-12 mb-4">
-        <div class="card advanced-insight-card">
-            <div class="card-body">
-                <h5 class="card-title">Cross-Dataset Insights</h5>
-                <span class="badge badge-ai mb-3">Advanced AI Analysis</span>
-                
-                {% if insights and insights.narrative %}
-                    <p class="card-text">{{ insights.narrative|safe }}</p>
-                {% else %}
-                    <p class="card-text">Advanced statistical analysis can reveal cross-dataset patterns and correlations that may not be immediately apparent. Configure your API key and import tax data to generate AI-powered insights.</p>
-                {% endif %}
-                
-                <hr>
-                
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <small class="text-muted">Last updated: {{ current_timestamp }}</small>
-                    <button class="btn btn-sm btn-outline-primary refresh-insights" id="refreshInsights">
-                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh Insights
-                    </button>
-                </div>
-            </div>
+  <div class="col-md-12 mb-4">
+    <div class="card advanced-insight-card">
+      <div class="card-body">
+        <h5 class="card-title">Cross-Dataset Insights</h5>
+        <span class="badge badge-ai mb-3">Advanced AI Analysis</span>
+
+        {% if insights and insights.narrative %}
+        <p class="card-text">{{ insights.narrative|safe }}</p>
+        {% else %}
+        <p class="card-text">
+          Advanced statistical analysis can reveal cross-dataset patterns and
+          correlations that may not be immediately apparent. Configure your API
+          key and import tax data to generate AI-powered insights.
+        </p>
+        {% endif %}
+
+        <hr />
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted"
+            >Last updated: {{ current_timestamp }}</small
+          >
+          <button
+            class="btn btn-sm btn-outline-primary refresh-insights"
+            id="refreshInsights"
+          >
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh Insights
+          </button>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Advanced AI Capabilities -->
 <div class="row mb-4">
-    <div class="col">
-        <h2>Advanced AI Capabilities</h2>
-        <p>Powerful features powered by advanced AI agents</p>
-    </div>
+  <div class="col">
+    <h2>Advanced AI Capabilities</h2>
+    <p>Powerful features powered by advanced AI agents</p>
+  </div>
 </div>
 
 <div class="row mb-5">
-    {% if insights.advanced_capabilities %}
-        {% for capability in insights.advanced_capabilities %}
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="card capability-card h-100">
-                <div class="card-body text-center">
-                    <div class="capability-icon">
-                        <i class="{{ capability.icon }}"></i>
-                    </div>
-                    <h5 class="card-title">{{ capability.name }}</h5>
-                    <p class="card-text">{{ capability.description }}</p>
-                </div>
-            </div>
+  {% if insights.advanced_capabilities %} {% for capability in
+  insights.advanced_capabilities %}
+  <div class="col-md-6 col-lg-3 mb-4">
+    <div class="card capability-card h-100">
+      <div class="card-body text-center">
+        <div class="capability-icon">
+          <i class="{{ capability.icon }}"></i>
         </div>
-        {% endfor %}
-    {% endif %}
+        <h5 class="card-title">{{ capability.name }}</h5>
+        <p class="card-text">{{ capability.description }}</p>
+      </div>
+    </div>
+  </div>
+  {% endfor %} {% endif %}
 </div>
 
 <!-- Statistical Insights -->
 <div class="row mb-4">
-    <div class="col">
-        <h2>AI-Powered Statistical Insights</h2>
-        <p>Deep analysis of your tax data across multiple datasets</p>
-    </div>
+  <div class="col">
+    <h2>AI-Powered Statistical Insights</h2>
+    <p>Deep analysis of your tax data across multiple datasets</p>
+  </div>
 </div>
 
 <div class="row mb-5">
-    {% if insights and insights.statistics %}
-        {% for stat in insights.statistics %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card data-card h-100">
-                <div class="card-body">
-                    <div class="data-header">
-                        <i class="{{ stat.icon }}"></i>
-                        <h5 class="card-title mb-0">{{ stat.title }}</h5>
-                    </div>
-                    <p class="card-text">{{ stat.description }}</p>
-                    
-                    {% if stat.data %}
-                    <ul class="list-unstyled mt-3">
-                        {% for item in stat.data %}
-                            <li>
-                                <div class="d-flex justify-content-between">
-                                    <span>{{ item.label }}</span>
-                                    <span class="fw-bold">{{ item.value }}</span>
-                                </div>
-                                {% if item.trend %}
-                                    <div class="progress mt-1" style="height: 6px;">
-                                        <div class="progress-bar {{ item.color }}" style="width: {{ item.trend_value }}%"></div>
-                                    </div>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-            </div>
+  {% if insights and insights.statistics %} {% for stat in insights.statistics
+  %}
+  <div class="col-md-6 col-lg-4 mb-4">
+    <div class="card data-card h-100">
+      <div class="card-body">
+        <div class="data-header">
+          <i class="{{ stat.icon }}"></i>
+          <h5 class="card-title mb-0">{{ stat.title }}</h5>
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="col-12">
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle-fill me-2"></i> No statistical insights available yet. Configure your API key and import tax data to generate insights.
+        <p class="card-text">{{ stat.description }}</p>
+
+        {% if stat.data %}
+        <ul class="list-unstyled mt-3">
+          {% for item in stat.data %}
+          <li>
+            <div class="d-flex justify-content-between">
+              <span>{{ item.label }}</span>
+              <span class="fw-bold">{{ item.value }}</span>
             </div>
-        </div>
-    {% endif %}
+            {% if item.trend %}
+            <div class="progress mt-1" style="height: 6px">
+              <div
+                class="progress-bar {{ item.color }}"
+                style="width: {{ item.trend_value }}%"
+              ></div>
+            </div>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %} {% else %}
+  <div class="col-12">
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle-fill me-2"></i> No statistical insights
+      available yet. Configure your API key and import tax data to generate
+      insights.
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 <!-- Multi-Step Analysis Section -->
 <div class="row mb-4">
-    <div class="col">
-        <h2>Multi-Step Analysis</h2>
-        <p>Comprehensive automated analysis workflows</p>
-    </div>
+  <div class="col">
+    <h2>Multi-Step Analysis</h2>
+    <p>Comprehensive automated analysis workflows</p>
+  </div>
 </div>
 
 <div class="row mb-5">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="mb-3">Run Comprehensive Analysis</h5>
-                <p>Perform a detailed multi-step analysis on a tax district to generate comprehensive insights.</p>
-                
-                <form id="multiStepAnalysisForm" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="districtId" class="form-label">Tax District</label>
-                        <select class="form-select" id="districtId" required>
-                            <option value="" selected disabled>Select a district...</option>
-                            <!-- This would be populated from the database -->
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="analysisType" class="form-label">Analysis Type</label>
-                        <select class="form-select" id="analysisType">
-                            <option value="comprehensive" selected>Comprehensive</option>
-                            <option value="trend">Trend Analysis</option>
-                            <option value="compliance">Compliance Check</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label for="years" class="form-label">Years to Analyze</label>
-                        <select class="form-select" id="years">
-                            <option value="1">1 Year</option>
-                            <option value="3" selected>3 Years</option>
-                            <option value="5">5 Years</option>
-                            <option value="10">10 Years</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-play-fill me-1"></i> Run Analysis
-                        </button>
-                    </div>
-                </form>
-                
-                <div id="analysisResults" class="mt-4" style="display: none;">
-                    <!-- Results will be displayed here -->
-                </div>
-            </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="mb-3">Run Comprehensive Analysis</h5>
+        <p>
+          Perform a detailed multi-step analysis on a tax district to generate
+          comprehensive insights.
+        </p>
+
+        <form id="multiStepAnalysisForm" class="row g-3">
+          <div class="col-md-4">
+            <label for="districtId" class="form-label">Tax District</label>
+            <select class="form-select" id="districtId" required>
+              <option value="" selected disabled>Select a district...</option>
+              <!-- This would be populated from the database -->
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="analysisType" class="form-label">Analysis Type</label>
+            <select class="form-select" id="analysisType">
+              <option value="comprehensive" selected>Comprehensive</option>
+              <option value="trend">Trend Analysis</option>
+              <option value="compliance">Compliance Check</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label for="years" class="form-label">Years to Analyze</label>
+            <select class="form-select" id="years">
+              <option value="1">1 Year</option>
+              <option value="3" selected>3 Years</option>
+              <option value="5">5 Years</option>
+              <option value="10">10 Years</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-play-fill me-1"></i> Run Analysis
+            </button>
+          </div>
+        </form>
+
+        <div id="analysisResults" class="mt-4" style="display: none">
+          <!-- Results will be displayed here -->
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- How It Works -->
 <div class="row mb-4">
-    <div class="col">
-        <h2>How Advanced AI Analysis Works</h2>
-        <p>Understanding the technology behind our advanced AI capabilities</p>
-    </div>
+  <div class="col">
+    <h2>How Advanced AI Analysis Works</h2>
+    <p>Understanding the technology behind our advanced AI capabilities</p>
+  </div>
 </div>
 
 <div class="row mb-5">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5 class="mb-3">Advanced AI Agent Technology</h5>
-                        <p>Our Advanced Analysis Agent uses state-of-the-art language model technology to provide unprecedented insights into your tax data:</p>
-                        
-                        <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Cross-Dataset Analysis:</strong> Discovers hidden connections between different data sources</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Contextual Understanding:</strong> Maintains context across interactions for more relevant analysis</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Role-Based Recommendations:</strong> Delivers insights tailored to your specific needs</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Natural Language Interface:</strong> Communicate with your data using everyday language</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Multi-Step Analysis Workflows:</strong> Coordinates complex analysis tasks automatically</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Anomaly Detection:</strong> Identifies unusual patterns across multiple datasets</li>
-                            <li><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Strategic Planning Support:</strong> Provides actionable insights for policy decisions</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h5 class="mb-3">Powered by Claude 3.5 Sonnet</h5>
-                        <p>The Advanced Analysis Agent is built on Anthropic's Claude 3.5 Sonnet model, providing state-of-the-art AI capabilities:</p>
-                        
-                        <div class="card bg-light">
-                            <div class="card-body">
-                                <h6><i class="bi bi-shield-lock me-2"></i> Data Security & Privacy</h6>
-                                <p class="small mb-0">Our implementation ensures your data remains secure and private:</p>
-                                <ul class="small mb-0">
-                                    <li>All data is processed securely</li>
-                                    <li>No personally identifiable information is shared</li>
-                                    <li>Our API implementation includes strict data sanitization</li>
-                                    <li>Advanced insights are generated within your secure environment</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h5 class="mb-3">Advanced AI Agent Technology</h5>
+            <p>
+              Our Advanced Analysis Agent uses state-of-the-art language model
+              technology to provide unprecedented insights into your tax data:
+            </p>
+
+            <ul class="list-unstyled">
+              <li>
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong>Cross-Dataset Analysis:</strong> Discovers hidden
+                connections between different data sources
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong>Contextual Understanding:</strong> Maintains context
+                across interactions for more relevant analysis
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong>Role-Based Recommendations:</strong> Delivers insights
+                tailored to your specific needs
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong>Natural Language Interface:</strong> Communicate with
+                your data using everyday language
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong>Multi-Step Analysis Workflows:</strong> Coordinates
+                complex analysis tasks automatically
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong>Anomaly Detection:</strong> Identifies unusual patterns
+                across multiple datasets
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <strong>Strategic Planning Support:</strong> Provides actionable
+                insights for policy decisions
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5 class="mb-3">Powered by Claude 3.5 Sonnet</h5>
+            <p>
+              The Advanced Analysis Agent is built on Anthropic's Claude 3.5
+              Sonnet model, providing state-of-the-art AI capabilities:
+            </p>
+
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6>
+                  <i class="bi bi-shield-lock me-2"></i> Data Security & Privacy
+                </h6>
+                <p class="small mb-0">
+                  Our implementation ensures your data remains secure and
+                  private:
+                </p>
+                <ul class="small mb-0">
+                  <li>All data is processed securely</li>
+                  <li>No personally identifiable information is shared</li>
+                  <li>
+                    Our API implementation includes strict data sanitization
+                  </li>
+                  <li>
+                    Advanced insights are generated within your secure
+                    environment
+                  </li>
+                </ul>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- API Key Modal -->
-<div class="modal fade" id="apiKeyModal" tabindex="-1" aria-labelledby="apiKeyModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="apiKeyModal"
+  tabindex="-1"
+  aria-labelledby="apiKeyModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="apiKeyModalLabel">Configure Anthropic API Key</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title" id="apiKeyModalLabel">
+          Configure Anthropic API Key
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="modal-body">
-        <p>To enable advanced AI-powered insights, you need to provide an Anthropic API key. This key will be stored securely in your environment variables.</p>
-        
+        <p>
+          To enable advanced AI-powered insights, you need to provide an
+          Anthropic API key. This key will be stored securely in your
+          environment variables.
+        </p>
+
         <div class="alert alert-info mb-3">
-          <h6><i class="bi bi-info-circle me-2"></i>About Anthropic API Keys</h6>
+          <h6>
+            <i class="bi bi-info-circle me-2"></i>About Anthropic API Keys
+          </h6>
           <ul class="mb-0">
             <li>API keys start with <code>sk-ant-</code></li>
             <li>Keys require a credit balance to access Claude 3.5 Sonnet</li>
-            <li>If you encounter credit issues, you can add credits or use a different key</li>
+            <li>
+              If you encounter credit issues, you can add credits or use a
+              different key
+            </li>
           </ul>
         </div>
-        
+
         <form id="apiKeyForm">
           <div class="mb-3">
             <label for="apiKey" class="form-label">Anthropic API Key</label>
-            <input type="password" class="form-control" id="apiKey" placeholder="sk-ant-..." required>
-            <div class="form-text">Your API key is transmitted securely and stored in server environment variables.</div>
+            <input
+              type="password"
+              class="form-control"
+              id="apiKey"
+              placeholder="sk-ant-..."
+              required
+            />
+            <div class="form-text">
+              Your API key is transmitted securely and stored in server
+              environment variables.
+            </div>
           </div>
           <div id="apiKeyResponseMessage"></div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" id="saveApiKey">Save API Key</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="saveApiKey">
+          Save API Key
+        </button>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <!-- Include Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+/>
 <script src="/static/js/mcp_api_key.js"></script>
 <script>
-    // Get CSRF token from meta tag
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-    
-    // JavaScript for advanced insights functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        // Natural Language Query Interface
-        const nlQueryInput = document.getElementById('nlQuery');
-        const submitQueryBtn = document.getElementById('submitQuery');
-        const clearHistoryBtn = document.getElementById('clearHistory');
-        const queryHistory = document.getElementById('queryHistory');
-        
-        // Refresh insights button
-        const refreshInsightsBtn = document.getElementById('refreshInsights');
-        
-        // Multi-Step Analysis Form
-        const multiStepAnalysisForm = document.getElementById('multiStepAnalysisForm');
-        const analysisResults = document.getElementById('analysisResults');
-        
-        // Load tax districts for the multi-step analysis form
-        loadTaxDistricts();
-        
-        // Load conversation history
-        loadConversationHistory();
-        
-        // Submit query button event
-        submitQueryBtn.addEventListener('click', function() {
-            const query = nlQueryInput.value.trim();
-            if (query) {
-                processNaturalLanguageQuery(query);
-                nlQueryInput.value = '';
+  // Get CSRF token from meta tag
+  const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    ?.getAttribute("content");
+
+  // JavaScript for advanced insights functionality
+  document.addEventListener("DOMContentLoaded", function () {
+    // Natural Language Query Interface
+    const nlQueryInput = document.getElementById("nlQuery");
+    const submitQueryBtn = document.getElementById("submitQuery");
+    const clearHistoryBtn = document.getElementById("clearHistory");
+    const queryHistory = document.getElementById("queryHistory");
+
+    // Refresh insights button
+    const refreshInsightsBtn = document.getElementById("refreshInsights");
+
+    // Multi-Step Analysis Form
+    const multiStepAnalysisForm = document.getElementById(
+      "multiStepAnalysisForm",
+    );
+    const analysisResults = document.getElementById("analysisResults");
+
+    // Load tax districts for the multi-step analysis form
+    loadTaxDistricts();
+
+    // Load conversation history
+    loadConversationHistory();
+
+    // Submit query button event
+    submitQueryBtn.addEventListener("click", function () {
+      const query = nlQueryInput.value.trim();
+      if (query) {
+        processNaturalLanguageQuery(query);
+        nlQueryInput.value = "";
+      }
+    });
+
+    // Also submit on Enter key
+    nlQueryInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        const query = nlQueryInput.value.trim();
+        if (query) {
+          processNaturalLanguageQuery(query);
+          nlQueryInput.value = "";
+        }
+      }
+    });
+
+    // Clear history button event
+    clearHistoryBtn.addEventListener("click", function () {
+      clearConversationHistory();
+    });
+
+    // Refresh insights button event
+    refreshInsightsBtn.addEventListener("click", function () {
+      refreshInsights();
+    });
+
+    // Multi-Step Analysis Form submit event
+    multiStepAnalysisForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      runMultiStepAnalysis();
+    });
+
+    // Process natural language query
+    function processNaturalLanguageQuery(query) {
+      // Add user message to history immediately for better UX
+      addMessageToHistory("user", query);
+
+      // Show loading indicator
+      addMessageToHistory(
+        "assistant",
+        '<div class="d-flex align-items-center"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing your query...</div>',
+        true,
+      );
+
+      // Make API call
+      fetch("/api/advanced-mcp/query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ query: query }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          // Remove loading message
+          removeLoadingMessage();
+
+          if (data.error) {
+            addMessageToHistory(
+              "assistant",
+              `<div class="text-danger">Error: ${data.error}</div>`,
+            );
+          } else if (data.response.error) {
+            addMessageToHistory(
+              "assistant",
+              `<div class="text-danger">Error: ${data.response.error}</div>`,
+            );
+          } else {
+            // Format and display the response
+            let answerHtml = `<p>${data.response.answer}</p>`;
+
+            // Add follow-up questions if available
+            if (
+              data.response.follow_up_questions &&
+              data.response.follow_up_questions.length > 0
+            ) {
+              answerHtml +=
+                '<p class="mt-3 mb-1"><strong>You might also want to ask:</strong></p>';
+              answerHtml += '<ul class="suggested-questions">';
+              data.response.follow_up_questions.forEach((question) => {
+                answerHtml += `<li><a href="#" class="suggested-question">${question}</a></li>`;
+              });
+              answerHtml += "</ul>";
             }
-        });
-        
-        // Also submit on Enter key
-        nlQueryInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const query = nlQueryInput.value.trim();
-                if (query) {
-                    processNaturalLanguageQuery(query);
-                    nlQueryInput.value = '';
-                }
-            }
-        });
-        
-        // Clear history button event
-        clearHistoryBtn.addEventListener('click', function() {
-            clearConversationHistory();
-        });
-        
-        // Refresh insights button event
-        refreshInsightsBtn.addEventListener('click', function() {
-            refreshInsights();
-        });
-        
-        // Multi-Step Analysis Form submit event
-        multiStepAnalysisForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            runMultiStepAnalysis();
-        });
-        
-        // Process natural language query
-        function processNaturalLanguageQuery(query) {
-            // Add user message to history immediately for better UX
-            addMessageToHistory('user', query);
-            
-            // Show loading indicator
-            addMessageToHistory('assistant', '<div class="d-flex align-items-center"><span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing your query...</div>', true);
-            
-            // Make API call
-            fetch('/api/advanced-mcp/query', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({ query: query }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Remove loading message
-                removeLoadingMessage();
-                
-                if (data.error) {
-                    addMessageToHistory('assistant', `<div class="text-danger">Error: ${data.error}</div>`);
-                } else if (data.response.error) {
-                    addMessageToHistory('assistant', `<div class="text-danger">Error: ${data.response.error}</div>`);
-                } else {
-                    // Format and display the response
-                    let answerHtml = `<p>${data.response.answer}</p>`;
-                    
-                    // Add follow-up questions if available
-                    if (data.response.follow_up_questions && data.response.follow_up_questions.length > 0) {
-                        answerHtml += '<p class="mt-3 mb-1"><strong>You might also want to ask:</strong></p>';
-                        answerHtml += '<ul class="suggested-questions">';
-                        data.response.follow_up_questions.forEach(question => {
-                            answerHtml += `<li><a href="#" class="suggested-question">${question}</a></li>`;
-                        });
-                        answerHtml += '</ul>';
-                    }
-                    
-                    addMessageToHistory('assistant', answerHtml);
-                    
-                    // Add click handlers for suggested questions
-                    document.querySelectorAll('.suggested-question').forEach(elem => {
-                        elem.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            const question = this.textContent;
-                            nlQueryInput.value = question;
-                            processNaturalLanguageQuery(question);
-                        });
-                    });
-                }
-            })
-            .catch(error => {
-                // Remove loading message
-                removeLoadingMessage();
-                addMessageToHistory('assistant', `<div class="text-danger">Error communicating with the server: ${error.message}</div>`);
+
+            addMessageToHistory("assistant", answerHtml);
+
+            // Add click handlers for suggested questions
+            document.querySelectorAll(".suggested-question").forEach((elem) => {
+              elem.addEventListener("click", function (e) {
+                e.preventDefault();
+                const question = this.textContent;
+                nlQueryInput.value = question;
+                processNaturalLanguageQuery(question);
+              });
             });
-        }
-        
-        // Add message to history
-        function addMessageToHistory(role, content, isLoading = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `query-message query-${role}`;
-            if (isLoading) {
-                messageDiv.id = 'loadingMessage';
-            }
-            messageDiv.innerHTML = content;
-            
-            // If history was empty, remove the placeholder text
-            if (queryHistory.querySelector('.text-center')) {
-                queryHistory.innerHTML = '';
-            }
-            
-            queryHistory.appendChild(messageDiv);
-            
-            // Scroll to bottom
-            queryHistory.scrollTop = queryHistory.scrollHeight;
-        }
-        
-        // Remove loading message
-        function removeLoadingMessage() {
-            const loadingMessage = document.getElementById('loadingMessage');
-            if (loadingMessage) {
-                loadingMessage.remove();
-            }
-        }
-        
-        // Load conversation history
-        function loadConversationHistory() {
-            fetch('/api/advanced-mcp/conversation-history', {
-                headers: {
-                    'X-CSRFToken': csrfToken
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.history && data.history.length > 0) {
-                    // Clear placeholder text
-                    queryHistory.innerHTML = '';
-                    
-                    // Add each message to the history
-                    data.history.forEach(entry => {
-                        addMessageToHistory(entry.role, entry.content);
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error loading conversation history:', error);
+          }
+        })
+        .catch((error) => {
+          // Remove loading message
+          removeLoadingMessage();
+          addMessageToHistory(
+            "assistant",
+            `<div class="text-danger">Error communicating with the server: ${error.message}</div>`,
+          );
+        });
+    }
+
+    // Add message to history
+    function addMessageToHistory(role, content, isLoading = false) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `query-message query-${role}`;
+      if (isLoading) {
+        messageDiv.id = "loadingMessage";
+      }
+      messageDiv.innerHTML = content;
+
+      // If history was empty, remove the placeholder text
+      if (queryHistory.querySelector(".text-center")) {
+        queryHistory.innerHTML = "";
+      }
+
+      queryHistory.appendChild(messageDiv);
+
+      // Scroll to bottom
+      queryHistory.scrollTop = queryHistory.scrollHeight;
+    }
+
+    // Remove loading message
+    function removeLoadingMessage() {
+      const loadingMessage = document.getElementById("loadingMessage");
+      if (loadingMessage) {
+        loadingMessage.remove();
+      }
+    }
+
+    // Load conversation history
+    function loadConversationHistory() {
+      fetch("/api/advanced-mcp/conversation-history", {
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.history && data.history.length > 0) {
+            // Clear placeholder text
+            queryHistory.innerHTML = "";
+
+            // Add each message to the history
+            data.history.forEach((entry) => {
+              addMessageToHistory(entry.role, entry.content);
             });
-        }
-        
-        // Clear conversation history
-        function clearConversationHistory() {
-            fetch('/api/advanced-mcp/conversation-history', {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': csrfToken
-                },
-                method: 'DELETE'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Clear the history UI
-                    queryHistory.innerHTML = `
+          }
+        })
+        .catch((error) => {
+          console.error("Error loading conversation history:", error);
+        });
+    }
+
+    // Clear conversation history
+    function clearConversationHistory() {
+      fetch("/api/advanced-mcp/conversation-history", {
+        method: "DELETE",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+        method: "DELETE",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            // Clear the history UI
+            queryHistory.innerHTML = `
                         <div class="text-center text-muted my-4">
                             <i class="bi bi-chat-dots d-block mb-2" style="font-size: 2rem;"></i>
                             <p>Start a conversation by typing a question above.</p>
                             <p class="small">Example: "What tax codes have the highest levy rates?" or "Show trends in assessed values for the past 3 years"</p>
                         </div>
                     `;
-                }
-            })
-            .catch(error => {
-                console.error('Error clearing conversation history:', error);
-            });
-        }
-        
-        // Refresh insights
-        function refreshInsights() {
-            window.location.reload();
-        }
-        
-        // Load tax districts for the multi-step analysis form
-        function loadTaxDistricts() {
-            // This would make an API call to get the list of tax districts
-            fetch('/api/tax-districts', {
-                headers: {
-                    'X-CSRFToken': csrfToken
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const districtSelect = document.getElementById('districtId');
-                data.districts.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district.id;
-                    option.textContent = district.name;
-                    districtSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading tax districts:', error);
-                // Fallback: Add some dummy districts for demo purposes
-                const districtSelect = document.getElementById('districtId');
-                ['District 1', 'District 2', 'District 3'].forEach((name, i) => {
-                    const option = document.createElement('option');
-                    option.value = i + 1;
-                    option.textContent = name;
-                    districtSelect.appendChild(option);
-                });
-            });
-        }
-        
-        // Run multi-step analysis
-        function runMultiStepAnalysis() {
-            const districtId = document.getElementById('districtId').value;
-            const analysisType = document.getElementById('analysisType').value;
-            const years = document.getElementById('years').value;
-            
-            // Show loading indicator
-            analysisResults.innerHTML = `
+          }
+        })
+        .catch((error) => {
+          console.error("Error clearing conversation history:", error);
+        });
+    }
+
+    // Refresh insights
+    function refreshInsights() {
+      window.location.reload();
+    }
+
+    // Load tax districts for the multi-step analysis form
+    function loadTaxDistricts() {
+      // This would make an API call to get the list of tax districts
+      fetch("/api/tax-districts", {
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const districtSelect = document.getElementById("districtId");
+          data.districts.forEach((district) => {
+            const option = document.createElement("option");
+            option.value = district.id;
+            option.textContent = district.name;
+            districtSelect.appendChild(option);
+          });
+        })
+        .catch((error) => {
+          console.error("Error loading tax districts:", error);
+          // Fallback: Add some dummy districts for demo purposes
+          const districtSelect = document.getElementById("districtId");
+          ["District 1", "District 2", "District 3"].forEach((name, i) => {
+            const option = document.createElement("option");
+            option.value = i + 1;
+            option.textContent = name;
+            districtSelect.appendChild(option);
+          });
+        });
+    }
+
+    // Run multi-step analysis
+    function runMultiStepAnalysis() {
+      const districtId = document.getElementById("districtId").value;
+      const analysisType = document.getElementById("analysisType").value;
+      const years = document.getElementById("years").value;
+
+      // Show loading indicator
+      analysisResults.innerHTML = `
                 <div class="alert alert-info">
                     <div class="d-flex align-items-center">
                         <span class="spinner-border spinner-border-sm me-3" role="status" aria-hidden="true"></span>
@@ -740,43 +896,43 @@
                     </div>
                 </div>
             `;
-            analysisResults.style.display = 'block';
-            
-            // Make API call
-            fetch('/api/advanced-mcp/multi-step-analysis', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                },
-                body: JSON.stringify({
-                    district_id: districtId,
-                    analysis_type: analysisType,
-                    years: parseInt(years)
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    analysisResults.innerHTML = `
+      analysisResults.style.display = "block";
+
+      // Make API call
+      fetch("/api/advanced-mcp/multi-step-analysis", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({
+          district_id: districtId,
+          analysis_type: analysisType,
+          years: parseInt(years),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            analysisResults.innerHTML = `
                         <div class="alert alert-danger">
                             <h5 class="alert-heading">Analysis Error</h5>
                             <p>${data.error}</p>
                         </div>
                     `;
-                } else if (data.response.error) {
-                    analysisResults.innerHTML = `
+          } else if (data.response.error) {
+            analysisResults.innerHTML = `
                         <div class="alert alert-danger">
                             <h5 class="alert-heading">Analysis Error</h5>
                             <p>${data.response.error}</p>
                         </div>
                     `;
-                } else {
-                    // Format and display the results
-                    const results = data.response;
-                    const insights = results.insights;
-                    
-                    let resultsHtml = `
+          } else {
+            // Format and display the results
+            const results = data.response;
+            const insights = results.insights;
+
+            let resultsHtml = `
                         <div class="card mb-4">
                             <div class="card-header bg-primary text-white">
                                 <h5 class="mb-0">${insights.analysis_type.toUpperCase()} Analysis Results: ${insights.district_name}</h5>
@@ -785,12 +941,12 @@
                                 <h6>Key Insights</h6>
                                 <ul>
                     `;
-                    
-                    insights.key_insights.forEach(insight => {
-                        resultsHtml += `<li>${insight}</li>`;
-                    });
-                    
-                    resultsHtml += `
+
+            insights.key_insights.forEach((insight) => {
+              resultsHtml += `<li>${insight}</li>`;
+            });
+
+            resultsHtml += `
                                 </ul>
                                 
                                 <div class="row mt-4">
@@ -798,24 +954,24 @@
                                         <h6>Trends</h6>
                                         <ul>
                     `;
-                    
-                    insights.trends.forEach(trend => {
-                        resultsHtml += `<li>${trend}</li>`;
-                    });
-                    
-                    resultsHtml += `
+
+            insights.trends.forEach((trend) => {
+              resultsHtml += `<li>${trend}</li>`;
+            });
+
+            resultsHtml += `
                                         </ul>
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Anomalies</h6>
                                         <ul>
                     `;
-                    
-                    insights.anomalies.forEach(anomaly => {
-                        resultsHtml += `<li>${anomaly}</li>`;
-                    });
-                    
-                    resultsHtml += `
+
+            insights.anomalies.forEach((anomaly) => {
+              resultsHtml += `<li>${anomaly}</li>`;
+            });
+
+            resultsHtml += `
                                         </ul>
                                     </div>
                                 </div>
@@ -823,12 +979,12 @@
                                 <h6 class="mt-4">Recommendations</h6>
                                 <ul>
                     `;
-                    
-                    insights.recommendations.forEach(recommendation => {
-                        resultsHtml += `<li>${recommendation}</li>`;
-                    });
-                    
-                    resultsHtml += `
+
+            insights.recommendations.forEach((recommendation) => {
+              resultsHtml += `<li>${recommendation}</li>`;
+            });
+
+            resultsHtml += `
                                 </ul>
                             </div>
                             <div class="card-footer">
@@ -836,19 +992,19 @@
                             </div>
                         </div>
                     `;
-                    
-                    analysisResults.innerHTML = resultsHtml;
-                }
-            })
-            .catch(error => {
-                analysisResults.innerHTML = `
+
+            analysisResults.innerHTML = resultsHtml;
+          }
+        })
+        .catch((error) => {
+          analysisResults.innerHTML = `
                     <div class="alert alert-danger">
                         <h5 class="alert-heading">Server Error</h5>
                         <p>Error communicating with the server: ${error.message}</p>
                     </div>
                 `;
-            });
-        }
-    });
+        });
+    }
+  });
 </script>
 {% endblock %}

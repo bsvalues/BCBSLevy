@@ -1,167 +1,233 @@
-{% extends "base.html" %}
-
-{% block title %}Tax Districts{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Tax Districts{% endblock %} {% block
+content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="display-5 fw-bold text-gradient">Tax Districts</h1>
-            <p class="lead">Explore property tax districts in Benton County.</p>
-        </div>
-        <div class="col-md-4 text-md-end">
-            <!-- View toggle buttons -->
-            <div class="btn-group mb-3" role="group" aria-label="View options">
-                <a href="{{ url_for('public.district_list', year=year) }}" 
-                   class="btn btn-outline-primary {% if request.args.get('view') != 'immersive' %}active{% endif %}">
-                    <i class="fas fa-list me-1"></i> Standard View
-                </a>
-                <a href="{{ url_for('public.district_list', year=year, view='immersive') }}" 
-                   class="btn btn-outline-primary {% if request.args.get('view') == 'immersive' %}active{% endif %}">
-                    <i class="fas fa-map-marked-alt me-1"></i> Map View
-                </a>
-            </div>
-            
-            <!-- Year selector dropdown -->
-            <div class="btn-group ms-2">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    {{ year }}
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    {% for y in available_years %}
-                    <li><a class="dropdown-item {% if y == year %}active{% endif %}" 
-                           href="{{ url_for('public.district_list', year=y) }}">{{ y }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold text-gradient">Tax Districts</h1>
+      <p class="lead">Explore property tax districts in Benton County.</p>
     </div>
-    
-    <!-- Filter section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-3">Filter Districts</h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button class="filter-btn btn btn-sm btn-outline-primary active" data-type="all">All</button>
-                        <button class="filter-btn btn btn-sm btn-outline-danger" data-type="SCHOOL">School</button>
-                        <button class="filter-btn btn btn-sm btn-outline-info" data-type="CITY">City</button>
-                        <button class="filter-btn btn btn-sm btn-outline-warning" data-type="FIRE">Fire</button>
-                        <button class="filter-btn btn btn-sm btn-outline-success" data-type="COUNTY">County</button>
-                        <button class="filter-btn btn btn-sm btn-outline-secondary" data-type="OTHER">Other</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="col-md-4 text-md-end">
+      <!-- View toggle buttons -->
+      <div class="btn-group mb-3" role="group" aria-label="View options">
+        <a
+          href="{{ url_for('public.district_list', year=year) }}"
+          class="btn btn-outline-primary {% if request.args.get('view') != 'immersive' %}active{% endif %}"
+        >
+          <i class="fas fa-list me-1"></i> Standard View
+        </a>
+        <a
+          href="{{ url_for('public.district_list', year=year, view='immersive') }}"
+          class="btn btn-outline-primary {% if request.args.get('view') == 'immersive' %}active{% endif %}"
+        >
+          <i class="fas fa-map-marked-alt me-1"></i> Map View
+        </a>
+      </div>
 
-    <!-- District list -->
-    <div class="row mb-4">
-        {% for district in districts %}
-        <div class="col-md-6 col-lg-4 mb-4 district-card" data-type="{{ district.district_type }}">
-            <div class="card h-100 shadow-sm border-0 rounded-4 hover-elevate">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">{{ district.district_name }}</h5>
-                        <span class="badge rounded-pill text-bg-{{ 
+      <!-- Year selector dropdown -->
+      <div class="btn-group ms-2">
+        <button
+          type="button"
+          class="btn btn-primary dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          {{ year }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          {% for y in available_years %}
+          <li>
+            <a
+              class="dropdown-item {% if y == year %}active{% endif %}"
+              href="{{ url_for('public.district_list', year=y) }}"
+              >{{ y }}</a
+            >
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-3">Filter Districts</h5>
+          <div class="d-flex flex-wrap gap-2">
+            <button
+              class="filter-btn btn btn-sm btn-outline-primary active"
+              data-type="all"
+            >
+              All
+            </button>
+            <button
+              class="filter-btn btn btn-sm btn-outline-danger"
+              data-type="SCHOOL"
+            >
+              School
+            </button>
+            <button
+              class="filter-btn btn btn-sm btn-outline-info"
+              data-type="CITY"
+            >
+              City
+            </button>
+            <button
+              class="filter-btn btn btn-sm btn-outline-warning"
+              data-type="FIRE"
+            >
+              Fire
+            </button>
+            <button
+              class="filter-btn btn btn-sm btn-outline-success"
+              data-type="COUNTY"
+            >
+              County
+            </button>
+            <button
+              class="filter-btn btn btn-sm btn-outline-secondary"
+              data-type="OTHER"
+            >
+              Other
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- District list -->
+  <div class="row mb-4">
+    {% for district in districts %}
+    <div
+      class="col-md-6 col-lg-4 mb-4 district-card"
+      data-type="{{ district.district_type }}"
+    >
+      <div class="card h-100 shadow-sm border-0 rounded-4 hover-elevate">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">{{ district.district_name }}</h5>
+            <span
+              class="badge rounded-pill text-bg-{{ 
                             'danger' if district.district_type == 'SCHOOL' else 
                             'info' if district.district_type == 'CITY' else 
                             'warning' if district.district_type == 'FIRE' else 
                             'success' if district.district_type == 'COUNTY' else 
                             'secondary' 
-                        }}">{{ district.district_type }}</span>
-                    </div>
-                    <p class="card-text text-muted small mb-3">District Code: {{ district.district_code }}</p>
-                    
-                    <div class="row g-2 mb-3">
-                        {% if district.tax_codes and district.tax_codes|length > 0 %}
-                        <div class="col-6">
-                            <div class="p-2 border rounded text-center bg-light">
-                                <small class="d-block text-muted mb-1">Levy Rate</small>
-                                <span class="fw-bold">{{ district.tax_codes[0].effective_tax_rate|default(0)|format_number }}</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-2 border rounded text-center bg-light">
-                                <small class="d-block text-muted mb-1">Levy Amount</small>
-                                <span class="fw-bold">{{ district.tax_codes[0].total_levy_amount|default(0)|format_currency }}</span>
-                            </div>
-                        </div>
-                        {% else %}
-                        <div class="col-12">
-                            <div class="p-2 border rounded text-center bg-light">
-                                <span class="text-muted">No tax information available</span>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="text-end">
-                        <a href="{{ url_for('public.district_detail', district_id=district.id) }}" class="btn btn-sm btn-primary">View Details</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-{% endblock %}
+                        }}"
+              >{{ district.district_type }}</span
+            >
+          </div>
+          <p class="card-text text-muted small mb-3">
+            District Code: {{ district.district_code }}
+          </p>
 
-{% block scripts %}
+          <div class="row g-2 mb-3">
+            {% if district.tax_codes and district.tax_codes|length > 0 %}
+            <div class="col-6">
+              <div class="p-2 border rounded text-center bg-light">
+                <small class="d-block text-muted mb-1">Levy Rate</small>
+                <span class="fw-bold"
+                  >{{
+                  district.tax_codes[0].effective_tax_rate|default(0)|format_number
+                  }}</span
+                >
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 border rounded text-center bg-light">
+                <small class="d-block text-muted mb-1">Levy Amount</small>
+                <span class="fw-bold"
+                  >{{
+                  district.tax_codes[0].total_levy_amount|default(0)|format_currency
+                  }}</span
+                >
+              </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+              <div class="p-2 border rounded text-center bg-light">
+                <span class="text-muted">No tax information available</span>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="text-end">
+            <a
+              href="{{ url_for('public.district_detail', district_id=district.id) }}"
+              class="btn btn-sm btn-primary"
+              >View Details</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle filter buttons
-        const filterButtons = document.querySelectorAll('.filter-btn');
-        const districtCards = document.querySelectorAll('.district-card');
-        
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Toggle active state on buttons
-                if (this.dataset.type === 'all') {
-                    // When "All" is clicked, make only it active
-                    filterButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                } else {
-                    // When a specific type is clicked, deactivate "All"
-                    const allButton = document.querySelector('.filter-btn[data-type="all"]');
-                    allButton.classList.remove('active');
-                    
-                    // Toggle this button
-                    this.classList.toggle('active');
-                    
-                    // If no type filters are active, reactivate "All"
-                    const activeTypeFilters = document.querySelectorAll('.filter-btn.active:not([data-type="all"])');
-                    if (activeTypeFilters.length === 0) {
-                        allButton.classList.add('active');
-                    }
-                }
-                
-                // Filter the cards
-                filterDistricts();
-            });
-        });
-        
-        // Filter function
-        function filterDistricts() {
-            // Check if "All" filter is active
-            const allActive = document.querySelector('.filter-btn[data-type="all"]').classList.contains('active');
-            
-            // Get active type filters
-            const activeTypes = Array.from(document.querySelectorAll('.filter-btn.active:not([data-type="all"])'))
-                                     .map(btn => btn.dataset.type);
-            
-            // Show/hide cards based on filters
-            districtCards.forEach(card => {
-                if (allActive || activeTypes.includes(card.dataset.type)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Handle filter buttons
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const districtCards = document.querySelectorAll(".district-card");
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        // Toggle active state on buttons
+        if (this.dataset.type === "all") {
+          // When "All" is clicked, make only it active
+          filterButtons.forEach((btn) => {
+            btn.classList.remove("active");
+          });
+          this.classList.add("active");
+        } else {
+          // When a specific type is clicked, deactivate "All"
+          const allButton = document.querySelector(
+            '.filter-btn[data-type="all"]',
+          );
+          allButton.classList.remove("active");
+
+          // Toggle this button
+          this.classList.toggle("active");
+
+          // If no type filters are active, reactivate "All"
+          const activeTypeFilters = document.querySelectorAll(
+            '.filter-btn.active:not([data-type="all"])',
+          );
+          if (activeTypeFilters.length === 0) {
+            allButton.classList.add("active");
+          }
         }
+
+        // Filter the cards
+        filterDistricts();
+      });
     });
+
+    // Filter function
+    function filterDistricts() {
+      // Check if "All" filter is active
+      const allActive = document
+        .querySelector('.filter-btn[data-type="all"]')
+        .classList.contains("active");
+
+      // Get active type filters
+      const activeTypes = Array.from(
+        document.querySelectorAll('.filter-btn.active:not([data-type="all"])'),
+      ).map((btn) => btn.dataset.type);
+
+      // Show/hide cards based on filters
+      districtCards.forEach((card) => {
+        if (allActive || activeTypes.includes(card.dataset.type)) {
+          card.style.display = "";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+  });
 </script>
 {% endblock %}

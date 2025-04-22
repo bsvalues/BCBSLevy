@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef, useEffect } from "react"
-import { motion } from "framer-motion"
+import { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
 
 interface GlassmorphicContainerProps {
-  children: React.ReactNode
-  className?: string
-  intensity?: "light" | "medium" | "strong"
-  interactive?: boolean
-  hoverEffect?: boolean
-  glowColor?: string
+  children: React.ReactNode;
+  className?: string;
+  intensity?: "light" | "medium" | "strong";
+  interactive?: boolean;
+  hoverEffect?: boolean;
+  glowColor?: string;
 }
 
 export function GlassmorphicContainer({
@@ -22,38 +22,38 @@ export function GlassmorphicContainer({
   hoverEffect = false,
   glowColor = "#00e5ff",
 }: GlassmorphicContainerProps) {
-  const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [isHovered, setIsHovered] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Intensity settings
   const blurMap = {
     light: "backdrop-blur-md",
     medium: "backdrop-blur-xl",
     strong: "backdrop-blur-2xl",
-  }
+  };
 
   const bgOpacityMap = {
     light: "bg-[#001529]/60",
     medium: "bg-[#001529]/70",
     strong: "bg-[#001529]/80",
-  }
+  };
 
   const borderOpacityMap = {
     light: "border-[#00e5ff]/10",
     medium: "border-[#00e5ff]/20",
     strong: "border-[#00e5ff]/30",
-  }
+  };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!interactive || !containerRef.current) return
+    if (!interactive || !containerRef.current) return;
 
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    setPosition({ x, y })
-  }
+    setPosition({ x, y });
+  };
 
   return (
     <motion.div
@@ -103,15 +103,15 @@ export function GlassmorphicContainer({
 
       {children}
     </motion.div>
-  )
+  );
 }
 
 interface GlowEffectProps {
-  children: React.ReactNode
-  color?: string
-  intensity?: "light" | "medium" | "strong"
-  className?: string
-  pulseEffect?: boolean
+  children: React.ReactNode;
+  color?: string;
+  intensity?: "light" | "medium" | "strong";
+  className?: string;
+  pulseEffect?: boolean;
 }
 
 export function GlowEffect({
@@ -126,13 +126,13 @@ export function GlowEffect({
     light: "10px",
     medium: "15px",
     strong: "25px",
-  }
+  };
 
   const opacityMap = {
     light: 0.2,
     medium: 0.3,
     strong: 0.4,
-  }
+  };
 
   return (
     <div className={`relative ${className}`}>
@@ -146,17 +146,22 @@ export function GlowEffect({
       />
       {children}
     </div>
-  )
+  );
 }
 
 interface FloatingElementProps {
-  children: React.ReactNode
-  amplitude?: number
-  duration?: number
-  className?: string
+  children: React.ReactNode;
+  amplitude?: number;
+  duration?: number;
+  className?: string;
 }
 
-export function FloatingElement({ children, amplitude = 10, duration = 4, className = "" }: FloatingElementProps) {
+export function FloatingElement({
+  children,
+  amplitude = 10,
+  duration = 4,
+  className = "",
+}: FloatingElementProps) {
   return (
     <motion.div
       className={className}
@@ -171,15 +176,15 @@ export function FloatingElement({ children, amplitude = 10, duration = 4, classN
     >
       {children}
     </motion.div>
-  )
+  );
 }
 
 interface ParticleFieldProps {
-  count?: number
-  color?: string
-  size?: number
-  speed?: number
-  className?: string
+  count?: number;
+  color?: string;
+  size?: number;
+  speed?: number;
+  className?: string;
 }
 
 export function ParticleField({
@@ -189,17 +194,19 @@ export function ParticleField({
   speed = 3,
   className = "",
 }: ParticleFieldProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
-  const [particles, setParticles] = useState<Array<{ x: number; y: number; size: number; duration: number }>>([])
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [particles, setParticles] = useState<
+    Array<{ x: number; y: number; size: number; duration: number }>
+  >([]);
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current) return;
 
     const updateDimensions = () => {
-      if (!containerRef.current) return
-      const { width, height } = containerRef.current.getBoundingClientRect()
-      setDimensions({ width, height })
+      if (!containerRef.current) return;
+      const { width, height } = containerRef.current.getBoundingClientRect();
+      setDimensions({ width, height });
 
       // Generate particles
       const newParticles = Array.from({ length: count }, () => ({
@@ -207,21 +214,24 @@ export function ParticleField({
         y: Math.random() * height,
         size: Math.random() * size + 1,
         duration: Math.random() * speed + speed / 2,
-      }))
+      }));
 
-      setParticles(newParticles)
-    }
+      setParticles(newParticles);
+    };
 
-    updateDimensions()
-    window.addEventListener("resize", updateDimensions)
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
 
     return () => {
-      window.removeEventListener("resize", updateDimensions)
-    }
-  }, [count, size, speed])
+      window.removeEventListener("resize", updateDimensions);
+    };
+  }, [count, size, speed]);
 
   return (
-    <div ref={containerRef} className={`absolute inset-0 overflow-hidden ${className}`}>
+    <div
+      ref={containerRef}
+      className={`absolute inset-0 overflow-hidden ${className}`}
+    >
       {particles.map((particle, index) => (
         <motion.div
           key={index}
@@ -247,16 +257,20 @@ export function ParticleField({
         />
       ))}
     </div>
-  )
+  );
 }
 
 interface AnimatedBackgroundProps {
-  children: React.ReactNode
-  variant?: "particles" | "gradient" | "waves"
-  className?: string
+  children: React.ReactNode;
+  variant?: "particles" | "gradient" | "waves";
+  className?: string;
 }
 
-export function AnimatedBackground({ children, variant = "gradient", className = "" }: AnimatedBackgroundProps) {
+export function AnimatedBackground({
+  children,
+  variant = "gradient",
+  className = "",
+}: AnimatedBackgroundProps) {
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {variant === "particles" && <ParticleField />}
@@ -265,7 +279,8 @@ export function AnimatedBackground({ children, variant = "gradient", className =
         <motion.div
           className="absolute inset-0 -z-10"
           style={{
-            background: "radial-gradient(circle at 50% 50%, #00e5ff10, #00152900 70%)",
+            background:
+              "radial-gradient(circle at 50% 50%, #00e5ff10, #00152900 70%)",
           }}
           animate={{
             scale: [1, 1.2, 1],
@@ -281,7 +296,11 @@ export function AnimatedBackground({ children, variant = "gradient", className =
 
       {variant === "waves" && (
         <div className="absolute inset-0 -z-10">
-          <svg className="absolute bottom-0 left-0 w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+          <svg
+            className="absolute bottom-0 left-0 w-full"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1440 320"
+          >
             <motion.path
               fill="#00e5ff10"
               d="M0,192L48,176C96,160,192,128,288,133.3C384,139,480,181,576,186.7C672,192,768,160,864,154.7C960,149,1056,171,1152,165.3C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
@@ -304,5 +323,5 @@ export function AnimatedBackground({ children, variant = "gradient", className =
 
       {children}
     </div>
-  )
+  );
 }

@@ -1,83 +1,130 @@
-{% extends 'base.html' %}
-
-{% block title %}Create Data Archive{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Create Data Archive{% endblock %} {%
+block content %}
 <div class="container my-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="mb-3"><i class="bi bi-archive"></i> Create Data Archive</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('data_archives') }}">Data Archives</a></li>
-                    <li class="breadcrumb-item active">Create Archive</li>
-                </ol>
-            </nav>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="mb-3"><i class="bi bi-archive"></i> Create Data Archive</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('data_archives') }}">Data Archives</a>
+          </li>
+          <li class="breadcrumb-item active">Create Archive</li>
+        </ol>
+      </nav>
     </div>
-    
-    <!-- Create Archive Form -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-archive"></i> Archive Details</h5>
+  </div>
+
+  <!-- Create Archive Form -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-archive"></i> Archive Details</h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('create_archive') }}">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="table_name" class="form-label"
+                  >Table to Archive</label
+                >
+                <select
+                  name="table_name"
+                  id="table_name"
+                  class="form-select"
+                  required
+                >
+                  <option value="" selected disabled>Select a table</option>
+                  {% for table in tables %}
+                  <option value="{{ table.value }}">{{ table.label }}</option>
+                  {% endfor %}
+                </select>
+                <div class="form-text">
+                  Select the table you want to archive.
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('create_archive') }}">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="table_name" class="form-label">Table to Archive</label>
-                                <select name="table_name" id="table_name" class="form-select" required>
-                                    <option value="" selected disabled>Select a table</option>
-                                    {% for table in tables %}
-                                    <option value="{{ table.value }}">{{ table.label }}</option>
-                                    {% endfor %}
-                                </select>
-                                <div class="form-text">Select the table you want to archive.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="archive_type" class="form-label">Archive Type</label>
-                                <select name="archive_type" id="archive_type" class="form-select" required>
-                                    {% for type in archive_types %}
-                                    <option value="{{ type.value }}" {% if type.value == 'backup' %}selected{% endif %}>
-                                        {{ type.label }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                <div class="form-text">Select the type of archive to create.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="retention_days" class="form-label">Retention Period (days)</label>
-                                <input type="number" name="retention_days" id="retention_days" class="form-control" 
-                                      placeholder="Leave blank for no expiration">
-                                <div class="form-text">How long to keep this archive (in days). Leave blank for no expiration.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="description" class="form-label">Description</label>
-                                <input type="text" name="description" id="description" class="form-control" 
-                                      placeholder="Optional description">
-                                <div class="form-text">Optional description for this archive.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> 
-                            This will create a snapshot of all data in the selected table. 
-                            For large tables, this operation may take some time.
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('data_archives') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Archive</button>
-                        </div>
-                    </form>
+              </div>
+              <div class="col-md-6">
+                <label for="archive_type" class="form-label"
+                  >Archive Type</label
+                >
+                <select
+                  name="archive_type"
+                  id="archive_type"
+                  class="form-select"
+                  required
+                >
+                  {% for type in archive_types %}
+                  <option
+                    value="{{ type.value }}"
+                    {%
+                    if
+                    type.value=""
+                    ="backup"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ type.label }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="form-text">
+                  Select the type of archive to create.
                 </div>
+              </div>
             </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="retention_days" class="form-label"
+                  >Retention Period (days)</label
+                >
+                <input
+                  type="number"
+                  name="retention_days"
+                  id="retention_days"
+                  class="form-control"
+                  placeholder="Leave blank for no expiration"
+                />
+                <div class="form-text">
+                  How long to keep this archive (in days). Leave blank for no
+                  expiration.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="description" class="form-label">Description</label>
+                <input
+                  type="text"
+                  name="description"
+                  id="description"
+                  class="form-control"
+                  placeholder="Optional description"
+                />
+                <div class="form-text">
+                  Optional description for this archive.
+                </div>
+              </div>
+            </div>
+
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              This will create a snapshot of all data in the selected table. For
+              large tables, this operation may take some time.
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{{ url_for('data_archives') }}" class="btn btn-secondary"
+                >Cancel</a
+              >
+              <button type="submit" class="btn btn-primary">
+                Create Archive
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

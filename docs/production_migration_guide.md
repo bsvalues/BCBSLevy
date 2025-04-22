@@ -43,6 +43,7 @@ python production_migrate.py migrate
 ```
 
 This process will:
+
 - Create a backup
 - Record the pre-migration schema
 - Apply migrations
@@ -92,6 +93,7 @@ python setup_production.py
 ```
 
 This will:
+
 1. Create necessary directories (logs, backups)
 2. Check database connection
 3. Backup the current database
@@ -101,6 +103,7 @@ This will:
 ## For More Information
 
 For detailed information about PostgreSQL migration strategies and best practices, see:
+
 - [PostgreSQL Production Database Migration Guide](postgresql_production_migration.md)
 - [Flask-Migrate Documentation](https://flask-migrate.readthedocs.io/)
 - [Alembic Documentation](https://alembic.sqlalchemy.org/)
@@ -112,6 +115,7 @@ For detailed information about PostgreSQL migration strategies and best practice
 #### Invalid Database Connection
 
 If you encounter connection errors:
+
 1. Verify your PostgreSQL credentials
 2. Ensure the database exists
 3. Check network access to the database server
@@ -119,12 +123,14 @@ If you encounter connection errors:
 #### Migration Timeout
 
 For large databases, migrations may time out:
+
 1. Increase `statement_timeout` in PostgreSQL configuration
 2. Use the `--sql` flag to generate SQL and run manually in batches
 
 #### Database Locked
 
 If the database is locked during migration:
+
 1. Check for long-running queries
 2. Terminate blocking connections
 3. Schedule migrations during off-peak hours

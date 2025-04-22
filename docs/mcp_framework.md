@@ -25,6 +25,7 @@ The Function Registry is a central repository for all AI-powered functions avail
 - Implementation details
 
 Example functions include:
+
 - `analyze_tax_distribution`
 - `analyze_historical_trends`
 - `predict_levy_rates`
@@ -34,16 +35,19 @@ Example functions include:
 The MCP framework includes specialized AI agents for different tasks:
 
 #### Levy Analysis Agent
+
 - Analyzes levy rates and assessed values across districts
 - Identifies patterns and anomalies in tax data
 - Provides insights on tax burden distribution
 
 #### Levy Prediction Agent
+
 - Predicts future levy rates based on historical data
 - Forecasts assessed value changes
 - Models impact of statutory changes
 
 #### Workflow Coordinator Agent
+
 - Coordinates complex multi-agent workflows
 - Manages dependencies between tasks
 - Handles error recovery and retries
@@ -53,12 +57,14 @@ The MCP framework includes specialized AI agents for different tasks:
 Workflows are predefined sequences of function calls and agent interactions designed to accomplish specific tasks. Key workflows include:
 
 #### Tax Distribution Analysis Workflow
+
 1. Collect tax code and property data
 2. Calculate distribution metrics
 3. Generate visualizations
 4. Provide insights and recommendations
 
 #### Levy Calculation Workflow
+
 1. Gather levy amounts and assessed values
 2. Calculate preliminary levy rates
 3. Apply statutory limits
@@ -66,6 +72,7 @@ Workflows are predefined sequences of function calls and agent interactions desi
 5. Provide optimization recommendations
 
 #### Property Lookup Workflow
+
 1. Retrieve property data
 2. Calculate property tax
 3. Analyze property in context of similar properties
@@ -82,6 +89,7 @@ The application integrates with Anthropic's Claude 3.5 Sonnet model to provide a
 - Recommendation generation
 
 The Claude service is implemented in `utils/anthropic_utils.py` and provides methods for:
+
 - Generating text responses
 - Chat-based interactions
 - Structured data analysis
@@ -130,6 +138,7 @@ The MCP framework is integrated throughout the application:
 ### Error Handling
 
 The MCP framework includes robust error handling:
+
 - Graceful degradation when AI services are unavailable
 - Fallback to non-AI alternatives when appropriate
 - Clear error messages and logging

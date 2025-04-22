@@ -1,376 +1,463 @@
-{% extends 'base.html' %}
-
-{% block title %}Data Export - Levy Calculation System{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Data Export - Levy Calculation
+System{% endblock %} {% block content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 mb-3">Data Export</h1>
-            <p class="lead">Export property, tax district, and levy data from the Levy Calculation System.</p>
-            
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Export Data</h5>
-                </div>
-                <div class="card-body">
-                    <form action="{{ url_for('data_management.process_export') }}" method="POST" id="exportForm">
-                        <div class="mb-3">
-                            <label for="export_type" class="form-label">Export Type</label>
-                            <select class="form-select" id="export_type" name="export_type" required>
-                                <option value="property" selected>Property Data</option>
-                                <option value="tax_district">Tax District Data</option>
-                                <option value="tax_code">Tax Code Data</option>
-                                <option value="levy_report">Levy Report</option>
-                            </select>
-                            <div class="form-text">
-                                Select the type of data you want to export.
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="file_format" class="form-label">File Format</label>
-                            <select class="form-select" id="file_format" name="file_format" required>
-                                <option value="csv" selected>CSV</option>
-                                <option value="xlsx">Excel (XLSX)</option>
-                                <option value="json">JSON</option>
-                                <option value="xml">XML</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="year" class="form-label">Year</label>
-                            <select class="form-select" id="year" name="year" required>
-                                {% for year in years %}
-                                    <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="tax_code" class="form-label">Tax Code (Optional)</label>
-                            <select class="form-select" id="tax_code" name="tax_code">
-                                <option value="">All Tax Codes</option>
-                                {% for code in tax_codes %}
-                                    <option value="{{ code.code }}">{{ code.code }} - {{ code.description or 'No Description' }}</option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-text">
-                                Filter by tax code (optional).
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-download"></i> Export Data
-                        </button>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Export Options</h5>
-                </div>
-                <div class="card-body">
-                    <div class="accordion" id="exportOptionsAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="propertyExportHeading">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#propertyExportCollapse" aria-expanded="true" aria-controls="propertyExportCollapse">
-                                    Property Data Export
-                                </button>
-                            </h2>
-                            <div id="propertyExportCollapse" class="accordion-collapse collapse show" aria-labelledby="propertyExportHeading" data-bs-parent="#exportOptionsAccordion">
-                                <div class="accordion-body">
-                                    <p>Property data exports include the following fields:</p>
-                                    <ul>
-                                        <li>property_id</li>
-                                        <li>address</li>
-                                        <li>owner_name</li>
-                                        <li>assessed_value</li>
-                                        <li>tax_code</li>
-                                        <li>property_type</li>
-                                        <li>year</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="districtExportHeading">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#districtExportCollapse" aria-expanded="false" aria-controls="districtExportCollapse">
-                                    Tax District Export
-                                </button>
-                            </h2>
-                            <div id="districtExportCollapse" class="accordion-collapse collapse" aria-labelledby="districtExportHeading" data-bs-parent="#exportOptionsAccordion">
-                                <div class="accordion-body">
-                                    <p>Tax district exports include the following fields:</p>
-                                    <ul>
-                                        <li>tax_district_id</li>
-                                        <li>district_name</li>
-                                        <li>levy_code</li>
-                                        <li>year</li>
-                                        <li>statutory_limit</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="taxCodeExportHeading">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#taxCodeExportCollapse" aria-expanded="false" aria-controls="taxCodeExportCollapse">
-                                    Tax Code Export
-                                </button>
-                            </h2>
-                            <div id="taxCodeExportCollapse" class="accordion-collapse collapse" aria-labelledby="taxCodeExportHeading" data-bs-parent="#exportOptionsAccordion">
-                                <div class="accordion-body">
-                                    <p>Tax code exports include the following fields:</p>
-                                    <ul>
-                                        <li>code</li>
-                                        <li>description</li>
-                                        <li>total_assessed_value</li>
-                                        <li>levy_rate</li>
-                                        <li>levy_amount</li>
-                                        <li>year</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="levyReportHeading">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#levyReportCollapse" aria-expanded="false" aria-controls="levyReportCollapse">
-                                    Levy Report Export
-                                </button>
-                            </h2>
-                            <div id="levyReportCollapse" class="accordion-collapse collapse" aria-labelledby="levyReportHeading" data-bs-parent="#exportOptionsAccordion">
-                                <div class="accordion-body">
-                                    <p>Levy report exports include comprehensive levy data with historical comparisons:</p>
-                                    <ul>
-                                        <li>tax_code</li>
-                                        <li>description</li>
-                                        <li>total_assessed_value</li>
-                                        <li>levy_rate</li>
-                                        <li>levy_amount</li>
-                                        <li>year</li>
-                                        <li>historical_rates</li>
-                                        <li>compliance_checks</li>
-                                        <li>year-over-year changes</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Recent Export History</h5>
-                </div>
-                <div class="card-body">
-                    {% if export_logs %}
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Filename</th>
-                                        <th>Type</th>
-                                        <th>Records</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for log in export_logs %}
-                                        <tr>
-                                            <td>{{ log.export_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                            <td>{{ log.filename }}</td>
-                                            <td>{{ log.export_type }}</td>
-                                            <td>{{ log.rows_exported }}</td>
-                                            <td>
-                                                {% if log.status == 'completed' %}
-                                                    <span class="badge bg-success">Completed</span>
-                                                {% elif log.status == 'partial' %}
-                                                    <span class="badge bg-warning">Partial</span>
-                                                {% elif log.status == 'failed' %}
-                                                    <span class="badge bg-danger">Failed</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">{{ log.status }}</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info">
-                            No export history available.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="card mt-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Data Statistics</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-body bg-light">
-                                    <h5 class="card-title">Property Count</h5>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h1 class="property-count">-</h1>
-                                            <p class="mb-0 text-muted">For selected year</p>
-                                        </div>
-                                        <i class="bi bi-house-door fs-1 text-primary"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-body bg-light">
-                                    <h5 class="card-title">Tax District Count</h5>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h1 class="district-count">-</h1>
-                                            <p class="mb-0 text-muted">For selected year</p>
-                                        </div>
-                                        <i class="bi bi-building fs-1 text-success"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-body bg-light">
-                                    <h5 class="card-title">Tax Codes</h5>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h1 class="tax-code-count">-</h1>
-                                            <p class="mb-0 text-muted">For selected year</p>
-                                        </div>
-                                        <i class="bi bi-tag fs-1 text-info"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-body bg-light">
-                                    <h5 class="card-title">Available Years</h5>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <div>
-                                            <h1 class="year-count">-</h1>
-                                            <p class="mb-0 text-muted">With data records</p>
-                                        </div>
-                                        <i class="bi bi-calendar-date fs-1 text-warning"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 mb-3">Data Export</h1>
+      <p class="lead">
+        Export property, tax district, and levy data from the Levy Calculation
+        System.
+      </p>
 
-{% block scripts %}
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %} {% endif %} {% endwith %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Export Data</h5>
+        </div>
+        <div class="card-body">
+          <form
+            action="{{ url_for('data_management.process_export') }}"
+            method="POST"
+            id="exportForm"
+          >
+            <div class="mb-3">
+              <label for="export_type" class="form-label">Export Type</label>
+              <select
+                class="form-select"
+                id="export_type"
+                name="export_type"
+                required
+              >
+                <option value="property" selected>Property Data</option>
+                <option value="tax_district">Tax District Data</option>
+                <option value="tax_code">Tax Code Data</option>
+                <option value="levy_report">Levy Report</option>
+              </select>
+              <div class="form-text">
+                Select the type of data you want to export.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="file_format" class="form-label">File Format</label>
+              <select
+                class="form-select"
+                id="file_format"
+                name="file_format"
+                required
+              >
+                <option value="csv" selected>CSV</option>
+                <option value="xlsx">Excel (XLSX)</option>
+                <option value="json">JSON</option>
+                <option value="xml">XML</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="year" class="form-label">Year</label>
+              <select class="form-select" id="year" name="year" required>
+                {% for year in years %}
+                <option
+                  value="{{ year }}"
+                  {%
+                  if
+                  year=""
+                  ="current_year"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ year }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="tax_code" class="form-label"
+                >Tax Code (Optional)</label
+              >
+              <select class="form-select" id="tax_code" name="tax_code">
+                <option value="">All Tax Codes</option>
+                {% for code in tax_codes %}
+                <option value="{{ code.code }}">
+                  {{ code.code }} - {{ code.description or 'No Description' }}
+                </option>
+                {% endfor %}
+              </select>
+              <div class="form-text">Filter by tax code (optional).</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-download"></i> Export Data
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">Export Options</h5>
+        </div>
+        <div class="card-body">
+          <div class="accordion" id="exportOptionsAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="propertyExportHeading">
+                <button
+                  class="accordion-button"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#propertyExportCollapse"
+                  aria-expanded="true"
+                  aria-controls="propertyExportCollapse"
+                >
+                  Property Data Export
+                </button>
+              </h2>
+              <div
+                id="propertyExportCollapse"
+                class="accordion-collapse collapse show"
+                aria-labelledby="propertyExportHeading"
+                data-bs-parent="#exportOptionsAccordion"
+              >
+                <div class="accordion-body">
+                  <p>Property data exports include the following fields:</p>
+                  <ul>
+                    <li>property_id</li>
+                    <li>address</li>
+                    <li>owner_name</li>
+                    <li>assessed_value</li>
+                    <li>tax_code</li>
+                    <li>property_type</li>
+                    <li>year</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="districtExportHeading">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#districtExportCollapse"
+                  aria-expanded="false"
+                  aria-controls="districtExportCollapse"
+                >
+                  Tax District Export
+                </button>
+              </h2>
+              <div
+                id="districtExportCollapse"
+                class="accordion-collapse collapse"
+                aria-labelledby="districtExportHeading"
+                data-bs-parent="#exportOptionsAccordion"
+              >
+                <div class="accordion-body">
+                  <p>Tax district exports include the following fields:</p>
+                  <ul>
+                    <li>tax_district_id</li>
+                    <li>district_name</li>
+                    <li>levy_code</li>
+                    <li>year</li>
+                    <li>statutory_limit</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="taxCodeExportHeading">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#taxCodeExportCollapse"
+                  aria-expanded="false"
+                  aria-controls="taxCodeExportCollapse"
+                >
+                  Tax Code Export
+                </button>
+              </h2>
+              <div
+                id="taxCodeExportCollapse"
+                class="accordion-collapse collapse"
+                aria-labelledby="taxCodeExportHeading"
+                data-bs-parent="#exportOptionsAccordion"
+              >
+                <div class="accordion-body">
+                  <p>Tax code exports include the following fields:</p>
+                  <ul>
+                    <li>code</li>
+                    <li>description</li>
+                    <li>total_assessed_value</li>
+                    <li>levy_rate</li>
+                    <li>levy_amount</li>
+                    <li>year</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="levyReportHeading">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#levyReportCollapse"
+                  aria-expanded="false"
+                  aria-controls="levyReportCollapse"
+                >
+                  Levy Report Export
+                </button>
+              </h2>
+              <div
+                id="levyReportCollapse"
+                class="accordion-collapse collapse"
+                aria-labelledby="levyReportHeading"
+                data-bs-parent="#exportOptionsAccordion"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Levy report exports include comprehensive levy data with
+                    historical comparisons:
+                  </p>
+                  <ul>
+                    <li>tax_code</li>
+                    <li>description</li>
+                    <li>total_assessed_value</li>
+                    <li>levy_rate</li>
+                    <li>levy_amount</li>
+                    <li>year</li>
+                    <li>historical_rates</li>
+                    <li>compliance_checks</li>
+                    <li>year-over-year changes</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">Recent Export History</h5>
+        </div>
+        <div class="card-body">
+          {% if export_logs %}
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Filename</th>
+                  <th>Type</th>
+                  <th>Records</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in export_logs %}
+                <tr>
+                  <td>{{ log.export_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>{{ log.filename }}</td>
+                  <td>{{ log.export_type }}</td>
+                  <td>{{ log.rows_exported }}</td>
+                  <td>
+                    {% if log.status == 'completed' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% elif log.status == 'partial' %}
+                    <span class="badge bg-warning">Partial</span>
+                    {% elif log.status == 'failed' %}
+                    <span class="badge bg-danger">Failed</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ log.status }}</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="alert alert-info">No export history available.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Data Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-body bg-light">
+                  <h5 class="card-title">Property Count</h5>
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <div>
+                      <h1 class="property-count">-</h1>
+                      <p class="mb-0 text-muted">For selected year</p>
+                    </div>
+                    <i class="bi bi-house-door fs-1 text-primary"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-body bg-light">
+                  <h5 class="card-title">Tax District Count</h5>
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <div>
+                      <h1 class="district-count">-</h1>
+                      <p class="mb-0 text-muted">For selected year</p>
+                    </div>
+                    <i class="bi bi-building fs-1 text-success"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-body bg-light">
+                  <h5 class="card-title">Tax Codes</h5>
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <div>
+                      <h1 class="tax-code-count">-</h1>
+                      <p class="mb-0 text-muted">For selected year</p>
+                    </div>
+                    <i class="bi bi-tag fs-1 text-info"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card h-100">
+                <div class="card-body bg-light">
+                  <h5 class="card-title">Available Years</h5>
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <div>
+                      <h1 class="year-count">-</h1>
+                      <p class="mb-0 text-muted">With data records</p>
+                    </div>
+                    <i class="bi bi-calendar-date fs-1 text-warning"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const yearSelect = document.getElementById('year');
-        const taxCodeSelect = document.getElementById('tax_code');
-        
-        // Update statistics when year or tax code changes
-        function updateStatistics() {
-            const year = yearSelect.value;
-            const taxCode = taxCodeSelect.value;
-            
-            // Fetch property count
-            fetch(`{{ url_for('data_management.property_count') }}?year=${year}&tax_code=${taxCode}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('.property-count').textContent = data.count.toLocaleString();
-                });
-            
-            // Fetch district count
-            fetch(`{{ url_for('data_management.district_count') }}?year=${year}&tax_code=${taxCode}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('.district-count').textContent = data.count.toLocaleString();
-                });
-            
-            // Fetch tax code count
-            fetch(`{{ url_for('data_management.tax_code_list') }}?year=${year}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('.tax-code-count').textContent = data.length.toLocaleString();
-                });
-            
-            // Fetch available years
-            fetch(`{{ url_for('data_management.available_years') }}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('.year-count').textContent = data.length.toLocaleString();
-                });
-        }
-        
-        // Update statistics on load and when selections change
-        updateStatistics();
-        yearSelect.addEventListener('change', updateStatistics);
-        taxCodeSelect.addEventListener('change', updateStatistics);
-        
-        // Show/hide tax code filter based on export type
-        const exportTypeSelect = document.getElementById('export_type');
-        const taxCodeContainer = taxCodeSelect.parentElement;
-        
-        exportTypeSelect.addEventListener('change', function() {
-            const exportType = this.value;
-            
-            // Show tax code filter for property and district exports
-            if (exportType === 'property' || exportType === 'tax_district') {
-                taxCodeContainer.style.display = 'block';
-            } else {
-                taxCodeContainer.style.display = 'none';
-                taxCodeSelect.value = ''; // Reset selection
-            }
-            
-            // Update visible accordion panel
-            const accordionId = {
-                'property': 'propertyExportCollapse',
-                'tax_district': 'districtExportCollapse',
-                'tax_code': 'taxCodeExportCollapse',
-                'levy_report': 'levyReportCollapse'
-            }[exportType];
-            
-            // Hide all accordion panels
-            document.querySelectorAll('.accordion-collapse').forEach(panel => {
-                panel.classList.remove('show');
-            });
-            
-            // Show selected panel
-            document.getElementById(accordionId).classList.add('show');
+  document.addEventListener("DOMContentLoaded", function () {
+    const yearSelect = document.getElementById("year");
+    const taxCodeSelect = document.getElementById("tax_code");
+
+    // Update statistics when year or tax code changes
+    function updateStatistics() {
+      const year = yearSelect.value;
+      const taxCode = taxCodeSelect.value;
+
+      // Fetch property count
+      fetch(
+        `{{ url_for('data_management.property_count') }}?year=${year}&tax_code=${taxCode}`,
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          document.querySelector(".property-count").textContent =
+            data.count.toLocaleString();
         });
+
+      // Fetch district count
+      fetch(
+        `{{ url_for('data_management.district_count') }}?year=${year}&tax_code=${taxCode}`,
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          document.querySelector(".district-count").textContent =
+            data.count.toLocaleString();
+        });
+
+      // Fetch tax code count
+      fetch(`{{ url_for('data_management.tax_code_list') }}?year=${year}`)
+        .then((response) => response.json())
+        .then((data) => {
+          document.querySelector(".tax-code-count").textContent =
+            data.length.toLocaleString();
+        });
+
+      // Fetch available years
+      fetch(`{{ url_for('data_management.available_years') }}`)
+        .then((response) => response.json())
+        .then((data) => {
+          document.querySelector(".year-count").textContent =
+            data.length.toLocaleString();
+        });
+    }
+
+    // Update statistics on load and when selections change
+    updateStatistics();
+    yearSelect.addEventListener("change", updateStatistics);
+    taxCodeSelect.addEventListener("change", updateStatistics);
+
+    // Show/hide tax code filter based on export type
+    const exportTypeSelect = document.getElementById("export_type");
+    const taxCodeContainer = taxCodeSelect.parentElement;
+
+    exportTypeSelect.addEventListener("change", function () {
+      const exportType = this.value;
+
+      // Show tax code filter for property and district exports
+      if (exportType === "property" || exportType === "tax_district") {
+        taxCodeContainer.style.display = "block";
+      } else {
+        taxCodeContainer.style.display = "none";
+        taxCodeSelect.value = ""; // Reset selection
+      }
+
+      // Update visible accordion panel
+      const accordionId = {
+        property: "propertyExportCollapse",
+        tax_district: "districtExportCollapse",
+        tax_code: "taxCodeExportCollapse",
+        levy_report: "levyReportCollapse",
+      }[exportType];
+
+      // Hide all accordion panels
+      document.querySelectorAll(".accordion-collapse").forEach((panel) => {
+        panel.classList.remove("show");
+      });
+
+      // Show selected panel
+      document.getElementById(accordionId).classList.add("show");
     });
+  });
 </script>
 {% endblock %}

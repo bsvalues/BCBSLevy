@@ -7,548 +7,588 @@
 
 /* Full-screen Map Container */
 .immersive-map-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    z-index: 0;
-    background-color: #000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 0;
+  background-color: #000;
 }
 
 /* Map Content */
 .map-canvas {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
 /* Translucent Overlay for Controls */
 .immersive-controls-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-    pointer-events: none; /* Allow clicking through to map */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none; /* Allow clicking through to map */
 }
 
 /* All children of the overlay should accept events */
 .immersive-controls-overlay > * {
-    pointer-events: auto;
+  pointer-events: auto;
 }
 
 /* Glass Panel Effect */
 .glass-panel {
-    background: rgba(25, 31, 45, 0.65); /* Dark blue with transparency */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    color: white;
-    padding: 20px;
-    transition: all 0.3s ease;
+  background: rgba(25, 31, 45, 0.65); /* Dark blue with transparency */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  color: white;
+  padding: 20px;
+  transition: all 0.3s ease;
 }
 
 .glass-panel:hover {
-    background: rgba(32, 40, 59, 0.75);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: rgba(32, 40, 59, 0.75);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Header Panel */
 .map-header-panel {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    z-index: 10;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* Control Panels */
 .map-control-panel {
-    position: absolute;
-    z-index: 10;
-    max-width: 360px;
-    width: 100%;
+  position: absolute;
+  z-index: 10;
+  max-width: 360px;
+  width: 100%;
 }
 
 .map-control-panel.top-left {
-    top: 90px;
-    left: 20px;
+  top: 90px;
+  left: 20px;
 }
 
 .map-control-panel.top-right {
-    top: 90px;
-    right: 20px;
+  top: 90px;
+  right: 20px;
 }
 
 .map-control-panel.bottom-left {
-    bottom: 20px;
-    left: 20px;
+  bottom: 20px;
+  left: 20px;
 }
 
 .map-control-panel.bottom-right {
-    bottom: 20px;
-    right: 20px;
+  bottom: 20px;
+  right: 20px;
 }
 
 /* Collapsible Panels */
 .collapsible-panel {
-    overflow: hidden;
-    transition: max-height 0.3s ease;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 
 .collapsible-panel.collapsed {
-    max-height: 56px; /* Height of header only */
+  max-height: 56px; /* Height of header only */
 }
 
 .collapsible-panel .panel-header {
-    padding: 15px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .collapsible-panel .panel-content {
-    padding: 0 15px 15px;
+  padding: 0 15px 15px;
 }
 
 /* 3D Search Box */
 .search-3d {
-    background: rgba(255, 255, 255, 0.15);
-    border: none;
-    border-radius: 30px;
-    padding: 12px 20px;
-    color: white;
-    width: 100%;
-    font-size: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 30px;
+  padding: 12px 20px;
+  color: white;
+  width: 100%;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .search-3d:focus {
-    background: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 255, 255, 0.2);
-    outline: none;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    0 0 0 2px rgba(255, 255, 255, 0.2);
+  outline: none;
 }
 
 .search-3d::placeholder {
-    color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* 3D Buttons */
 .btn-3d {
-    background: linear-gradient(145deg, rgba(32, 112, 210, 0.7), rgba(32, 112, 210, 0.9));
-    border: none;
-    border-radius: 30px;
-    color: white;
-    padding: 12px 25px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 -2px 0px rgba(255, 255, 255, 0.15) inset;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+  background: linear-gradient(
+    145deg,
+    rgba(32, 112, 210, 0.7),
+    rgba(32, 112, 210, 0.9)
+  );
+  border: none;
+  border-radius: 30px;
+  color: white;
+  padding: 12px 25px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    0 -2px 0px rgba(255, 255, 255, 0.15) inset;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .btn-3d:hover {
-    background: linear-gradient(145deg, rgba(32, 112, 210, 0.8), rgba(32, 112, 210, 1));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3), 0 -2px 0px rgba(255, 255, 255, 0.15) inset;
+  background: linear-gradient(
+    145deg,
+    rgba(32, 112, 210, 0.8),
+    rgba(32, 112, 210, 1)
+  );
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 15px rgba(0, 0, 0, 0.3),
+    0 -2px 0px rgba(255, 255, 255, 0.15) inset;
 }
 
 .btn-3d:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 -1px 0px rgba(255, 255, 255, 0.15) inset;
+  transform: translateY(1px);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 -1px 0px rgba(255, 255, 255, 0.15) inset;
 }
 
 /* Toggle Switch */
 .toggle-switch-3d {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 30px;
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
 }
 
 .toggle-switch-3d input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 30px;
-    transition: .4s;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  transition: 0.4s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 22px;
-    width: 22px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    border-radius: 50%;
-    transition: .4s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 input:checked + .toggle-slider {
-    background: linear-gradient(145deg, rgba(32, 112, 210, 0.7), rgba(32, 112, 210, 0.9));
+  background: linear-gradient(
+    145deg,
+    rgba(32, 112, 210, 0.7),
+    rgba(32, 112, 210, 0.9)
+  );
 }
 
 input:checked + .toggle-slider:before {
-    transform: translateX(30px);
+  transform: translateX(30px);
 }
 
 /* Filter Chips */
 .filter-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 15px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
 }
 
 .filter-chip {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 30px;
-    padding: 6px 15px;
-    font-size: 0.875rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
+  padding: 6px 15px;
+  font-size: 0.875rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .filter-chip:hover {
-    background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .filter-chip.active {
-    background: linear-gradient(145deg, rgba(32, 112, 210, 0.7), rgba(32, 112, 210, 0.9));
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    145deg,
+    rgba(32, 112, 210, 0.7),
+    rgba(32, 112, 210, 0.9)
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .filter-chip i {
-    font-size: 0.8rem;
+  font-size: 0.8rem;
 }
 
 /* Control Sliders */
 .range-slider-3d {
-    width: 100%;
-    margin: 15px 0;
+  width: 100%;
+  margin: 15px 0;
 }
 
 .range-slider-3d .slider-container {
-    position: relative;
-    height: 30px;
-    display: flex;
-    align-items: center;
+  position: relative;
+  height: 30px;
+  display: flex;
+  align-items: center;
 }
 
 .range-slider-3d input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
-    outline: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  outline: none;
 }
 
 .range-slider-3d input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: white;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
 }
 
 .range-slider-3d input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.1);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
 }
 
 .range-slider-3d .value-display {
-    position: absolute;
-    right: 0;
-    top: -25px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.875rem;
-    font-weight: 500;
+  position: absolute;
+  right: 0;
+  top: -25px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 /* Immersive Cards Carousel */
 .immersive-carousel {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 20px;
-    z-index: 10;
-    padding: 0 60px;
-    pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  z-index: 10;
+  padding: 0 60px;
+  pointer-events: none;
 }
 
 .immersive-carousel-inner {
-    pointer-events: auto;
+  pointer-events: auto;
 }
 
 /* 3D District Cards */
 .district-card-3d {
-    background: rgba(25, 31, 45, 0.75);
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transform: scale(0.95) translateY(0);
+  background: rgba(25, 31, 45, 0.75);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transform: scale(0.95) translateY(0);
 }
 
 .district-card-3d:hover {
-    transform: scale(1) translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  transform: scale(1) translateY(-10px);
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
 }
 
 .district-card-3d .card-header {
-    position: relative;
-    height: 120px;
-    background-size: cover;
-    background-position: center;
-    padding: 15px;
-    display: flex;
-    align-items: flex-end;
+  position: relative;
+  height: 120px;
+  background-size: cover;
+  background-position: center;
+  padding: 15px;
+  display: flex;
+  align-items: flex-end;
 }
 
 .district-card-3d .card-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, transparent 20%, rgba(0, 0, 0, 0.8) 100%);
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 20%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  pointer-events: none;
 }
 
 .district-card-3d .card-header h3 {
-    color: white;
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    position: relative;
-    z-index: 1;
+  color: white;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
 }
 
 .district-card-3d .card-body {
-    color: rgba(255, 255, 255, 0.9);
-    padding: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 15px;
 }
 
 .district-card-3d .stat-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
 }
 
 .district-card-3d .stat-label {
-    color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .district-card-3d .stat-value {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .district-card-3d .card-footer {
-    padding: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .district-card-3d .btn-card {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 30px;
-    color: white;
-    padding: 8px 15px;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 30px;
+  color: white;
+  padding: 8px 15px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
 .district-card-3d .btn-card:hover {
-    background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .district-card-3d .btn-card.primary {
-    background: linear-gradient(145deg, rgba(32, 112, 210, 0.7), rgba(32, 112, 210, 0.9));
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    145deg,
+    rgba(32, 112, 210, 0.7),
+    rgba(32, 112, 210, 0.9)
+  );
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
 .district-card-3d .btn-card.primary:hover {
-    background: linear-gradient(145deg, rgba(32, 112, 210, 0.8), rgba(32, 112, 210, 1));
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(
+    145deg,
+    rgba(32, 112, 210, 0.8),
+    rgba(32, 112, 210, 1)
+  );
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Map Markers */
 .map-marker {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: rgba(32, 112, 210, 0.9);
-    border: 2px solid white;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(32, 112, 210, 0.9);
+  border: 2px solid white;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .map-marker:hover {
-    transform: scale(1.2);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  transform: scale(1.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
 .map-marker.active {
-    background: #ff5e00;
-    transform: scale(1.3);
+  background: #ff5e00;
+  transform: scale(1.3);
 }
 
 /* Popup Styles */
 .map-popup {
-    background: rgba(25, 31, 45, 0.9);
-    border-radius: 10px;
-    padding: 15px;
-    min-width: 200px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: white;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+  background: rgba(25, 31, 45, 0.9);
+  border-radius: 10px;
+  padding: 15px;
+  min-width: 200px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: white;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .map-popup h4 {
-    margin: 0 0 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .map-popup p {
-    margin: 0 0 8px;
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .map-popup .popup-footer {
-    margin-top: 12px;
-    display: flex;
-    justify-content: space-between;
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
 }
 
 /* View Toggle Button */
 .view-toggle-container {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 10;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
 }
 
 .view-toggle {
-    display: flex;
-    background: rgba(25, 31, 45, 0.75);
-    border-radius: 30px;
-    padding: 5px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  background: rgba(25, 31, 45, 0.75);
+  border-radius: 30px;
+  padding: 5px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .view-toggle button {
-    background: transparent;
-    border: none;
-    border-radius: 25px;
-    padding: 8px 15px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  border-radius: 25px;
+  padding: 8px 15px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
 .view-toggle button.active {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-    .map-header-panel,
-    .map-control-panel {
-        width: calc(100% - 40px);
-        max-width: none;
-    }
-    
-    .map-control-panel.top-right,
-    .map-control-panel.bottom-right {
-        right: 20px;
-        left: 20px;
-    }
-    
-    .immersive-carousel {
-        padding: 0 20px;
-    }
+  .map-header-panel,
+  .map-control-panel {
+    width: calc(100% - 40px);
+    max-width: none;
+  }
+
+  .map-control-panel.top-right,
+  .map-control-panel.bottom-right {
+    right: 20px;
+    left: 20px;
+  }
+
+  .immersive-carousel {
+    padding: 0 20px;
+  }
 }
 
 /* Animation for cards entrance */
 @keyframes cardEntrance {
-    from {
-        opacity: 0;
-        transform: scale(0.8) translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .district-card-animated {
-    animation: cardEntrance 0.6s ease forwards;
+  animation: cardEntrance 0.6s ease forwards;
 }

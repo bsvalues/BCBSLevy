@@ -1,172 +1,240 @@
-{% extends "base.html" %}
-
-{% block title %}Schedule Report{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Schedule Report{% endblock %} {%
+block content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('reports_dashboard') }}">Reports</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Schedule Report</li>
-                </ol>
-            </nav>
-            <h1 class="mb-3">Schedule Report</h1>
-            <p class="lead">Configure automatic report generation and delivery.</p>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('reports_dashboard') }}">Reports</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Schedule Report
+          </li>
+        </ol>
+      </nav>
+      <h1 class="mb-3">Schedule Report</h1>
+      <p class="lead">Configure automatic report generation and delivery.</p>
     </div>
+  </div>
 
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Schedule Configuration</h5>
-                </div>
-                <div class="card-body">
-                    <form action="{{ url_for('schedule_report_submit') }}" method="post">
-                        <div class="mb-3">
-                            <label for="template_id" class="form-label">Select Template</label>
-                            <select class="form-select" id="template_id" name="template_id" required>
-                                <option value="">Choose a report template</option>
-                                {% for template in templates %}
-                                <option value="{{ template.id }}" {% if selected_template and selected_template.id == template.id %}selected{% endif %}>
-                                    {{ template.name }} ({{ template.type|replace('_', ' ')|title }})
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div id="template-details" class="mb-3 {% if not selected_template %}d-none{% endif %}">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <p id="template-description">
-                                        {% if selected_template %}
-                                            {{ selected_template.description or 'No description provided.' }}
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Export Format</label>
-                            <div class="row">
-                                {% for format in export_formats %}
-                                <div class="col-md-6 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="export_format" id="format-{{ format.id }}" value="{{ format.id }}" {% if loop.first %}checked{% endif %}>
-                                        <label class="form-check-label" for="format-{{ format.id }}">
-                                            <i class="{{ format.icon }} me-2"></i> {{ format.name }}
-                                        </label>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="frequency" class="form-label">Schedule Frequency</label>
-                            <select class="form-select" id="frequency" name="frequency" required>
-                                <option value="">Select frequency</option>
-                                {% for frequency in frequencies %}
-                                <option value="{{ frequency.id }}">{{ frequency.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div id="day-selector" class="mb-3 d-none">
-                            <label for="day" class="form-label">Day of Week</label>
-                            <select class="form-select" id="day" name="day">
-                                {% for day in days_of_week %}
-                                <option value="{{ day.id }}">{{ day.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="time" class="form-label">Time of Day</label>
-                            <input type="time" class="form-control" id="time" name="time" value="08:00">
-                            <div class="form-text">The time when the report will be generated.</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="subject" class="form-label">Email Subject</label>
-                            <input type="text" class="form-control" id="subject" name="subject" placeholder="Report: [Report Name]">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="recipients" class="form-label">Recipients</label>
-                            <textarea class="form-control" id="recipients" name="recipients" rows="3" placeholder="email@example.com, another@example.com"></textarea>
-                            <div class="form-text">Enter email addresses separated by commas or semicolons.</div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-calendar-check me-2"></i> Schedule Report
-                            </button>
-                            <a href="{{ url_for('reports_dashboard') }}" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Schedule Configuration</h5>
+        </div>
+        <div class="card-body">
+          <form action="{{ url_for('schedule_report_submit') }}" method="post">
+            <div class="mb-3">
+              <label for="template_id" class="form-label"
+                >Select Template</label
+              >
+              <select
+                class="form-select"
+                id="template_id"
+                name="template_id"
+                required
+              >
+                <option value="">Choose a report template</option>
+                {% for template in templates %}
+                <option
+                  value="{{ template.id }}"
+                  {%
+                  if
+                  selected_template
+                  and
+                  selected_template.id=""
+                  ="template.id"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ template.name }} ({{ template.type|replace('_', ' ')|title
+                  }})
+                </option>
+                {% endfor %}
+              </select>
             </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
 
-{% block scripts %}
+            <div
+              id="template-details"
+              class="mb-3 {% if not selected_template %}d-none{% endif %}"
+            >
+              <div class="card bg-light">
+                <div class="card-body">
+                  <p id="template-description">
+                    {% if selected_template %} {{ selected_template.description
+                    or 'No description provided.' }} {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Export Format</label>
+              <div class="row">
+                {% for format in export_formats %}
+                <div class="col-md-6 mb-2">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="export_format"
+                      id="format-{{ format.id }}"
+                      value="{{ format.id }}"
+                      {%
+                      if
+                      loop.first
+                      %}checked{%
+                      endif
+                      %}
+                    />
+                    <label
+                      class="form-check-label"
+                      for="format-{{ format.id }}"
+                    >
+                      <i class="{{ format.icon }} me-2"></i> {{ format.name }}
+                    </label>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="frequency" class="form-label"
+                >Schedule Frequency</label
+              >
+              <select
+                class="form-select"
+                id="frequency"
+                name="frequency"
+                required
+              >
+                <option value="">Select frequency</option>
+                {% for frequency in frequencies %}
+                <option value="{{ frequency.id }}">{{ frequency.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div id="day-selector" class="mb-3 d-none">
+              <label for="day" class="form-label">Day of Week</label>
+              <select class="form-select" id="day" name="day">
+                {% for day in days_of_week %}
+                <option value="{{ day.id }}">{{ day.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="time" class="form-label">Time of Day</label>
+              <input
+                type="time"
+                class="form-control"
+                id="time"
+                name="time"
+                value="08:00"
+              />
+              <div class="form-text">
+                The time when the report will be generated.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="subject" class="form-label">Email Subject</label>
+              <input
+                type="text"
+                class="form-control"
+                id="subject"
+                name="subject"
+                placeholder="Report: [Report Name]"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="recipients" class="form-label">Recipients</label>
+              <textarea
+                class="form-control"
+                id="recipients"
+                name="recipients"
+                rows="3"
+                placeholder="email@example.com, another@example.com"
+              ></textarea>
+              <div class="form-text">
+                Enter email addresses separated by commas or semicolons.
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-calendar-check me-2"></i> Schedule Report
+              </button>
+              <a
+                href="{{ url_for('reports_dashboard') }}"
+                class="btn btn-secondary"
+                >Cancel</a
+              >
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Template selection
-        const templateSelect = document.getElementById('template_id');
-        const templateDetails = document.getElementById('template-details');
-        const templateDescription = document.getElementById('template-description');
-        
-        // Template data
-        const templates = {
-            {% for template in templates %}
-            "{{ template.id }}": {
-                name: "{{ template.name }}",
-                description: "{{ template.description or 'No description provided.' }}"
-            }{% if not loop.last %},{% endif %}
-            {% endfor %}
-        };
-        
-        // Schedule frequency
-        const frequencySelect = document.getElementById('frequency');
-        const daySelector = document.getElementById('day-selector');
-        
-        // Handle template selection change
-        templateSelect.addEventListener('change', function() {
-            const templateId = this.value;
-            
-            if (templateId && templates[templateId]) {
-                // Update template details
-                templateDescription.textContent = templates[templateId].description;
-                
-                // Show template details
-                templateDetails.classList.remove('d-none');
-                
-                // Update subject field with template name
-                const subjectField = document.getElementById('subject');
-                if (!subjectField.value) {
-                    subjectField.value = `Report: ${templates[templateId].name}`;
-                }
-            } else {
-                // Hide template details if no template selected
-                templateDetails.classList.add('d-none');
-            }
-        });
-        
-        // Handle frequency selection change
-        frequencySelect.addEventListener('change', function() {
-            if (this.value === 'weekly') {
-                daySelector.classList.remove('d-none');
-            } else {
-                daySelector.classList.add('d-none');
-            }
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      // Template selection
+      const templateSelect = document.getElementById('template_id');
+      const templateDetails = document.getElementById('template-details');
+      const templateDescription = document.getElementById('template-description');
+
+      // Template data
+      const templates = {
+          {% for template in templates %}
+          "{{ template.id }}": {
+              name: "{{ template.name }}",
+              description: "{{ template.description or 'No description provided.' }}"
+          }{% if not loop.last %},{% endif %}
+          {% endfor %}
+      };
+
+      // Schedule frequency
+      const frequencySelect = document.getElementById('frequency');
+      const daySelector = document.getElementById('day-selector');
+
+      // Handle template selection change
+      templateSelect.addEventListener('change', function() {
+          const templateId = this.value;
+
+          if (templateId && templates[templateId]) {
+              // Update template details
+              templateDescription.textContent = templates[templateId].description;
+
+              // Show template details
+              templateDetails.classList.remove('d-none');
+
+              // Update subject field with template name
+              const subjectField = document.getElementById('subject');
+              if (!subjectField.value) {
+                  subjectField.value = `Report: ${templates[templateId].name}`;
+              }
+          } else {
+              // Hide template details if no template selected
+              templateDetails.classList.add('d-none');
+          }
+      });
+
+      // Handle frequency selection change
+      frequencySelect.addEventListener('change', function() {
+          if (this.value === 'weekly') {
+              daySelector.classList.remove('d-none');
+          } else {
+              daySelector.classList.add('d-none');
+          }
+      });
+  });
 </script>
 {% endblock %}

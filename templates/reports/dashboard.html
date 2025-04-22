@@ -1,162 +1,208 @@
-{% extends "base.html" %}
-
-{% block title %}Reports Dashboard{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Reports Dashboard{% endblock %} {%
+block content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="mb-3">Reports Dashboard</h1>
-            <p class="lead">Create, manage, and export custom property tax reports.</p>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="mb-3">Reports Dashboard</h1>
+      <p class="lead">
+        Create, manage, and export custom property tax reports.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Report Options</h5>
         </div>
+        <div class="card-body">
+          <div class="d-grid gap-3">
+            <a
+              href="{{ url_for('report_generator') }}"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-file-earmark-text me-2"></i> Generate Report
+            </a>
+            <a
+              href="{{ url_for('report_templates') }}"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-list-check me-2"></i> Manage Templates
+            </a>
+            <a
+              href="{{ url_for('new_report_template') }}"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-plus-circle me-2"></i> Create New Template
+            </a>
+            <a
+              href="{{ url_for('schedule_report_form') }}"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-calendar-event me-2"></i> Schedule Reports
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Report Options</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-3">
-                        <a href="{{ url_for('report_generator') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-file-earmark-text me-2"></i> Generate Report
-                        </a>
-                        <a href="{{ url_for('report_templates') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-list-check me-2"></i> Manage Templates
-                        </a>
-                        <a href="{{ url_for('new_report_template') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-plus-circle me-2"></i> Create New Template
-                        </a>
-                        <a href="{{ url_for('schedule_report_form') }}" class="btn btn-outline-primary">
-                            <i class="bi bi-calendar-event me-2"></i> Schedule Reports
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <div class="col-md-8 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Recent Exports</h5>
         </div>
+        <div class="card-body">
+          {% if recent_exports %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Filename</th>
+                  <th>Date</th>
+                  <th>Records</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for export in recent_exports %}
+                <tr>
+                  <td>{{ export.filename }}</td>
+                  <td>{{ export.export_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>{{ export.rows_exported }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i
+              class="bi bi-file-earmark-arrow-down text-muted"
+              style="font-size: 3rem"
+            ></i>
+            <p class="mt-3 text-muted">
+              No recent exports found. Generate a report to see it here.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="col-md-8 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Recent Exports</h5>
-                </div>
-                <div class="card-body">
-                    {% if recent_exports %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Filename</th>
-                                    <th>Date</th>
-                                    <th>Records</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for export in recent_exports %}
-                                <tr>
-                                    <td>{{ export.filename }}</td>
-                                    <td>{{ export.export_date.strftime('%Y-%m-%d %H:%M') }}</td>
-                                    <td>{{ export.rows_exported }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4">
-                        <i class="bi bi-file-earmark-arrow-down text-muted" style="font-size: 3rem;"></i>
-                        <p class="mt-3 text-muted">No recent exports found. Generate a report to see it here.</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+  <div class="row mb-4">
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Templates by Type</h5>
         </div>
+        <div class="card-body">
+          {% if templates %}
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card bg-light mb-3">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Property</h6>
+                  <p class="card-text fs-3">
+                    {{ templates|selectattr('type', 'equalto',
+                    'property')|list|length }}
+                  </p>
+                  <a
+                    href="{{ url_for('report_templates', type='property') }}"
+                    class="btn btn-sm btn-outline-primary"
+                    >View</a
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light mb-3">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Tax Code</h6>
+                  <p class="card-text fs-3">
+                    {{ templates|selectattr('type', 'equalto',
+                    'tax_code')|list|length }}
+                  </p>
+                  <a
+                    href="{{ url_for('report_templates', type='tax_code') }}"
+                    class="btn btn-sm btn-outline-primary"
+                    >View</a
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light mb-3">
+                <div class="card-body text-center">
+                  <h6 class="card-title">District</h6>
+                  <p class="card-text fs-3">
+                    {{ templates|selectattr('type', 'equalto',
+                    'district')|list|length }}
+                  </p>
+                  <a
+                    href="{{ url_for('report_templates', type='district') }}"
+                    class="btn btn-sm btn-outline-primary"
+                    >View</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <i
+              class="bi bi-file-earmark-ruled text-muted"
+              style="font-size: 3rem"
+            ></i>
+            <p class="mt-3 text-muted">
+              No templates found. Create a report template to get started.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Templates by Type</h5>
-                </div>
-                <div class="card-body">
-                    {% if templates %}
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card bg-light mb-3">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Property</h6>
-                                    <p class="card-text fs-3">{{ templates|selectattr('type', 'equalto', 'property')|list|length }}</p>
-                                    <a href="{{ url_for('report_templates', type='property') }}" class="btn btn-sm btn-outline-primary">View</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-light mb-3">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Tax Code</h6>
-                                    <p class="card-text fs-3">{{ templates|selectattr('type', 'equalto', 'tax_code')|list|length }}</p>
-                                    <a href="{{ url_for('report_templates', type='tax_code') }}" class="btn btn-sm btn-outline-primary">View</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card bg-light mb-3">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">District</h6>
-                                    <p class="card-text fs-3">{{ templates|selectattr('type', 'equalto', 'district')|list|length }}</p>
-                                    <a href="{{ url_for('report_templates', type='district') }}" class="btn btn-sm btn-outline-primary">View</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4">
-                        <i class="bi bi-file-earmark-ruled text-muted" style="font-size: 3rem;"></i>
-                        <p class="mt-3 text-muted">No templates found. Create a report template to get started.</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Database Statistics</h5>
         </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Database Statistics</h5>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card bg-light mb-3">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Properties</h6>
+                  <p class="card-text fs-3">
+                    {{ property_count|default('0')|number_format }}
+                  </p>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card bg-light mb-3">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Properties</h6>
-                                    <p class="card-text fs-3">{{ property_count|default('0')|number_format }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card bg-light mb-3">
-                                <div class="card-body text-center">
-                                    <h6 class="card-title">Tax Codes</h6>
-                                    <p class="card-text fs-3">{{ tax_code_count|default('0')|number_format }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <p class="mb-2">Available data for reporting:</p>
-                        <ul>
-                            <li>Property values and tax rates</li>
-                            <li>Historical tax code information</li>
-                            <li>District aggregations</li>
-                            <li>Year-over-year comparisons</li>
-                        </ul>
-                    </div>
-                </div>
+              </div>
             </div>
+            <div class="col-md-6">
+              <div class="card bg-light mb-3">
+                <div class="card-body text-center">
+                  <h6 class="card-title">Tax Codes</h6>
+                  <p class="card-text fs-3">
+                    {{ tax_code_count|default('0')|number_format }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <p class="mb-2">Available data for reporting:</p>
+            <ul>
+              <li>Property values and tax rates</li>
+              <li>Historical tax code information</li>
+              <li>District aggregations</li>
+              <li>Year-over-year comparisons</li>
+            </ul>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

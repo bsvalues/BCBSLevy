@@ -1,133 +1,177 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-bs-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Benton County Property Tax Portal{% endblock %}</title>
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}Benton County Property Tax Portal{% endblock %}
+    </title>
+
     <!-- Bootstrap CSS (Dark Theme) -->
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    
+    <link
+      href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css"
+      rel="stylesheet"
+    />
+
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+
     <!-- Custom CSS for Public Portal -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}">
-    
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/public.css') }}"
+    />
+
     <!-- Custom CSS for Tooltips -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tooltip.css') }}">
-    
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/tooltip.css') }}"
+    />
+
     <!-- jQuery for AJAX calls and tooltips -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     {% block head_extras %}{% endblock %}
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('public_portal_home') }}">
-                <i class="bi bi-house-fill me-2"></i>
-                Benton County Property Tax Portal
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == url_for('public_portal_home') %}active{% endif %}" 
-                           href="{{ url_for('public_portal_home') }}">
-                            <i class="bi bi-house me-1"></i> Home
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == url_for('public_property_lookup') %}active{% endif %}" 
-                           href="{{ url_for('public_property_lookup') }}">
-                            <i class="bi bi-search me-1"></i> Property Lookup
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == url_for('public_tax_resources') %}active{% endif %}" 
-                           href="{{ url_for('public_tax_resources') }}">
-                            <i class="bi bi-info-circle me-1"></i> Tax Resources
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == url_for('public_glossary') %}active{% endif %}" 
-                           href="{{ url_for('public_glossary') }}">
-                            <i class="bi bi-book me-1"></i> Glossary
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home.index') }}">
-                            <i class="bi bi-shield-lock me-1"></i> Assessor Login
-                        </a>
-                    </li>
-                </ul>
-            </div>
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('public_portal_home') }}">
+          <i class="bi bi-house-fill me-2"></i>
+          Benton County Property Tax Portal
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == url_for('public_portal_home') %}active{% endif %}"
+                href="{{ url_for('public_portal_home') }}"
+              >
+                <i class="bi bi-house me-1"></i> Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == url_for('public_property_lookup') %}active{% endif %}"
+                href="{{ url_for('public_property_lookup') }}"
+              >
+                <i class="bi bi-search me-1"></i> Property Lookup
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == url_for('public_tax_resources') %}active{% endif %}"
+                href="{{ url_for('public_tax_resources') }}"
+              >
+                <i class="bi bi-info-circle me-1"></i> Tax Resources
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == url_for('public_glossary') %}active{% endif %}"
+                href="{{ url_for('public_glossary') }}"
+              >
+                <i class="bi bi-book me-1"></i> Glossary
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('home.index') }}">
+                <i class="bi bi-shield-lock me-1"></i> Assessor Login
+              </a>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
 
     <!-- Main content container -->
     <div class="container mb-5">
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <!-- Page content -->
-        {% block content %}{% endblock %}
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="alert alert-{{ category }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <!-- Page content -->
+      {% block content %}{% endblock %}
     </div>
 
     <!-- Back to top button, visible on mobile -->
-    <button id="back-to-top-btn" class="btn btn-primary rounded-circle" aria-label="Back to top">
-        <i class="bi bi-arrow-up"></i>
+    <button
+      id="back-to-top-btn"
+      class="btn btn-primary rounded-circle"
+      aria-label="Back to top"
+    >
+      <i class="bi bi-arrow-up"></i>
     </button>
 
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-dark">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="text-muted mb-0">&copy; {{ now.year }} Benton County Assessor's Office</p>
-                </div>
-                <div class="col-md-6 text-md-end text-center mt-2 mt-md-0">
-                    <a href="#" class="text-muted me-3">Privacy Policy</a>
-                    <a href="#" class="text-muted me-3">Terms of Use</a>
-                    <a href="{{ url_for('public_glossary') }}" class="text-muted">Glossary</a>
-                </div>
-            </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="text-muted mb-0">
+              &copy; {{ now.year }} Benton County Assessor's Office
+            </p>
+          </div>
+          <div class="col-md-6 text-md-end text-center mt-2 mt-md-0">
+            <a href="#" class="text-muted me-3">Privacy Policy</a>
+            <a href="#" class="text-muted me-3">Terms of Use</a>
+            <a href="{{ url_for('public_glossary') }}" class="text-muted"
+              >Glossary</a
+            >
+          </div>
         </div>
+      </div>
     </footer>
 
     <!-- Custom JS for Public Portal -->
     <script src="{{ url_for('static', filename='js/public.js') }}"></script>
-    
+
     <!-- Initialize tooltips -->
     <script>
-        $(function () {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl, {
-                    html: true
-                })
-            })
+      $(function () {
+        var tooltipTriggerList = [].slice.call(
+          document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+        );
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl, {
+            html: true,
+          });
         });
+      });
     </script>
-    
+
     {% block scripts %}{% endblock %}
-</body>
+  </body>
 </html>

@@ -1,193 +1,221 @@
-{% extends 'simple_base.html' %}
-
-{% block title %}Tax Terminology Glossary - Benton County Property Tax Portal{% endblock %}
-
-{% block page_title %}Property Tax Glossary{% endblock %}
-{% block page_subtitle %}Understanding property tax terminology to help you navigate your property taxes{% endblock %}
-
-{% block content %}
+{% extends 'simple_base.html' %} {% block title %}Tax Terminology Glossary -
+Benton County Property Tax Portal{% endblock %} {% block page_title %}Property
+Tax Glossary{% endblock %} {% block page_subtitle %}Understanding property tax
+terminology to help you navigate your property taxes{% endblock %} {% block
+content %}
 <div class="container py-4">
-    <!-- Introduction -->
-    <div class="row mb-5">
-        <div class="col-lg-8 mx-auto">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body p-4">
-                    <h2 class="h4 mb-3">About This Glossary</h2>
-                    <p>This glossary provides definitions for common property tax terms used in Benton County. Understanding these terms can help you better comprehend your property tax bill and the factors that affect your property taxes.</p>
-                    <p class="mb-0">If you have questions about a term not listed here or need further clarification, please <a href="#" class="text-decoration-none">contact the Assessor's Office</a>.</p>
-                </div>
-            </div>
+  <!-- Introduction -->
+  <div class="row mb-5">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h2 class="h4 mb-3">About This Glossary</h2>
+          <p>
+            This glossary provides definitions for common property tax terms
+            used in Benton County. Understanding these terms can help you better
+            comprehend your property tax bill and the factors that affect your
+            property taxes.
+          </p>
+          <p class="mb-0">
+            If you have questions about a term not listed here or need further
+            clarification, please
+            <a href="#" class="text-decoration-none"
+              >contact the Assessor's Office</a
+            >.
+          </p>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Quick Reference Terms -->
-    <div class="row mb-5">
-        <div class="col-lg-8 mx-auto">
-            <h2 class="h3 mb-4">Frequently Used Terms</h2>
-            <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
-                {% for term, definition in frequently_used_terms %}
-                <div class="col">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h3 class="h5 card-title text-primary">{{ term }}</h3>
-                            <p class="card-text">{{ definition }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+  <!-- Quick Reference Terms -->
+  <div class="row mb-5">
+    <div class="col-lg-8 mx-auto">
+      <h2 class="h3 mb-4">Frequently Used Terms</h2>
+      <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        {% for term, definition in frequently_used_terms %}
+        <div class="col">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <h3 class="h5 card-title text-primary">{{ term }}</h3>
+              <p class="card-text">{{ definition }}</p>
             </div>
+          </div>
         </div>
+        {% endfor %}
+      </div>
     </div>
+  </div>
 
-    <!-- Alphabetical Index -->
-    <div class="row mb-4">
-        <div class="col-lg-8 mx-auto">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light">
-                    <h2 class="h4 mb-0">Term Index</h2>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex flex-wrap justify-content-center">
-                        {% for letter in alphabetical_terms.keys()|sort %}
-                        <a href="#letter-{{ letter }}" class="btn btn-outline-primary m-1">{{ letter }}</a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+  <!-- Alphabetical Index -->
+  <div class="row mb-4">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+          <h2 class="h4 mb-0">Term Index</h2>
         </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap justify-content-center">
+            {% for letter in alphabetical_terms.keys()|sort %}
+            <a href="#letter-{{ letter }}" class="btn btn-outline-primary m-1"
+              >{{ letter }}</a
+            >
+            {% endfor %}
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Alphabetical Terms -->
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            {% for letter, terms in alphabetical_terms.items()|sort %}
-            <div class="card border-0 shadow-sm mb-4" id="letter-{{ letter }}">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="h3 mb-0">{{ letter }}</h2>
+  <!-- Alphabetical Terms -->
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      {% for letter, terms in alphabetical_terms.items()|sort %}
+      <div class="card border-0 shadow-sm mb-4" id="letter-{{ letter }}">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h3 mb-0">{{ letter }}</h2>
+        </div>
+        <div class="card-body p-0">
+          <div class="accordion" id="accordion-{{ letter }}">
+            {% for term_obj in terms %}
+            <div class="accordion-item border-0 border-bottom">
+              <h3 class="accordion-header">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapse-{{ letter }}-{{ loop.index }}"
+                  aria-expanded="false"
+                  aria-controls="collapse-{{ letter }}-{{ loop.index }}"
+                >
+                  {{ term_obj.term }}
+                </button>
+              </h3>
+              <div
+                id="collapse-{{ letter }}-{{ loop.index }}"
+                class="accordion-collapse collapse"
+                data-bs-parent="#accordion-{{ letter }}"
+              >
+                <div class="accordion-body">
+                  <p>{{ term_obj.definition }}</p>
+                  {% if term_obj.example is defined %}
+                  <div class="bg-light p-3 rounded">
+                    <p class="mb-0">
+                      <strong>Example:</strong> {{ term_obj.example }}
+                    </p>
+                  </div>
+                  {% endif %}
                 </div>
-                <div class="card-body p-0">
-                    <div class="accordion" id="accordion-{{ letter }}">
-                        {% for term_obj in terms %}
-                        <div class="accordion-item border-0 border-bottom">
-                            <h3 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ letter }}-{{ loop.index }}" aria-expanded="false" aria-controls="collapse-{{ letter }}-{{ loop.index }}">
-                                    {{ term_obj.term }}
-                                </button>
-                            </h3>
-                            <div id="collapse-{{ letter }}-{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ letter }}">
-                                <div class="accordion-body">
-                                    <p>{{ term_obj.definition }}</p>
-                                    {% if term_obj.example is defined %}
-                                    <div class="bg-light p-3 rounded">
-                                        <p class="mb-0"><strong>Example:</strong> {{ term_obj.example }}</p>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="card-footer text-end bg-white">
-                    <a href="#" class="text-decoration-none">
-                        <i class="bi bi-arrow-up"></i> Back to Top
-                    </a>
-                </div>
+              </div>
             </div>
             {% endfor %}
+          </div>
         </div>
+        <div class="card-footer text-end bg-white">
+          <a href="#" class="text-decoration-none">
+            <i class="bi bi-arrow-up"></i> Back to Top
+          </a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
+  </div>
 
-    <!-- Additional Resources -->
-    <div class="row mb-5">
-        <div class="col-lg-8 mx-auto">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <h2 class="h4 mb-3">Additional Resources</h2>
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0">
-                                    <i class="bi bi-file-earmark-text text-primary fs-3"></i>
-                                </div>
-                                <div class="ms-3">
-                                    <h3 class="h6 mb-2">Washington State Property Tax Guide</h3>
-                                    <p class="small mb-0">A comprehensive guide to property taxes in Washington state.</p>
-                                    <a href="#" class="btn btn-sm btn-outline-primary mt-2">Download PDF</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex">
-                                <div class="flex-shrink-0">
-                                    <i class="bi bi-journal-text text-primary fs-3"></i>
-                                </div>
-                                <div class="ms-3">
-                                    <h3 class="h6 mb-2">Property Tax FAQs</h3>
-                                    <p class="small mb-0">Answers to common questions about property taxes in Benton County.</p>
-                                    <a href="#" class="btn btn-sm btn-outline-primary mt-2">View FAQs</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  <!-- Additional Resources -->
+  <div class="row mb-5">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h4 mb-3">Additional Resources</h2>
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="bi bi-file-earmark-text text-primary fs-3"></i>
                 </div>
+                <div class="ms-3">
+                  <h3 class="h6 mb-2">Washington State Property Tax Guide</h3>
+                  <p class="small mb-0">
+                    A comprehensive guide to property taxes in Washington state.
+                  </p>
+                  <a href="#" class="btn btn-sm btn-outline-primary mt-2"
+                    >Download PDF</a
+                  >
+                </div>
+              </div>
             </div>
+            <div class="col-md-6">
+              <div class="d-flex">
+                <div class="flex-shrink-0">
+                  <i class="bi bi-journal-text text-primary fs-3"></i>
+                </div>
+                <div class="ms-3">
+                  <h3 class="h6 mb-2">Property Tax FAQs</h3>
+                  <p class="small mb-0">
+                    Answers to common questions about property taxes in Benton
+                    County.
+                  </p>
+                  <a href="#" class="btn btn-sm btn-outline-primary mt-2"
+                    >View FAQs</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Don't interfere with accordion links
-                if (this.classList.contains('accordion-button')) {
-                    return;
-                }
-                
-                const targetId = this.getAttribute('href');
-                
-                if (targetId === '#') {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                } else {
-                    document.querySelector(targetId).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-    });
-</script>
-{% endblock %}
+  document.addEventListener("DOMContentLoaded", function () {
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
 
-{% block extra_css %}
+        // Don't interfere with accordion links
+        if (this.classList.contains("accordion-button")) {
+          return;
+        }
+
+        const targetId = this.getAttribute("href");
+
+        if (targetId === "#") {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        } else {
+          document.querySelector(targetId).scrollIntoView({
+            behavior: "smooth",
+          });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %} {% block extra_css %}
 <style>
-    /* Custom styles for glossary */
-    .accordion-button:not(.collapsed) {
-        background-color: rgba(var(--bs-primary-rgb), 0.1);
-        color: var(--bs-primary);
-    }
-    
-    .accordion-button:focus {
-        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
-    }
-    
-    /* Style for back-to-top link */
-    .card-footer a:hover {
-        text-decoration: underline !important;
-    }
-    
-    /* Custom styling for letter index buttons */
-    .btn-outline-primary {
-        min-width: 2.5rem;
-    }
+  /* Custom styles for glossary */
+  .accordion-button:not(.collapsed) {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+  }
+
+  .accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+  }
+
+  /* Style for back-to-top link */
+  .card-footer a:hover {
+    text-decoration: underline !important;
+  }
+
+  /* Custom styling for letter index buttons */
+  .btn-outline-primary {
+    min-width: 2.5rem;
+  }
 </style>
 {% endblock %}

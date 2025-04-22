@@ -1,297 +1,335 @@
-{% extends "levy_audit/base_levy_audit.html" %}
-
-{% block title %}Levy Assistant - LevyMaster{% endblock %}
-
-{% block levy_audit_content %}
+{% extends "levy_audit/base_levy_audit.html" %} {% block title %}Levy Assistant
+- LevyMaster{% endblock %} {% block levy_audit_content %}
 <div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('levy_audit.index') }}">Levy Audit</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Levy Assistant</li>
-                </ol>
-            </nav>
-            
-            <h1 class="h2 mb-3">Levy Assistant</h1>
-            <p class="lead text-muted">
-                Ask questions and get expert guidance on property tax topics from Lev, your AI assistant.
-            </p>
+  <div class="row mb-4">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('levy_audit.index') }}">Levy Audit</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Levy Assistant
+          </li>
+        </ol>
+      </nav>
+
+      <h1 class="h2 mb-3">Levy Assistant</h1>
+      <p class="lead text-muted">
+        Ask questions and get expert guidance on property tax topics from Lev,
+        your AI assistant.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-3 mb-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-robot me-2"></i>About Lev
+          </h5>
         </div>
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <div class="audit-avatar mx-auto mb-3">
+              <i class="bi bi-robot"></i>
+            </div>
+            <h5 class="mb-0">Lev</h5>
+            <p class="text-muted mb-0">Property Tax Expert</p>
+          </div>
+
+          <p class="small">
+            Lev is an AI assistant specialized in property tax and levy topics,
+            with deep knowledge of regulations, calculations, and best
+            practices.
+          </p>
+
+          <h6 class="mt-4 mb-2">Capabilities</h6>
+          <ul class="small">
+            <li>Answer property tax questions</li>
+            <li>Explain levy laws and calculations</li>
+            <li>Provide guidance on compliance</li>
+            <li>Offer recommendations</li>
+            <li>Analyze historical trends</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-lightbulb me-2"></i>Sample Questions
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary text-start sample-question">
+              What is a levy rate?
+            </button>
+            <button class="btn btn-outline-primary text-start sample-question">
+              How are tax districts organized in WA?
+            </button>
+            <button class="btn btn-outline-primary text-start sample-question">
+              Explain 1% constitutional limit
+            </button>
+            <button class="btn btn-outline-primary text-start sample-question">
+              What are banked capacity requirements?
+            </button>
+            <button class="btn btn-outline-primary text-start sample-question">
+              How do I calculate effective tax rate?
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-3 mb-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-robot me-2"></i>About Lev
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-3">
-                        <div class="audit-avatar mx-auto mb-3">
-                            <i class="bi bi-robot"></i>
-                        </div>
-                        <h5 class="mb-0">Lev</h5>
-                        <p class="text-muted mb-0">Property Tax Expert</p>
-                    </div>
-                    
-                    <p class="small">
-                        Lev is an AI assistant specialized in property tax and levy topics, 
-                        with deep knowledge of regulations, calculations, and best practices.
-                    </p>
-                    
-                    <h6 class="mt-4 mb-2">Capabilities</h6>
-                    <ul class="small">
-                        <li>Answer property tax questions</li>
-                        <li>Explain levy laws and calculations</li>
-                        <li>Provide guidance on compliance</li>
-                        <li>Offer recommendations</li>
-                        <li>Analyze historical trends</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-lightbulb me-2"></i>Sample Questions
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary text-start sample-question">
-                            What is a levy rate?
-                        </button>
-                        <button class="btn btn-outline-primary text-start sample-question">
-                            How are tax districts organized in WA?
-                        </button>
-                        <button class="btn btn-outline-primary text-start sample-question">
-                            Explain 1% constitutional limit
-                        </button>
-                        <button class="btn btn-outline-primary text-start sample-question">
-                            What are banked capacity requirements?
-                        </button>
-                        <button class="btn btn-outline-primary text-start sample-question">
-                            How do I calculate effective tax rate?
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <div class="col-lg-9">
+      <div class="card shadow-sm">
+        <div
+          class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+        >
+          <h5 class="card-title mb-0">
+            <i class="bi bi-chat-square-text me-2"></i>Levy Assistant Chat
+          </h5>
+          <div>
+            <button
+              class="btn btn-sm btn-light"
+              id="clearChat"
+              title="Clear conversation"
+            >
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
         </div>
-        
-        <div class="col-lg-9">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-chat-square-text me-2"></i>Levy Assistant Chat
-                    </h5>
-                    <div>
-                        <button class="btn btn-sm btn-light" id="clearChat" title="Clear conversation">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
+        <div class="card-body p-0">
+          <!-- Chat Messages Container -->
+          <div class="chat-container" id="chatContainer">
+            {% if chat_history %} {% for message in chat_history %} {% if
+            message.role == 'user' %}
+            <div class="chat-message user">
+              <div class="d-flex align-items-start">
+                <div>
+                  <p class="mb-0">{{ message.content }}</p>
+                  <div class="mt-1 text-end">
+                    <small class="text-muted"
+                      >{{ message.timestamp.strftime('%H:%M') }}</small
+                    >
+                  </div>
                 </div>
-                <div class="card-body p-0">
-                    <!-- Chat Messages Container -->
-                    <div class="chat-container" id="chatContainer">
-                        {% if chat_history %}
-                            {% for message in chat_history %}
-                                {% if message.role == 'user' %}
-                                <div class="chat-message user">
-                                    <div class="d-flex align-items-start">
-                                        <div>
-                                            <p class="mb-0">{{ message.content }}</p>
-                                            <div class="mt-1 text-end">
-                                                <small class="text-muted">{{ message.timestamp.strftime('%H:%M') }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% else %}
-                                <div class="chat-message assistant">
-                                    <div class="d-flex align-items-start">
-                                        <div class="me-2 mt-1">
-                                            <div class="audit-avatar" style="width: 32px; height: 32px; font-size: 0.9rem;">
-                                                <i class="bi bi-robot"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="mb-0">{{ message.content }}</p>
-                                            <div class="mt-1">
-                                                <small class="text-white-50">{{ message.timestamp.strftime('%H:%M') }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <div class="chat-message assistant">
-                                <div class="d-flex align-items-start">
-                                    <div class="me-2 mt-1">
-                                        <div class="audit-avatar" style="width: 32px; height: 32px; font-size: 0.9rem;">
-                                            <i class="bi bi-robot"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0">Hello! I'm Lev, your property tax and levy expert assistant. How can I help you today?</p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Chat Input Form -->
-                    <div class="p-3 border-top">
-                        <form id="chatForm" method="POST" class="chat-form">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="userQuery" name="query" placeholder="Ask a question about property tax or levy..." required>
-                                <button class="btn btn-primary" type="submit">
-                                    <i class="bi bi-send"></i>
-                                </button>
-                            </div>
-                            <div class="form-text small text-muted mt-2">
-                                <i class="bi bi-info-circle me-1"></i> For district-specific questions, include the district name or ID in your query.
-                            </div>
-                        </form>
-                    </div>
-                </div>
+              </div>
             </div>
-            
-            <!-- Context Selection (Optional) -->
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0 d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-geo-alt me-2"></i>Set Context (Optional)</span>
-                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#contextCollapse" aria-expanded="false" aria-controls="contextCollapse">
-                            <i class="bi bi-chevron-down"></i>
-                        </button>
-                    </h5>
+            {% else %}
+            <div class="chat-message assistant">
+              <div class="d-flex align-items-start">
+                <div class="me-2 mt-1">
+                  <div
+                    class="audit-avatar"
+                    style="width: 32px; height: 32px; font-size: 0.9rem"
+                  >
+                    <i class="bi bi-robot"></i>
+                  </div>
                 </div>
-                <div class="collapse" id="contextCollapse">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="contextDistrict" class="form-label">Tax District</label>
-                                <select class="form-select" id="contextDistrict">
-                                    <option value="">None (General Questions)</option>
-                                    {% for district in districts %}
-                                    <option value="{{ district.id }}">{{ district.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="contextYear" class="form-label">Assessment Year</label>
-                                <select class="form-select" id="contextYear">
-                                    <option value="">Current Year</option>
-                                    {% for year in available_years %}
-                                    <option value="{{ year }}">{{ year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button id="applyContext" class="btn btn-sm btn-primary">
-                                <i class="bi bi-check-circle me-2"></i>Apply Context
-                            </button>
-                        </div>
-                    </div>
+                <div>
+                  <p class="mb-0">{{ message.content }}</p>
+                  <div class="mt-1">
+                    <small class="text-white-50"
+                      >{{ message.timestamp.strftime('%H:%M') }}</small
+                    >
+                  </div>
                 </div>
+              </div>
             </div>
+            {% endif %} {% endfor %} {% else %}
+            <div class="chat-message assistant">
+              <div class="d-flex align-items-start">
+                <div class="me-2 mt-1">
+                  <div
+                    class="audit-avatar"
+                    style="width: 32px; height: 32px; font-size: 0.9rem"
+                  >
+                    <i class="bi bi-robot"></i>
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-0">
+                    Hello! I'm Lev, your property tax and levy expert assistant.
+                    How can I help you today?
+                  </p>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Chat Input Form -->
+          <div class="p-3 border-top">
+            <form id="chatForm" method="POST" class="chat-form">
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="userQuery"
+                  name="query"
+                  placeholder="Ask a question about property tax or levy..."
+                  required
+                />
+                <button class="btn btn-primary" type="submit">
+                  <i class="bi bi-send"></i>
+                </button>
+              </div>
+              <div class="form-text small text-muted mt-2">
+                <i class="bi bi-info-circle me-1"></i> For district-specific
+                questions, include the district name or ID in your query.
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
+
+      <!-- Context Selection (Optional) -->
+      <div class="card shadow-sm mt-4">
+        <div class="card-header bg-light">
+          <h5
+            class="card-title mb-0 d-flex justify-content-between align-items-center"
+          >
+            <span
+              ><i class="bi bi-geo-alt me-2"></i>Set Context (Optional)</span
+            >
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#contextCollapse"
+              aria-expanded="false"
+              aria-controls="contextCollapse"
+            >
+              <i class="bi bi-chevron-down"></i>
+            </button>
+          </h5>
+        </div>
+        <div class="collapse" id="contextCollapse">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="contextDistrict" class="form-label"
+                  >Tax District</label
+                >
+                <select class="form-select" id="contextDistrict">
+                  <option value="">None (General Questions)</option>
+                  {% for district in districts %}
+                  <option value="{{ district.id }}">{{ district.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="contextYear" class="form-label"
+                  >Assessment Year</label
+                >
+                <select class="form-select" id="contextYear">
+                  <option value="">Current Year</option>
+                  {% for year in available_years %}
+                  <option value="{{ year }}">{{ year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="d-flex justify-content-end">
+              <button id="applyContext" class="btn btn-sm btn-primary">
+                <i class="bi bi-check-circle me-2"></i>Apply Context
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Sample question click
-        const sampleQuestions = document.querySelectorAll('.sample-question');
-        const userQueryInput = document.getElementById('userQuery');
-        const chatForm = document.getElementById('chatForm');
-        const clearChatBtn = document.getElementById('clearChat');
-        
-        sampleQuestions.forEach(btn => {
-            btn.addEventListener('click', function() {
-                userQueryInput.value = this.textContent.trim();
-                userQueryInput.focus();
-            });
-        });
-        
-        // Clear chat
-        clearChatBtn.addEventListener('click', function() {
-            if (confirm('This will clear your conversation history. Continue?')) {
-                fetch('{{ url_for("levy_audit.levy_assistant") }}?clear=true', {
-                    method: 'GET'
-                })
-                .then(() => window.location.reload());
-            }
-        });
-        
-        // Apply context
-        const applyContextBtn = document.getElementById('applyContext');
-        const contextDistrict = document.getElementById('contextDistrict');
-        const contextYear = document.getElementById('contextYear');
-        
-        if (applyContextBtn) {
-            applyContextBtn.addEventListener('click', function() {
-                const district = contextDistrict.value;
-                const year = contextYear.value;
-                
-                // Add hidden fields to the form
-                let districtField = document.getElementById('contextDistrictHidden');
-                if (!districtField) {
-                    districtField = document.createElement('input');
-                    districtField.type = 'hidden';
-                    districtField.id = 'contextDistrictHidden';
-                    districtField.name = 'district_id';
-                    chatForm.appendChild(districtField);
-                }
-                districtField.value = district;
-                
-                let yearField = document.getElementById('contextYearHidden');
-                if (!yearField) {
-                    yearField = document.createElement('input');
-                    yearField.type = 'hidden';
-                    yearField.id = 'contextYearHidden';
-                    yearField.name = 'year';
-                    chatForm.appendChild(yearField);
-                }
-                yearField.value = year;
-                
-                // Show success toast
-                const toast = document.createElement('div');
-                toast.className = 'position-fixed top-0 end-0 p-3';
-                toast.style.zIndex = '9999';
-                toast.innerHTML = `
+  document.addEventListener("DOMContentLoaded", function () {
+    // Sample question click
+    const sampleQuestions = document.querySelectorAll(".sample-question");
+    const userQueryInput = document.getElementById("userQuery");
+    const chatForm = document.getElementById("chatForm");
+    const clearChatBtn = document.getElementById("clearChat");
+
+    sampleQuestions.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        userQueryInput.value = this.textContent.trim();
+        userQueryInput.focus();
+      });
+    });
+
+    // Clear chat
+    clearChatBtn.addEventListener("click", function () {
+      if (confirm("This will clear your conversation history. Continue?")) {
+        fetch('{{ url_for("levy_audit.levy_assistant") }}?clear=true', {
+          method: "GET",
+        }).then(() => window.location.reload());
+      }
+    });
+
+    // Apply context
+    const applyContextBtn = document.getElementById("applyContext");
+    const contextDistrict = document.getElementById("contextDistrict");
+    const contextYear = document.getElementById("contextYear");
+
+    if (applyContextBtn) {
+      applyContextBtn.addEventListener("click", function () {
+        const district = contextDistrict.value;
+        const year = contextYear.value;
+
+        // Add hidden fields to the form
+        let districtField = document.getElementById("contextDistrictHidden");
+        if (!districtField) {
+          districtField = document.createElement("input");
+          districtField.type = "hidden";
+          districtField.id = "contextDistrictHidden";
+          districtField.name = "district_id";
+          chatForm.appendChild(districtField);
+        }
+        districtField.value = district;
+
+        let yearField = document.getElementById("contextYearHidden");
+        if (!yearField) {
+          yearField = document.createElement("input");
+          yearField.type = "hidden";
+          yearField.id = "contextYearHidden";
+          yearField.name = "year";
+          chatForm.appendChild(yearField);
+        }
+        yearField.value = year;
+
+        // Show success toast
+        const toast = document.createElement("div");
+        toast.className = "position-fixed top-0 end-0 p-3";
+        toast.style.zIndex = "9999";
+        toast.innerHTML = `
                     <div class="toast show bg-success text-white" role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="toast-header bg-success text-white">
                             <strong class="me-auto">Context Applied</strong>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
                         <div class="toast-body">
-                            Context set to: ${district ? 'District #'+district : 'Any District'}, 
-                            ${year ? 'Year '+year : 'Current Year'}
+                            Context set to: ${district ? "District #" + district : "Any District"}, 
+                            ${year ? "Year " + year : "Current Year"}
                         </div>
                     </div>
                 `;
-                document.body.appendChild(toast);
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
-                
-                // Collapse the context panel
-                const contextCollapse = document.getElementById('contextCollapse');
-                const bsCollapse = new bootstrap.Collapse(contextCollapse, {
-                    toggle: false
-                });
-                bsCollapse.hide();
-            });
-        }
-    });
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          toast.remove();
+        }, 3000);
+
+        // Collapse the context panel
+        const contextCollapse = document.getElementById("contextCollapse");
+        const bsCollapse = new bootstrap.Collapse(contextCollapse, {
+          toggle: false,
+        });
+        bsCollapse.hide();
+      });
+    }
+  });
 </script>
 {% endblock %}

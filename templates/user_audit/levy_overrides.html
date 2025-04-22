@@ -1,499 +1,722 @@
-{% extends "base.html" %}
-
-{% block title %}Levy Override Management{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Levy Override Management{% endblock
+%} {% block content %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Levy Override Management</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('user_audit.index') }}">User Audit</a></li>
-        <li class="breadcrumb-item active">Levy Overrides</li>
-    </ol>
-    
-    <!-- Filter Card -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-filter me-1"></i>
-            Filter Options
-        </div>
-        <div class="card-body">
-            <form method="get" action="{{ url_for('user_audit.levy_overrides') }}" id="filterForm">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label for="user_id" class="form-label">User</label>
-                        <select class="form-select" id="user_id" name="user_id">
-                            <option value="">All Users</option>
-                            {% for user in users %}
-                            <option value="{{ user.id }}" {% if selected_user_id == user.id %}selected{% endif %}>
-                                {{ user.username }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="tax_district_id" class="form-label">Tax District</label>
-                        <select class="form-select" id="tax_district_id" name="tax_district_id">
-                            <option value="">All Districts</option>
-                            {% for district in districts %}
-                            <option value="{{ district.id }}" {% if selected_tax_district_id == district.id %}selected{% endif %}>
-                                {{ district.district_name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select class="form-select" id="status" name="status">
-                            <option value="" {% if not selected_status %}selected{% endif %}>All Statuses</option>
-                            <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending Approval</option>
-                            <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Approved</option>
-                            <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>Rejected</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="year" class="form-label">Year</label>
-                        <select class="form-select" id="year" name="year">
-                            <option value="">All Years</option>
-                            {% for year in years %}
-                            <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>
-                                {{ year }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 text-end">
-                        <button type="submit" class="btn btn-primary">Apply Filters</button>
-                        <a href="{{ url_for('user_audit.levy_overrides') }}" class="btn btn-secondary">Reset</a>
-                    </div>
-                </div>
-            </form>
-        </div>
+  <h1 class="mt-4">Levy Override Management</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('user_audit.index') }}">User Audit</a>
+    </li>
+    <li class="breadcrumb-item active">Levy Overrides</li>
+  </ol>
+
+  <!-- Filter Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-filter me-1"></i>
+      Filter Options
     </div>
-    
-    <!-- Results Card -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="fas fa-clipboard-check me-1"></i>
-                    Levy Override Results
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-outline-secondary" id="exportBtn">
-                        <i class="fas fa-file-export me-1"></i> Export
-                    </button>
-                </div>
-            </div>
+    <div class="card-body">
+      <form
+        method="get"
+        action="{{ url_for('user_audit.levy_overrides') }}"
+        id="filterForm"
+      >
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="user_id" class="form-label">User</label>
+            <select class="form-select" id="user_id" name="user_id">
+              <option value="">All Users</option>
+              {% for user in users %}
+              <option
+                value="{{ user.id }}"
+                {%
+                if
+                selected_user_id=""
+                ="user.id"
+                %}selected{%
+                endif
+                %}
+              >
+                {{ user.username }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="tax_district_id" class="form-label">Tax District</label>
+            <select
+              class="form-select"
+              id="tax_district_id"
+              name="tax_district_id"
+            >
+              <option value="">All Districts</option>
+              {% for district in districts %}
+              <option
+                value="{{ district.id }}"
+                {%
+                if
+                selected_tax_district_id=""
+                ="district.id"
+                %}selected{%
+                endif
+                %}
+              >
+                {{ district.district_name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="" {% if not selected_status %}selected{% endif %}>
+                All Statuses
+              </option>
+              <option
+                value="pending"
+                {%
+                if
+                selected_status=""
+                ="pending"
+                %}selected{%
+                endif
+                %}
+              >
+                Pending Approval
+              </option>
+              <option
+                value="approved"
+                {%
+                if
+                selected_status=""
+                ="approved"
+                %}selected{%
+                endif
+                %}
+              >
+                Approved
+              </option>
+              <option
+                value="rejected"
+                {%
+                if
+                selected_status=""
+                ="rejected"
+                %}selected{%
+                endif
+                %}
+              >
+                Rejected
+              </option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="year" class="form-label">Year</label>
+            <select class="form-select" id="year" name="year">
+              <option value="">All Years</option>
+              {% for year in years %}
+              <option
+                value="{{ year }}"
+                {%
+                if
+                selected_year=""
+                ="year"
+                %}selected{%
+                endif
+                %}
+              >
+                {{ year }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="overridesTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>District/Code</th>
-                            <th>Year</th>
-                            <th>Field</th>
-                            <th>Original</th>
-                            <th>Override</th>
-                            <th>Change</th>
-                            <th>Timestamp</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for override in pagination.items %}
-                        <tr>
-                            <td>{{ override.id }}</td>
-                            <td>
-                                <a href="{{ url_for('user_audit.user_detail', user_id=override.user_id) }}">
-                                    {{ override.user.username }}
-                                </a>
-                            </td>
-                            <td>
-                                {% if override.tax_district %}
-                                {{ override.tax_district.district_name }}
-                                {% elif override.tax_code %}
-                                {{ override.tax_code.code_name }}
-                                {% else %}
-                                Unknown
-                                {% endif %}
-                            </td>
-                            <td>{{ override.year }}</td>
-                            <td>{{ override.field_name }}</td>
-                            <td>${{ "%.2f"|format(override.original_value) }}</td>
-                            <td>${{ "%.2f"|format(override.override_value) }}</td>
-                            <td>
-                                {% if override.percent_change %}
-                                <span class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}">
-                                    {{ "%.2f"|format(override.percent_change) }}%
-                                </span>
-                                {% else %}
-                                N/A
-                                {% endif %}
-                            </td>
-                            <td>{{ override.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>
-                                {% if override.requires_approval and override.approved is none %}
-                                <span class="badge bg-warning">Pending</span>
-                                {% elif override.approved == true %}
-                                <span class="badge bg-success">Approved</span>
-                                {% elif override.approved == false %}
-                                <span class="badge bg-danger">Rejected</span>
-                                {% else %}
-                                <span class="badge bg-secondary">No Approval Required</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ override.id }}">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                                
-                                {% if override.requires_approval and override.approved is none %}
-                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#approveModal{{ override.id }}">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ override.id }}">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                                {% endif %}
-                                
-                                <!-- Details Modal -->
-                                <div class="modal fade" id="detailsModal{{ override.id }}" tabindex="-1" aria-labelledby="detailsModalLabel{{ override.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="detailsModalLabel{{ override.id }}">Override Details #{{ override.id }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="mb-3">
-                                                    <h6>Override Information</h6>
-                                                    <dl class="row">
-                                                        <dt class="col-sm-3">User:</dt>
-                                                        <dd class="col-sm-9">{{ override.user.username }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">
-                                                            {% if override.tax_district %}
-                                                            Tax District:
-                                                            {% elif override.tax_code %}
-                                                            Tax Code:
-                                                            {% else %}
-                                                            Entity:
-                                                            {% endif %}
-                                                        </dt>
-                                                        <dd class="col-sm-9">
-                                                            {% if override.tax_district %}
-                                                            {{ override.tax_district.district_name }}
-                                                            {% elif override.tax_code %}
-                                                            {{ override.tax_code.code_name }}
-                                                            {% else %}
-                                                            Unknown
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        <dt class="col-sm-3">Year:</dt>
-                                                        <dd class="col-sm-9">{{ override.year }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Field:</dt>
-                                                        <dd class="col-sm-9">{{ override.field_name }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Original Value:</dt>
-                                                        <dd class="col-sm-9">${{ "%.2f"|format(override.original_value) }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Override Value:</dt>
-                                                        <dd class="col-sm-9">${{ "%.2f"|format(override.override_value) }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Percent Change:</dt>
-                                                        <dd class="col-sm-9">
-                                                            {% if override.percent_change %}
-                                                            <span class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}">
-                                                                {{ "%.2f"|format(override.percent_change) }}%
-                                                            </span>
-                                                            {% else %}
-                                                            N/A
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        <dt class="col-sm-3">Timestamp:</dt>
-                                                        <dd class="col-sm-9">{{ override.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Status:</dt>
-                                                        <dd class="col-sm-9">
-                                                            {% if override.requires_approval and override.approved is none %}
-                                                            <span class="badge bg-warning">Pending</span>
-                                                            {% elif override.approved == true %}
-                                                            <span class="badge bg-success">Approved</span>
-                                                            {% elif override.approved == false %}
-                                                            <span class="badge bg-danger">Rejected</span>
-                                                            {% else %}
-                                                            <span class="badge bg-secondary">No Approval Required</span>
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        {% if override.justification %}
-                                                        <dt class="col-sm-3">Justification:</dt>
-                                                        <dd class="col-sm-9">{{ override.justification }}</dd>
-                                                        {% endif %}
-                                                        
-                                                        {% if override.approved is not none %}
-                                                        <dt class="col-sm-3">Approver:</dt>
-                                                        <dd class="col-sm-9">
-                                                            {% if override.approver %}
-                                                            {{ override.approver.username }}
-                                                            {% else %}
-                                                            N/A
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        <dt class="col-sm-3">Approval Time:</dt>
-                                                        <dd class="col-sm-9">
-                                                            {% if override.approval_timestamp %}
-                                                            {{ override.approval_timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-                                                            {% else %}
-                                                            N/A
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        {% if override.approval_notes %}
-                                                        <dt class="col-sm-3">Approval Notes:</dt>
-                                                        <dd class="col-sm-9">{{ override.approval_notes }}</dd>
-                                                        {% endif %}
-                                                        {% endif %}
-                                                    </dl>
-                                                </div>
-                                                
-                                                {% if override.calculation_params %}
-                                                <div class="mb-3">
-                                                    <h6>Calculation Parameters</h6>
-                                                    <pre class="bg-light p-3 rounded"><code>{{ override.calculation_params | tojson(indent=2) }}</code></pre>
-                                                </div>
-                                                {% endif %}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Approve Modal -->
-                                {% if override.requires_approval and override.approved is none %}
-                                <div class="modal fade" id="approveModal{{ override.id }}" tabindex="-1" aria-labelledby="approveModalLabel{{ override.id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="approveModalLabel{{ override.id }}">Approve Override</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <form action="{{ url_for('user_audit.approve_override', override_id=override.id) }}" method="post">
-                                                <div class="modal-body">
-                                                    <p>Are you sure you want to approve this override?</p>
-                                                    <dl class="row">
-                                                        <dt class="col-sm-4">Field:</dt>
-                                                        <dd class="col-sm-8">{{ override.field_name }}</dd>
-                                                        
-                                                        <dt class="col-sm-4">Original Value:</dt>
-                                                        <dd class="col-sm-8">${{ "%.2f"|format(override.original_value) }}</dd>
-                                                        
-                                                        <dt class="col-sm-4">Override Value:</dt>
-                                                        <dd class="col-sm-8">${{ "%.2f"|format(override.override_value) }}</dd>
-                                                        
-                                                        <dt class="col-sm-4">Percent Change:</dt>
-                                                        <dd class="col-sm-8">
-                                                            {% if override.percent_change %}
-                                                            <span class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}">
-                                                                {{ "%.2f"|format(override.percent_change) }}%
-                                                            </span>
-                                                            {% else %}
-                                                            N/A
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        {% if override.justification %}
-                                                        <dt class="col-sm-4">Justification:</dt>
-                                                        <dd class="col-sm-8">{{ override.justification }}</dd>
-                                                        {% endif %}
-                                                    </dl>
-                                                    
-                                                    <div class="mb-3">
-                                                        <label for="approvalNotes{{ override.id }}" class="form-label">Approval Notes:</label>
-                                                        <textarea class="form-control" id="approvalNotes{{ override.id }}" name="approval_notes" rows="3"></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <button type="submit" class="btn btn-success">Approve</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Reject Modal -->
-                                <div class="modal fade" id="rejectModal{{ override.id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ override.id }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="rejectModalLabel{{ override.id }}">Reject Override</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <form action="{{ url_for('user_audit.reject_override', override_id=override.id) }}" method="post">
-                                                <div class="modal-body">
-                                                    <p>Are you sure you want to reject this override?</p>
-                                                    <dl class="row">
-                                                        <dt class="col-sm-4">Field:</dt>
-                                                        <dd class="col-sm-8">{{ override.field_name }}</dd>
-                                                        
-                                                        <dt class="col-sm-4">Original Value:</dt>
-                                                        <dd class="col-sm-8">${{ "%.2f"|format(override.original_value) }}</dd>
-                                                        
-                                                        <dt class="col-sm-4">Override Value:</dt>
-                                                        <dd class="col-sm-8">${{ "%.2f"|format(override.override_value) }}</dd>
-                                                        
-                                                        <dt class="col-sm-4">Percent Change:</dt>
-                                                        <dd class="col-sm-8">
-                                                            {% if override.percent_change %}
-                                                            <span class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}">
-                                                                {{ "%.2f"|format(override.percent_change) }}%
-                                                            </span>
-                                                            {% else %}
-                                                            N/A
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        {% if override.justification %}
-                                                        <dt class="col-sm-4">Justification:</dt>
-                                                        <dd class="col-sm-8">{{ override.justification }}</dd>
-                                                        {% endif %}
-                                                    </dl>
-                                                    
-                                                    <div class="mb-3">
-                                                        <label for="rejectionNotes{{ override.id }}" class="form-label">Rejection Notes:</label>
-                                                        <textarea class="form-control" id="rejectionNotes{{ override.id }}" name="approval_notes" rows="3" required></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <button type="submit" class="btn btn-danger">Reject</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="11" class="text-center">No levy overrides found matching the filters</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            {% if pagination.pages > 1 %}
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center mt-4">
-                    <!-- Previous page -->
-                    {% if pagination.has_prev %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('user_audit.levy_overrides', page=pagination.prev_num, user_id=selected_user_id, tax_district_id=selected_tax_district_id, status=selected_status, year=selected_year) }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    <!-- Page numbers -->
-                    {% for page_num in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
-                        {% if page_num %}
-                            {% if page_num != pagination.page %}
-                            <li class="page-item">
-                                <a class="page-link" href="{{ url_for('user_audit.levy_overrides', page=page_num, user_id=selected_user_id, tax_district_id=selected_tax_district_id, status=selected_status, year=selected_year) }}">{{ page_num }}</a>
-                            </li>
-                            {% else %}
-                            <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
-                            {% endif %}
-                        {% else %}
-                            <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+        <div class="row">
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a
+              href="{{ url_for('user_audit.levy_overrides') }}"
+              class="btn btn-secondary"
+              >Reset</a
+            >
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <i class="fas fa-clipboard-check me-1"></i>
+          Levy Override Results
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-secondary" id="exportBtn">
+            <i class="fas fa-file-export me-1"></i> Export
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover" id="overridesTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>District/Code</th>
+              <th>Year</th>
+              <th>Field</th>
+              <th>Original</th>
+              <th>Override</th>
+              <th>Change</th>
+              <th>Timestamp</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for override in pagination.items %}
+            <tr>
+              <td>{{ override.id }}</td>
+              <td>
+                <a
+                  href="{{ url_for('user_audit.user_detail', user_id=override.user_id) }}"
+                >
+                  {{ override.user.username }}
+                </a>
+              </td>
+              <td>
+                {% if override.tax_district %} {{
+                override.tax_district.district_name }} {% elif override.tax_code
+                %} {{ override.tax_code.code_name }} {% else %} Unknown {% endif
+                %}
+              </td>
+              <td>{{ override.year }}</td>
+              <td>{{ override.field_name }}</td>
+              <td>${{ "%.2f"|format(override.original_value) }}</td>
+              <td>${{ "%.2f"|format(override.override_value) }}</td>
+              <td>
+                {% if override.percent_change %}
+                <span
+                  class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}"
+                >
+                  {{ "%.2f"|format(override.percent_change) }}%
+                </span>
+                {% else %} N/A {% endif %}
+              </td>
+              <td>{{ override.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+              <td>
+                {% if override.requires_approval and override.approved is none
+                %}
+                <span class="badge bg-warning">Pending</span>
+                {% elif override.approved == true %}
+                <span class="badge bg-success">Approved</span>
+                {% elif override.approved == false %}
+                <span class="badge bg-danger">Rejected</span>
+                {% else %}
+                <span class="badge bg-secondary">No Approval Required</span>
+                {% endif %}
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-info"
+                  data-bs-toggle="modal"
+                  data-bs-target="#detailsModal{{ override.id }}"
+                >
+                  <i class="fas fa-info-circle"></i>
+                </button>
+
+                {% if override.requires_approval and override.approved is none
+                %}
+                <button
+                  type="button"
+                  class="btn btn-sm btn-success"
+                  data-bs-toggle="modal"
+                  data-bs-target="#approveModal{{ override.id }}"
+                >
+                  <i class="fas fa-check"></i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger"
+                  data-bs-toggle="modal"
+                  data-bs-target="#rejectModal{{ override.id }}"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+                {% endif %}
+
+                <!-- Details Modal -->
+                <div
+                  class="modal fade"
+                  id="detailsModal{{ override.id }}"
+                  tabindex="-1"
+                  aria-labelledby="detailsModalLabel{{ override.id }}"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5
+                          class="modal-title"
+                          id="detailsModalLabel{{ override.id }}"
+                        >
+                          Override Details #{{ override.id }}
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <h6>Override Information</h6>
+                          <dl class="row">
+                            <dt class="col-sm-3">User:</dt>
+                            <dd class="col-sm-9">
+                              {{ override.user.username }}
+                            </dd>
+
+                            <dt class="col-sm-3">
+                              {% if override.tax_district %} Tax District: {%
+                              elif override.tax_code %} Tax Code: {% else %}
+                              Entity: {% endif %}
+                            </dt>
+                            <dd class="col-sm-9">
+                              {% if override.tax_district %} {{
+                              override.tax_district.district_name }} {% elif
+                              override.tax_code %} {{
+                              override.tax_code.code_name }} {% else %} Unknown
+                              {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-3">Year:</dt>
+                            <dd class="col-sm-9">{{ override.year }}</dd>
+
+                            <dt class="col-sm-3">Field:</dt>
+                            <dd class="col-sm-9">{{ override.field_name }}</dd>
+
+                            <dt class="col-sm-3">Original Value:</dt>
+                            <dd class="col-sm-9">
+                              ${{ "%.2f"|format(override.original_value) }}
+                            </dd>
+
+                            <dt class="col-sm-3">Override Value:</dt>
+                            <dd class="col-sm-9">
+                              ${{ "%.2f"|format(override.override_value) }}
+                            </dd>
+
+                            <dt class="col-sm-3">Percent Change:</dt>
+                            <dd class="col-sm-9">
+                              {% if override.percent_change %}
+                              <span
+                                class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}"
+                              >
+                                {{ "%.2f"|format(override.percent_change) }}%
+                              </span>
+                              {% else %} N/A {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-3">Timestamp:</dt>
+                            <dd class="col-sm-9">
+                              {{ override.timestamp.strftime('%Y-%m-%d
+                              %H:%M:%S') }}
+                            </dd>
+
+                            <dt class="col-sm-3">Status:</dt>
+                            <dd class="col-sm-9">
+                              {% if override.requires_approval and
+                              override.approved is none %}
+                              <span class="badge bg-warning">Pending</span>
+                              {% elif override.approved == true %}
+                              <span class="badge bg-success">Approved</span>
+                              {% elif override.approved == false %}
+                              <span class="badge bg-danger">Rejected</span>
+                              {% else %}
+                              <span class="badge bg-secondary"
+                                >No Approval Required</span
+                              >
+                              {% endif %}
+                            </dd>
+
+                            {% if override.justification %}
+                            <dt class="col-sm-3">Justification:</dt>
+                            <dd class="col-sm-9">
+                              {{ override.justification }}
+                            </dd>
+                            {% endif %} {% if override.approved is not none %}
+                            <dt class="col-sm-3">Approver:</dt>
+                            <dd class="col-sm-9">
+                              {% if override.approver %} {{
+                              override.approver.username }} {% else %} N/A {%
+                              endif %}
+                            </dd>
+
+                            <dt class="col-sm-3">Approval Time:</dt>
+                            <dd class="col-sm-9">
+                              {% if override.approval_timestamp %} {{
+                              override.approval_timestamp.strftime('%Y-%m-%d
+                              %H:%M:%S') }} {% else %} N/A {% endif %}
+                            </dd>
+
+                            {% if override.approval_notes %}
+                            <dt class="col-sm-3">Approval Notes:</dt>
+                            <dd class="col-sm-9">
+                              {{ override.approval_notes }}
+                            </dd>
+                            {% endif %} {% endif %}
+                          </dl>
+                        </div>
+
+                        {% if override.calculation_params %}
+                        <div class="mb-3">
+                          <h6>Calculation Parameters</h6>
+                          <pre
+                            class="bg-light p-3 rounded"
+                          ><code>{{ override.calculation_params | tojson(indent=2) }}</code></pre>
+                        </div>
                         {% endif %}
-                    {% endfor %}
-                    
-                    <!-- Next page -->
-                    {% if pagination.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('user_audit.levy_overrides', page=pagination.next_num, user_id=selected_user_id, tax_district_id=selected_tax_district_id, status=selected_status, year=selected_year) }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Approve Modal -->
+                {% if override.requires_approval and override.approved is none
+                %}
+                <div
+                  class="modal fade"
+                  id="approveModal{{ override.id }}"
+                  tabindex="-1"
+                  aria-labelledby="approveModalLabel{{ override.id }}"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5
+                          class="modal-title"
+                          id="approveModalLabel{{ override.id }}"
+                        >
+                          Approve Override
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <form
+                        action="{{ url_for('user_audit.approve_override', override_id=override.id) }}"
+                        method="post"
+                      >
+                        <div class="modal-body">
+                          <p>Are you sure you want to approve this override?</p>
+                          <dl class="row">
+                            <dt class="col-sm-4">Field:</dt>
+                            <dd class="col-sm-8">{{ override.field_name }}</dd>
+
+                            <dt class="col-sm-4">Original Value:</dt>
+                            <dd class="col-sm-8">
+                              ${{ "%.2f"|format(override.original_value) }}
+                            </dd>
+
+                            <dt class="col-sm-4">Override Value:</dt>
+                            <dd class="col-sm-8">
+                              ${{ "%.2f"|format(override.override_value) }}
+                            </dd>
+
+                            <dt class="col-sm-4">Percent Change:</dt>
+                            <dd class="col-sm-8">
+                              {% if override.percent_change %}
+                              <span
+                                class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}"
+                              >
+                                {{ "%.2f"|format(override.percent_change) }}%
+                              </span>
+                              {% else %} N/A {% endif %}
+                            </dd>
+
+                            {% if override.justification %}
+                            <dt class="col-sm-4">Justification:</dt>
+                            <dd class="col-sm-8">
+                              {{ override.justification }}
+                            </dd>
+                            {% endif %}
+                          </dl>
+
+                          <div class="mb-3">
+                            <label
+                              for="approvalNotes{{ override.id }}"
+                              class="form-label"
+                              >Approval Notes:</label
+                            >
+                            <textarea
+                              class="form-control"
+                              id="approvalNotes{{ override.id }}"
+                              name="approval_notes"
+                              rows="3"
+                            ></textarea>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Cancel
+                          </button>
+                          <button type="submit" class="btn btn-success">
+                            Approve
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Reject Modal -->
+                <div
+                  class="modal fade"
+                  id="rejectModal{{ override.id }}"
+                  tabindex="-1"
+                  aria-labelledby="rejectModalLabel{{ override.id }}"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5
+                          class="modal-title"
+                          id="rejectModalLabel{{ override.id }}"
+                        >
+                          Reject Override
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <form
+                        action="{{ url_for('user_audit.reject_override', override_id=override.id) }}"
+                        method="post"
+                      >
+                        <div class="modal-body">
+                          <p>Are you sure you want to reject this override?</p>
+                          <dl class="row">
+                            <dt class="col-sm-4">Field:</dt>
+                            <dd class="col-sm-8">{{ override.field_name }}</dd>
+
+                            <dt class="col-sm-4">Original Value:</dt>
+                            <dd class="col-sm-8">
+                              ${{ "%.2f"|format(override.original_value) }}
+                            </dd>
+
+                            <dt class="col-sm-4">Override Value:</dt>
+                            <dd class="col-sm-8">
+                              ${{ "%.2f"|format(override.override_value) }}
+                            </dd>
+
+                            <dt class="col-sm-4">Percent Change:</dt>
+                            <dd class="col-sm-8">
+                              {% if override.percent_change %}
+                              <span
+                                class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}"
+                              >
+                                {{ "%.2f"|format(override.percent_change) }}%
+                              </span>
+                              {% else %} N/A {% endif %}
+                            </dd>
+
+                            {% if override.justification %}
+                            <dt class="col-sm-4">Justification:</dt>
+                            <dd class="col-sm-8">
+                              {{ override.justification }}
+                            </dd>
+                            {% endif %}
+                          </dl>
+
+                          <div class="mb-3">
+                            <label
+                              for="rejectionNotes{{ override.id }}"
+                              class="form-label"
+                              >Rejection Notes:</label
+                            >
+                            <textarea
+                              class="form-control"
+                              id="rejectionNotes{{ override.id }}"
+                              name="approval_notes"
+                              rows="3"
+                              required
+                            ></textarea>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                          >
+                            Cancel
+                          </button>
+                          <button type="submit" class="btn btn-danger">
+                            Reject
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="11" class="text-center">
+                No levy overrides found matching the filters
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if pagination.pages > 1 %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+          <!-- Previous page -->
+          {% if pagination.has_prev %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="{{ url_for('user_audit.levy_overrides', page=pagination.prev_num, user_id=selected_user_id, tax_district_id=selected_tax_district_id, status=selected_status, year=selected_year) }}"
+              aria-label="Previous"
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+
+          <!-- Page numbers -->
+          {% for page_num in pagination.iter_pages(left_edge=2, left_current=2,
+          right_current=3, right_edge=2) %} {% if page_num %} {% if page_num !=
+          pagination.page %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="{{ url_for('user_audit.levy_overrides', page=page_num, user_id=selected_user_id, tax_district_id=selected_tax_district_id, status=selected_status, year=selected_year) }}"
+              >{{ page_num }}</a
+            >
+          </li>
+          {% else %}
+          <li class="page-item active">
+            <a class="page-link" href="#">{{ page_num }}</a>
+          </li>
+          {% endif %} {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#">...</a>
+          </li>
+          {% endif %} {% endfor %}
+
+          <!-- Next page -->
+          {% if pagination.has_next %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="{{ url_for('user_audit.levy_overrides', page=pagination.next_num, user_id=selected_user_id, tax_district_id=selected_tax_district_id, status=selected_status, year=selected_year) }}"
+              aria-label="Next"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
     </div>
+  </div>
 </div>
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Export functionality
-        document.getElementById('exportBtn').addEventListener('click', function() {
-            // Create CSV content
-            var table = document.getElementById('overridesTable');
-            var rows = table.querySelectorAll('tr');
-            var csv = [];
-            
-            for (var i = 0; i < rows.length; i++) {
-                var row = [], cols = rows[i].querySelectorAll('td, th');
-                
-                for (var j = 0; j < cols.length; j++) {
-                    // Skip the actions column
-                    if (j === cols.length - 1 && i > 0) continue;
-                    
-                    // Remove HTML and get text content
-                    var text = cols[j].textContent.trim();
-                    // Escape quotes and enclose in quotes
-                    text = text.replace(/"/g, '""');
-                    row.push('"' + text + '"');
-                }
-                
-                csv.push(row.join(','));
-            }
-            
-            // Create blob and download
-            var csvContent = csv.join('\n');
-            var blob = new Blob([csvContent], { type: 'text/csv' });
-            var url = window.URL.createObjectURL(blob);
-            
-            var a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'levy_overrides_' + new Date().toISOString().slice(0, 10) + '.csv');
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Export functionality
+    document.getElementById("exportBtn").addEventListener("click", function () {
+      // Create CSV content
+      var table = document.getElementById("overridesTable");
+      var rows = table.querySelectorAll("tr");
+      var csv = [];
+
+      for (var i = 0; i < rows.length; i++) {
+        var row = [],
+          cols = rows[i].querySelectorAll("td, th");
+
+        for (var j = 0; j < cols.length; j++) {
+          // Skip the actions column
+          if (j === cols.length - 1 && i > 0) continue;
+
+          // Remove HTML and get text content
+          var text = cols[j].textContent.trim();
+          // Escape quotes and enclose in quotes
+          text = text.replace(/"/g, '""');
+          row.push('"' + text + '"');
+        }
+
+        csv.push(row.join(","));
+      }
+
+      // Create blob and download
+      var csvContent = csv.join("\n");
+      var blob = new Blob([csvContent], { type: "text/csv" });
+      var url = window.URL.createObjectURL(blob);
+
+      var a = document.createElement("a");
+      a.setAttribute("hidden", "");
+      a.setAttribute("href", url);
+      a.setAttribute(
+        "download",
+        "levy_overrides_" + new Date().toISOString().slice(0, 10) + ".csv",
+      );
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
     });
+  });
 </script>
-{% endblock %}
-{% endblock %}
+{% endblock %} {% endblock %}

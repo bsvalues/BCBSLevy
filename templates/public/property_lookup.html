@@ -1,274 +1,356 @@
-{% extends "public/base_public.html" %}
-
-{% block title %}Property Lookup - Benton County Property Tax Portal{% endblock %}
-
-{% block head_extras %}
+{% extends "public/base_public.html" %} {% block title %}Property Lookup -
+Benton County Property Tax Portal{% endblock %} {% block head_extras %}
 <!-- jQuery UI for autocomplete -->
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link
+  rel="stylesheet"
+  href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+/>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0"><i class="bi bi-search me-2"></i>Property Tax Information Lookup</h2>
-            </div>
-            <div class="card-body">
-                <p class="lead">Enter your property ID to view tax information, including assessed value, levy rate, and estimated tax amount.</p>
-                
-                <form method="post" class="mb-4">
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="property_id" name="property_id" placeholder="Enter Property ID"
-                               {% if property_data %}value="{{ property_data.property_id }}"{% endif %} 
-                               autocomplete="off" inputmode="search" required>
-                        <label for="property_id">Property ID</label>
-                        <small class="form-text text-muted mt-1">Type at least 3 characters for suggestions</small>
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-search me-2"></i>Look Up Property
-                        </button>
-                    </div>
-                </form>
-                
-                {% if not property_data %}
-                <div class="alert alert-info" role="alert">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    <span>{{ "To find your Property ID, check your tax statement or property deed. You can also call the Benton County Assessor's Office at (555) 123-4567 for assistance."|add_tooltips|safe }}</span>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        {% if property_data %}
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">
-                <h3 class="mb-0"><i class="bi bi-house me-2"></i>Property Information</h3>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h4>Property Details</h4>
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr>
-                                    <th>Property ID</th>
-                                    <td>{{ property_data.property_id }}</td>
-                                </tr>
-                                <tr>
-                                    <th>{{ "Assessed Value"|tooltip|safe }}</th>
-                                    <td>${{ property_data.assessed_value|format(',') }}</td>
-                                </tr>
-                                <tr>
-                                    <th>{{ "Tax Code"|tooltip|safe }}</th>
-                                    <td>{{ property_data.tax_code }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <h4>Tax Information</h4>
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr>
-                                    <th>{{ "Levy Rate"|tooltip|safe }}</th>
-                                    <td>${{ property_data.levy_rate|round(4) }} per $1,000</td>
-                                </tr>
-                                <tr>
-                                    <th>Estimated Annual Tax</th>
-                                    <td>${{ property_data.calculated_tax|round(2)|format(',') }}</td>
-                                </tr>
-                                <tr>
-                                    <th>1st Half Due</th>
-                                    <td>${{ (property_data.calculated_tax / 2)|round(2)|format(',') }} (April 30, 2025)</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                {% if property_data.historical_rates %}
-                <div class="mb-4">
-                    <h4>Historical Tax Rates</h4>
-                    <table class="table table-bordered table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Year</th>
-                                <th>Levy Rate</th>
-                                <th>Change from Previous</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for rate in property_data.historical_rates %}
-                            <tr>
-                                <td>{{ rate.year }}</td>
-                                <td>${{ rate.levy_rate|round(4) }}</td>
-                                <td>
-                                    {% if loop.index > 1 %}
-                                        {% set prev_rate = property_data.historical_rates[loop.index0-1].levy_rate %}
-                                        {% set change = ((rate.levy_rate - prev_rate) / prev_rate * 100)|round(2) %}
-                                        {% if change > 0 %}
-                                            <span class="text-danger">+{{ change }}%</span>
-                                        {% elif change < 0 %}
-                                            <span class="text-success">{{ change }}%</span>
-                                        {% else %}
-                                            <span>0.00%</span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="text-muted">—</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% endif %}
-                
-                {% if property_data.linked_levy_codes %}
-                <div>
-                    <h4>Tax Districts in Your Area</h4>
-                    <p>Your property tax supports the following local government services:</p>
-                    <div class="row">
-                        {% for code in property_data.linked_levy_codes %}
-                        <div class="col-md-4 col-sm-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ code.district_name|default('District #' + code.tax_district_id|string) }}</h5>
-                                    <p class="card-text">Tax Code: {{ code.levy_code }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            <div class="card-footer bg-light">
-                <p class="mb-0 text-muted small">
-                    <i class="bi bi-info-circle me-1"></i>
-                    The information provided is for estimation purposes only. For official tax information, please contact the Benton County Assessor's Office.
-                </p>
-            </div>
-        </div>
-        {% endif %}
-        
-        <div class="card">
-            <div class="card-header">
-                <h3 class="mb-0"><i class="bi bi-question-circle me-2"></i>Frequently Asked Questions</h3>
-            </div>
-            <div class="card-body">
-                <div class="accordion" id="propertyFAQ">
-                    <div class="accordion-item">
-                        <h4 class="accordion-header" id="faqOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="true" aria-controls="faqCollapseOne">
-                                How is my property tax calculated?
-                            </button>
-                        </h4>
-                        <div id="faqCollapseOne" class="accordion-collapse collapse show" aria-labelledby="faqOne" data-bs-parent="#propertyFAQ">
-                            <div class="accordion-body">
-                                {{ "Your property tax is calculated by multiplying your property's assessed value by the levy rate for your tax code area. The levy rate is expressed in dollars per $1,000 of assessed value. For example, if your property's assessed value is $300,000 and the levy rate is $10.50 per $1,000, your annual property tax would be $3,150."|add_tooltips|safe }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h4 class="accordion-header" id="faqTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
-                                When are property taxes due?
-                            </button>
-                        </h4>
-                        <div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqTwo" data-bs-parent="#propertyFAQ">
-                            <div class="accordion-body">
-                                Property taxes in Benton County are paid in two installments. The first half is due by April 30, and the second half is due by October 31. Payments received after these dates may be subject to interest and penalties as prescribed by state law.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h4 class="accordion-header" id="faqThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
-                                How can I appeal my property assessment?
-                            </button>
-                        </h4>
-                        <div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqThree" data-bs-parent="#propertyFAQ">
-                            <div class="accordion-body">
-                                {{ "If you believe your property's assessed value is incorrect, you can file a Property Tax Appeal with the County Board of Equalization. Appeals must be filed within 30 days of the date the value notice was mailed, or by July 1, whichever is later. Contact the Benton County Assessor's Office for more information on the appeal process."|add_tooltips|safe }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  <div class="col-lg-8 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">
+          <i class="bi bi-search me-2"></i>Property Tax Information Lookup
+        </h2>
+      </div>
+      <div class="card-body">
+        <p class="lead">
+          Enter your property ID to view tax information, including assessed
+          value, levy rate, and estimated tax amount.
+        </p>
 
-{% block scripts %}
-<script>
-    $(document).ready(function() {
-        // Property ID autocomplete with mobile enhancements
-        $('#property_id').autocomplete({
-            source: function(request, response) {
-                $.ajax({
-                    url: "{{ url_for('api_public_property_search') }}",
-                    dataType: "json",
-                    data: {
-                        term: request.term
-                    },
-                    success: function(data) {
-                        response($.map(data, function(item) {
-                            return {
-                                label: item.id,
-                                value: item.id
-                            }
-                        }));
-                    }
-                });
-            },
-            minLength: 3,
-            position: { my: "left top+5", at: "left bottom" },
-            appendTo: ".form-floating", // Ensures dropdown is in the right container
-            classes: {
-                "ui-autocomplete": "dropdown-menu" // Make it look like Bootstrap
-            }
-        });
-        
-        // Make autocomplete more touch-friendly
-        if (isTouchDevice()) {
-            $('.ui-autocomplete').css({
-                'max-height': '50vh',
-                'overflow-y': 'auto',
-                '-webkit-overflow-scrolling': 'touch'
-            });
-            
-            // Increase touch target size of jQuery UI autocomplete items
-            $(document).on('click', '.ui-menu-item, .ui-menu-item-wrapper', function(e) {
-                // Prevent default handling to avoid double-selection on touch devices
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Get the item text and select it
-                var text = $(this).text().trim();
-                $('#property_id').val(text);
-                $('#property_id').autocomplete('close');
-            });
-        }
-        
-        {% if property_data %}
-        // Add print functionality
-        const printBtn = document.createElement('button');
-        printBtn.className = 'btn btn-outline-secondary mt-3';
-        printBtn.innerHTML = '<i class="bi bi-printer me-2"></i>Print Property Information';
-        printBtn.id = 'printPropertyInfo';
-        printBtn.type = 'button';
-        printBtn.addEventListener('click', function() {
-            window.print();
-        });
-        
-        // Append button to property information card
-        document.querySelector('.card-footer.bg-light').appendChild(printBtn);
+        <form method="post" class="mb-4">
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="property_id"
+              name="property_id"
+              placeholder="Enter Property ID"
+              {%
+              if
+              property_data
+              %}value="{{ property_data.property_id }}"
+              {%
+              endif
+              %}
+              autocomplete="off"
+              inputmode="search"
+              required
+            />
+            <label for="property_id">Property ID</label>
+            <small class="form-text text-muted mt-1"
+              >Type at least 3 characters for suggestions</small
+            >
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-search me-2"></i>Look Up Property
+            </button>
+          </div>
+        </form>
+
+        {% if not property_data %}
+        <div class="alert alert-info" role="alert">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          <span
+            >{{ "To find your Property ID, check your tax statement or property
+            deed. You can also call the Benton County Assessor's Office at (555)
+            123-4567 for assistance."|add_tooltips|safe }}</span
+          >
+        </div>
         {% endif %}
-    });
+      </div>
+    </div>
+
+    {% if property_data %}
+    <div class="card mb-4">
+      <div class="card-header bg-success text-white">
+        <h3 class="mb-0">
+          <i class="bi bi-house me-2"></i>Property Information
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <h4>Property Details</h4>
+            <table class="table table-bordered">
+              <tbody>
+                <tr>
+                  <th>Property ID</th>
+                  <td>{{ property_data.property_id }}</td>
+                </tr>
+                <tr>
+                  <th>{{ "Assessed Value"|tooltip|safe }}</th>
+                  <td>${{ property_data.assessed_value|format(',') }}</td>
+                </tr>
+                <tr>
+                  <th>{{ "Tax Code"|tooltip|safe }}</th>
+                  <td>{{ property_data.tax_code }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h4>Tax Information</h4>
+            <table class="table table-bordered">
+              <tbody>
+                <tr>
+                  <th>{{ "Levy Rate"|tooltip|safe }}</th>
+                  <td>${{ property_data.levy_rate|round(4) }} per $1,000</td>
+                </tr>
+                <tr>
+                  <th>Estimated Annual Tax</th>
+                  <td>
+                    ${{ property_data.calculated_tax|round(2)|format(',') }}
+                  </td>
+                </tr>
+                <tr>
+                  <th>1st Half Due</th>
+                  <td>
+                    ${{ (property_data.calculated_tax / 2)|round(2)|format(',')
+                    }} (April 30, 2025)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {% if property_data.historical_rates %}
+        <div class="mb-4">
+          <h4>Historical Tax Rates</h4>
+          <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>Year</th>
+                <th>Levy Rate</th>
+                <th>Change from Previous</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for rate in property_data.historical_rates %}
+              <tr>
+                <td>{{ rate.year }}</td>
+                <td>${{ rate.levy_rate|round(4) }}</td>
+                <td>
+                  {% if loop.index > 1 %} {% set prev_rate =
+                  property_data.historical_rates[loop.index0-1].levy_rate %} {%
+                  set change = ((rate.levy_rate - prev_rate) / prev_rate *
+                  100)|round(2) %} {% if change > 0 %}
+                  <span class="text-danger">+{{ change }}%</span>
+                  {% elif change < 0 %}
+                  <span class="text-success">{{ change }}%</span>
+                  {% else %}
+                  <span>0.00%</span>
+                  {% endif %} {% else %}
+                  <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %} {% if property_data.linked_levy_codes %}
+        <div>
+          <h4>Tax Districts in Your Area</h4>
+          <p>
+            Your property tax supports the following local government services:
+          </p>
+          <div class="row">
+            {% for code in property_data.linked_levy_codes %}
+            <div class="col-md-4 col-sm-6 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    {{ code.district_name|default('District #' +
+                    code.tax_district_id|string) }}
+                  </h5>
+                  <p class="card-text">Tax Code: {{ code.levy_code }}</p>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <div class="card-footer bg-light">
+        <p class="mb-0 text-muted small">
+          <i class="bi bi-info-circle me-1"></i>
+          The information provided is for estimation purposes only. For official
+          tax information, please contact the Benton County Assessor's Office.
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="mb-0">
+          <i class="bi bi-question-circle me-2"></i>Frequently Asked Questions
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="accordion" id="propertyFAQ">
+          <div class="accordion-item">
+            <h4 class="accordion-header" id="faqOne">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faqCollapseOne"
+                aria-expanded="true"
+                aria-controls="faqCollapseOne"
+              >
+                How is my property tax calculated?
+              </button>
+            </h4>
+            <div
+              id="faqCollapseOne"
+              class="accordion-collapse collapse show"
+              aria-labelledby="faqOne"
+              data-bs-parent="#propertyFAQ"
+            >
+              <div class="accordion-body">
+                {{ "Your property tax is calculated by multiplying your
+                property's assessed value by the levy rate for your tax code
+                area. The levy rate is expressed in dollars per $1,000 of
+                assessed value. For example, if your property's assessed value
+                is $300,000 and the levy rate is $10.50 per $1,000, your annual
+                property tax would be $3,150."|add_tooltips|safe }}
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h4 class="accordion-header" id="faqTwo">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faqCollapseTwo"
+                aria-expanded="false"
+                aria-controls="faqCollapseTwo"
+              >
+                When are property taxes due?
+              </button>
+            </h4>
+            <div
+              id="faqCollapseTwo"
+              class="accordion-collapse collapse"
+              aria-labelledby="faqTwo"
+              data-bs-parent="#propertyFAQ"
+            >
+              <div class="accordion-body">
+                Property taxes in Benton County are paid in two installments.
+                The first half is due by April 30, and the second half is due by
+                October 31. Payments received after these dates may be subject
+                to interest and penalties as prescribed by state law.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h4 class="accordion-header" id="faqThree">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faqCollapseThree"
+                aria-expanded="false"
+                aria-controls="faqCollapseThree"
+              >
+                How can I appeal my property assessment?
+              </button>
+            </h4>
+            <div
+              id="faqCollapseThree"
+              class="accordion-collapse collapse"
+              aria-labelledby="faqThree"
+              data-bs-parent="#propertyFAQ"
+            >
+              <div class="accordion-body">
+                {{ "If you believe your property's assessed value is incorrect,
+                you can file a Property Tax Appeal with the County Board of
+                Equalization. Appeals must be filed within 30 days of the date
+                the value notice was mailed, or by July 1, whichever is later.
+                Contact the Benton County Assessor's Office for more information
+                on the appeal process."|add_tooltips|safe }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  $(document).ready(function() {
+      // Property ID autocomplete with mobile enhancements
+      $('#property_id').autocomplete({
+          source: function(request, response) {
+              $.ajax({
+                  url: "{{ url_for('api_public_property_search') }}",
+                  dataType: "json",
+                  data: {
+                      term: request.term
+                  },
+                  success: function(data) {
+                      response($.map(data, function(item) {
+                          return {
+                              label: item.id,
+                              value: item.id
+                          }
+                      }));
+                  }
+              });
+          },
+          minLength: 3,
+          position: { my: "left top+5", at: "left bottom" },
+          appendTo: ".form-floating", // Ensures dropdown is in the right container
+          classes: {
+              "ui-autocomplete": "dropdown-menu" // Make it look like Bootstrap
+          }
+      });
+
+      // Make autocomplete more touch-friendly
+      if (isTouchDevice()) {
+          $('.ui-autocomplete').css({
+              'max-height': '50vh',
+              'overflow-y': 'auto',
+              '-webkit-overflow-scrolling': 'touch'
+          });
+
+          // Increase touch target size of jQuery UI autocomplete items
+          $(document).on('click', '.ui-menu-item, .ui-menu-item-wrapper', function(e) {
+              // Prevent default handling to avoid double-selection on touch devices
+              e.preventDefault();
+              e.stopPropagation();
+
+              // Get the item text and select it
+              var text = $(this).text().trim();
+              $('#property_id').val(text);
+              $('#property_id').autocomplete('close');
+          });
+      }
+
+      {% if property_data %}
+      // Add print functionality
+      const printBtn = document.createElement('button');
+      printBtn.className = 'btn btn-outline-secondary mt-3';
+      printBtn.innerHTML = '<i class="bi bi-printer me-2"></i>Print Property Information';
+      printBtn.id = 'printPropertyInfo';
+      printBtn.type = 'button';
+      printBtn.addEventListener('click', function() {
+          window.print();
+      });
+
+      // Append button to property information card
+      document.querySelector('.card-footer.bg-light').appendChild(printBtn);
+      {% endif %}
+  });
 </script>
 {% endblock %}

@@ -2,96 +2,102 @@
 
 /* Gradient headers */
 .bg-gradient {
-    background: linear-gradient(135deg, #0f4c81 0%, #0c7b93 100%);
+  background: linear-gradient(135deg, #0f4c81 0%, #0c7b93 100%);
 }
 
 .bg-gradient-info {
-    background: linear-gradient(135deg, #2c7be5 0%, #6610f2 100%);
+  background: linear-gradient(135deg, #2c7be5 0%, #6610f2 100%);
 }
 
 .district-header {
-    background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
 }
 
 .levy-header {
-    background: linear-gradient(135deg, #43a047 0%, #00695c 100%);
+  background: linear-gradient(135deg, #43a047 0%, #00695c 100%);
 }
 
 /* Card borders */
 .border-primary-light {
-    border-top: 4px solid #2c7be5 !important;
-    transition: all 0.3s ease;
+  border-top: 4px solid #2c7be5 !important;
+  transition: all 0.3s ease;
 }
 
 .border-success-light {
-    border-top: 4px solid #43a047 !important;
-    transition: all 0.3s ease;
+  border-top: 4px solid #43a047 !important;
+  transition: all 0.3s ease;
 }
 
 .border-info-light {
-    border-top: 4px solid #17a2b8 !important;
-    transition: all 0.3s ease;
+  border-top: 4px solid #17a2b8 !important;
+  transition: all 0.3s ease;
 }
 
 /* Hover effects */
 .border-primary-light:hover,
 .border-success-light:hover,
 .border-info-light:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    transform: translateY(-3px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-3px);
 }
 
 /* Preview table animations */
 #preview-table {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 #preview-table th {
-    background-color: #f8f9fa;
-    position: relative;
+  background-color: #f8f9fa;
+  position: relative;
 }
 
 #preview-table th:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(to right, #2c7be5, #6610f2);
-    transition: width 0.5s ease;
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(to right, #2c7be5, #6610f2);
+  transition: width 0.5s ease;
 }
 
 #preview-table th:hover:after {
-    width: 100%;
+  width: 100%;
 }
 
 /* Helper classes */
 .shadow-hover {
-    transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease;
 }
 
 .shadow-hover:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Animation classes */
 .fade-in {
-    animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .card-deck {
-        display: block;
-    }
-    
-    .card-deck .card {
-        margin-bottom: 1rem;
-    }
+  .card-deck {
+    display: block;
+  }
+
+  .card-deck .card {
+    margin-bottom: 1rem;
+  }
 }

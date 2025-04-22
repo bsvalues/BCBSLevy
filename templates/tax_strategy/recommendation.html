@@ -1,244 +1,249 @@
-{% extends "base.html" %}
-
-{% block title %}Tax Strategy Recommendation{% endblock %}
-
-{% block styles %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}Tax Strategy Recommendation{%
+endblock %} {% block styles %} {{ super() }}
 <style>
-    .strategy-header {
-        background-color: #f8f9fc;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-    }
-    
-    .strategy-header h2 {
-        color: #4e73df;
-        margin-bottom: 15px;
-    }
-    
-    .path-breadcrumb {
-        display: flex;
-        flex-wrap: wrap;
-        margin-bottom: 20px;
-    }
-    
-    .path-step {
-        background-color: #e3e6f0;
-        border-radius: 30px;
-        padding: 8px 15px;
-        margin-right: 8px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        font-size: 0.85rem;
-    }
-    
-    .path-step:after {
-        content: '\f054';
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        margin-left: 8px;
-        color: #4e73df;
-        font-size: 0.7rem;
-    }
-    
-    .path-step:last-child {
-        background-color: #1cc88a;
-        color: white;
-    }
-    
-    .path-step:last-child:after {
-        content: none;
-    }
-    
-    .action-card {
-        border-left: 4px solid #1cc88a;
-        margin-bottom: 20px;
-    }
-    
-    .timeline-container {
-        position: relative;
-        margin-left: 20px;
-        padding-left: 30px;
-    }
-    
-    .timeline-item {
-        position: relative;
-        padding-bottom: 30px;
-    }
-    
-    .timeline-item:before {
-        content: '';
-        position: absolute;
-        left: -30px;
-        top: 0;
-        width: 2px;
-        height: 100%;
-        background-color: #e3e6f0;
-    }
-    
-    .timeline-item:last-child:before {
-        height: 15px;
-    }
-    
-    .timeline-item:after {
-        content: '';
-        position: absolute;
-        left: -39px;
-        top: 5px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: #4e73df;
-        border: 4px solid #fff;
-        box-shadow: 0 0 0 2px #e3e6f0;
-    }
-    
-    .timeline-item h5 {
-        margin-bottom: 10px;
-    }
-    
-    .resource-link {
-        display: block;
-        padding: 12px 15px;
-        border-radius: 4px;
-        background-color: #f8f9fc;
-        margin-bottom: 10px;
-        transition: all 0.2s ease;
-    }
-    
-    .resource-link:hover {
-        background-color: #eaecf4;
-        text-decoration: none;
-    }
-    
-    .resource-link i {
-        color: #4e73df;
-        margin-right: 10px;
-    }
-    
-    .savings-highlight {
-        background-color: #1cc88a;
-        color: white;
-        padding: 10px 15px;
-        border-radius: 4px;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-</style>
-{% endblock %}
+  .strategy-header {
+    background-color: #f8f9fc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+  }
 
-{% block content %}
+  .strategy-header h2 {
+    color: #4e73df;
+    margin-bottom: 15px;
+  }
+
+  .path-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .path-step {
+    background-color: #e3e6f0;
+    border-radius: 30px;
+    padding: 8px 15px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .path-step:after {
+    content: "\f054";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    margin-left: 8px;
+    color: #4e73df;
+    font-size: 0.7rem;
+  }
+
+  .path-step:last-child {
+    background-color: #1cc88a;
+    color: white;
+  }
+
+  .path-step:last-child:after {
+    content: none;
+  }
+
+  .action-card {
+    border-left: 4px solid #1cc88a;
+    margin-bottom: 20px;
+  }
+
+  .timeline-container {
+    position: relative;
+    margin-left: 20px;
+    padding-left: 30px;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 30px;
+  }
+
+  .timeline-item:before {
+    content: "";
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background-color: #e3e6f0;
+  }
+
+  .timeline-item:last-child:before {
+    height: 15px;
+  }
+
+  .timeline-item:after {
+    content: "";
+    position: absolute;
+    left: -39px;
+    top: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #4e73df;
+    border: 4px solid #fff;
+    box-shadow: 0 0 0 2px #e3e6f0;
+  }
+
+  .timeline-item h5 {
+    margin-bottom: 10px;
+  }
+
+  .resource-link {
+    display: block;
+    padding: 12px 15px;
+    border-radius: 4px;
+    background-color: #f8f9fc;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .resource-link:hover {
+    background-color: #eaecf4;
+    text-decoration: none;
+  }
+
+  .resource-link i {
+    color: #4e73df;
+    margin-right: 10px;
+  }
+
+  .savings-highlight {
+    background-color: #1cc88a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+</style>
+{% endblock %} {% block content %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">Tax Strategy Recommendation</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('tax_strategy.index') }}">Tax Strategy</a></li>
-        <li class="breadcrumb-item active">Recommendation</li>
-    </ol>
-    
-    <div class="strategy-header">
-        <h2>{{ recommendation.title }}</h2>
-        <p class="lead">{{ recommendation.description }}</p>
-        
-        <div class="path-breadcrumb">
-            {% for step in path_description %}
-            <div class="path-step">{{ step }}</div>
+  <h1 class="mt-4">Tax Strategy Recommendation</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('tax_strategy.index') }}">Tax Strategy</a>
+    </li>
+    <li class="breadcrumb-item active">Recommendation</li>
+  </ol>
+
+  <div class="strategy-header">
+    <h2>{{ recommendation.title }}</h2>
+    <p class="lead">{{ recommendation.description }}</p>
+
+    <div class="path-breadcrumb">
+      {% for step in path_description %}
+      <div class="path-step">{{ step }}</div>
+      {% endfor %}
+    </div>
+
+    {% if recommendation.estimated_savings %}
+    <div class="savings-highlight">{{ recommendation.estimated_savings }}</div>
+    {% endif %}
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-tasks me-1"></i>
+          Action Plan
+        </div>
+        <div class="card-body">
+          {% for step in recommendation.steps %}
+          <div class="card action-card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">{{ step.title }}</h5>
+            </div>
+            <div class="card-body">
+              <p>{{ step.description }}</p>
+            </div>
+          </div>
+          {% endfor %}
+
+          <h5 class="mt-4 mb-3">Implementation Timeline</h5>
+          <div class="timeline-container">
+            {% for item in recommendation.implementation_timeline %}
+            <div class="timeline-item">
+              <h5>{{ item.timeframe }}</h5>
+              <p>{{ item.action }}</p>
+            </div>
             {% endfor %}
+          </div>
         </div>
-        
-        {% if recommendation.estimated_savings %}
-        <div class="savings-highlight">
-            {{ recommendation.estimated_savings }}
-        </div>
-        {% endif %}
+      </div>
     </div>
-    
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-tasks me-1"></i>
-                    Action Plan
-                </div>
-                <div class="card-body">
-                    {% for step in recommendation.steps %}
-                    <div class="card action-card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">{{ step.title }}</h5>
-                        </div>
-                        <div class="card-body">
-                            <p>{{ step.description }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                    
-                    <h5 class="mt-4 mb-3">Implementation Timeline</h5>
-                    <div class="timeline-container">
-                        {% for item in recommendation.implementation_timeline %}
-                        <div class="timeline-item">
-                            <h5>{{ item.timeframe }}</h5>
-                            <p>{{ item.action }}</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-file-alt me-1"></i>
+          Additional Resources
         </div>
-        
-        <div class="col-lg-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-file-alt me-1"></i>
-                    Additional Resources
-                </div>
-                <div class="card-body">
-                    {% for resource in recommendation.additional_resources %}
-                    <a href="{{ resource.link }}" class="resource-link">
-                        <i class="fas fa-external-link-alt"></i>
-                        {{ resource.title }}
-                    </a>
-                    {% endfor %}
-                    
-                    <div class="alert alert-info mt-4">
-                        <h6 class="alert-heading">Need Assistance?</h6>
-                        <p class="mb-0">Contact the Benton County Assessor's Office for personalized assistance with your property tax questions.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-print me-1"></i>
-                    Export Options
-                </div>
-                <div class="card-body">
-                    <p>Save or share this recommendation:</p>
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary">
-                            <i class="fas fa-file-pdf me-1"></i> Export as PDF
-                        </button>
-                        <button class="btn btn-outline-primary">
-                            <i class="fas fa-envelope me-1"></i> Email Recommendation
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="card-body">
+          {% for resource in recommendation.additional_resources %}
+          <a href="{{ resource.link }}" class="resource-link">
+            <i class="fas fa-external-link-alt"></i>
+            {{ resource.title }}
+          </a>
+          {% endfor %}
+
+          <div class="alert alert-info mt-4">
+            <h6 class="alert-heading">Need Assistance?</h6>
+            <p class="mb-0">
+              Contact the Benton County Assessor's Office for personalized
+              assistance with your property tax questions.
+            </p>
+          </div>
         </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-print me-1"></i>
+          Export Options
+        </div>
+        <div class="card-body">
+          <p>Save or share this recommendation:</p>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary">
+              <i class="fas fa-file-pdf me-1"></i> Export as PDF
+            </button>
+            <button class="btn btn-outline-primary">
+              <i class="fas fa-envelope me-1"></i> Email Recommendation
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <div class="row mt-2 mb-4">
-        <div class="col-12 text-center">
-            <a href="{{ url_for('tax_strategy.index') }}" class="btn btn-secondary me-2">
-                <i class="fas fa-arrow-left me-1"></i> Back to Decision Tree
-            </a>
-            <a href="{{ url_for('tax_strategy.strategy_analysis') }}" class="btn btn-primary">
-                <i class="fas fa-search me-1"></i> Compare Other Strategies
-            </a>
-        </div>
+  </div>
+
+  <div class="row mt-2 mb-4">
+    <div class="col-12 text-center">
+      <a
+        href="{{ url_for('tax_strategy.index') }}"
+        class="btn btn-secondary me-2"
+      >
+        <i class="fas fa-arrow-left me-1"></i> Back to Decision Tree
+      </a>
+      <a
+        href="{{ url_for('tax_strategy.strategy_analysis') }}"
+        class="btn btn-primary"
+      >
+        <i class="fas fa-search me-1"></i> Compare Other Strategies
+      </a>
     </div>
+  </div>
 </div>
 {% endblock %}

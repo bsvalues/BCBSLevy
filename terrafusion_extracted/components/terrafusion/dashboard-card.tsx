@@ -1,12 +1,16 @@
-import Image from "next/image"
+import Image from "next/image";
 
 interface DashboardCardProps {
-  title: string
-  metric: string | number
-  description?: string
+  title: string;
+  metric: string | number;
+  description?: string;
 }
 
-export function DashboardCard({ title, metric, description }: DashboardCardProps) {
+export function DashboardCard({
+  title,
+  metric,
+  description,
+}: DashboardCardProps) {
   return (
     <div
       className="w-80 p-8 rounded-xl relative bg-[#001529]/90 border border-[#00e5ff]/20"
@@ -29,10 +33,14 @@ export function DashboardCard({ title, metric, description }: DashboardCardProps
         <h3 className="text-sm font-medium text-[#00e5ff]/70">{title}</h3>
 
         {/* Large metric with fluid scaling */}
-        <p className="text-[clamp(2.6rem,2vw+1.4rem,4rem)] font-bold text-white">{metric}</p>
+        <p className="text-[clamp(2.6rem,2vw+1.4rem,4rem)] font-bold text-white">
+          {metric}
+        </p>
 
-        {description && <p className="text-sm text-[#00e5ff]/50">{description}</p>}
+        {description && (
+          <p className="text-sm text-[#00e5ff]/50">{description}</p>
+        )}
       </div>
     </div>
-  )
+  );
 }

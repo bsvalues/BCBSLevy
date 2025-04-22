@@ -1,10 +1,9 @@
-{% extends "base.html" %}
-
-{% block title %}Advanced Historical Analysis{% endblock %}
-
-{% block head %}
-{{ super() }}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% extends "base.html" %} {% block title %}Advanced Historical Analysis{%
+endblock %} {% block head %} {{ super() }}
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+/>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -25,7 +24,7 @@
   .stat-card {
     background-color: #fff;
     border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     padding: 15px;
     margin-bottom: 15px;
   }
@@ -90,76 +89,153 @@
     margin-right: 5px;
   }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
   <h1 class="mb-4">Advanced Historical Analysis</h1>
-  
+
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Introduction</h5>
-          <p class="card-text">This dashboard provides advanced analytical tools for historical tax rate data. Use the various analysis sections below to gain insights into historical trends, patterns, and forecasts for tax rates.</p>
+          <p class="card-text">
+            This dashboard provides advanced analytical tools for historical tax
+            rate data. Use the various analysis sections below to gain insights
+            into historical trends, patterns, and forecasts for tax rates.
+          </p>
         </div>
       </div>
     </div>
   </div>
-  
+
   <ul class="nav nav-tabs analysis-tabs mb-4" id="analysisTab" role="tablist">
     <li class="nav-item" role="presentation">
-      <a class="nav-link active" id="statistics-tab" data-bs-toggle="tab" href="#statistics" role="tab" aria-controls="statistics" aria-selected="true">Basic Statistics</a>
+      <a
+        class="nav-link active"
+        id="statistics-tab"
+        data-bs-toggle="tab"
+        href="#statistics"
+        role="tab"
+        aria-controls="statistics"
+        aria-selected="true"
+        >Basic Statistics</a
+      >
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link" id="forecast-tab" data-bs-toggle="tab" href="#forecast" role="tab" aria-controls="forecast" aria-selected="false">Trend Forecasting</a>
+      <a
+        class="nav-link"
+        id="forecast-tab"
+        data-bs-toggle="tab"
+        href="#forecast"
+        role="tab"
+        aria-controls="forecast"
+        aria-selected="false"
+        >Trend Forecasting</a
+      >
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link" id="anomalies-tab" data-bs-toggle="tab" href="#anomalies" role="tab" aria-controls="anomalies" aria-selected="false">Anomaly Detection</a>
+      <a
+        class="nav-link"
+        id="anomalies-tab"
+        data-bs-toggle="tab"
+        href="#anomalies"
+        role="tab"
+        aria-controls="anomalies"
+        aria-selected="false"
+        >Anomaly Detection</a
+      >
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link" id="district-tab" data-bs-toggle="tab" href="#district" role="tab" aria-controls="district" aria-selected="false">District Analysis</a>
+      <a
+        class="nav-link"
+        id="district-tab"
+        data-bs-toggle="tab"
+        href="#district"
+        role="tab"
+        aria-controls="district"
+        aria-selected="false"
+        >District Analysis</a
+      >
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link" id="comparison-tab" data-bs-toggle="tab" href="#comparison" role="tab" aria-controls="comparison" aria-selected="false">Year Comparison</a>
+      <a
+        class="nav-link"
+        id="comparison-tab"
+        data-bs-toggle="tab"
+        href="#comparison"
+        role="tab"
+        aria-controls="comparison"
+        aria-selected="false"
+        >Year Comparison</a
+      >
     </li>
   </ul>
-  
+
   <div class="tab-content" id="analysisTabContent">
     <!-- Basic Statistics Tab -->
-    <div class="tab-pane fade show active" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
+    <div
+      class="tab-pane fade show active"
+      id="statistics"
+      role="tabpanel"
+      aria-labelledby="statistics-tab"
+    >
       <div class="analysis-section">
         <h2 class="analysis-title">Basic Statistical Analysis</h2>
-        <p>Analyze basic statistical measures for historical levy rates of a specific tax code.</p>
-        
+        <p>
+          Analyze basic statistical measures for historical levy rates of a
+          specific tax code.
+        </p>
+
         <form method="POST" action="">
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="stats_tax_code" class="form-label">Tax Code</label>
-              <select class="form-select" id="stats_tax_code" name="stats_tax_code" required>
+              <select
+                class="form-select"
+                id="stats_tax_code"
+                name="stats_tax_code"
+                required
+              >
                 <option value="">Select a tax code</option>
                 {% for tax_code in tax_codes %}
-                <option value="{{ tax_code.tax_code }}">{{ tax_code.tax_code }}</option>
+                <option value="{{ tax_code.tax_code }}">
+                  {{ tax_code.tax_code }}
+                </option>
                 {% endfor %}
               </select>
             </div>
             <div class="col-md-6">
-              <label for="stats_years" class="form-label">Years (Optional)</label>
-              <select class="form-select" id="stats_years" name="stats_years" multiple>
+              <label for="stats_years" class="form-label"
+                >Years (Optional)</label
+              >
+              <select
+                class="form-select"
+                id="stats_years"
+                name="stats_years"
+                multiple
+              >
                 {% for year in available_years %}
                 <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
               </select>
-              <div class="form-text">Hold Ctrl/Cmd to select multiple years</div>
+              <div class="form-text">
+                Hold Ctrl/Cmd to select multiple years
+              </div>
             </div>
           </div>
-          <button type="submit" name="analyze_statistics" class="btn btn-primary">Analyze</button>
+          <button
+            type="submit"
+            name="analyze_statistics"
+            class="btn btn-primary"
+          >
+            Analyze
+          </button>
         </form>
-        
+
         {% if stats_data and not stats_data.error %}
         <div class="results-container">
           <h3>Statistical Analysis for Tax Code {{ stats_data.tax_code }}</h3>
-          
+
           <div class="row">
             <div class="col-md-4">
               <div class="stat-card">
@@ -180,7 +256,7 @@
               </div>
             </div>
           </div>
-          
+
           <div class="row">
             <div class="col-md-4">
               <div class="stat-card">
@@ -201,14 +277,17 @@
               </div>
             </div>
           </div>
-          
+
           <div class="row">
             <div class="col-md-6">
               <div class="stat-card">
-                <div class="stat-title">Total Change ({{ stats_data.first_year }} to {{ stats_data.last_year }})</div>
+                <div class="stat-title">
+                  Total Change ({{ stats_data.first_year }} to {{
+                  stats_data.last_year }})
+                </div>
                 <div class="stat-value">
-                  {{ stats_data.total_change|round(2) }}
-                  {% if stats_data.total_change > 0 %}
+                  {{ stats_data.total_change|round(2) }} {% if
+                  stats_data.total_change > 0 %}
                   <i class="fas fa-arrow-up trend-up"></i>
                   {% elif stats_data.total_change < 0 %}
                   <i class="fas fa-arrow-down trend-down"></i>
@@ -222,31 +301,27 @@
               <div class="stat-card">
                 <div class="stat-title">Percent Change</div>
                 <div class="stat-value">
-                  {% if stats_data.percent_change is not none %}
-                  {{ stats_data.percent_change|round(2) }}%
-                  {% if stats_data.percent_change > 0 %}
+                  {% if stats_data.percent_change is not none %} {{
+                  stats_data.percent_change|round(2) }}% {% if
+                  stats_data.percent_change > 0 %}
                   <i class="fas fa-arrow-up trend-up"></i>
                   {% elif stats_data.percent_change < 0 %}
                   <i class="fas fa-arrow-down trend-down"></i>
                   {% else %}
                   <i class="fas fa-equals trend-neutral"></i>
-                  {% endif %}
-                  {% else %}
-                  N/A
-                  {% endif %}
+                  {% endif %} {% else %} N/A {% endif %}
                 </div>
               </div>
             </div>
           </div>
-          
+
           {% if stats_data.cagr is not none %}
           <div class="row">
             <div class="col-md-6">
               <div class="stat-card">
                 <div class="stat-title">Compound Annual Growth Rate (CAGR)</div>
                 <div class="stat-value">
-                  {{ stats_data.cagr|round(2) }}%
-                  {% if stats_data.cagr > 0 %}
+                  {{ stats_data.cagr|round(2) }}% {% if stats_data.cagr > 0 %}
                   <i class="fas fa-arrow-up trend-up"></i>
                   {% elif stats_data.cagr < 0 %}
                   <i class="fas fa-arrow-down trend-down"></i>
@@ -258,12 +333,12 @@
             </div>
           </div>
           {% endif %}
-          
+
           <div class="results-subtitle">Historical Data</div>
           <div class="chart-container">
             <canvas id="statsChart"></canvas>
           </div>
-          
+
           <div class="table-responsive mt-4">
             <table class="table table-striped">
               <thead>
@@ -283,13 +358,13 @@
             </table>
           </div>
         </div>
-        
+
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             const statsData = {{ stats_data.historical_data|tojson }};
             const years = statsData.map(item => item.year);
             const rates = statsData.map(item => item.levy_rate);
-            
+
             const ctx = document.getElementById('statsChart').getContext('2d');
             new Chart(ctx, {
               type: 'line',
@@ -328,38 +403,68 @@
         {% endif %}
       </div>
     </div>
-    
+
     <!-- Trend Forecasting Tab -->
-    <div class="tab-pane fade" id="forecast" role="tabpanel" aria-labelledby="forecast-tab">
+    <div
+      class="tab-pane fade"
+      id="forecast"
+      role="tabpanel"
+      aria-labelledby="forecast-tab"
+    >
       <div class="analysis-section">
         <h2 class="analysis-title">Trend Forecasting</h2>
-        <p>Forecast future levy rates based on historical data using various forecasting methods.</p>
-        
+        <p>
+          Forecast future levy rates based on historical data using various
+          forecasting methods.
+        </p>
+
         <form method="POST" action="">
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="forecast_tax_code" class="form-label">Tax Code</label>
-              <select class="form-select" id="forecast_tax_code" name="forecast_tax_code" required>
+              <select
+                class="form-select"
+                id="forecast_tax_code"
+                name="forecast_tax_code"
+                required
+              >
                 <option value="">Select a tax code</option>
                 {% for tax_code in tax_codes %}
-                <option value="{{ tax_code.tax_code }}">{{ tax_code.tax_code }}</option>
+                <option value="{{ tax_code.tax_code }}">
+                  {{ tax_code.tax_code }}
+                </option>
                 {% endfor %}
               </select>
             </div>
             <div class="col-md-6">
-              <label for="forecast_base_years" class="form-label">Base Years (Optional)</label>
-              <select class="form-select" id="forecast_base_years" name="forecast_base_years" multiple>
+              <label for="forecast_base_years" class="form-label"
+                >Base Years (Optional)</label
+              >
+              <select
+                class="form-select"
+                id="forecast_base_years"
+                name="forecast_base_years"
+                multiple
+              >
                 {% for year in available_years %}
                 <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
               </select>
-              <div class="form-text">Hold Ctrl/Cmd to select multiple years</div>
+              <div class="form-text">
+                Hold Ctrl/Cmd to select multiple years
+              </div>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col-md-6">
-              <label for="forecast_years" class="form-label">Forecast Years</label>
-              <select class="form-select" id="forecast_years" name="forecast_years">
+              <label for="forecast_years" class="form-label"
+                >Forecast Years</label
+              >
+              <select
+                class="form-select"
+                id="forecast_years"
+                name="forecast_years"
+              >
                 <option value="1">1 year</option>
                 <option value="2">2 years</option>
                 <option value="3" selected>3 years</option>
@@ -368,8 +473,14 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label for="forecast_method" class="form-label">Forecast Method</label>
-              <select class="form-select" id="forecast_method" name="forecast_method">
+              <label for="forecast_method" class="form-label"
+                >Forecast Method</label
+              >
+              <select
+                class="form-select"
+                id="forecast_method"
+                name="forecast_method"
+              >
                 <option value="linear" selected>Linear Regression</option>
                 <option value="average">Simple Average</option>
                 <option value="weighted">Weighted Average</option>
@@ -378,18 +489,23 @@
               </select>
             </div>
           </div>
-          <button type="submit" name="forecast_trends" class="btn btn-primary">Forecast</button>
+          <button type="submit" name="forecast_trends" class="btn btn-primary">
+            Forecast
+          </button>
         </form>
-        
+
         {% if forecast_data and not forecast_data.error %}
         <div class="results-container">
           <h3>Forecast for Tax Code {{ forecast_data.tax_code }}</h3>
-          <p>Using {{ forecast_data.forecast_method }} method to forecast {{ forecast_data.forecast_years }} year(s) ahead</p>
-          
+          <p>
+            Using {{ forecast_data.forecast_method }} method to forecast {{
+            forecast_data.forecast_years }} year(s) ahead
+          </p>
+
           <div class="chart-container">
             <canvas id="forecastChart"></canvas>
           </div>
-          
+
           <div class="row mt-4">
             <div class="col-md-6">
               <h4 class="results-subtitle">Forecast Details</h4>
@@ -402,17 +518,26 @@
                   </tr>
                   <tr>
                     <th>R² (Coefficient of Determination)</th>
-                    <td>{{ forecast_data.forecast_details.r_squared|round(4) }}</td>
+                    <td>
+                      {{ forecast_data.forecast_details.r_squared|round(4) }}
+                    </td>
                   </tr>
                   {% elif forecast_data.forecast_method == 'average' %}
                   <tr>
                     <th>Average Value</th>
-                    <td>{{ forecast_data.forecast_details.average_value|round(2) }}</td>
+                    <td>
+                      {{ forecast_data.forecast_details.average_value|round(2)
+                      }}
+                    </td>
                   </tr>
                   {% elif forecast_data.forecast_method == 'weighted' %}
                   <tr>
                     <th>Weighted Average</th>
-                    <td>{{ forecast_data.forecast_details.weighted_average|round(2) }}</td>
+                    <td>
+                      {{
+                      forecast_data.forecast_details.weighted_average|round(2)
+                      }}
+                    </td>
                   </tr>
                   {% elif forecast_data.forecast_method == 'exponential' %}
                   <tr>
@@ -460,7 +585,7 @@
               </table>
             </div>
           </div>
-          
+
           <h4 class="results-subtitle">All Data</h4>
           <div class="table-responsive">
             <table class="table table-striped">
@@ -476,23 +601,26 @@
                 <tr>
                   <td>{{ data.year }}</td>
                   <td>{{ data.levy_rate|round(2) }}</td>
-                  <td>{% if data.is_forecast %}Forecast{% else %}Historical{% endif %}</td>
+                  <td>
+                    {% if data.is_forecast %}Forecast{% else %}Historical{%
+                    endif %}
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
         </div>
-        
+
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             const allData = {{ forecast_data.all_data|tojson }};
             const labels = allData.map(item => item.year);
-            
+
             // Split the data into historical and forecast
             const historicalData = [];
             const forecastData = [];
-            
+
             allData.forEach(item => {
               if (item.is_forecast) {
                 forecastData.push({
@@ -506,7 +634,7 @@
                 });
               }
             });
-            
+
             const ctx = document.getElementById('forecastChart').getContext('2d');
             new Chart(ctx, {
               type: 'line',
@@ -557,38 +685,65 @@
         {% endif %}
       </div>
     </div>
-    
+
     <!-- Anomaly Detection Tab -->
-    <div class="tab-pane fade" id="anomalies" role="tabpanel" aria-labelledby="anomalies-tab">
+    <div
+      class="tab-pane fade"
+      id="anomalies"
+      role="tabpanel"
+      aria-labelledby="anomalies-tab"
+    >
       <div class="analysis-section">
         <h2 class="analysis-title">Anomaly Detection</h2>
         <p>Detect unusual patterns or outliers in historical levy rates.</p>
-        
+
         <form method="POST" action="">
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="anomaly_tax_code" class="form-label">Tax Code</label>
-              <select class="form-select" id="anomaly_tax_code" name="anomaly_tax_code" required>
+              <select
+                class="form-select"
+                id="anomaly_tax_code"
+                name="anomaly_tax_code"
+                required
+              >
                 <option value="">Select a tax code</option>
                 {% for tax_code in tax_codes %}
-                <option value="{{ tax_code.tax_code }}">{{ tax_code.tax_code }}</option>
+                <option value="{{ tax_code.tax_code }}">
+                  {{ tax_code.tax_code }}
+                </option>
                 {% endfor %}
               </select>
             </div>
             <div class="col-md-6">
-              <label for="anomaly_years" class="form-label">Years (Optional)</label>
-              <select class="form-select" id="anomaly_years" name="anomaly_years" multiple>
+              <label for="anomaly_years" class="form-label"
+                >Years (Optional)</label
+              >
+              <select
+                class="form-select"
+                id="anomaly_years"
+                name="anomaly_years"
+                multiple
+              >
                 {% for year in available_years %}
                 <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
               </select>
-              <div class="form-text">Hold Ctrl/Cmd to select multiple years</div>
+              <div class="form-text">
+                Hold Ctrl/Cmd to select multiple years
+              </div>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col-md-6">
-              <label for="anomaly_threshold" class="form-label">Anomaly Threshold (Z-score)</label>
-              <select class="form-select" id="anomaly_threshold" name="anomaly_threshold">
+              <label for="anomaly_threshold" class="form-label"
+                >Anomaly Threshold (Z-score)</label
+              >
+              <select
+                class="form-select"
+                id="anomaly_threshold"
+                name="anomaly_threshold"
+              >
                 <option value="1.5">1.5 (More Sensitive)</option>
                 <option value="2.0" selected>2.0 (Standard)</option>
                 <option value="2.5">2.5 (Less Sensitive)</option>
@@ -596,22 +751,25 @@
               </select>
             </div>
           </div>
-          <button type="submit" name="detect_anomalies" class="btn btn-primary">Detect Anomalies</button>
+          <button type="submit" name="detect_anomalies" class="btn btn-primary">
+            Detect Anomalies
+          </button>
         </form>
-        
+
         {% if anomaly_data and not anomaly_data.error %}
         <div class="results-container">
           <h3>Anomaly Detection for Tax Code {{ anomaly_data.tax_code }}</h3>
           <p>Using a Z-score threshold of {{ anomaly_data.threshold }}</p>
-          
+
           <div class="alert alert-info">
-            <strong>Found {{ anomaly_data.anomaly_count }} anomalies</strong> out of {{ anomaly_data.all_rates|length }} years.
+            <strong>Found {{ anomaly_data.anomaly_count }} anomalies</strong>
+            out of {{ anomaly_data.all_rates|length }} years.
           </div>
-          
+
           <div class="chart-container">
             <canvas id="anomalyChart"></canvas>
           </div>
-          
+
           {% if anomaly_data.changes %}
           <h4 class="results-subtitle">Year-to-Year Changes</h4>
           <div class="table-responsive">
@@ -627,20 +785,22 @@
               </thead>
               <tbody>
                 {% for change in anomaly_data.changes %}
-                <tr {% if change.is_anomaly %}class="table-danger"{% endif %}>
+                <tr {% if change.is_anomaly %}class="table-danger" {% endif %}>
                   <td>{{ change.from_year }} to {{ change.to_year }}</td>
                   <td>{{ change.change|round(2) }}</td>
                   <td>{{ change.percent_change|round(2) }}%</td>
                   <td>{{ change.z_score|round(2) }}</td>
-                  <td>{% if change.is_anomaly %}<span class="badge bg-danger">Anomaly</span>{% else %}Normal{% endif %}</td>
+                  <td>
+                    {% if change.is_anomaly %}<span class="badge bg-danger"
+                      >Anomaly</span
+                    >{% else %}Normal{% endif %}
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
-          {% endif %}
-          
-          {% if anomaly_data.level_shifts %}
+          {% endif %} {% if anomaly_data.level_shifts %}
           <h4 class="results-subtitle">Level Shifts</h4>
           <div class="table-responsive">
             <table class="table table-striped">
@@ -660,14 +820,17 @@
                   <td>{{ shift.before_avg|round(2) }}</td>
                   <td>{{ shift.after_avg|round(2) }}</td>
                   <td>{{ shift.shift_magnitude|round(2) }}</td>
-                  <td>{{ shift.shift_percent|round(2) if shift.shift_percent else 'N/A' }}%</td>
+                  <td>
+                    {{ shift.shift_percent|round(2) if shift.shift_percent else
+                    'N/A' }}%
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
           {% endif %}
-          
+
           <h4 class="results-subtitle">All Rates</h4>
           <div class="table-responsive">
             <table class="table table-striped">
@@ -680,18 +843,16 @@
               </thead>
               <tbody>
                 {% for rate in anomaly_data.all_rates %}
-                <tr {% if rate.is_anomaly %}class="table-danger"{% endif %}>
+                <tr {% if rate.is_anomaly %}class="table-danger" {% endif %}>
                   <td>{{ rate.year }}</td>
                   <td>{{ rate.levy_rate|round(2) }}</td>
                   <td>
                     {% if rate.is_anomaly %}
                     <span class="badge bg-danger">
-                      Anomaly ({{ rate.anomaly_type }})
-                      {% if rate.z_score %} Z-score: {{ rate.z_score|round(2) }}{% endif %}
+                      Anomaly ({{ rate.anomaly_type }}) {% if rate.z_score %}
+                      Z-score: {{ rate.z_score|round(2) }}{% endif %}
                     </span>
-                    {% else %}
-                    Normal
-                    {% endif %}
+                    {% else %} Normal {% endif %}
                   </td>
                 </tr>
                 {% endfor %}
@@ -699,26 +860,26 @@
             </table>
           </div>
         </div>
-        
+
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             const ratesData = {{ anomaly_data.all_rates|tojson }};
             const years = ratesData.map(item => item.year);
             const rates = ratesData.map(item => item.levy_rate);
-            
+
             // Create point styles based on anomaly status
             const pointBackgroundColors = ratesData.map(item => {
               return item.is_anomaly ? 'rgb(255, 99, 132)' : 'rgb(75, 192, 192)';
             });
-            
+
             const pointBorderColors = ratesData.map(item => {
               return item.is_anomaly ? 'rgb(255, 99, 132)' : 'rgb(75, 192, 192)';
             });
-            
+
             const pointRadius = ratesData.map(item => {
               return item.is_anomaly ? 6 : 3;
             });
-            
+
             const ctx = document.getElementById('anomalyChart').getContext('2d');
             new Chart(ctx, {
               type: 'line',
@@ -761,14 +922,14 @@
                         const dataIndex = context.dataIndex;
                         const item = ratesData[dataIndex];
                         let label = `Levy Rate: ${item.levy_rate.toFixed(2)}`;
-                        
+
                         if (item.is_anomaly) {
                           label += ` (Anomaly: ${item.anomaly_type})`;
                           if (item.z_score) {
                             label += ` Z-score: ${item.z_score.toFixed(2)}`;
                           }
                         }
-                        
+
                         return label;
                       }
                     }
@@ -781,18 +942,30 @@
         {% endif %}
       </div>
     </div>
-    
+
     <!-- District Analysis Tab -->
-    <div class="tab-pane fade" id="district" role="tabpanel" aria-labelledby="district-tab">
+    <div
+      class="tab-pane fade"
+      id="district"
+      role="tabpanel"
+      aria-labelledby="district-tab"
+    >
       <div class="analysis-section">
         <h2 class="analysis-title">District Analysis</h2>
-        <p>Analyze aggregated data for all tax codes within a specific district.</p>
-        
+        <p>
+          Analyze aggregated data for all tax codes within a specific district.
+        </p>
+
         <form method="POST" action="">
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="district_id" class="form-label">District ID</label>
-              <select class="form-select" id="district_id" name="district_id" required>
+              <select
+                class="form-select"
+                id="district_id"
+                name="district_id"
+                required
+              >
                 <option value="">Select a district</option>
                 {% for district in districts %}
                 <option value="{{ district }}">{{ district }}</option>
@@ -800,31 +973,50 @@
               </select>
             </div>
             <div class="col-md-6">
-              <label for="district_years" class="form-label">Years (Optional)</label>
-              <select class="form-select" id="district_years" name="district_years" multiple>
+              <label for="district_years" class="form-label"
+                >Years (Optional)</label
+              >
+              <select
+                class="form-select"
+                id="district_years"
+                name="district_years"
+                multiple
+              >
                 {% for year in available_years %}
                 <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
               </select>
-              <div class="form-text">Hold Ctrl/Cmd to select multiple years</div>
+              <div class="form-text">
+                Hold Ctrl/Cmd to select multiple years
+              </div>
             </div>
           </div>
-          <button type="submit" name="aggregate_district" class="btn btn-primary">Analyze District</button>
+          <button
+            type="submit"
+            name="aggregate_district"
+            class="btn btn-primary"
+          >
+            Analyze District
+          </button>
         </form>
-        
+
         {% if district_data and not district_data.error %}
         <div class="results-container">
-          <h3>District Analysis: {{ district_data.district_name }} (ID: {{ district_data.district_id }})</h3>
+          <h3>
+            District Analysis: {{ district_data.district_name }} (ID: {{
+            district_data.district_id }})
+          </h3>
           <p>District Code: {{ district_data.district_code }}</p>
-          
+
           <div class="alert alert-info">
-            <strong>{{ district_data.tax_codes|length }} tax codes</strong> found in this district.
+            <strong>{{ district_data.tax_codes|length }} tax codes</strong>
+            found in this district.
           </div>
-          
+
           <div class="chart-container">
             <canvas id="districtChart"></canvas>
           </div>
-          
+
           <h4 class="results-subtitle">Yearly Statistics</h4>
           <div class="table-responsive">
             <table class="table table-striped">
@@ -853,26 +1045,23 @@
                   <td>{{ stat.std_dev|round(2) }}</td>
                   <td>{{ stat.total_rate|round(2) }}</td>
                   <td>
-                    {% if 'change_from_prev' in stat %}
-                    {{ stat.change_from_prev|round(2) }}
-                    ({{ stat.percent_change|round(2) if stat.percent_change else 'N/A' }}%)
-                    {% if stat.change_from_prev > 0 %}
+                    {% if 'change_from_prev' in stat %} {{
+                    stat.change_from_prev|round(2) }} ({{
+                    stat.percent_change|round(2) if stat.percent_change else
+                    'N/A' }}%) {% if stat.change_from_prev > 0 %}
                     <i class="fas fa-arrow-up trend-up"></i>
                     {% elif stat.change_from_prev < 0 %}
                     <i class="fas fa-arrow-down trend-down"></i>
                     {% else %}
                     <i class="fas fa-equals trend-neutral"></i>
-                    {% endif %}
-                    {% else %}
-                    -
-                    {% endif %}
+                    {% endif %} {% else %} - {% endif %}
                   </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
-          
+
           <h4 class="results-subtitle">Tax Codes in District</h4>
           <div class="table-responsive">
             <table class="table table-striped">
@@ -891,7 +1080,7 @@
             </table>
           </div>
         </div>
-        
+
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             const yearlyStats = {{ district_data.yearly_stats|tojson }};
@@ -899,7 +1088,7 @@
             const avgRates = yearlyStats.map(item => item.avg_rate);
             const minRates = yearlyStats.map(item => item.min_rate);
             const maxRates = yearlyStats.map(item => item.max_rate);
-            
+
             const ctx = document.getElementById('districtChart').getContext('2d');
             new Chart(ctx, {
               type: 'line',
@@ -957,18 +1146,31 @@
         {% endif %}
       </div>
     </div>
-    
+
     <!-- Year Comparison Tab -->
-    <div class="tab-pane fade" id="comparison" role="tabpanel" aria-labelledby="comparison-tab">
+    <div
+      class="tab-pane fade"
+      id="comparison"
+      role="tabpanel"
+      aria-labelledby="comparison-tab"
+    >
       <div class="analysis-section">
         <h2 class="analysis-title">Year Comparison Report</h2>
-        <p>Compare tax rates between two different years to identify significant changes.</p>
-        
+        <p>
+          Compare tax rates between two different years to identify significant
+          changes.
+        </p>
+
         <form method="POST" action="">
           <div class="row mb-3">
             <div class="col-md-4">
               <label for="start_year" class="form-label">Start Year</label>
-              <select class="form-select" id="start_year" name="start_year" required>
+              <select
+                class="form-select"
+                id="start_year"
+                name="start_year"
+                required
+              >
                 <option value="">Select a year</option>
                 {% for year in available_years %}
                 <option value="{{ year }}">{{ year }}</option>
@@ -977,7 +1179,12 @@
             </div>
             <div class="col-md-4">
               <label for="end_year" class="form-label">End Year</label>
-              <select class="form-select" id="end_year" name="end_year" required>
+              <select
+                class="form-select"
+                id="end_year"
+                name="end_year"
+                required
+              >
                 <option value="">Select a year</option>
                 {% for year in available_years %}
                 <option value="{{ year }}">{{ year }}</option>
@@ -986,67 +1193,98 @@
             </div>
             <div class="col-md-4">
               <label for="min_change" class="form-label">Min Change (%)</label>
-              <input type="number" class="form-control" id="min_change" name="min_change" value="1.0" min="0.0" step="0.1">
+              <input
+                type="number"
+                class="form-control"
+                id="min_change"
+                name="min_change"
+                value="1.0"
+                min="0.0"
+                step="0.1"
+              />
             </div>
           </div>
-          <button type="submit" name="generate_comparison" class="btn btn-primary">Generate Report</button>
+          <button
+            type="submit"
+            name="generate_comparison"
+            class="btn btn-primary"
+          >
+            Generate Report
+          </button>
         </form>
-        
+
         {% if comparison_report and not comparison_report.error %}
         <div class="results-container">
-          <h3>Comparison Report: {{ comparison_report.start_year }} vs {{ comparison_report.end_year }}</h3>
-          <p>Showing changes with minimum threshold of {{ comparison_report.min_change_threshold }}%</p>
-          
+          <h3>
+            Comparison Report: {{ comparison_report.start_year }} vs {{
+            comparison_report.end_year }}
+          </h3>
+          <p>
+            Showing changes with minimum threshold of {{
+            comparison_report.min_change_threshold }}%
+          </p>
+
           <div class="row">
             <div class="col-md-4">
               <div class="stat-card">
                 <div class="stat-title">Total Tax Codes Compared</div>
-                <div class="stat-value">{{ comparison_report.summary.count }}</div>
+                <div class="stat-value">
+                  {{ comparison_report.summary.count }}
+                </div>
               </div>
             </div>
             <div class="col-md-4">
               <div class="stat-card">
                 <div class="stat-title">Increased</div>
-                <div class="stat-value trend-up">{{ comparison_report.summary.increased_count }}</div>
+                <div class="stat-value trend-up">
+                  {{ comparison_report.summary.increased_count }}
+                </div>
               </div>
             </div>
             <div class="col-md-4">
               <div class="stat-card">
                 <div class="stat-title">Decreased</div>
-                <div class="stat-value trend-down">{{ comparison_report.summary.decreased_count }}</div>
+                <div class="stat-value trend-down">
+                  {{ comparison_report.summary.decreased_count }}
+                </div>
               </div>
             </div>
           </div>
-          
+
           <div class="row">
             <div class="col-md-4">
               <div class="stat-card">
                 <div class="stat-title">Average Change</div>
                 <div class="stat-value">
-                  {{ comparison_report.summary.avg_abs_change|round(2) }}
-                  ({{ comparison_report.summary.avg_pct_change|round(2) if comparison_report.summary.avg_pct_change else 'N/A' }}%)
+                  {{ comparison_report.summary.avg_abs_change|round(2) }} ({{
+                  comparison_report.summary.avg_pct_change|round(2) if
+                  comparison_report.summary.avg_pct_change else 'N/A' }}%)
                 </div>
               </div>
             </div>
             <div class="col-md-4">
               <div class="stat-card">
                 <div class="stat-title">Max Increase</div>
-                <div class="stat-value trend-up">{{ comparison_report.summary.max_increase|round(2) }}</div>
+                <div class="stat-value trend-up">
+                  {{ comparison_report.summary.max_increase|round(2) }}
+                </div>
               </div>
             </div>
             <div class="col-md-4">
               <div class="stat-card">
                 <div class="stat-title">Max Decrease</div>
-                <div class="stat-value trend-down">{{ comparison_report.summary.max_decrease|round(2) }}</div>
+                <div class="stat-value trend-down">
+                  {{ comparison_report.summary.max_decrease|round(2) }}
+                </div>
               </div>
             </div>
           </div>
-          
+
           <h4 class="results-subtitle">Comparison Details</h4>
           <div class="chart-container">
             <canvas id="comparisonChart"></canvas>
           </div>
-          
+
           <div class="table-responsive mt-4">
             <table class="table table-striped table-hover comparison-table">
               <thead>
@@ -1061,12 +1299,17 @@
               </thead>
               <tbody>
                 {% for comp in comparison_report.comparisons %}
-                <tr class="{% if comp.change_direction == 'increase' %}table-danger{% elif comp.change_direction == 'decrease' %}table-success{% endif %}">
+                <tr
+                  class="{% if comp.change_direction == 'increase' %}table-danger{% elif comp.change_direction == 'decrease' %}table-success{% endif %}"
+                >
                   <td>{{ comp.tax_code }}</td>
                   <td>{{ comp.start_rate|round(2) }}</td>
                   <td>{{ comp.end_rate|round(2) }}</td>
                   <td>{{ comp.absolute_change|round(2) }}</td>
-                  <td>{{ comp.percent_change|round(2) if comp.percent_change else 'N/A' }}%</td>
+                  <td>
+                    {{ comp.percent_change|round(2) if comp.percent_change else
+                    'N/A' }}%
+                  </td>
                   <td>
                     {% if comp.change_direction == 'increase' %}
                     <span class="badge bg-danger">Increase</span>
@@ -1082,18 +1325,18 @@
             </table>
           </div>
         </div>
-        
+
         <script>
           document.addEventListener('DOMContentLoaded', function() {
             const comparisonData = {{ comparison_report.comparisons|tojson }};
-            
+
             // Sort by percent change for better visualization
             comparisonData.sort((a, b) => (b.percent_change || 0) - (a.percent_change || 0));
-            
+
             // Extract tax codes and percent changes
             const taxCodes = comparisonData.map(item => item.tax_code);
             const percentChanges = comparisonData.map(item => item.percent_change || 0);
-            
+
             // Create an array of colors based on the change direction
             const barColors = comparisonData.map(item => {
               if (item.change_direction === 'increase') {
@@ -1104,7 +1347,7 @@
                 return 'rgba(201, 203, 207, 0.8)';
               }
             });
-            
+
             const ctx = document.getElementById('comparisonChart').getContext('2d');
             new Chart(ctx, {
               type: 'bar',
@@ -1145,18 +1388,17 @@
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+    );
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
+      return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-    
+
     // Show the tab from URL hash if present
     let hash = window.location.hash;
     if (hash) {
@@ -1165,12 +1407,12 @@
         new bootstrap.Tab(tab).show();
       }
     }
-    
+
     // Update hash when tab changes
     const tabs = document.querySelectorAll('a[data-bs-toggle="tab"]');
-    tabs.forEach(tab => {
-      tab.addEventListener('shown.bs.tab', function (event) {
-        window.location.hash = event.target.getAttribute('href');
+    tabs.forEach((tab) => {
+      tab.addEventListener("shown.bs.tab", function (event) {
+        window.location.hash = event.target.getAttribute("href");
       });
     });
   });

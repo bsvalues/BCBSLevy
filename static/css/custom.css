@@ -2,92 +2,92 @@
 
 /* Additional spacing for main content */
 .main-content {
-    margin-top: 2rem;
-    margin-bottom: 3rem;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
 }
 
 /* Dashboard card styling */
 .dashboard-card {
-    transition: all 0.3s ease;
-    height: 100%;
+  transition: all 0.3s ease;
+  height: 100%;
 }
 
 .dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-card .card-value {
-    font-size: 2.5rem;
-    font-weight: bold;
+  font-size: 2.5rem;
+  font-weight: bold;
 }
 
 /* Charts container */
 .chart-container {
-    position: relative;
-    margin: 1rem 0;
-    height: 300px;
+  position: relative;
+  margin: 1rem 0;
+  height: 300px;
 }
 
 /* Form styling */
 .form-container {
-    background-color: var(--bs-dark-bg-subtle);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+  background-color: var(--bs-dark-bg-subtle);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 /* Property lookup result box */
 .property-result {
-    background-color: var(--bs-dark-bg-subtle);
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    margin-top: 2rem;
+  background-color: var(--bs-dark-bg-subtle);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-top: 2rem;
 }
 
 .property-result .property-value {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 /* Custom table styling */
 .table-levy {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
 .table-levy thead {
-    background-color: var(--bs-dark-bg-subtle);
+  background-color: var(--bs-dark-bg-subtle);
 }
 
 /* File upload styling */
 .file-upload-container {
-    border: 2px dashed var(--bs-dark-bg-subtle);
-    border-radius: 0.5rem;
-    padding: 2rem;
-    text-align: center;
-    transition: all 0.3s ease;
+  border: 2px dashed var(--bs-dark-bg-subtle);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
 }
 
 .file-upload-container:hover {
-    border-color: var(--bs-primary);
+  border-color: var(--bs-primary);
 }
 
 .file-upload-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--bs-secondary);
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--bs-secondary);
 }
 
 /* Help text styling */
 .help-text {
-    font-size: 0.85rem;
-    color: var(--bs-secondary);
-    margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--bs-secondary);
+  margin-top: 0.25rem;
 }
 
 /* Footer styling */
 .footer {
-    margin-top: 4rem;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    border-top: 1px solid var(--bs-dark-bg-subtle);
+  margin-top: 4rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  border-top: 1px solid var(--bs-dark-bg-subtle);
 }

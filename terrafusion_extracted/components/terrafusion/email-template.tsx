@@ -1,11 +1,16 @@
 interface EmailTemplateProps {
-  title: string
-  content: string
-  ctaText: string
-  ctaUrl: string
+  title: string;
+  content: string;
+  ctaText: string;
+  ctaUrl: string;
 }
 
-export function EmailTemplate({ title, content, ctaText, ctaUrl }: EmailTemplateProps) {
+export function EmailTemplate({
+  title,
+  content,
+  ctaText,
+  ctaUrl,
+}: EmailTemplateProps) {
   return (
     <div className="w-full max-w-[600px] mx-auto border border-gray-200 rounded-md overflow-hidden font-sans">
       {/* Header with Monoline Seal */}
@@ -21,10 +26,15 @@ export function EmailTemplate({ title, content, ctaText, ctaUrl }: EmailTemplate
       <div className="p-8 bg-white">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">{title}</h1>
 
-        <div className="text-[15px] leading-6 text-gray-700 mb-8">{content}</div>
+        <div className="text-[15px] leading-6 text-gray-700 mb-8">
+          {content}
+        </div>
 
         {/* CTA button */}
-        <a href={ctaUrl} className="inline-block px-6 py-3 bg-[#C080FF] text-white font-medium rounded-md text-center">
+        <a
+          href={ctaUrl}
+          className="inline-block px-6 py-3 bg-[#C080FF] text-white font-medium rounded-md text-center"
+        >
           {ctaText}
         </a>
       </div>
@@ -35,5 +45,5 @@ export function EmailTemplate({ title, content, ctaText, ctaUrl }: EmailTemplate
         <p className="mt-1">123 Tech Park, Innovation City, CA 94103</p>
       </div>
     </div>
-  )
+  );
 }

@@ -7,75 +7,75 @@
 
 /* General styles */
 :root {
-    /* Benton County Colors */
-    --primary-color: #1a7b92;   /* Teal Blue - Primary Brand Color */
-    --secondary-color: #4d7c2d; /* Green - Secondary Brand Color */
-    --accent-color: #5da2b3;    /* Light Teal - Accent Color */
-    --bg-dark: #193046;         /* Dark Navy - Background Color */
-    --text-light: #f7f9fc;      /* Off-White - Text on dark backgrounds */
-    --accent-yellow: #e3b23c;   /* Yellow accent for special highlights */
-    --border-radius: 0.5rem;
-    --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    --z-index-breadcrumb: 10;   /* Z-index for breadcrumb navigation */
+  /* Benton County Colors */
+  --primary-color: #1a7b92; /* Teal Blue - Primary Brand Color */
+  --secondary-color: #4d7c2d; /* Green - Secondary Brand Color */
+  --accent-color: #5da2b3; /* Light Teal - Accent Color */
+  --bg-dark: #193046; /* Dark Navy - Background Color */
+  --text-light: #f7f9fc; /* Off-White - Text on dark backgrounds */
+  --accent-yellow: #e3b23c; /* Yellow accent for special highlights */
+  --border-radius: 0.5rem;
+  --box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  --z-index-breadcrumb: 10; /* Z-index for breadcrumb navigation */
 }
 
 /* Breadcrumb navigation */
 .breadcrumb {
-    position: relative;
-    z-index: var(--z-index-breadcrumb);
-    margin-bottom: 1rem;
+  position: relative;
+  z-index: var(--z-index-breadcrumb);
+  margin-bottom: 1rem;
 }
 
 .breadcrumb-item a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.2s ease;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .breadcrumb-item a:hover {
-    color: var(--accent-color);
-    text-decoration: underline;
+  color: var(--accent-color);
+  text-decoration: underline;
 }
 
 /* Module selection buttons (commonly used in module indices) */
 .module-selection .card {
-    position: relative;
-    z-index: 5; /* Lower z-index than breadcrumb navigation */
+  position: relative;
+  z-index: 5; /* Lower z-index than breadcrumb navigation */
 }
 
 /* Back arrow styles - completely redone to avoid all overlap issues */
 .back-link-container {
-    display: block;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  position: relative;
 }
 
 .back-arrow {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.9rem;
-    color: var(--primary-color);
-    text-decoration: none;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    transition: all 0.2s ease;
-    position: relative;
-    background-color: transparent;
-    border: none;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  position: relative;
+  background-color: transparent;
+  border: none;
 }
 
 .back-arrow i {
-    margin-right: 0.25rem;
-    font-size: 1rem;
-    transition: transform 0.2s ease;
+  margin-right: 0.25rem;
+  font-size: 1rem;
+  transition: transform 0.2s ease;
 }
 
 .back-arrow:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: var(--accent-color);
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--accent-color);
 }
 
 .back-arrow:hover i {
-    transform: translateX(-3px);
+  transform: translateX(-3px);
 }

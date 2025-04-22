@@ -1,346 +1,391 @@
-{% extends "base.html" %}
-
-{% block title %}Forecast Scenario Comparison{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Forecast Scenario Comparison{%
+endblock %} {% block content %}
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('forecasting_dashboard') }}">Forecasting</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Scenario Comparison</li>
-                </ol>
-            </nav>
-            <h1 class="mb-3">Forecast Scenario Comparison</h1>
-            <p class="lead">Compare baseline, optimistic, and pessimistic forecast scenarios.</p>
+  <div class="row mb-4">
+    <div class="col">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('forecasting_dashboard') }}">Forecasting</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Scenario Comparison
+          </li>
+        </ol>
+      </nav>
+      <h1 class="mb-3">Forecast Scenario Comparison</h1>
+      <p class="lead">
+        Compare baseline, optimistic, and pessimistic forecast scenarios.
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Configure Comparison</h5>
         </div>
+        <div class="card-body">
+          <form id="comparison-form">
+            <div class="mb-3">
+              <label for="tax-code" class="form-label">Tax Code</label>
+              <select
+                class="form-select"
+                id="tax-code"
+                name="tax_code"
+                required
+              >
+                <option value="">Select a tax code</option>
+                {% for tax_code in tax_codes %}
+                <option value="{{ tax_code.code }}">{{ tax_code.code }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="model-type" class="form-label">Forecast Model</label>
+              <select class="form-select" id="model-type" name="model_type">
+                <option value="linear">Linear Trend</option>
+                <option value="exponential">Exponential Smoothing</option>
+                <option value="arima">ARIMA</option>
+              </select>
+              <div class="form-text">
+                The same model will be used for all scenarios.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="years-ahead" class="form-label">Forecast Years</label>
+              <input
+                type="number"
+                class="form-control"
+                id="years-ahead"
+                name="years_ahead"
+                min="1"
+                max="10"
+                value="3"
+              />
+              <div class="form-text">
+                Number of future years to forecast (1-10).
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              Generate Comparison
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Configure Comparison</h5>
-                </div>
-                <div class="card-body">
-                    <form id="comparison-form">
-                        <div class="mb-3">
-                            <label for="tax-code" class="form-label">Tax Code</label>
-                            <select class="form-select" id="tax-code" name="tax_code" required>
-                                <option value="">Select a tax code</option>
-                                {% for tax_code in tax_codes %}
-                                <option value="{{ tax_code.code }}">{{ tax_code.code }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="model-type" class="form-label">Forecast Model</label>
-                            <select class="form-select" id="model-type" name="model_type">
-                                <option value="linear">Linear Trend</option>
-                                <option value="exponential">Exponential Smoothing</option>
-                                <option value="arima">ARIMA</option>
-                            </select>
-                            <div class="form-text">The same model will be used for all scenarios.</div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="years-ahead" class="form-label">Forecast Years</label>
-                            <input type="number" class="form-control" id="years-ahead" name="years_ahead" min="1" max="10" value="3">
-                            <div class="form-text">Number of future years to forecast (1-10).</div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Generate Comparison</button>
-                    </form>
-                </div>
-            </div>
+    <div class="col-md-8 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="card-title mb-0" id="comparison-title">
+            Scenario Comparison
+          </h5>
         </div>
+        <div class="card-body">
+          <div id="loading" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Generating comparison...</p>
+          </div>
 
-        <div class="col-md-8 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h5 class="card-title mb-0" id="comparison-title">Scenario Comparison</h5>
-                </div>
-                <div class="card-body">
-                    <div id="loading" class="text-center d-none">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2">Generating comparison...</p>
-                    </div>
-                    
-                    <div id="comparison-placeholder" class="text-center">
-                        <div class="mt-5 mb-5">
-                            <i class="bi bi-bar-chart text-muted" style="font-size: 4rem;"></i>
-                            <p class="mt-3 text-muted">Select a tax code and configure options to compare scenarios.</p>
-                        </div>
-                    </div>
-                    
-                    <div id="comparison-error" class="alert alert-danger mt-3 d-none">
-                        <i class="bi bi-exclamation-triangle me-2"></i>
-                        <span id="error-message"></span>
-                    </div>
-                    
-                    <div id="comparison-chart-container" class="d-none">
-                        <div id="comparison-chart" style="height: 400px;"></div>
-                    </div>
-                    
-                    <div id="comparison-table-container" class="mt-4 d-none">
-                        <h5>Scenario Details</h5>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Year</th>
-                                        <th>Baseline Forecast</th>
-                                        <th>Optimistic Forecast</th>
-                                        <th>Pessimistic Forecast</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="comparison-table-body">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+          <div id="comparison-placeholder" class="text-center">
+            <div class="mt-5 mb-5">
+              <i class="bi bi-bar-chart text-muted" style="font-size: 4rem"></i>
+              <p class="mt-3 text-muted">
+                Select a tax code and configure options to compare scenarios.
+              </p>
             </div>
-        </div>
-    </div>
+          </div>
 
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Understanding the Scenarios</h5>
+          <div id="comparison-error" class="alert alert-danger mt-3 d-none">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span id="error-message"></span>
+          </div>
+
+          <div id="comparison-chart-container" class="d-none">
+            <div id="comparison-chart" style="height: 400px"></div>
+          </div>
+
+          <div id="comparison-table-container" class="mt-4 d-none">
+            <h5>Scenario Details</h5>
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Baseline Forecast</th>
+                    <th>Optimistic Forecast</th>
+                    <th>Pessimistic Forecast</th>
+                  </tr>
+                </thead>
+                <tbody id="comparison-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Understanding the Scenarios</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-header bg-secondary">
+                  <h6 class="card-title mb-0 text-white">Baseline Scenario</h6>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header bg-secondary">
-                                    <h6 class="card-title mb-0 text-white">Baseline Scenario</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p>The baseline scenario represents the most likely future trend based on historical data without any adjustments. This is the expected outcome if current trends continue.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header bg-success">
-                                    <h6 class="card-title mb-0 text-white">Optimistic Scenario</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p>The optimistic scenario represents a more favorable outcome with lower levy rates. This scenario assumes more efficient tax collection, stronger property value growth, or additional tax base.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header bg-warning">
-                                    <h6 class="card-title mb-0">Pessimistic Scenario</h6>
-                                </div>
-                                <div class="card-body">
-                                    <p>The pessimistic scenario represents a less favorable outcome with higher levy rates. This scenario assumes challenges in tax collection, slower property value growth, or erosion of the tax base.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  <p>
+                    The baseline scenario represents the most likely future
+                    trend based on historical data without any adjustments. This
+                    is the expected outcome if current trends continue.
+                  </p>
                 </div>
+              </div>
             </div>
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-header bg-success">
+                  <h6 class="card-title mb-0 text-white">
+                    Optimistic Scenario
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <p>
+                    The optimistic scenario represents a more favorable outcome
+                    with lower levy rates. This scenario assumes more efficient
+                    tax collection, stronger property value growth, or
+                    additional tax base.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                <div class="card-header bg-warning">
+                  <h6 class="card-title mb-0">Pessimistic Scenario</h6>
+                </div>
+                <div class="card-body">
+                  <p>
+                    The pessimistic scenario represents a less favorable outcome
+                    with higher levy rates. This scenario assumes challenges in
+                    tax collection, slower property value growth, or erosion of
+                    the tax base.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const comparisonForm = document.getElementById('comparison-form');
-        const loadingElement = document.getElementById('loading');
-        const placeholderElement = document.getElementById('comparison-placeholder');
-        const errorElement = document.getElementById('comparison-error');
-        const errorMessageElement = document.getElementById('error-message');
-        const chartContainer = document.getElementById('comparison-chart-container');
-        const comparisonTitle = document.getElementById('comparison-title');
-        const tableContainer = document.getElementById('comparison-table-container');
-        const tableBody = document.getElementById('comparison-table-body');
-        
-        comparisonForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Show loading state
-            loadingElement.classList.remove('d-none');
-            placeholderElement.classList.add('d-none');
-            errorElement.classList.add('d-none');
-            chartContainer.classList.add('d-none');
-            tableContainer.classList.add('d-none');
-            
-            // Get form data
-            const formData = new FormData(comparisonForm);
-            
-            // Send request
-            fetch('/forecasting/compare', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(data => {
-                        throw new Error(data.error || 'Error generating comparison');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Update title
-                comparisonTitle.textContent = `Scenario Comparison for Tax Code ${data.tax_code}`;
-                
-                // Display chart
-                displayComparisonChart(data);
-                
-                // Display table
-                displayComparisonTable(data);
-                
-                // Hide loading state
-                loadingElement.classList.add('d-none');
-            })
-            .catch(error => {
-                // Show error message
-                errorMessageElement.textContent = error.message;
-                errorElement.classList.remove('d-none');
-                
-                // Hide loading state
-                loadingElement.classList.add('d-none');
+  document.addEventListener("DOMContentLoaded", function () {
+    const comparisonForm = document.getElementById("comparison-form");
+    const loadingElement = document.getElementById("loading");
+    const placeholderElement = document.getElementById(
+      "comparison-placeholder",
+    );
+    const errorElement = document.getElementById("comparison-error");
+    const errorMessageElement = document.getElementById("error-message");
+    const chartContainer = document.getElementById(
+      "comparison-chart-container",
+    );
+    const comparisonTitle = document.getElementById("comparison-title");
+    const tableContainer = document.getElementById(
+      "comparison-table-container",
+    );
+    const tableBody = document.getElementById("comparison-table-body");
+
+    comparisonForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Show loading state
+      loadingElement.classList.remove("d-none");
+      placeholderElement.classList.add("d-none");
+      errorElement.classList.add("d-none");
+      chartContainer.classList.add("d-none");
+      tableContainer.classList.add("d-none");
+
+      // Get form data
+      const formData = new FormData(comparisonForm);
+
+      // Send request
+      fetch("/forecasting/compare", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((data) => {
+              throw new Error(data.error || "Error generating comparison");
             });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          // Update title
+          comparisonTitle.textContent = `Scenario Comparison for Tax Code ${data.tax_code}`;
+
+          // Display chart
+          displayComparisonChart(data);
+
+          // Display table
+          displayComparisonTable(data);
+
+          // Hide loading state
+          loadingElement.classList.add("d-none");
+        })
+        .catch((error) => {
+          // Show error message
+          errorMessageElement.textContent = error.message;
+          errorElement.classList.remove("d-none");
+
+          // Hide loading state
+          loadingElement.classList.add("d-none");
         });
-        
-        function displayComparisonChart(data) {
-            // Get data from chart_data
-            const historical = data.chart_data.historical;
-            const scenarios = data.chart_data.scenarios;
-            
-            // Create data for Plotly
-            const traces = [
-                {
-                    x: historical.x,
-                    y: historical.y,
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'Historical',
-                    line: {
-                        color: 'blue',
-                        width: 2
-                    },
-                    marker: {
-                        size: 8
-                    }
-                }
-            ];
-            
-            // Add scenario traces
-            const colors = {
-                baseline: 'red',
-                optimistic: 'green',
-                pessimistic: 'orange'
-            };
-            
-            scenarios.forEach(scenario => {
-                traces.push({
-                    x: scenario.x,
-                    y: scenario.y,
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: scenario.name,
-                    line: {
-                        color: colors[scenario.name.toLowerCase()] || 'gray',
-                        width: 2,
-                        dash: scenario.line?.dash || 'solid'
-                    },
-                    marker: {
-                        size: 8
-                    }
-                });
-            });
-            
-            const layout = {
-                title: `Scenario Comparison for ${data.tax_code}`,
-                xaxis: {
-                    title: 'Year',
-                    tickmode: 'linear'
-                },
-                yaxis: {
-                    title: 'Levy Rate',
-                    tickformat: '.4f'
-                },
-                legend: {
-                    x: 0.01,
-                    y: 0.99,
-                    bgcolor: 'rgba(255, 255, 255, 0.5)'
-                },
-                margin: {
-                    l: 70,
-                    r: 30,
-                    b: 50,
-                    t: 60
-                }
-            };
-            
-            // Create chart
-            Plotly.newPlot('comparison-chart', traces, layout);
-            
-            // Show chart container
-            chartContainer.classList.remove('d-none');
-        }
-        
-        function displayComparisonTable(data) {
-            // Clear table body
-            tableBody.innerHTML = '';
-            
-            // Get years from baseline scenario
-            const years = data.scenarios.baseline.years;
-            
-            // Add rows for each forecast year
-            for (let i = 0; i < years.length; i++) {
-                const year = years[i];
-                const baselineRate = data.scenarios.baseline.predicted_rates[i];
-                const optimisticRate = data.scenarios.optimistic.predicted_rates[i];
-                const pessimisticRate = data.scenarios.pessimistic.predicted_rates[i];
-                
-                const row = document.createElement('tr');
-                
-                const yearCell = document.createElement('td');
-                yearCell.textContent = year;
-                row.appendChild(yearCell);
-                
-                const baselineCell = document.createElement('td');
-                baselineCell.textContent = baselineRate.toFixed(4);
-                row.appendChild(baselineCell);
-                
-                const optimisticCell = document.createElement('td');
-                optimisticCell.textContent = optimisticRate.toFixed(4);
-                optimisticCell.classList.add('text-success');
-                if (optimisticRate < baselineRate) {
-                    optimisticCell.innerHTML += ' <i class="bi bi-arrow-down-short"></i>';
-                }
-                row.appendChild(optimisticCell);
-                
-                const pessimisticCell = document.createElement('td');
-                pessimisticCell.textContent = pessimisticRate.toFixed(4);
-                pessimisticCell.classList.add('text-warning');
-                if (pessimisticRate > baselineRate) {
-                    pessimisticCell.innerHTML += ' <i class="bi bi-arrow-up-short"></i>';
-                }
-                row.appendChild(pessimisticCell);
-                
-                tableBody.appendChild(row);
-            }
-            
-            // Show table container
-            tableContainer.classList.remove('d-none');
-        }
     });
+
+    function displayComparisonChart(data) {
+      // Get data from chart_data
+      const historical = data.chart_data.historical;
+      const scenarios = data.chart_data.scenarios;
+
+      // Create data for Plotly
+      const traces = [
+        {
+          x: historical.x,
+          y: historical.y,
+          type: "scatter",
+          mode: "lines+markers",
+          name: "Historical",
+          line: {
+            color: "blue",
+            width: 2,
+          },
+          marker: {
+            size: 8,
+          },
+        },
+      ];
+
+      // Add scenario traces
+      const colors = {
+        baseline: "red",
+        optimistic: "green",
+        pessimistic: "orange",
+      };
+
+      scenarios.forEach((scenario) => {
+        traces.push({
+          x: scenario.x,
+          y: scenario.y,
+          type: "scatter",
+          mode: "lines+markers",
+          name: scenario.name,
+          line: {
+            color: colors[scenario.name.toLowerCase()] || "gray",
+            width: 2,
+            dash: scenario.line?.dash || "solid",
+          },
+          marker: {
+            size: 8,
+          },
+        });
+      });
+
+      const layout = {
+        title: `Scenario Comparison for ${data.tax_code}`,
+        xaxis: {
+          title: "Year",
+          tickmode: "linear",
+        },
+        yaxis: {
+          title: "Levy Rate",
+          tickformat: ".4f",
+        },
+        legend: {
+          x: 0.01,
+          y: 0.99,
+          bgcolor: "rgba(255, 255, 255, 0.5)",
+        },
+        margin: {
+          l: 70,
+          r: 30,
+          b: 50,
+          t: 60,
+        },
+      };
+
+      // Create chart
+      Plotly.newPlot("comparison-chart", traces, layout);
+
+      // Show chart container
+      chartContainer.classList.remove("d-none");
+    }
+
+    function displayComparisonTable(data) {
+      // Clear table body
+      tableBody.innerHTML = "";
+
+      // Get years from baseline scenario
+      const years = data.scenarios.baseline.years;
+
+      // Add rows for each forecast year
+      for (let i = 0; i < years.length; i++) {
+        const year = years[i];
+        const baselineRate = data.scenarios.baseline.predicted_rates[i];
+        const optimisticRate = data.scenarios.optimistic.predicted_rates[i];
+        const pessimisticRate = data.scenarios.pessimistic.predicted_rates[i];
+
+        const row = document.createElement("tr");
+
+        const yearCell = document.createElement("td");
+        yearCell.textContent = year;
+        row.appendChild(yearCell);
+
+        const baselineCell = document.createElement("td");
+        baselineCell.textContent = baselineRate.toFixed(4);
+        row.appendChild(baselineCell);
+
+        const optimisticCell = document.createElement("td");
+        optimisticCell.textContent = optimisticRate.toFixed(4);
+        optimisticCell.classList.add("text-success");
+        if (optimisticRate < baselineRate) {
+          optimisticCell.innerHTML += ' <i class="bi bi-arrow-down-short"></i>';
+        }
+        row.appendChild(optimisticCell);
+
+        const pessimisticCell = document.createElement("td");
+        pessimisticCell.textContent = pessimisticRate.toFixed(4);
+        pessimisticCell.classList.add("text-warning");
+        if (pessimisticRate > baselineRate) {
+          pessimisticCell.innerHTML += ' <i class="bi bi-arrow-up-short"></i>';
+        }
+        row.appendChild(pessimisticCell);
+
+        tableBody.appendChild(row);
+      }
+
+      // Show table container
+      tableContainer.classList.remove("d-none");
+    }
+  });
 </script>
 {% endblock %}

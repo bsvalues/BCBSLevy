@@ -1,94 +1,153 @@
-{% extends "base.html" %}
-
-{% block title %}My Profile - Levy Calculation System{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}My Profile - Levy Calculation
+System{% endblock %} {% block content %}
 <div class="container py-5">
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Account Settings</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="{{ url_for('auth.profile') }}" class="list-group-item list-group-item-action active">Profile</a>
-                    <a href="{{ url_for('auth.change_password') }}" class="list-group-item list-group-item-action">Change Password</a>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-lg-3">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Account Settings</h5>
         </div>
-        
-        <div class="col-lg-9">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="card-title mb-0">My Profile</h4>
-                </div>
-                <div class="card-body">
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ message }}</div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    
-                    <form method="post" action="{{ url_for('auth.profile') }}">
-                        <div class="row mb-3">
-                            <label for="username" class="col-sm-3 col-form-label">Username</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control-plaintext" id="username" value="{{ user.username }}" readonly>
-                                <small class="text-muted">Username cannot be changed.</small>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <label for="email" class="col-sm-3 col-form-label">Email</label>
-                            <div class="col-sm-9">
-                                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <label for="first_name" class="col-sm-3 col-form-label">First Name</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name or '' }}">
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <label for="last_name" class="col-sm-3 col-form-label">Last Name</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name or '' }}">
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <label for="account_type" class="col-sm-3 col-form-label">Account Type</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control-plaintext" id="account_type" value="{{ 'Administrator' if user.is_admin else 'Standard User' }}" readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <label for="created_at" class="col-sm-3 col-form-label">Created</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control-plaintext" id="created_at" value="{{ user.created_at|datetime }}" readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <label for="last_login" class="col-sm-3 col-form-label">Last Login</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control-plaintext" id="last_login" value="{{ user.last_login|datetime if user.last_login else 'Never' }}" readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-primary">Update Profile</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div class="list-group list-group-flush">
+          <a
+            href="{{ url_for('auth.profile') }}"
+            class="list-group-item list-group-item-action active"
+            >Profile</a
+          >
+          <a
+            href="{{ url_for('auth.change_password') }}"
+            class="list-group-item list-group-item-action"
+            >Change Password</a
+          >
         </div>
+      </div>
     </div>
+
+    <div class="col-lg-9">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="card-title mb-0">My Profile</h4>
+        </div>
+        <div class="card-body">
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <form method="post" action="{{ url_for('auth.profile') }}">
+            <div class="row mb-3">
+              <label for="username" class="col-sm-3 col-form-label"
+                >Username</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="username"
+                  value="{{ user.username }}"
+                  readonly
+                />
+                <small class="text-muted">Username cannot be changed.</small>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label for="email" class="col-sm-3 col-form-label">Email</label>
+              <div class="col-sm-9">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  value="{{ user.email }}"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label for="first_name" class="col-sm-3 col-form-label"
+                >First Name</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="first_name"
+                  name="first_name"
+                  value="{{ user.first_name or '' }}"
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label for="last_name" class="col-sm-3 col-form-label"
+                >Last Name</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="last_name"
+                  name="last_name"
+                  value="{{ user.last_name or '' }}"
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label for="account_type" class="col-sm-3 col-form-label"
+                >Account Type</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="account_type"
+                  value="{{ 'Administrator' if user.is_admin else 'Standard User' }}"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label for="created_at" class="col-sm-3 col-form-label"
+                >Created</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="created_at"
+                  value="{{ user.created_at|datetime }}"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label for="last_login" class="col-sm-3 col-form-label"
+                >Last Login</label
+              >
+              <div class="col-sm-9">
+                <input
+                  type="text"
+                  class="form-control-plaintext"
+                  id="last_login"
+                  value="{{ user.last_login|datetime if user.last_login else 'Never' }}"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <button type="submit" class="btn btn-primary">
+                Update Profile
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

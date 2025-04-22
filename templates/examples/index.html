@@ -1,71 +1,100 @@
-{% extends "simple_base.html" %}
-
-{% block title %}Component Examples{% endblock %}
-
-{% block content %}
+{% extends "simple_base.html" %} {% block title %}Component Examples{% endblock
+%} {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-lg border-0 rounded-4 mb-5">
-                <div class="card-body p-5">
-                    <h1 class="display-5 fw-bold text-center mb-4">UI Component Examples</h1>
-                    <p class="lead text-center mb-5">Explore our interactive component library showcasing the design system used throughout the application.</p>
-                    
-                    <div class="row g-4">
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
-                                <div class="card-body text-center p-4">
-                                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-flex mb-3">
-                                        <i class="bi bi-ui-checks text-primary fs-1"></i>
-                                    </div>
-                                    <h3 class="h5 mb-3">Form Elements</h3>
-                                    <p class="text-muted">Interactive form controls with validation states and feedback.</p>
-                                    <a href="{{ url_for('examples.forms_demo') }}" class="btn btn-outline-primary rounded-pill mt-3">
-                                        View Forms
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
-                                <div class="card-body text-center p-4">
-                                    <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-flex mb-3">
-                                        <i class="bi bi-credit-card-2-front text-info fs-1"></i>
-                                    </div>
-                                    <h3 class="h5 mb-3">Card Layouts</h3>
-                                    <p class="text-muted">Responsive card designs for presenting content in an elegant way.</p>
-                                    <a href="{{ url_for('examples.cards_demo') }}" class="btn btn-outline-info rounded-pill mt-3">
-                                        View Cards
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
-                                <div class="card-body text-center p-4">
-                                    <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-flex mb-3">
-                                        <i class="bi bi-hourglass-split text-success fs-1"></i>
-                                    </div>
-                                    <h3 class="h5 mb-3">Loading States</h3>
-                                    <p class="text-muted">Custom loading animations for async operations and data fetching.</p>
-                                    <a href="{{ url_for('examples.loading_animations_demo') }}" class="btn btn-outline-success rounded-pill mt-3">
-                                        View Animations
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center mt-5">
-                        <a href="{{ url_for('home.index') }}" class="btn btn-primary rounded-pill px-4">
-                            <i class="bi bi-house-door me-2"></i>Return to Home
-                        </a>
-                    </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0 rounded-4 mb-5">
+        <div class="card-body p-5">
+          <h1 class="display-5 fw-bold text-center mb-4">
+            UI Component Examples
+          </h1>
+          <p class="lead text-center mb-5">
+            Explore our interactive component library showcasing the design
+            system used throughout the application.
+          </p>
+
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
+                <div class="card-body text-center p-4">
+                  <div
+                    class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-flex mb-3"
+                  >
+                    <i class="bi bi-ui-checks text-primary fs-1"></i>
+                  </div>
+                  <h3 class="h5 mb-3">Form Elements</h3>
+                  <p class="text-muted">
+                    Interactive form controls with validation states and
+                    feedback.
+                  </p>
+                  <a
+                    href="{{ url_for('examples.forms_demo') }}"
+                    class="btn btn-outline-primary rounded-pill mt-3"
+                  >
+                    View Forms
+                  </a>
                 </div>
+              </div>
             </div>
+
+            <div class="col-md-4">
+              <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
+                <div class="card-body text-center p-4">
+                  <div
+                    class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-flex mb-3"
+                  >
+                    <i class="bi bi-credit-card-2-front text-info fs-1"></i>
+                  </div>
+                  <h3 class="h5 mb-3">Card Layouts</h3>
+                  <p class="text-muted">
+                    Responsive card designs for presenting content in an elegant
+                    way.
+                  </p>
+                  <a
+                    href="{{ url_for('examples.cards_demo') }}"
+                    class="btn btn-outline-info rounded-pill mt-3"
+                  >
+                    View Cards
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card h-100 border-0 shadow-sm rounded-4 hover-lift">
+                <div class="card-body text-center p-4">
+                  <div
+                    class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-flex mb-3"
+                  >
+                    <i class="bi bi-hourglass-split text-success fs-1"></i>
+                  </div>
+                  <h3 class="h5 mb-3">Loading States</h3>
+                  <p class="text-muted">
+                    Custom loading animations for async operations and data
+                    fetching.
+                  </p>
+                  <a
+                    href="{{ url_for('examples.loading_animations_demo') }}"
+                    class="btn btn-outline-success rounded-pill mt-3"
+                  >
+                    View Animations
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center mt-5">
+            <a
+              href="{{ url_for('home.index') }}"
+              class="btn btn-primary rounded-pill px-4"
+            >
+              <i class="bi bi-house-door me-2"></i>Return to Home
+            </a>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

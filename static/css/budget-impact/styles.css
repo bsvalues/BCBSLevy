@@ -18,19 +18,19 @@
 /* AI Insights Styles */
 .insight-card {
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
   transition: all 0.3s ease;
 }
 
 .insight-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .insight-header {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -79,9 +79,15 @@
 
 /* Animation for AI insights */
 @keyframes highlightPulse {
-  0% { background-color: rgba(13, 110, 253, 0.05); }
-  50% { background-color: rgba(13, 110, 253, 0.15); }
-  100% { background-color: rgba(13, 110, 253, 0.05); }
+  0% {
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+  50% {
+    background-color: rgba(13, 110, 253, 0.15);
+  }
+  100% {
+    background-color: rgba(13, 110, 253, 0.05);
+  }
 }
 
 .highlight-pulse {

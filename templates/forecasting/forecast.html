@@ -1,190 +1,426 @@
-{% extends "base.html" %}
-
-{% block title %}{{ page_title }}{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}{{ page_title }}{% endblock %} {%
+block content %}
 <!-- Header Section with Gradient Background -->
 <div class="app-header-bg py-4 mb-4 rounded-4 mx-3">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-5 fw-bold text-white mb-3">Generate Levy Rate Forecast</h1>
-                <p class="lead text-light opacity-90 mb-0">Predict future tax rates with advanced statistical models and AI-powered analysis</p>
-            </div>
-            <div class="col-lg-6 text-lg-end">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb justify-content-lg-end mb-0">
-                        <li class="breadcrumb-item"><a href="{{ url_for('forecasting.index') }}" class="text-white opacity-75">Forecasting</a></li>
-                        <li class="breadcrumb-item active text-white" aria-current="page">Generate Forecast</li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="display-5 fw-bold text-white mb-3">
+          Generate Levy Rate Forecast
+        </h1>
+        <p class="lead text-light opacity-90 mb-0">
+          Predict future tax rates with advanced statistical models and
+          AI-powered analysis
+        </p>
+      </div>
+      <div class="col-lg-6 text-lg-end">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-lg-end mb-0">
+            <li class="breadcrumb-item">
+              <a
+                href="{{ url_for('forecasting.index') }}"
+                class="text-white opacity-75"
+                >Forecasting</a
+              >
+            </li>
+            <li class="breadcrumb-item active text-white" aria-current="page">
+              Generate Forecast
+            </li>
+          </ol>
+        </nav>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="container">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm hover-card mb-4" style="border-radius: 16px; overflow: hidden;">
-                <div class="position-absolute top-0 start-0 w-100" style="background: linear-gradient(90deg, #3DA5BD, #5da2b3); height: 4px;"></div>
-                <div class="card-body p-4 p-lg-5">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(61, 165, 189, 0.1);">
-                            <i class="bi bi-graph-up" style="color: #3DA5BD;"></i>
-                        </div>
-                        <h3 class="card-title h4 mb-0 fw-bold">Forecast Configuration</h3>
-                    </div>
-                    
-                    <form method="post" action="{{ url_for('forecasting.forecast') }}">
-                        <div class="mb-4">
-                            <label for="tax_code_id" class="form-label fw-medium">Tax Code *</label>
-                            <select class="form-select form-select-lg" id="tax_code_id" name="tax_code_id" required>
-                                <option value="" selected disabled>Select a tax code</option>
-                                {% for code in tax_codes %}
-                                <option value="{{ code.id }}" {% if tax_code_id == code.id %}selected{% endif %}>
-                                    {{ code.code }} ({{ code.history_count }} years of data)
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-text">Select the tax code to forecast.</div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="years_to_forecast" class="form-label fw-medium">Years to Forecast</label>
-                            <input type="number" class="form-control form-control-lg" id="years_to_forecast" name="years_to_forecast" 
-                                   min="1" max="10" value="{{ years_to_forecast or 3 }}">
-                            <div class="form-text">Number of years to forecast into the future (1-10).</div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="confidence_level" class="form-label fw-medium">Confidence Level</label>
-                            <select class="form-select form-select-lg" id="confidence_level" name="confidence_level">
-                                <option value="0.90" {% if confidence_level == 0.90 %}selected{% endif %}>90%</option>
-                                <option value="0.95" {% if confidence_level == 0.95 or not confidence_level %}selected{% endif %}>95%</option>
-                                <option value="0.99" {% if confidence_level == 0.99 %}selected{% endif %}>99%</option>
-                            </select>
-                            <div class="form-text">Confidence level for prediction intervals.</div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="preferred_model" class="form-label fw-medium">Preferred Model</label>
-                            <select class="form-select form-select-lg" id="preferred_model" name="preferred_model">
-                                <option value="" {% if not preferred_model %}selected{% endif %}>Auto (Best Fit)</option>
-                                <option value="linear" {% if preferred_model == 'linear' %}selected{% endif %}>Linear Trend</option>
-                                <option value="exponential" {% if preferred_model == 'exponential' %}selected{% endif %}>Exponential Smoothing</option>
-                                <option value="arima" {% if preferred_model == 'arima' %}selected{% endif %}>ARIMA</option>
-                            </select>
-                            <div class="form-text">Select a specific model or let the system choose the best fit based on historical data.</div>
-                        </div>
-                        
-                        <div class="mb-4 form-check">
-                            <input type="checkbox" class="form-check-input" id="include_explanation" name="include_explanation" 
-                                   {% if include_explanation %}checked{% endif %} value="true">
-                            <label class="form-check-label fw-medium" for="include_explanation">
-                                Include AI-Enhanced Explanation
-                            </label>
-                            <div class="form-text">Generate an AI-enhanced explanation and recommendations based on the forecast results.</div>
-                        </div>
-                        
-                        <div class="d-grid gap-2 mt-5">
-                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5">
-                                <i class="bi bi-graph-up me-2"></i>Generate Forecast
-                            </button>
-                            <a href="{{ url_for('forecasting.index') }}" class="btn btn-outline-secondary rounded-pill px-5 mt-2">
-                                <i class="bi bi-arrow-left me-2"></i>Back to Forecasting
-                            </a>
-                        </div>
-                    </form>
-                </div>
+  <div class="row">
+    <div class="col-lg-8">
+      <div
+        class="card border-0 shadow-sm hover-card mb-4"
+        style="border-radius: 16px; overflow: hidden"
+      >
+        <div
+          class="position-absolute top-0 start-0 w-100"
+          style="
+            background: linear-gradient(90deg, #3da5bd, #5da2b3);
+            height: 4px;
+          "
+        ></div>
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex align-items-center mb-4">
+            <div
+              class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3"
+              style="background-color: rgba(61, 165, 189, 0.1)"
+            >
+              <i class="bi bi-graph-up" style="color: #3da5bd"></i>
             </div>
+            <h3 class="card-title h4 mb-0 fw-bold">Forecast Configuration</h3>
+          </div>
+
+          <form method="post" action="{{ url_for('forecasting.forecast') }}">
+            <div class="mb-4">
+              <label for="tax_code_id" class="form-label fw-medium"
+                >Tax Code *</label
+              >
+              <select
+                class="form-select form-select-lg"
+                id="tax_code_id"
+                name="tax_code_id"
+                required
+              >
+                <option value="" selected disabled>Select a tax code</option>
+                {% for code in tax_codes %}
+                <option
+                  value="{{ code.id }}"
+                  {%
+                  if
+                  tax_code_id=""
+                  ="code.id"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ code.code }} ({{ code.history_count }} years of data)
+                </option>
+                {% endfor %}
+              </select>
+              <div class="form-text">Select the tax code to forecast.</div>
+            </div>
+
+            <div class="mb-4">
+              <label for="years_to_forecast" class="form-label fw-medium"
+                >Years to Forecast</label
+              >
+              <input
+                type="number"
+                class="form-control form-control-lg"
+                id="years_to_forecast"
+                name="years_to_forecast"
+                min="1"
+                max="10"
+                value="{{ years_to_forecast or 3 }}"
+              />
+              <div class="form-text">
+                Number of years to forecast into the future (1-10).
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="confidence_level" class="form-label fw-medium"
+                >Confidence Level</label
+              >
+              <select
+                class="form-select form-select-lg"
+                id="confidence_level"
+                name="confidence_level"
+              >
+                <option
+                  value="0.90"
+                  {%
+                  if
+                  confidence_level=""
+                  ="0.90"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  90%
+                </option>
+                <option
+                  value="0.95"
+                  {%
+                  if
+                  confidence_level=""
+                  ="0.95"
+                  or
+                  not
+                  confidence_level
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  95%
+                </option>
+                <option
+                  value="0.99"
+                  {%
+                  if
+                  confidence_level=""
+                  ="0.99"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  99%
+                </option>
+              </select>
+              <div class="form-text">
+                Confidence level for prediction intervals.
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="preferred_model" class="form-label fw-medium"
+                >Preferred Model</label
+              >
+              <select
+                class="form-select form-select-lg"
+                id="preferred_model"
+                name="preferred_model"
+              >
+                <option
+                  value=""
+                  {%
+                  if
+                  not
+                  preferred_model
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Auto (Best Fit)
+                </option>
+                <option
+                  value="linear"
+                  {%
+                  if
+                  preferred_model=""
+                  ="linear"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Linear Trend
+                </option>
+                <option
+                  value="exponential"
+                  {%
+                  if
+                  preferred_model=""
+                  ="exponential"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  Exponential Smoothing
+                </option>
+                <option
+                  value="arima"
+                  {%
+                  if
+                  preferred_model=""
+                  ="arima"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  ARIMA
+                </option>
+              </select>
+              <div class="form-text">
+                Select a specific model or let the system choose the best fit
+                based on historical data.
+              </div>
+            </div>
+
+            <div class="mb-4 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="include_explanation"
+                name="include_explanation"
+                {%
+                if
+                include_explanation
+                %}checked{%
+                endif
+                %}
+                value="true"
+              />
+              <label
+                class="form-check-label fw-medium"
+                for="include_explanation"
+              >
+                Include AI-Enhanced Explanation
+              </label>
+              <div class="form-text">
+                Generate an AI-enhanced explanation and recommendations based on
+                the forecast results.
+              </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-5">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg rounded-pill px-5"
+              >
+                <i class="bi bi-graph-up me-2"></i>Generate Forecast
+              </button>
+              <a
+                href="{{ url_for('forecasting.index') }}"
+                class="btn btn-outline-secondary rounded-pill px-5 mt-2"
+              >
+                <i class="bi bi-arrow-left me-2"></i>Back to Forecasting
+              </a>
+            </div>
+          </form>
         </div>
-        
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm hover-card mb-4" style="border-radius: 16px; overflow: hidden;">
-                <div class="position-absolute top-0 start-0 w-100" style="background: linear-gradient(90deg, #66A355, #78c265); height: 4px;"></div>
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(102, 163, 85, 0.1);">
-                            <i class="bi bi-info-circle" style="color: #66A355;"></i>
-                        </div>
-                        <h3 class="card-title h4 mb-0 fw-bold">About Forecasting Models</h3>
-                    </div>
-                    
-                    <dl class="mb-0">
-                        <dt class="mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="feature-icon me-2 d-inline-flex align-items-center justify-content-center rounded-circle p-2" style="background-color: rgba(61, 165, 189, 0.1);">
-                                    <i class="bi bi-graph-up" style="color: #3DA5BD;"></i>
-                                </div>
-                                <span>Linear Trend</span>
-                            </div>
-                        </dt>
-                        <dd class="mb-3 ms-4 ps-2 text-muted">Uses linear regression to project future values based on historical trends. Best for data with consistent growth or decline patterns.</dd>
-                        
-                        <dt class="mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="feature-icon me-2 d-inline-flex align-items-center justify-content-center rounded-circle p-2" style="background-color: rgba(102, 163, 85, 0.1);">
-                                    <i class="bi bi-graph-up-arrow" style="color: #66A355;"></i>
-                                </div>
-                                <span>Exponential Smoothing</span>
-                            </div>
-                        </dt>
-                        <dd class="mb-3 ms-4 ps-2 text-muted">Applies exponentially decreasing weights to past observations. Works well with data that has seasonality or level shifts.</dd>
-                        
-                        <dt class="mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="feature-icon me-2 d-inline-flex align-items-center justify-content-center rounded-circle p-2" style="background-color: rgba(240, 199, 92, 0.1);">
-                                    <i class="bi bi-activity" style="color: #F0C75C;"></i>
-                                </div>
-                                <span>ARIMA</span>
-                            </div>
-                        </dt>
-                        <dd class="ms-4 ps-2 text-muted">Autoregressive Integrated Moving Average model captures complex patterns in the data. Best for data with autocorrelation and non-stationary characteristics.</dd>
-                    </dl>
-                    
-                    <div class="alert alert-info mt-4 mb-0 rounded-3" style="background-color: rgba(61, 165, 189, 0.1); border-color: rgba(61, 165, 189, 0.2); color: #3DA5BD;">
-                        <div class="d-flex">
-                            <i class="bi bi-info-circle me-2 fs-5"></i>
-                            <div>
-                                <strong>How Models Are Evaluated:</strong> The system evaluates models using metrics like RMSE (Root Mean Squared Error), MAE (Mean Absolute Error), and MAPE (Mean Absolute Percentage Error) to select the most accurate model for your data.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card border-0 shadow-sm hover-card" style="border-radius: 16px; overflow: hidden;">
-                <div class="position-absolute top-0 start-0 w-100" style="background: linear-gradient(90deg, #F0C75C, #f5d78a); height: 4px;"></div>
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(240, 199, 92, 0.1);">
-                            <i class="bi bi-lightbulb" style="color: #F0C75C;"></i>
-                        </div>
-                        <h3 class="card-title h4 mb-0 fw-bold">AI-Enhanced Insights</h3>
-                    </div>
-                    
-                    <p class="text-muted">When the "Include AI-Enhanced Explanation" option is selected, our system uses advanced AI to:</p>
-                    
-                    <ul class="text-muted mb-4">
-                        <li class="mb-2">Analyze historical patterns and trends</li>
-                        <li class="mb-2">Explain the forecast results in plain language</li>
-                        <li class="mb-2">Provide strategic recommendations based on the projections</li>
-                        <li class="mb-2">Highlight potential impacts on tax planning</li>
-                        <li>Identify factors influencing the forecasted rates</li>
-                    </ul>
-                    
-                    <div class="alert alert-warning mb-0 rounded-3" style="background-color: rgba(240, 199, 92, 0.1); border-color: rgba(240, 199, 92, 0.2); color: #a87c23;">
-                        <div class="d-flex">
-                            <i class="bi bi-cpu me-2 fs-5"></i>
-                            <div>
-                                <strong>Note:</strong> AI-enhanced analysis requires the Anthropic Claude API key to be configured.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+
+    <div class="col-lg-4">
+      <div
+        class="card border-0 shadow-sm hover-card mb-4"
+        style="border-radius: 16px; overflow: hidden"
+      >
+        <div
+          class="position-absolute top-0 start-0 w-100"
+          style="
+            background: linear-gradient(90deg, #66a355, #78c265);
+            height: 4px;
+          "
+        ></div>
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div
+              class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3"
+              style="background-color: rgba(102, 163, 85, 0.1)"
+            >
+              <i class="bi bi-info-circle" style="color: #66a355"></i>
+            </div>
+            <h3 class="card-title h4 mb-0 fw-bold">About Forecasting Models</h3>
+          </div>
+
+          <dl class="mb-0">
+            <dt class="mb-2">
+              <div class="d-flex align-items-center">
+                <div
+                  class="feature-icon me-2 d-inline-flex align-items-center justify-content-center rounded-circle p-2"
+                  style="background-color: rgba(61, 165, 189, 0.1)"
+                >
+                  <i class="bi bi-graph-up" style="color: #3da5bd"></i>
+                </div>
+                <span>Linear Trend</span>
+              </div>
+            </dt>
+            <dd class="mb-3 ms-4 ps-2 text-muted">
+              Uses linear regression to project future values based on
+              historical trends. Best for data with consistent growth or decline
+              patterns.
+            </dd>
+
+            <dt class="mb-2">
+              <div class="d-flex align-items-center">
+                <div
+                  class="feature-icon me-2 d-inline-flex align-items-center justify-content-center rounded-circle p-2"
+                  style="background-color: rgba(102, 163, 85, 0.1)"
+                >
+                  <i class="bi bi-graph-up-arrow" style="color: #66a355"></i>
+                </div>
+                <span>Exponential Smoothing</span>
+              </div>
+            </dt>
+            <dd class="mb-3 ms-4 ps-2 text-muted">
+              Applies exponentially decreasing weights to past observations.
+              Works well with data that has seasonality or level shifts.
+            </dd>
+
+            <dt class="mb-2">
+              <div class="d-flex align-items-center">
+                <div
+                  class="feature-icon me-2 d-inline-flex align-items-center justify-content-center rounded-circle p-2"
+                  style="background-color: rgba(240, 199, 92, 0.1)"
+                >
+                  <i class="bi bi-activity" style="color: #f0c75c"></i>
+                </div>
+                <span>ARIMA</span>
+              </div>
+            </dt>
+            <dd class="ms-4 ps-2 text-muted">
+              Autoregressive Integrated Moving Average model captures complex
+              patterns in the data. Best for data with autocorrelation and
+              non-stationary characteristics.
+            </dd>
+          </dl>
+
+          <div
+            class="alert alert-info mt-4 mb-0 rounded-3"
+            style="
+              background-color: rgba(61, 165, 189, 0.1);
+              border-color: rgba(61, 165, 189, 0.2);
+              color: #3da5bd;
+            "
+          >
+            <div class="d-flex">
+              <i class="bi bi-info-circle me-2 fs-5"></i>
+              <div>
+                <strong>How Models Are Evaluated:</strong> The system evaluates
+                models using metrics like RMSE (Root Mean Squared Error), MAE
+                (Mean Absolute Error), and MAPE (Mean Absolute Percentage Error)
+                to select the most accurate model for your data.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="card border-0 shadow-sm hover-card"
+        style="border-radius: 16px; overflow: hidden"
+      >
+        <div
+          class="position-absolute top-0 start-0 w-100"
+          style="
+            background: linear-gradient(90deg, #f0c75c, #f5d78a);
+            height: 4px;
+          "
+        ></div>
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div
+              class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3"
+              style="background-color: rgba(240, 199, 92, 0.1)"
+            >
+              <i class="bi bi-lightbulb" style="color: #f0c75c"></i>
+            </div>
+            <h3 class="card-title h4 mb-0 fw-bold">AI-Enhanced Insights</h3>
+          </div>
+
+          <p class="text-muted">
+            When the "Include AI-Enhanced Explanation" option is selected, our
+            system uses advanced AI to:
+          </p>
+
+          <ul class="text-muted mb-4">
+            <li class="mb-2">Analyze historical patterns and trends</li>
+            <li class="mb-2">Explain the forecast results in plain language</li>
+            <li class="mb-2">
+              Provide strategic recommendations based on the projections
+            </li>
+            <li class="mb-2">Highlight potential impacts on tax planning</li>
+            <li>Identify factors influencing the forecasted rates</li>
+          </ul>
+
+          <div
+            class="alert alert-warning mb-0 rounded-3"
+            style="
+              background-color: rgba(240, 199, 92, 0.1);
+              border-color: rgba(240, 199, 92, 0.2);
+              color: #a87c23;
+            "
+          >
+            <div class="d-flex">
+              <i class="bi bi-cpu me-2 fs-5"></i>
+              <div>
+                <strong>Note:</strong> AI-enhanced analysis requires the
+                Anthropic Claude API key to be configured.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,131 +1,131 @@
 /* District Import Preview CSS */
 
 .preview-district-card {
-    border-radius: 12px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
-    border-left: 4px solid #3DA5BD;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border-left: 4px solid #3da5bd;
 }
 
 .preview-district-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .district-preview-container {
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 5px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
 .district-preview-container::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 .district-preview-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
+  background: #f1f1f1;
+  border-radius: 4px;
 }
 
 .district-preview-container::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
+  background: #ccc;
+  border-radius: 4px;
 }
 
 .district-preview-container::-webkit-scrollbar-thumb:hover {
-    background: #aaa;
+  background: #aaa;
 }
 
 .import-preview-area {
-    background-color: #f8f9fa;
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 20px;
-    border: 1px solid #dee2e6;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .preview-controls {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .preview-header {
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 /* Animation styles */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .preview-district-card {
-    animation-fill-mode: both;
+  animation-fill-mode: both;
 }
 
 .preview-district-card.animated {
-    animation: fadeInUp 0.5s ease;
+  animation: fadeInUp 0.5s ease;
 }
 
 /* District type colors */
 .preview-district-card.school-district {
-    border-left-color: #66A355;
+  border-left-color: #66a355;
 }
 
 .preview-district-card.city-district {
-    border-left-color: #36b9cc;
+  border-left-color: #36b9cc;
 }
 
 .preview-district-card.fire-district {
-    border-left-color: #e74a3b;
+  border-left-color: #e74a3b;
 }
 
 .preview-district-card.county-district {
-    border-left-color: #f6c23e;
+  border-left-color: #f6c23e;
 }
 
 /* Loader */
 .preview-loader {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 0;
 }
 
 .preview-loader .spinner-grow {
-    width: 3rem;
-    height: 3rem;
+  width: 3rem;
+  height: 3rem;
 }
 
 /* Feature icon style */
 .feature-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 1.2rem;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .district-preview-container {
-        max-height: 300px;
-    }
-    
-    .preview-controls {
-        margin-top: 10px;
-        justify-content: center;
-    }
+  .district-preview-container {
+    max-height: 300px;
+  }
+
+  .preview-controls {
+    margin-top: 10px;
+    justify-content: center;
+  }
 }

@@ -1,26 +1,32 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect, createContext, useContext, useCallback } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from "lucide-react"
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useCallback,
+} from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, AlertCircle, CheckCircle, Info, AlertTriangle } from "lucide-react";
 
 // Types
-type NotificationType = "success" | "error" | "info" | "warning"
+type NotificationType = "success" | "error" | "info" | "warning";
 
 interface Notification {
-  id: string
-  type: NotificationType
-  title: string
-  message: string
-  duration?: number
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  duration?: number;
 }
 
 interface NotificationContextType {
-  notifications: Notification[]
-  addNotification: (notification: Omit<Notification, "id">) => void
-  removeNotification: (id: string) => void
+  notifications: Notification[];
+  addNotification: (notification: Omit<Notification, "id">) => void;
+  removeNotification: (id: string) => void;
 }
 
 // Create context
@@ -28,43 +34,56 @@ const NotificationContext = createContext<NotificationContextType>({
   notifications: [],
   addNotification: () => {},
   removeNotification: () => {},
-})
+});
 
 // Provider component
-export function NotificationProvider({ children }: { children: React.ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>([])
+export function NotificationProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const addNotification = useCallback((notification: Omit<Notification, "id">) => {
-    const id = Math.random().toString(36).substring(2, 9)
-    setNotifications((prev) => [...prev, { ...notification, id }])
-  }, [])
+  const addNotification = useCallback(
+    (notification: Omit<Notification, "id">) => {
+      const id = Math.random().toString(36).substring(2, 9);
+      setNotifications((prev) => [...prev, { ...notification, id }]);
+    },
+    [],
+  );
 
   const removeNotification = useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((notification) => notification.id !== id))
-  }, [])
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== id),
+    );
+  }, []);
 
   return (
-    <NotificationContext.Provider value={{ notifications, addNotification, removeNotification }}>
+    <NotificationContext.Provider
+      value={{ notifications, addNotification, removeNotification }}
+    >
       {children}
       <NotificationContainer />
     </NotificationContext.Provider>
-  )
+  );
 }
 
 // Hook to use notifications
 export function useNotifications() {
-  const context = useContext(NotificationContext)
+  const context = useContext(NotificationContext);
 
   if (!context) {
-    throw new Error("useNotifications must be used within a NotificationProvider")
+    throw new Error(
+      "useNotifications must be used within a NotificationProvider",
+    );
   }
 
-  return context
+  return context;
 }
 
 // Notification container
 function NotificationContainer() {
-  const { notifications, removeNotification } = useNotifications()
+  const { notifications, removeNotification } = useNotifications();
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-md">
@@ -78,7 +97,7 @@ function NotificationContainer() {
         ))}
       </AnimatePresence>
     </div>
-  )
+  );
 }
 
 // Individual notification
@@ -86,18 +105,18 @@ function NotificationItem({
   notification,
   onClose,
 }: {
-  notification: Notification
-  onClose: () => void
+  notification: Notification;
+  onClose: () => void;
 }) {
   useEffect(() => {
     if (notification.duration !== Number.POSITIVE_INFINITY) {
       const timer = setTimeout(() => {
-        onClose()
-      }, notification.duration || 5000)
+        onClose();
+      }, notification.duration || 5000);
 
-      return () => clearTimeout(timer)
+      return () => clearTimeout(timer);
     }
-  }, [notification, onClose])
+  }, [notification, onClose]);
 
   // Icon based on type
   const icons = {
@@ -105,7 +124,7 @@ function NotificationItem({
     error: <AlertCircle className="w-5 h-5" />,
     info: <Info className="w-5 h-5" />,
     warning: <AlertTriangle className="w-5 h-5" />,
-  }
+  };
 
   // Colors based on type
   const colors = {
@@ -113,7 +132,7 @@ function NotificationItem({
     error: "bg-red-500/10 border-red-500/30 text-red-500",
     info: "bg-blue-500/10 border-blue-500/30 text-blue-500",
     warning: "bg-amber-500/10 border-amber-500/30 text-amber-500",
-  }
+  };
 
   return (
     <motion.div
@@ -130,7 +149,10 @@ function NotificationItem({
           <p className="text-xs opacity-80 mt-1">{notification.message}</p>
         </div>
 
-        <button onClick={onClose} className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity">
+        <button
+          onClick={onClose}
+          className="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+        >
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -141,9 +163,12 @@ function NotificationItem({
           className="absolute bottom-0 left-0 h-[2px] bg-current"
           initial={{ width: "100%" }}
           animate={{ width: "0%" }}
-          transition={{ duration: (notification.duration || 5000) / 1000, ease: "linear" }}
+          transition={{
+            duration: (notification.duration || 5000) / 1000,
+            ease: "linear",
+          }}
         />
       )}
     </motion.div>
-  )
+  );
 }

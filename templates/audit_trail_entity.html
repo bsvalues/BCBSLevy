@@ -1,210 +1,213 @@
-{% extends 'base.html' %}
-
-{% block title %}Audit Trail - {{ entity_name }}{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Audit Trail - {{ entity_name }}{%
+endblock %} {% block content %}
 <div class="container my-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="mb-3">
-                <i class="bi bi-journal-text"></i> Audit Trail
-                {% if entity_name %}
-                <small class="text-muted">{{ entity_name }}</small>
-                {% endif %}
-            </h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('audit_trail') }}">Audit Trail</a></li>
-                    <li class="breadcrumb-item active">{{ table_name }} #{{ record_id }}</li>
-                </ol>
-            </nav>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="mb-3">
+        <i class="bi bi-journal-text"></i> Audit Trail {% if entity_name %}
+        <small class="text-muted">{{ entity_name }}</small>
+        {% endif %}
+      </h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('audit_trail') }}">Audit Trail</a>
+          </li>
+          <li class="breadcrumb-item active">
+            {{ table_name }} #{{ record_id }}
+          </li>
+        </ol>
+      </nav>
     </div>
-    
-    <!-- Entity Details Card -->
-    {% if entity %}
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Entity Details</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% if table_name == 'property' %}
-                        <div class="col-md-3 mb-2">
-                            <strong>Property ID:</strong> {{ entity.property_id }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Assessed Value:</strong> ${{ "{:,.2f}".format(entity.assessed_value) }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Tax Code:</strong> {{ entity.tax_code }}
-                        </div>
-                        {% elif table_name == 'tax_code' %}
-                        <div class="col-md-3 mb-2">
-                            <strong>Code:</strong> {{ entity.code }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Levy Rate:</strong> {{ entity.levy_rate }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Levy Amount:</strong> ${{ "{:,.2f}".format(entity.levy_amount) if entity.levy_amount else 'N/A' }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Total Assessed Value:</strong> ${{ "{:,.2f}".format(entity.total_assessed_value) if entity.total_assessed_value else 'N/A' }}
-                        </div>
-                        {% elif table_name == 'tax_district' %}
-                        <div class="col-md-3 mb-2">
-                            <strong>District ID:</strong> {{ entity.tax_district_id }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Year:</strong> {{ entity.year }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Levy Code:</strong> {{ entity.levy_code }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Linked Levy Code:</strong> {{ entity.linked_levy_code }}
-                        </div>
-                        {% else %}
-                        <div class="col-12">
-                            <p>Detailed information not available for this entity type.</p>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
+  </div>
+
+  <!-- Entity Details Card -->
+  {% if entity %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-info-circle"></i> Entity Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% if table_name == 'property' %}
+            <div class="col-md-3 mb-2">
+              <strong>Property ID:</strong> {{ entity.property_id }}
             </div>
+            <div class="col-md-3 mb-2">
+              <strong>Assessed Value:</strong> ${{
+              "{:,.2f}".format(entity.assessed_value) }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Tax Code:</strong> {{ entity.tax_code }}
+            </div>
+            {% elif table_name == 'tax_code' %}
+            <div class="col-md-3 mb-2">
+              <strong>Code:</strong> {{ entity.code }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Levy Rate:</strong> {{ entity.levy_rate }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Levy Amount:</strong> ${{
+              "{:,.2f}".format(entity.levy_amount) if entity.levy_amount else
+              'N/A' }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Total Assessed Value:</strong> ${{
+              "{:,.2f}".format(entity.total_assessed_value) if
+              entity.total_assessed_value else 'N/A' }}
+            </div>
+            {% elif table_name == 'tax_district' %}
+            <div class="col-md-3 mb-2">
+              <strong>District ID:</strong> {{ entity.tax_district_id }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Year:</strong> {{ entity.year }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Levy Code:</strong> {{ entity.levy_code }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Linked Levy Code:</strong> {{ entity.linked_levy_code }}
+            </div>
+            {% else %}
+            <div class="col-12">
+              <p>Detailed information not available for this entity type.</p>
+            </div>
+            {% endif %}
+          </div>
         </div>
+      </div>
     </div>
-    {% endif %}
-    
-    <!-- Audit History Timeline -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Change History</h5>
-                </div>
-                <div class="card-body">
-                    {% if logs %}
-                    <div class="timeline">
-                        {% for log in logs %}
-                        <div class="timeline-item">
-                            <div class="timeline-marker 
-                                {% if log.action == 'CREATE' %}bg-success{% elif log.action == 'UPDATE' %}bg-warning{% elif log.action == 'DELETE' %}bg-danger{% else %}bg-secondary{% endif %}">
-                            </div>
-                            <div class="timeline-content">
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span>
-                                                {% if log.action == 'CREATE' %}
-                                                <span class="badge bg-success">Created</span>
-                                                {% elif log.action == 'UPDATE' %}
-                                                <span class="badge bg-warning">Updated</span>
-                                                {% elif log.action == 'DELETE' %}
-                                                <span class="badge bg-danger">Deleted</span>
-                                                {% else %}
-                                                <span class="badge bg-secondary">{{ log.action }}</span>
-                                                {% endif %}
-                                                {{ log.timestamp }}
-                                            </span>
-                                            <span class="text-muted">
-                                                {% if log.user_id %}User #{{ log.user_id }}{% else %}System{% endif %}
-                                                {% if log.ip_address %}from {{ log.ip_address }}{% endif %}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        {% if log.changes and log.changes|length > 0 %}
-                                        <div class="table-responsive">
-                                            <table class="table table-sm">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Field</th>
-                                                        <th>Old Value</th>
-                                                        <th>New Value</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for change in log.changes %}
-                                                    <tr>
-                                                        <td>{{ change.field }}</td>
-                                                        <td>
-                                                            {% if change.old_value is none %}
-                                                            <span class="text-muted">(none)</span>
-                                                            {% else %}
-                                                            {{ change.old_value }}
-                                                            {% endif %}
-                                                        </td>
-                                                        <td>
-                                                            {% if change.new_value is none %}
-                                                            <span class="text-muted">(none)</span>
-                                                            {% else %}
-                                                            {{ change.new_value }}
-                                                            {% endif %}
-                                                        </td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        {% else %}
-                                        <p class="text-muted">No detailed changes recorded.</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Audit History Timeline -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-clock-history"></i> Change History
+          </h5>
+        </div>
+        <div class="card-body">
+          {% if logs %}
+          <div class="timeline">
+            {% for log in logs %}
+            <div class="timeline-item">
+              <div
+                class="timeline-marker {% if log.action == 'CREATE' %}bg-success{% elif log.action == 'UPDATE' %}bg-warning{% elif log.action == 'DELETE' %}bg-danger{% else %}bg-secondary{% endif %}"
+              ></div>
+              <div class="timeline-content">
+                <div class="card mb-3">
+                  <div class="card-header">
+                    <div
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <span>
+                        {% if log.action == 'CREATE' %}
+                        <span class="badge bg-success">Created</span>
+                        {% elif log.action == 'UPDATE' %}
+                        <span class="badge bg-warning">Updated</span>
+                        {% elif log.action == 'DELETE' %}
+                        <span class="badge bg-danger">Deleted</span>
+                        {% else %}
+                        <span class="badge bg-secondary">{{ log.action }}</span>
+                        {% endif %} {{ log.timestamp }}
+                      </span>
+                      <span class="text-muted">
+                        {% if log.user_id %}User #{{ log.user_id }}{% else
+                        %}System{% endif %} {% if log.ip_address %}from {{
+                        log.ip_address }}{% endif %}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    {% if log.changes and log.changes|length > 0 %}
+                    <div class="table-responsive">
+                      <table class="table table-sm">
+                        <thead>
+                          <tr>
+                            <th>Field</th>
+                            <th>Old Value</th>
+                            <th>New Value</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for change in log.changes %}
+                          <tr>
+                            <td>{{ change.field }}</td>
+                            <td>
+                              {% if change.old_value is none %}
+                              <span class="text-muted">(none)</span>
+                              {% else %} {{ change.old_value }} {% endif %}
+                            </td>
+                            <td>
+                              {% if change.new_value is none %}
+                              <span class="text-muted">(none)</span>
+                              {% else %} {{ change.new_value }} {% endif %}
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
                     </div>
                     {% else %}
-                    <div class="alert alert-info">
-                        No audit history found for this entity.
-                    </div>
+                    <p class="text-muted">No detailed changes recorded.</p>
                     {% endif %}
+                  </div>
                 </div>
+              </div>
             </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            No audit history found for this entity.
+          </div>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block styles %}
+{% endblock %} {% block styles %}
 <style>
-    /* Timeline styling */
-    .timeline {
-        position: relative;
-        padding-left: 2rem;
-    }
-    
-    .timeline:before {
-        content: '';
-        position: absolute;
-        left: 0.5rem;
-        top: 0;
-        bottom: 0;
-        width: 2px;
-        background-color: #dee2e6;
-    }
-    
-    .timeline-item {
-        position: relative;
-        margin-bottom: 2rem;
-    }
-    
-    .timeline-marker {
-        position: absolute;
-        left: -2rem;
-        width: 1rem;
-        height: 1rem;
-        border-radius: 50%;
-        top: 0.5rem;
-    }
-    
-    .timeline-content {
-        padding-left: 0.5rem;
-    }
+  /* Timeline styling */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline:before {
+    content: "";
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #dee2e6;
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .timeline-marker {
+    position: absolute;
+    left: -2rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    top: 0.5rem;
+  }
+
+  .timeline-content {
+    padding-left: 0.5rem;
+  }
 </style>
 {% endblock %}

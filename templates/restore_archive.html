@@ -1,150 +1,184 @@
-{% extends 'base.html' %}
-
-{% block title %}Restore Data Archive{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Restore Data Archive{% endblock %} {%
+block content %}
 <div class="container my-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="mb-3"><i class="bi bi-arrow-counterclockwise"></i> Restore Data Archive</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('data_archives') }}">Data Archives</a></li>
-                    <li class="breadcrumb-item active">Restore Archive</li>
-                </ol>
-            </nav>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="mb-3">
+        <i class="bi bi-arrow-counterclockwise"></i> Restore Data Archive
+      </h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('data_archives') }}">Data Archives</a>
+          </li>
+          <li class="breadcrumb-item active">Restore Archive</li>
+        </ol>
+      </nav>
     </div>
-    
-    <!-- Archive Details Card -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Archive Details</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-2">
-                            <strong>Archive ID:</strong> {{ archive.id }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Table:</strong> {{ archive.table_name }}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Type:</strong> 
-                            {% if archive.archive_type == 'backup' %}
-                            <span class="badge bg-primary">Backup</span>
-                            {% elif archive.archive_type == 'year_end' %}
-                            <span class="badge bg-success">Year-End</span>
-                            {% elif archive.archive_type == 'quarterly' %}
-                            <span class="badge bg-info">Quarterly</span>
-                            {% elif archive.archive_type == 'monthly' %}
-                            <span class="badge bg-secondary">Monthly</span>
-                            {% elif archive.archive_type == 'pre_change' %}
-                            <span class="badge bg-warning">Pre-Change</span>
-                            {% else %}
-                            <span class="badge bg-light text-dark">{{ archive.archive_type }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <strong>Date:</strong> {{ archive.archive_date.strftime('%Y-%m-%d %H:%M') }}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <strong>Records:</strong> {{ archive.record_count }}
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <strong>Description:</strong> {{ archive.description or 'No description' }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Restore Options Form -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-arrow-counterclockwise"></i> Restore Options</h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('restore_data_archive', archive_id=archive.id) }}">
-                        <div class="mb-3">
-                            <label for="restore_type" class="form-label">Restore Type</label>
-                            <select name="restore_type" id="restore_type" class="form-select" required>
-                                <option value="merge" selected>Merge (Update existing records, add new ones)</option>
-                                <option value="replace">Replace (Delete existing data first)</option>
-                            </select>
-                            <div class="form-text">Choose how to handle existing data when restoring.</div>
-                        </div>
-                        
-                        <div class="alert alert-warning">
-                            <i class="bi bi-exclamation-triangle"></i> 
-                            <strong>Warning:</strong> This will modify data in the {{ archive.table_name }} table. 
-                            Make sure you understand the implications of this operation.
-                            {% if restore_type == 'replace' %}
-                            <p class="mt-2 mb-0"><strong>Replace mode will delete all existing data in the table!</strong></p>
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Preview Summary -->
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h6 class="mb-0">Restore Preview</h6>
-                            </div>
-                            <div class="card-body">
-                                <p>This archive contains <strong>{{ preview.stats.total_records }}</strong> records.</p>
-                                
-                                <p>When restored, these records will be:</p>
-                                <ul>
-                                    <li>Added as new records if they don't exist</li>
-                                    {% if restore_type == 'merge' %}
-                                    <li>Used to update existing records if they already exist</li>
-                                    {% else %}
-                                    <li>Replace all existing data in the table</li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('data_archives') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Restore Archive</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  </div>
 
-{% block scripts %}
+  <!-- Archive Details Card -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-info-circle"></i> Archive Details
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-2">
+              <strong>Archive ID:</strong> {{ archive.id }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Table:</strong> {{ archive.table_name }}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Type:</strong>
+              {% if archive.archive_type == 'backup' %}
+              <span class="badge bg-primary">Backup</span>
+              {% elif archive.archive_type == 'year_end' %}
+              <span class="badge bg-success">Year-End</span>
+              {% elif archive.archive_type == 'quarterly' %}
+              <span class="badge bg-info">Quarterly</span>
+              {% elif archive.archive_type == 'monthly' %}
+              <span class="badge bg-secondary">Monthly</span>
+              {% elif archive.archive_type == 'pre_change' %}
+              <span class="badge bg-warning">Pre-Change</span>
+              {% else %}
+              <span class="badge bg-light text-dark"
+                >{{ archive.archive_type }}</span
+              >
+              {% endif %}
+            </div>
+            <div class="col-md-3 mb-2">
+              <strong>Date:</strong> {{ archive.archive_date.strftime('%Y-%m-%d
+              %H:%M') }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <strong>Records:</strong> {{ archive.record_count }}
+            </div>
+            <div class="col-md-6 mb-2">
+              <strong>Description:</strong> {{ archive.description or 'No
+              description' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Restore Options Form -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-arrow-counterclockwise"></i> Restore Options
+          </h5>
+        </div>
+        <div class="card-body">
+          <form
+            method="POST"
+            action="{{ url_for('restore_data_archive', archive_id=archive.id) }}"
+          >
+            <div class="mb-3">
+              <label for="restore_type" class="form-label">Restore Type</label>
+              <select
+                name="restore_type"
+                id="restore_type"
+                class="form-select"
+                required
+              >
+                <option value="merge" selected>
+                  Merge (Update existing records, add new ones)
+                </option>
+                <option value="replace">
+                  Replace (Delete existing data first)
+                </option>
+              </select>
+              <div class="form-text">
+                Choose how to handle existing data when restoring.
+              </div>
+            </div>
+
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle"></i>
+              <strong>Warning:</strong> This will modify data in the {{
+              archive.table_name }} table. Make sure you understand the
+              implications of this operation. {% if restore_type == 'replace' %}
+              <p class="mt-2 mb-0">
+                <strong
+                  >Replace mode will delete all existing data in the
+                  table!</strong
+                >
+              </p>
+              {% endif %}
+            </div>
+
+            <!-- Preview Summary -->
+            <div class="card mb-3">
+              <div class="card-header">
+                <h6 class="mb-0">Restore Preview</h6>
+              </div>
+              <div class="card-body">
+                <p>
+                  This archive contains
+                  <strong>{{ preview.stats.total_records }}</strong> records.
+                </p>
+
+                <p>When restored, these records will be:</p>
+                <ul>
+                  <li>Added as new records if they don't exist</li>
+                  {% if restore_type == 'merge' %}
+                  <li>Used to update existing records if they already exist</li>
+                  {% else %}
+                  <li>Replace all existing data in the table</li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{{ url_for('data_archives') }}" class="btn btn-secondary"
+                >Cancel</a
+              >
+              <button type="submit" class="btn btn-primary">
+                Restore Archive
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Update warning message when restore type changes
-        const restoreTypeSelect = document.getElementById('restore_type');
-        const alertWarning = document.querySelector('.alert-warning');
-        
-        restoreTypeSelect.addEventListener('change', function() {
-            if (this.value === 'replace') {
-                if (!alertWarning.querySelector('p')) {
-                    const warningP = document.createElement('p');
-                    warningP.classList.add('mt-2', 'mb-0');
-                    warningP.innerHTML = '<strong>Replace mode will delete all existing data in the table!</strong>';
-                    alertWarning.appendChild(warningP);
-                }
-            } else {
-                const warningP = alertWarning.querySelector('p');
-                if (warningP) {
-                    warningP.remove();
-                }
-            }
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Update warning message when restore type changes
+    const restoreTypeSelect = document.getElementById("restore_type");
+    const alertWarning = document.querySelector(".alert-warning");
+
+    restoreTypeSelect.addEventListener("change", function () {
+      if (this.value === "replace") {
+        if (!alertWarning.querySelector("p")) {
+          const warningP = document.createElement("p");
+          warningP.classList.add("mt-2", "mb-0");
+          warningP.innerHTML =
+            "<strong>Replace mode will delete all existing data in the table!</strong>";
+          alertWarning.appendChild(warningP);
+        }
+      } else {
+        const warningP = alertWarning.querySelector("p");
+        if (warningP) {
+          warningP.remove();
+        }
+      }
     });
+  });
 </script>
 {% endblock %}

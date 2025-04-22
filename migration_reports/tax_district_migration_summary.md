@@ -9,10 +9,10 @@
 
 The following foreign key constraints were successfully migrated:
 
-| Table | Original Constraint | New Constraint | Status |
-|-------|---------------------|----------------|--------|
-| levy_rate | levy_rate_tax_district_id_fkey | levy_rate_tax_district_id_fkey | ✅ Migrated |
-| forecast | forecast_tax_district_id_fkey | forecast_tax_district_id_fkey | ✅ Migrated |
+| Table            | Original Constraint                   | New Constraint                        | Status      |
+| ---------------- | ------------------------------------- | ------------------------------------- | ----------- |
+| levy_rate        | levy_rate_tax_district_id_fkey        | levy_rate_tax_district_id_fkey        | ✅ Migrated |
+| forecast         | forecast_tax_district_id_fkey         | forecast_tax_district_id_fkey         | ✅ Migrated |
 | compliance_issue | compliance_issue_tax_district_id_fkey | compliance_issue_tax_district_id_fkey | ✅ Migrated |
 
 ## Verification Results

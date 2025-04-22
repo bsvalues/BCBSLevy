@@ -39,20 +39,25 @@
 }
 
 /* Form field microinteractions */
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   transition: all 0.3s ease;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
-.form-control.is-valid, .form-select.is-valid {
+.form-control.is-valid,
+.form-select.is-valid {
   border-left-width: 5px;
 }
 
-.form-control.is-invalid, .form-select.is-invalid {
+.form-control.is-invalid,
+.form-select.is-invalid {
   border-left-width: 5px;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
   transition: all 0.2s ease;
   transform: translateY(-1px);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
@@ -83,25 +88,50 @@ input:focus, select:focus, textarea:focus {
 
 /* Animations */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse-animation {
-  0% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.05); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes fade-up {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes highlight-animation {
-  0% { background-color: transparent; }
-  30% { background-color: rgba(13, 110, 253, 0.1); }
-  100% { background-color: transparent; }
+  0% {
+    background-color: transparent;
+  }
+  30% {
+    background-color: rgba(13, 110, 253, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 .animate-shake {
@@ -109,11 +139,21 @@ input:focus, select:focus, textarea:focus {
 }
 
 @keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .pulse-animation {
@@ -122,7 +162,9 @@ input:focus, select:focus, textarea:focus {
 
 /* Form range slider enhancements */
 .form-range::-webkit-slider-thumb {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form-range::-webkit-slider-thumb:active {
@@ -132,7 +174,9 @@ input:focus, select:focus, textarea:focus {
 
 /* Badge animations for range values */
 .badge {
-  transition: transform 0.3s ease, background-color 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
 }
 
 /* Preview animation effects */
@@ -141,7 +185,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Enhanced loading spinners */
-.spinner-grow, .spinner-border {
+.spinner-grow,
+.spinner-border {
   box-shadow: 0 0 10px rgba(13, 110, 253, 0.3);
 }
 
@@ -181,12 +226,13 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Form validation message transitions */
-.invalid-feedback, .valid-feedback {
+.invalid-feedback,
+.valid-feedback {
   transition: opacity 0.3s ease;
   opacity: 0;
 }
 
-.was-validated .invalid-feedback, 
+.was-validated .invalid-feedback,
 .was-validated .valid-feedback,
 .is-invalid ~ .invalid-feedback,
 .is-valid ~ .valid-feedback {

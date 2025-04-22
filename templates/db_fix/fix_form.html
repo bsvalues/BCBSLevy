@@ -1,57 +1,67 @@
-{% extends "simple_base.html" %}
-
-{% block title %}Database Fix Tools{% endblock %}
-
-{% block page_header %}
+{% extends "simple_base.html" %} {% block title %}Database Fix Tools{% endblock
+%} {% block page_header %}
 <div class="container py-4">
-    <h1 class="display-5 fw-bold">Database Maintenance Tools</h1>
-    <p class="lead">Tools for fixing and maintaining the database</p>
+  <h1 class="display-5 fw-bold">Database Maintenance Tools</h1>
+  <p class="lead">Tools for fixing and maintaining the database</p>
 </div>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container py-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Available Database Fixes</h4>
-                </div>
-                <div class="card-body">
-                    <p class="card-text mb-4">
-                        These tools are used to fix specific database issues. Please use with caution.
-                    </p>
-                    
-                    <div class="list-group mb-4">
-                        <a href="{{ url_for('db_fix.fix_import_log_enums') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="mb-1">Fix ImportLog Enum Values</h5>
-                                <p class="mb-0 text-muted">Fixes invalid enum values in the import_log table</p>
-                            </div>
-                            <span class="badge bg-primary rounded-pill">Run</span>
-                        </a>
-                        
-                        <a href="{{ url_for('db_fix.fix_export_log_enums') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="mb-1">Fix ExportLog Enum Values</h5>
-                                <p class="mb-0 text-muted">Fixes invalid enum values in the export_log table</p>
-                            </div>
-                            <span class="badge bg-primary rounded-pill">Run</span>
-                        </a>
-                    </div>
-                    
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <strong>Warning:</strong> These tools modify database values directly. Make sure you have a backup before proceeding.
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <a href="{{ url_for('home.index') }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-2"></i>Back to Home
-                    </a>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Available Database Fixes</h4>
         </div>
+        <div class="card-body">
+          <p class="card-text mb-4">
+            These tools are used to fix specific database issues. Please use
+            with caution.
+          </p>
+
+          <div class="list-group mb-4">
+            <a
+              href="{{ url_for('db_fix.fix_import_log_enums') }}"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <h5 class="mb-1">Fix ImportLog Enum Values</h5>
+                <p class="mb-0 text-muted">
+                  Fixes invalid enum values in the import_log table
+                </p>
+              </div>
+              <span class="badge bg-primary rounded-pill">Run</span>
+            </a>
+
+            <a
+              href="{{ url_for('db_fix.fix_export_log_enums') }}"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <h5 class="mb-1">Fix ExportLog Enum Values</h5>
+                <p class="mb-0 text-muted">
+                  Fixes invalid enum values in the export_log table
+                </p>
+              </div>
+              <span class="badge bg-primary rounded-pill">Run</span>
+            </a>
+          </div>
+
+          <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Warning:</strong> These tools modify database values
+            directly. Make sure you have a backup before proceeding.
+          </div>
+        </div>
+        <div class="card-footer">
+          <a
+            href="{{ url_for('home.index') }}"
+            class="btn btn-outline-secondary"
+          >
+            <i class="bi bi-arrow-left me-2"></i>Back to Home
+          </a>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

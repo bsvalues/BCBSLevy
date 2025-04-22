@@ -1,479 +1,528 @@
-{% extends 'base.html' %}
-
-{% block title %}Compare Levy Data - Levy Calculation System{% endblock %}
-
-{% block page_title %}Compare Levy Data Across Years{% endblock %}
-{% block page_subtitle %}Analyze trends and changes in levy data between multiple years{% endblock %}
-
-{% block header_actions %}
+{% extends 'base.html' %} {% block title %}Compare Levy Data - Levy Calculation
+System{% endblock %} {% block page_title %}Compare Levy Data Across Years{%
+endblock %} {% block page_subtitle %}Analyze trends and changes in levy data
+between multiple years{% endblock %} {% block header_actions %}
 <a href="{{ url_for('levy_exports.index') }}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-1"></i>Back to Levy Exports
+  <i class="bi bi-arrow-left me-1"></i>Back to Levy Exports
 </a>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <h5 class="card-title mb-4">
-            <i class="bi bi-bar-chart-steps me-2 text-primary"></i>Compare Levy Data
-        </h5>
-        
-        <form action="{{ url_for('levy_exports.compare') }}" method="get" class="mb-4">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <label for="start_year" class="form-label">Start Year</label>
-                    <select class="form-select" id="start_year" name="start_year">
-                        <option value="">Select year</option>
-                        {% for year in available_years %}
-                            <option value="{{ year }}" {% if year == start_year %}selected{% endif %}>{{ year }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="col-md-3">
-                    <label for="end_year" class="form-label">End Year</label>
-                    <select class="form-select" id="end_year" name="end_year">
-                        <option value="">Select year</option>
-                        {% for year in available_years %}
-                            <option value="{{ year }}" {% if year == end_year %}selected{% endif %}>{{ year }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="district_id" class="form-label">Tax District</label>
-                    <select class="form-select" id="district_id" name="district_id">
-                        <option value="">Select district</option>
-                        {% for district in all_districts %}
-                            <option value="{{ district.id }}" {% if district.id == district_id %}selected{% endif %}>
-                                {{ district.district_name }} ({{ district.district_code }})
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="col-md-2">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="bi bi-search me-1"></i>Compare
-                    </button>
-                </div>
-            </div>
-        </form>
-        
-        {% if comparison_data %}
-            <div class="alert alert-info mb-4">
-                <div class="d-flex">
-                    <div class="me-3">
-                        <i class="bi bi-info-circle-fill fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="alert-heading">Comparison Information</h6>
-                        <p class="mb-0">
-                            Comparing levy data for 
-                            <strong>{{ all_districts|selectattr('id', 'eq', district_id)|map(attribute='district_name')|first }}</strong> 
-                            between <strong>{{ start_year }}</strong> and <strong>{{ end_year }}</strong>.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tax Code Comparison Table -->
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Tax Code</th>
-                            {% for year in range(start_year, end_year + 1) %}
-                                <th class="text-center">{{ year }}</th>
-                            {% endfor %}
-                            <th class="text-center">% Change</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% set all_tax_codes = [] %}
-                        {% for year in comparison_data %}
-                            {% for code in comparison_data[year] %}
-                                {% if code not in all_tax_codes %}
-                                    {% set all_tax_codes = all_tax_codes + [code] %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                        
-                        {% for code in all_tax_codes|sort %}
-                            <tr>
-                                <td>{{ code }}</td>
-                                {% set first_rate = None %}
-                                {% set last_rate = None %}
-                                
-                                {% for year in range(start_year, end_year + 1) %}
-                                    <td class="text-center">
-                                        {% if year in comparison_data and code in comparison_data[year] %}
-                                            {% set rate = comparison_data[year][code]['levy_rate'] %}
-                                            {{ "%.4f"|format(rate) }}
-                                            
-                                            {% if first_rate is none %}
-                                                {% set first_rate = rate %}
-                                            {% endif %}
-                                            {% set last_rate = rate %}
-                                        {% else %}
-                                            <span class="text-muted">N/A</span>
-                                        {% endif %}
-                                    </td>
-                                {% endfor %}
-                                
-                                <td class="text-center">
-                                    {% if first_rate is not none and last_rate is not none and first_rate > 0 %}
-                                        {% set percent_change = ((last_rate - first_rate) / first_rate) * 100 %}
-                                        <span class="badge {% if percent_change > 0 %}bg-danger{% elif percent_change < 0 %}bg-success{% else %}bg-secondary{% endif %}">
-                                            {% if percent_change > 0 %}+{% endif %}{{ "%.2f"|format(percent_change) }}%
-                                        </span>
-                                    {% else %}
-                                        <span class="text-muted">N/A</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Chart Section -->
-            <div class="card bg-light mb-4">
-                <div class="card-body">
-                    <h6 class="card-title">
-                        <i class="bi bi-graph-up me-2"></i>Levy Rate Trends
-                    </h6>
-                    <div style="height: 400px;">
-                        <canvas id="levyRateChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Summary Statistics -->
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h6 class="card-title">
-                                <i class="bi bi-calculator me-2"></i>Summary Statistics
-                            </h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Year</th>
-                                            <th class="text-end">Avg. Levy Rate</th>
-                                            <th class="text-end">Min Rate</th>
-                                            <th class="text-end">Max Rate</th>
-                                            <th class="text-end">Tax Codes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for year in range(start_year, end_year + 1) %}
-                                            <tr>
-                                                <td>{{ year }}</td>
-                                                {% if year in comparison_data and comparison_data[year]|length > 0 %}
-                                                    {% set rates = [] %}
-                                                    {% for code, data in comparison_data[year].items() %}
-                                                        {% if data['levy_rate'] is not none %}
-                                                            {% set rates = rates + [data['levy_rate']] %}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                    
-                                                    <td class="text-end">{{ "%.4f"|format(rates|sum / rates|length) if rates|length > 0 else 'N/A' }}</td>
-                                                    <td class="text-end">{{ "%.4f"|format(rates|min) if rates|length > 0 else 'N/A' }}</td>
-                                                    <td class="text-end">{{ "%.4f"|format(rates|max) if rates|length > 0 else 'N/A' }}</td>
-                                                    <td class="text-end">{{ comparison_data[year]|length }}</td>
-                                                {% else %}
-                                                    <td class="text-end text-muted">N/A</td>
-                                                    <td class="text-end text-muted">N/A</td>
-                                                    <td class="text-end text-muted">N/A</td>
-                                                    <td class="text-end text-muted">0</td>
-                                                {% endif %}
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h6 class="card-title">
-                                <i class="bi bi-arrow-up-right me-2"></i>Percent Change Analysis
-                            </h6>
-                            
-                            {% if comparison_data[start_year] is defined and comparison_data[end_year] is defined %}
-                                <div class="table-responsive">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>Metric</th>
-                                                <th class="text-end">{{ start_year }}</th>
-                                                <th class="text-end">{{ end_year }}</th>
-                                                <th class="text-end">Change</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% set start_rates = [] %}
-                                            {% set end_rates = [] %}
-                                            
-                                            {% for code, data in comparison_data[start_year].items() %}
-                                                {% if data['levy_rate'] is not none %}
-                                                    {% set start_rates = start_rates + [data['levy_rate']] %}
-                                                {% endif %}
-                                            {% endfor %}
-                                            
-                                            {% for code, data in comparison_data[end_year].items() %}
-                                                {% if data['levy_rate'] is not none %}
-                                                    {% set end_rates = end_rates + [data['levy_rate']] %}
-                                                {% endif %}
-                                            {% endfor %}
-                                            
-                                            <tr>
-                                                <td>Average Rate</td>
-                                                <td class="text-end">{{ "%.4f"|format(start_rates|sum / start_rates|length) if start_rates|length > 0 else 'N/A' }}</td>
-                                                <td class="text-end">{{ "%.4f"|format(end_rates|sum / end_rates|length) if end_rates|length > 0 else 'N/A' }}</td>
-                                                <td class="text-end">
-                                                    {% if start_rates|length > 0 and end_rates|length > 0 %}
-                                                        {% set start_avg = start_rates|sum / start_rates|length %}
-                                                        {% set end_avg = end_rates|sum / end_rates|length %}
-                                                        {% set percent_change = ((end_avg - start_avg) / start_avg) * 100 %}
-                                                        <span class="badge {% if percent_change > 0 %}bg-danger{% elif percent_change < 0 %}bg-success{% else %}bg-secondary{% endif %}">
-                                                            {% if percent_change > 0 %}+{% endif %}{{ "%.2f"|format(percent_change) }}%
-                                                        </span>
-                                                    {% else %}
-                                                        <span class="text-muted">N/A</span>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Number of Tax Codes</td>
-                                                <td class="text-end">{{ comparison_data[start_year]|length }}</td>
-                                                <td class="text-end">{{ comparison_data[end_year]|length }}</td>
-                                                <td class="text-end">
-                                                    {% set code_change = comparison_data[end_year]|length - comparison_data[start_year]|length %}
-                                                    <span class="badge {% if code_change > 0 %}bg-primary{% elif code_change < 0 %}bg-warning{% else %}bg-secondary{% endif %}">
-                                                        {% if code_change > 0 %}+{% endif %}{{ code_change }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                
-                                <div class="alert alert-secondary mt-3">
-                                    <h6 class="alert-heading">Analysis Summary</h6>
-                                    <p class="mb-0">
-                                        Between {{ start_year }} and {{ end_year }}, the average levy rate 
-                                        {% if start_rates|length > 0 and end_rates|length > 0 %}
-                                            {% set start_avg = start_rates|sum / start_rates|length %}
-                                            {% set end_avg = end_rates|sum / end_rates|length %}
-                                            {% if end_avg > start_avg %}
-                                                <strong>increased</strong> by {{ "%.2f"|format(((end_avg - start_avg) / start_avg) * 100) }}%.
-                                            {% elif end_avg < start_avg %}
-                                                <strong>decreased</strong> by {{ "%.2f"|format(((start_avg - end_avg) / start_avg) * 100) }}%.
-                                            {% else %}
-                                                remained <strong>unchanged</strong>.
-                                            {% endif %}
-                                        {% else %}
-                                            could not be calculated due to missing data.
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            {% else %}
-                                <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle me-2"></i>Insufficient data to perform comparison analysis.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                <div class="d-flex">
-                    <div class="me-3">
-                        <i class="bi bi-info-circle-fill fs-4"></i>
-                    </div>
-                    <div>
-                        <h6 class="alert-heading">No Comparison Data</h6>
-                        <p class="mb-0">
-                            Select a start year, end year, and tax district to compare levy data across multiple years.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Quick Comparisons -->
-            <div class="row g-4 mt-2">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="card-title">
-                                <i class="bi bi-calendar3 me-2"></i>Last 5 Years
-                            </h6>
-                            <p class="card-text">
-                                Compare levy data across the last 5 years to see trends over time.
-                            </p>
-                            <a href="{{ url_for('levy_exports.compare', start_year=available_years[-5] if available_years|length >= 5 else available_years[0], end_year=available_years[-1]) }}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-graph-up me-1"></i>View 5 Year Comparison
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="card-title">
-                                <i class="bi bi-arrow-left-right me-2"></i>Year-to-Year
-                            </h6>
-                            <p class="card-text">
-                                Compare the most recent two years to see the latest changes in levy rates.
-                            </p>
-                            <a href="{{ url_for('levy_exports.compare', start_year=available_years[-2] if available_years|length >= 2 else available_years[-1], end_year=available_years[-1]) }}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-arrow-down-up me-1"></i>Year-to-Year Comparison
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body">
-                            <h6 class="card-title">
-                                <i class="bi bi-calendar-range me-2"></i>Full History
-                            </h6>
-                            <p class="card-text">
-                                View all available levy data across all years for complete historical context.
-                            </p>
-                            <a href="{{ url_for('levy_exports.compare', start_year=available_years[0], end_year=available_years[-1]) }}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-hourglass-split me-1"></i>Full Historical View
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</div>
-{% endblock %}
+  <div class="card-body">
+    <h5 class="card-title mb-4">
+      <i class="bi bi-bar-chart-steps me-2 text-primary"></i>Compare Levy Data
+    </h5>
 
-{% block extra_js %}
-{% if comparison_data %}
+    <form
+      action="{{ url_for('levy_exports.compare') }}"
+      method="get"
+      class="mb-4"
+    >
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label for="start_year" class="form-label">Start Year</label>
+          <select class="form-select" id="start_year" name="start_year">
+            <option value="">Select year</option>
+            {% for year in available_years %}
+            <option
+              value="{{ year }}"
+              {%
+              if
+              year=""
+              ="start_year"
+              %}selected{%
+              endif
+              %}
+            >
+              {{ year }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="end_year" class="form-label">End Year</label>
+          <select class="form-select" id="end_year" name="end_year">
+            <option value="">Select year</option>
+            {% for year in available_years %}
+            <option
+              value="{{ year }}"
+              {%
+              if
+              year=""
+              ="end_year"
+              %}selected{%
+              endif
+              %}
+            >
+              {{ year }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="district_id" class="form-label">Tax District</label>
+          <select class="form-select" id="district_id" name="district_id">
+            <option value="">Select district</option>
+            {% for district in all_districts %}
+            <option
+              value="{{ district.id }}"
+              {%
+              if
+              district.id=""
+              ="district_id"
+              %}selected{%
+              endif
+              %}
+            >
+              {{ district.district_name }} ({{ district.district_code }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">&nbsp;</label>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-search me-1"></i>Compare
+          </button>
+        </div>
+      </div>
+    </form>
+
+    {% if comparison_data %}
+    <div class="alert alert-info mb-4">
+      <div class="d-flex">
+        <div class="me-3">
+          <i class="bi bi-info-circle-fill fs-4"></i>
+        </div>
+        <div>
+          <h6 class="alert-heading">Comparison Information</h6>
+          <p class="mb-0">
+            Comparing levy data for
+            <strong
+              >{{ all_districts|selectattr('id', 'eq',
+              district_id)|map(attribute='district_name')|first }}</strong
+            >
+            between <strong>{{ start_year }}</strong> and
+            <strong>{{ end_year }}</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tax Code Comparison Table -->
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Tax Code</th>
+            {% for year in range(start_year, end_year + 1) %}
+            <th class="text-center">{{ year }}</th>
+            {% endfor %}
+            <th class="text-center">% Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set all_tax_codes = [] %} {% for year in comparison_data %} {% for
+          code in comparison_data[year] %} {% if code not in all_tax_codes %} {%
+          set all_tax_codes = all_tax_codes + [code] %} {% endif %} {% endfor %}
+          {% endfor %} {% for code in all_tax_codes|sort %}
+          <tr>
+            <td>{{ code }}</td>
+            {% set first_rate = None %} {% set last_rate = None %} {% for year
+            in range(start_year, end_year + 1) %}
+            <td class="text-center">
+              {% if year in comparison_data and code in comparison_data[year] %}
+              {% set rate = comparison_data[year][code]['levy_rate'] %} {{
+              "%.4f"|format(rate) }} {% if first_rate is none %} {% set
+              first_rate = rate %} {% endif %} {% set last_rate = rate %} {%
+              else %}
+              <span class="text-muted">N/A</span>
+              {% endif %}
+            </td>
+            {% endfor %}
+
+            <td class="text-center">
+              {% if first_rate is not none and last_rate is not none and
+              first_rate > 0 %} {% set percent_change = ((last_rate -
+              first_rate) / first_rate) * 100 %}
+              <span
+                class="badge {% if percent_change > 0 %}bg-danger{% elif percent_change < 0 %}bg-success{% else %}bg-secondary{% endif %}"
+              >
+                {% if percent_change > 0 %}+{% endif %}{{
+                "%.2f"|format(percent_change) }}%
+              </span>
+              {% else %}
+              <span class="text-muted">N/A</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="card bg-light mb-4">
+      <div class="card-body">
+        <h6 class="card-title">
+          <i class="bi bi-graph-up me-2"></i>Levy Rate Trends
+        </h6>
+        <div style="height: 400px">
+          <canvas id="levyRateChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="bi bi-calculator me-2"></i>Summary Statistics
+            </h6>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th class="text-end">Avg. Levy Rate</th>
+                    <th class="text-end">Min Rate</th>
+                    <th class="text-end">Max Rate</th>
+                    <th class="text-end">Tax Codes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for year in range(start_year, end_year + 1) %}
+                  <tr>
+                    <td>{{ year }}</td>
+                    {% if year in comparison_data and
+                    comparison_data[year]|length > 0 %} {% set rates = [] %} {%
+                    for code, data in comparison_data[year].items() %} {% if
+                    data['levy_rate'] is not none %} {% set rates = rates +
+                    [data['levy_rate']] %} {% endif %} {% endfor %}
+
+                    <td class="text-end">
+                      {{ "%.4f"|format(rates|sum / rates|length) if rates|length
+                      > 0 else 'N/A' }}
+                    </td>
+                    <td class="text-end">
+                      {{ "%.4f"|format(rates|min) if rates|length > 0 else 'N/A'
+                      }}
+                    </td>
+                    <td class="text-end">
+                      {{ "%.4f"|format(rates|max) if rates|length > 0 else 'N/A'
+                      }}
+                    </td>
+                    <td class="text-end">{{ comparison_data[year]|length }}</td>
+                    {% else %}
+                    <td class="text-end text-muted">N/A</td>
+                    <td class="text-end text-muted">N/A</td>
+                    <td class="text-end text-muted">N/A</td>
+                    <td class="text-end text-muted">0</td>
+                    {% endif %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="bi bi-arrow-up-right me-2"></i>Percent Change Analysis
+            </h6>
+
+            {% if comparison_data[start_year] is defined and
+            comparison_data[end_year] is defined %}
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th class="text-end">{{ start_year }}</th>
+                    <th class="text-end">{{ end_year }}</th>
+                    <th class="text-end">Change</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% set start_rates = [] %} {% set end_rates = [] %} {% for
+                  code, data in comparison_data[start_year].items() %} {% if
+                  data['levy_rate'] is not none %} {% set start_rates =
+                  start_rates + [data['levy_rate']] %} {% endif %} {% endfor %}
+                  {% for code, data in comparison_data[end_year].items() %} {%
+                  if data['levy_rate'] is not none %} {% set end_rates =
+                  end_rates + [data['levy_rate']] %} {% endif %} {% endfor %}
+
+                  <tr>
+                    <td>Average Rate</td>
+                    <td class="text-end">
+                      {{ "%.4f"|format(start_rates|sum / start_rates|length) if
+                      start_rates|length > 0 else 'N/A' }}
+                    </td>
+                    <td class="text-end">
+                      {{ "%.4f"|format(end_rates|sum / end_rates|length) if
+                      end_rates|length > 0 else 'N/A' }}
+                    </td>
+                    <td class="text-end">
+                      {% if start_rates|length > 0 and end_rates|length > 0 %}
+                      {% set start_avg = start_rates|sum / start_rates|length %}
+                      {% set end_avg = end_rates|sum / end_rates|length %} {%
+                      set percent_change = ((end_avg - start_avg) / start_avg) *
+                      100 %}
+                      <span
+                        class="badge {% if percent_change > 0 %}bg-danger{% elif percent_change < 0 %}bg-success{% else %}bg-secondary{% endif %}"
+                      >
+                        {% if percent_change > 0 %}+{% endif %}{{
+                        "%.2f"|format(percent_change) }}%
+                      </span>
+                      {% else %}
+                      <span class="text-muted">N/A</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Number of Tax Codes</td>
+                    <td class="text-end">
+                      {{ comparison_data[start_year]|length }}
+                    </td>
+                    <td class="text-end">
+                      {{ comparison_data[end_year]|length }}
+                    </td>
+                    <td class="text-end">
+                      {% set code_change = comparison_data[end_year]|length -
+                      comparison_data[start_year]|length %}
+                      <span
+                        class="badge {% if code_change > 0 %}bg-primary{% elif code_change < 0 %}bg-warning{% else %}bg-secondary{% endif %}"
+                      >
+                        {% if code_change > 0 %}+{% endif %}{{ code_change }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="alert alert-secondary mt-3">
+              <h6 class="alert-heading">Analysis Summary</h6>
+              <p class="mb-0">
+                Between {{ start_year }} and {{ end_year }}, the average levy
+                rate {% if start_rates|length > 0 and end_rates|length > 0 %} {%
+                set start_avg = start_rates|sum / start_rates|length %} {% set
+                end_avg = end_rates|sum / end_rates|length %} {% if end_avg >
+                start_avg %}
+                <strong>increased</strong> by {{ "%.2f"|format(((end_avg -
+                start_avg) / start_avg) * 100) }}%. {% elif end_avg < start_avg
+                %} <strong>decreased</strong> by {{ "%.2f"|format(((start_avg -
+                end_avg) / start_avg) * 100) }}%. {% else %} remained
+                <strong>unchanged</strong>. {% endif %} {% else %} could not be
+                calculated due to missing data. {% endif %}
+              </p>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+              <i class="bi bi-exclamation-triangle me-2"></i>Insufficient data
+              to perform comparison analysis.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+      <div class="d-flex">
+        <div class="me-3">
+          <i class="bi bi-info-circle-fill fs-4"></i>
+        </div>
+        <div>
+          <h6 class="alert-heading">No Comparison Data</h6>
+          <p class="mb-0">
+            Select a start year, end year, and tax district to compare levy data
+            across multiple years.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Comparisons -->
+    <div class="row g-4 mt-2">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="bi bi-calendar3 me-2"></i>Last 5 Years
+            </h6>
+            <p class="card-text">
+              Compare levy data across the last 5 years to see trends over time.
+            </p>
+            <a
+              href="{{ url_for('levy_exports.compare', start_year=available_years[-5] if available_years|length >= 5 else available_years[0], end_year=available_years[-1]) }}"
+              class="btn btn-outline-primary w-100"
+            >
+              <i class="bi bi-graph-up me-1"></i>View 5 Year Comparison
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="bi bi-arrow-left-right me-2"></i>Year-to-Year
+            </h6>
+            <p class="card-text">
+              Compare the most recent two years to see the latest changes in
+              levy rates.
+            </p>
+            <a
+              href="{{ url_for('levy_exports.compare', start_year=available_years[-2] if available_years|length >= 2 else available_years[-1], end_year=available_years[-1]) }}"
+              class="btn btn-outline-primary w-100"
+            >
+              <i class="bi bi-arrow-down-up me-1"></i>Year-to-Year Comparison
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title">
+              <i class="bi bi-calendar-range me-2"></i>Full History
+            </h6>
+            <p class="card-text">
+              View all available levy data across all years for complete
+              historical context.
+            </p>
+            <a
+              href="{{ url_for('levy_exports.compare', start_year=available_years[0], end_year=available_years[-1]) }}"
+              class="btn btn-outline-primary w-100"
+            >
+              <i class="bi bi-hourglass-split me-1"></i>Full Historical View
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %} {% block extra_js %} {% if comparison_data %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Prepare chart data
-        const years = [];
-        {% for year in range(start_year, end_year + 1) %}
-            years.push({{ year }});
-        {% endfor %}
-        
-        // Get all tax codes
-        const allTaxCodes = [
-            {% for code in all_tax_codes|sort %}
-                '{{ code }}',
-            {% endfor %}
-        ];
-        
-        // Prepare datasets
-        const datasets = [];
-        const colors = [
-            'rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)', 
-            'rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)',
-            'rgba(199, 199, 199, 1)', 'rgba(83, 102, 255, 1)', 'rgba(40, 159, 64, 1)',
-            'rgba(210, 105, 30, 1)', 'rgba(128, 0, 128, 1)'
-        ];
-        
-        // Limit to top 10 tax codes for readability if there are more
-        const displayCodes = allTaxCodes.length > 10 ? allTaxCodes.slice(0, 10) : allTaxCodes;
-        
-        displayCodes.forEach((code, index) => {
-            const data = [];
-            years.forEach(year => {
-                if ({{ comparison_data|tojson }}[year] && {{ comparison_data|tojson }}[year][code]) {
-                    data.push({{ comparison_data|tojson }}[year][code].levy_rate);
-                } else {
-                    data.push(null); // Use null for missing data
-                }
-            });
-            
-            datasets.push({
-                label: code,
-                data: data,
-                borderColor: colors[index % colors.length],
-                backgroundColor: colors[index % colors.length].replace('1)', '0.2)'),
-                tension: 0.2,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                fill: false
-            });
-        });
-        
-        // Create chart
-        const ctx = document.getElementById('levyRateChart').getContext('2d');
-        const levyRateChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: years,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Levy Rate Trends Over Time',
-                        font: {
-                            size: 16
-                        }
-                    },
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 12
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                if (context.parsed.y !== null) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(4);
-                                }
-                                return context.dataset.label + ': No data';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Year'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Levy Rate'
-                        },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      // Prepare chart data
+      const years = [];
+      {% for year in range(start_year, end_year + 1) %}
+          years.push({{ year }});
+      {% endfor %}
+
+      // Get all tax codes
+      const allTaxCodes = [
+          {% for code in all_tax_codes|sort %}
+              '{{ code }}',
+          {% endfor %}
+      ];
+
+      // Prepare datasets
+      const datasets = [];
+      const colors = [
+          'rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(75, 192, 192, 1)',
+          'rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)',
+          'rgba(199, 199, 199, 1)', 'rgba(83, 102, 255, 1)', 'rgba(40, 159, 64, 1)',
+          'rgba(210, 105, 30, 1)', 'rgba(128, 0, 128, 1)'
+      ];
+
+      // Limit to top 10 tax codes for readability if there are more
+      const displayCodes = allTaxCodes.length > 10 ? allTaxCodes.slice(0, 10) : allTaxCodes;
+
+      displayCodes.forEach((code, index) => {
+          const data = [];
+          years.forEach(year => {
+              if ({{ comparison_data|tojson }}[year] && {{ comparison_data|tojson }}[year][code]) {
+                  data.push({{ comparison_data|tojson }}[year][code].levy_rate);
+              } else {
+                  data.push(null); // Use null for missing data
+              }
+          });
+
+          datasets.push({
+              label: code,
+              data: data,
+              borderColor: colors[index % colors.length],
+              backgroundColor: colors[index % colors.length].replace('1)', '0.2)'),
+              tension: 0.2,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: false
+          });
+      });
+
+      // Create chart
+      const ctx = document.getElementById('levyRateChart').getContext('2d');
+      const levyRateChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: years,
+              datasets: datasets
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                  mode: 'index',
+                  intersect: false
+              },
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Levy Rate Trends Over Time',
+                      font: {
+                          size: 16
+                      }
+                  },
+                  legend: {
+                      position: 'bottom',
+                      labels: {
+                          boxWidth: 12
+                      }
+                  },
+                  tooltip: {
+                      callbacks: {
+                          label: function(context) {
+                              if (context.parsed.y !== null) {
+                                  return context.dataset.label + ': ' + context.parsed.y.toFixed(4);
+                              }
+                              return context.dataset.label + ': No data';
+                          }
+                      }
+                  }
+              },
+              scales: {
+                  x: {
+                      title: {
+                          display: true,
+                          text: 'Year'
+                      }
+                  },
+                  y: {
+                      title: {
+                          display: true,
+                          text: 'Levy Rate'
+                      },
+                      beginAtZero: true
+                  }
+              }
+          }
+      });
+  });
 </script>
-{% endif %}
-{% endblock %}
+{% endif %} {% endblock %}

@@ -5,289 +5,297 @@
 
 /* Base Carousel Styles */
 .keras-carousel {
-    position: relative;
-    width: 100%;
-    padding: 1.5rem 0;
-    margin-bottom: 2rem;
-    overflow: hidden;
+  position: relative;
+  width: 100%;
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+  overflow: hidden;
 }
 
 .keras-carousel-track {
-    display: flex;
-    transition: transform 0.5s ease-out;
+  display: flex;
+  transition: transform 0.5s ease-out;
 }
 
 /* Card Base Styles */
 .keras-card {
-    flex: 0 0 auto;
-    position: relative;
-    width: calc(33.333% - 1.5rem);
-    min-width: 280px;
-    margin-right: 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    background: #fff;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    transform: translateY(0);
+  flex: 0 0 auto;
+  position: relative;
+  width: calc(33.333% - 1.5rem);
+  min-width: 280px;
+  margin-right: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  transform: translateY(0);
 }
 
 .keras-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* Card Image */
 .keras-card-img-top {
-    height: 160px;
-    background-size: cover;
-    background-position: center;
-    position: relative;
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
 
 .keras-card-img-top::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0));
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 1),
+    rgba(255, 255, 255, 0)
+  );
 }
 
 /* Card Body */
 .keras-card-body {
-    padding: 1.25rem;
-    position: relative;
+  padding: 1.25rem;
+  position: relative;
 }
 
 .keras-card-title {
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #333;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
 }
 
 .keras-card-text {
-    color: #666;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    line-height: 1.5;
+  color: #666;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 /* Card Meta Info */
 .keras-card-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: auto;
 }
 
 .keras-card-meta span {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .keras-card-meta i {
-    margin-right: 0.25rem;
+  margin-right: 0.25rem;
 }
 
 /* Card Footer */
 .keras-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1.25rem;
-    background: #f8f9fa;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    font-size: 0.875rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: #f8f9fa;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  font-size: 0.875rem;
 }
 
 /* Navigation Controls */
 .keras-carousel-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.2s ease;
-    font-size: 1.25rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  font-size: 1.25rem;
 }
 
 .keras-carousel-nav:hover {
-    background: #f8f9fa;
+  background: #f8f9fa;
 }
 
 .keras-carousel-nav.prev {
-    left: 5px;
+  left: 5px;
 }
 
 .keras-carousel-nav.next {
-    right: 5px;
+  right: 5px;
 }
 
 .keras-carousel-nav.disabled {
-    opacity: 0.5;
-    pointer-events: none;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* Dots Pagination */
 .keras-carousel-dots {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 .keras-carousel-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #ddd;
-    margin: 0 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ddd;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .keras-carousel-dot:hover {
-    background: #bbb;
+  background: #bbb;
 }
 
 .keras-carousel-dot.active {
-    width: 20px;
-    border-radius: 10px;
-    background: #007bff;
+  width: 20px;
+  border-radius: 10px;
+  background: #007bff;
 }
 
 /* Card Color Variations */
 .keras-card-primary {
-    border-top: 3px solid #007bff;
+  border-top: 3px solid #007bff;
 }
 
 .keras-card-success {
-    border-top: 3px solid #28a745;
+  border-top: 3px solid #28a745;
 }
 
 .keras-card-info {
-    border-top: 3px solid #17a2b8;
+  border-top: 3px solid #17a2b8;
 }
 
 .keras-card-warning {
-    border-top: 3px solid #ffc107;
+  border-top: 3px solid #ffc107;
 }
 
 .keras-card-danger {
-    border-top: 3px solid #dc3545;
+  border-top: 3px solid #dc3545;
 }
 
 /* Gradient Cards */
 .keras-card-gradient {
-    --gradient-start: #007bff;
-    --gradient-end: #6610f2;
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    color: white;
+  --gradient-start: #007bff;
+  --gradient-end: #6610f2;
+  background: linear-gradient(
+    135deg,
+    var(--gradient-start),
+    var(--gradient-end)
+  );
+  color: white;
 }
 
 .keras-card-gradient .keras-card-title {
-    color: white;
+  color: white;
 }
 
 .keras-card-gradient .keras-card-text {
-    color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* Card with Badge */
 .keras-card-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    border-radius: 30px;
-    font-weight: 500;
-    z-index: 2;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 30px;
+  font-weight: 500;
+  z-index: 2;
 }
 
 /* Status Indicator */
 .keras-card-status {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-right: 0.5rem;
-    display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  display: inline-block;
 }
 
 /* Card Entrance Animations */
 .keras-card-animated {
-    animation: keras-card-entrance 0.5s ease forwards;
-    opacity: 0;
-    transform: translateY(20px);
+  animation: keras-card-entrance 0.5s ease forwards;
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 @keyframes keras-card-entrance {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Skeleton Loading */
 .keras-card-skeleton {
-    background: #f8f9fa;
+  background: #f8f9fa;
 }
 
 .keras-card-skeleton .keras-card-img-top {
-    background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s ease-in-out infinite;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 
 .keras-card-skeleton .keras-card-title {
-    height: 1.5rem;
-    width: 80%;
-    margin-bottom: 1rem;
-    background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s ease-in-out infinite;
-    border-radius: 4px;
+  height: 1.5rem;
+  width: 80%;
+  margin-bottom: 1rem;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
 }
 
 .keras-card-skeleton .keras-card-text {
-    height: 3rem;
-    background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
-    background-size: 200% 100%;
-    animation: skeleton-loading 1.5s ease-in-out infinite;
-    border-radius: 4px;
+  height: 3rem;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
 }
 
 @keyframes skeleton-loading {
-    100% {
-        background-position-x: -200%;
-    }
+  100% {
+    background-position-x: -200%;
+  }
 }
 
 /* Responsive Design */
 @media (max-width: 992px) {
-    .keras-card {
-        width: calc(50% - 1.5rem);
-    }
+  .keras-card {
+    width: calc(50% - 1.5rem);
+  }
 }
 
 @media (max-width: 576px) {
-    .keras-card {
-        width: calc(100% - 1rem);
-        margin-right: 1rem;
-    }
-    
-    .keras-carousel-nav {
-        display: none;
-    }
+  .keras-card {
+    width: calc(100% - 1rem);
+    margin-right: 1rem;
+  }
+
+  .keras-carousel-nav {
+    display: none;
+  }
 }

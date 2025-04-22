@@ -1,329 +1,350 @@
-{% extends 'simple_base.html' %}
-
-{% block title %}{{ district.district_name }} - Benton County Property Tax Portal{% endblock %}
-
-{% block content %}
+{% extends 'simple_base.html' %} {% block title %}{{ district.district_name }} -
+Benton County Property Tax Portal{% endblock %} {% block content %}
 <div class="container py-5">
-    <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('public.district_list') }}">Tax Districts</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ district.district_name }}</li>
-                </ol>
-            </nav>
-            <h1 class="h2 mb-3">{{ district.district_name }}</h1>
-            <div class="d-flex align-items-center mb-2">
-                <span class="badge bg-secondary me-2">{{ district.district_type }}</span>
-                <span class="text-muted">Code: {{ district.district_code }}</span>
-            </div>
-            <p class="lead">{{ district.description or 'Tax district information for ' + district.district_name }}</p>
-        </div>
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('public.index') }}">Home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('public.district_list') }}">Tax Districts</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ district.district_name }}
+          </li>
+        </ol>
+      </nav>
+      <h1 class="h2 mb-3">{{ district.district_name }}</h1>
+      <div class="d-flex align-items-center mb-2">
+        <span class="badge bg-secondary me-2"
+          >{{ district.district_type }}</span
+        >
+        <span class="text-muted">Code: {{ district.district_code }}</span>
+      </div>
+      <p class="lead">
+        {{ district.description or 'Tax district information for ' +
+        district.district_name }}
+      </p>
     </div>
-    
-    <!-- District Overview -->
-    <div class="row mb-5">
-        <!-- District Information -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">District Overview</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h3 class="h6 text-muted mb-2">General Information</h3>
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th style="width: 40%">District Name:</th>
-                                        <td>{{ district.district_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>District Code:</th>
-                                        <td>{{ district.district_code }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>District Type:</th>
-                                        <td>{{ district.district_type }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>County:</th>
-                                        <td>{{ district.county or 'Benton' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>State:</th>
-                                        <td>{{ district.state or 'WA' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Year:</th>
-                                        <td>{{ district.year }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h3 class="h6 text-muted mb-2">Levy Information</h3>
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th style="width: 50%">Statutory Limit:</th>
-                                        <td>
-                                            {% if district.statutory_limit %}
-                                                ${{ "{:.4f}".format(district.statutory_limit) }} per $1,000
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Properties in District:</th>
-                                        <td>{{ property_count }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Associated Tax Codes:</th>
-                                        <td>{{ tax_codes|length }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Status:</th>
-                                        <td>
-                                            {% if district.is_active %}
-                                                <span class="badge bg-success">Active</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">Inactive</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    {% if district.description %}
-                        <div class="mt-4">
-                            <h3 class="h6 text-muted mb-2">Description</h3>
-                            <p>{{ district.description }}</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Tax Codes in This District -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Tax Codes in This District</h2>
-                </div>
-                <div class="card-body">
-                    {% if tax_codes %}
-                        <div class="table-responsive">
-                            <table class="table table-hover table-sm">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Tax Code</th>
-                                        <th>Description</th>
-                                        <th class="text-end">Levy Rate</th>
-                                        <th class="text-end">Assessed Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for tax_code in tax_codes %}
-                                        <tr>
-                                            <td>{{ tax_code.tax_code }}</td>
-                                            <td>{{ tax_code.description or 'No description available' }}</td>
-                                            <td class="text-end">
-                                                {% if tax_code.id in historical_rates and historical_rates[tax_code.id].levy_rate %}
-                                                    {{ "{:.4f}".format(historical_rates[tax_code.id].levy_rate) }}
-                                                {% else %}
-                                                    N/A
-                                                {% endif %}
-                                            </td>
-                                            <td class="text-end">
-                                                {% if tax_code.id in historical_rates and historical_rates[tax_code.id].total_assessed_value %}
-                                                    ${{ "{:,.2f}".format(historical_rates[tax_code.id].total_assessed_value) }}
-                                                {% else %}
-                                                    N/A
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info mb-0">
-                            <i class="bi bi-info-circle me-2"></i> No tax codes are associated with this district.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+  </div>
+
+  <!-- District Overview -->
+  <div class="row mb-5">
+    <!-- District Information -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">District Overview</h2>
         </div>
-        
-        <!-- District Stats -->
-        <div class="col-lg-4">
-            <!-- District Stats Card -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">District Statistics</h2>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h6 class="text-muted mb-1">Properties</h6>
-                            <div class="h3">{{ property_count }}</div>
-                        </div>
-                        <div class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0">
-                            <i class="bi bi-houses text-primary fs-2"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h6 class="text-muted mb-1">Tax Codes</h6>
-                            <div class="h3">{{ tax_codes|length }}</div>
-                        </div>
-                        <div class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0">
-                            <i class="bi bi-upc text-primary fs-2"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h6 class="text-muted mb-1">District Type</h6>
-                            <div class="h3">{{ district.district_type }}</div>
-                        </div>
-                        <div class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0">
-                            <i class="bi bi-building text-primary fs-2"></i>
-                        </div>
-                    </div>
-                    
-                    {% if tax_codes %}
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted mb-1">Average Levy Rate</h6>
-                                <div class="h3">
-                                    {% set total_rate = 0 %}
-                                    {% set rate_count = 0 %}
-                                    {% for tax_code in tax_codes %}
-                                        {% if tax_code.id in historical_rates and historical_rates[tax_code.id].levy_rate %}
-                                            {% set total_rate = total_rate + historical_rates[tax_code.id].levy_rate %}
-                                            {% set rate_count = rate_count + 1 %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    {% if rate_count > 0 %}
-                                        {{ "{:.4f}".format(total_rate / rate_count) }}
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0">
-                                <i class="bi bi-cash-stack text-primary fs-2"></i>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h3 class="h6 text-muted mb-2">General Information</h3>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <th style="width: 40%">District Name:</th>
+                    <td>{{ district.district_name }}</td>
+                  </tr>
+                  <tr>
+                    <th>District Code:</th>
+                    <td>{{ district.district_code }}</td>
+                  </tr>
+                  <tr>
+                    <th>District Type:</th>
+                    <td>{{ district.district_type }}</td>
+                  </tr>
+                  <tr>
+                    <th>County:</th>
+                    <td>{{ district.county or 'Benton' }}</td>
+                  </tr>
+                  <tr>
+                    <th>State:</th>
+                    <td>{{ district.state or 'WA' }}</td>
+                  </tr>
+                  <tr>
+                    <th>Year:</th>
+                    <td>{{ district.year }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            
-            <!-- District Type Information -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">About {{ district.district_type }} Districts</h2>
-                </div>
-                <div class="card-body">
-                    {% if district.district_type == 'SCHOOL' %}
-                        <p>School districts are responsible for providing K-12 education within their boundaries. They receive funding from local property taxes, state allocations, and federal programs.</p>
-                        <p>School district levy rates typically include:</p>
-                        <ul>
-                            <li>General education levies</li>
-                            <li>Bond levies for capital improvements</li>
-                            <li>Technology levies</li>
-                            <li>Enrichment levies for programs beyond basic education</li>
-                        </ul>
-                    {% elif district.district_type == 'CITY' %}
-                        <p>Cities levy property taxes to fund municipal services such as:</p>
-                        <ul>
-                            <li>Police and public safety</li>
-                            <li>Street maintenance</li>
-                            <li>Parks and recreation</li>
-                            <li>General government operations</li>
-                            <li>Municipal facilities</li>
-                        </ul>
-                    {% elif district.district_type == 'FIRE' %}
-                        <p>Fire districts provide fire protection and emergency medical services. Their levies fund:</p>
-                        <ul>
-                            <li>Firefighter salaries and training</li>
-                            <li>Fire stations and equipment</li>
-                            <li>Emergency medical services</li>
-                            <li>Fire prevention programs</li>
-                        </ul>
-                    {% elif district.district_type == 'COUNTY' %}
-                        <p>County levies support county-wide services including:</p>
-                        <ul>
-                            <li>Courts and legal systems</li>
-                            <li>Sheriff and corrections</li>
-                            <li>Roads and infrastructure</li>
-                            <li>Public health</li>
-                            <li>Elections</li>
-                            <li>Property assessment and tax collection</li>
-                        </ul>
-                    {% elif district.district_type == 'LIBRARY' %}
-                        <p>Library districts fund public libraries and related services:</p>
-                        <ul>
-                            <li>Book and media collections</li>
-                            <li>Library facilities</li>
-                            <li>Librarian salaries</li>
-                            <li>Educational programs</li>
-                            <li>Digital resources and technology</li>
-                        </ul>
-                    {% elif district.district_type == 'PORT' %}
-                        <p>Port districts manage facilities like:</p>
-                        <ul>
-                            <li>Harbors and marinas</li>
-                            <li>Airports</li>
-                            <li>Industrial parks</li>
-                            <li>Economic development initiatives</li>
-                        </ul>
-                    {% else %}
-                        <p>This is a {{ district.district_type }} district. Tax districts are governmental entities authorized to levy property taxes to fund specific public services within their jurisdictional boundaries.</p>
-                    {% endif %}
-                </div>
+            <div class="col-md-6">
+              <h3 class="h6 text-muted mb-2">Levy Information</h3>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <th style="width: 50%">Statutory Limit:</th>
+                    <td>
+                      {% if district.statutory_limit %} ${{
+                      "{:.4f}".format(district.statutory_limit) }} per $1,000 {%
+                      else %} N/A {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Properties in District:</th>
+                    <td>{{ property_count }}</td>
+                  </tr>
+                  <tr>
+                    <th>Associated Tax Codes:</th>
+                    <td>{{ tax_codes|length }}</td>
+                  </tr>
+                  <tr>
+                    <th>Status:</th>
+                    <td>
+                      {% if district.is_active %}
+                      <span class="badge bg-success">Active</span>
+                      {% else %}
+                      <span class="badge bg-secondary">Inactive</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            
-            <!-- Actions -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('public.search') }}?tax_code={{ tax_codes[0].tax_code if tax_codes else '' }}" class="btn btn-outline-primary">
-                            <i class="bi bi-search me-2"></i>Find Properties in This District
-                        </a>
-                        <a href="{{ url_for('public.district_list') }}" class="btn btn-outline-secondary">
-                            <i class="bi bi-building me-2"></i>View All Districts
-                        </a>
-                    </div>
-                </div>
-            </div>
+          </div>
+
+          {% if district.description %}
+          <div class="mt-4">
+            <h3 class="h6 text-muted mb-2">Description</h3>
+            <p>{{ district.description }}</p>
+          </div>
+          {% endif %}
         </div>
+      </div>
+
+      <!-- Tax Codes in This District -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Tax Codes in This District</h2>
+        </div>
+        <div class="card-body">
+          {% if tax_codes %}
+          <div class="table-responsive">
+            <table class="table table-hover table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th>Tax Code</th>
+                  <th>Description</th>
+                  <th class="text-end">Levy Rate</th>
+                  <th class="text-end">Assessed Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tax_code in tax_codes %}
+                <tr>
+                  <td>{{ tax_code.tax_code }}</td>
+                  <td>
+                    {{ tax_code.description or 'No description available' }}
+                  </td>
+                  <td class="text-end">
+                    {% if tax_code.id in historical_rates and
+                    historical_rates[tax_code.id].levy_rate %} {{
+                    "{:.4f}".format(historical_rates[tax_code.id].levy_rate) }}
+                    {% else %} N/A {% endif %}
+                  </td>
+                  <td class="text-end">
+                    {% if tax_code.id in historical_rates and
+                    historical_rates[tax_code.id].total_assessed_value %} ${{
+                    "{:,.2f}".format(historical_rates[tax_code.id].total_assessed_value)
+                    }} {% else %} N/A {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-2"></i> No tax codes are associated
+            with this district.
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
+
+    <!-- District Stats -->
+    <div class="col-lg-4">
+      <!-- District Stats Card -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">District Statistics</h2>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h6 class="text-muted mb-1">Properties</h6>
+              <div class="h3">{{ property_count }}</div>
+            </div>
+            <div
+              class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0"
+            >
+              <i class="bi bi-houses text-primary fs-2"></i>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h6 class="text-muted mb-1">Tax Codes</h6>
+              <div class="h3">{{ tax_codes|length }}</div>
+            </div>
+            <div
+              class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0"
+            >
+              <i class="bi bi-upc text-primary fs-2"></i>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h6 class="text-muted mb-1">District Type</h6>
+              <div class="h3">{{ district.district_type }}</div>
+            </div>
+            <div
+              class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0"
+            >
+              <i class="bi bi-building text-primary fs-2"></i>
+            </div>
+          </div>
+
+          {% if tax_codes %}
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted mb-1">Average Levy Rate</h6>
+              <div class="h3">
+                {% set total_rate = 0 %} {% set rate_count = 0 %} {% for
+                tax_code in tax_codes %} {% if tax_code.id in historical_rates
+                and historical_rates[tax_code.id].levy_rate %} {% set total_rate
+                = total_rate + historical_rates[tax_code.id].levy_rate %} {% set
+                rate_count = rate_count + 1 %} {% endif %} {% endfor %} {% if
+                rate_count > 0 %} {{ "{:.4f}".format(total_rate / rate_count) }}
+                {% else %} N/A {% endif %}
+              </div>
+            </div>
+            <div
+              class="icon-square bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0"
+            >
+              <i class="bi bi-cash-stack text-primary fs-2"></i>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- District Type Information -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">About {{ district.district_type }} Districts</h2>
+        </div>
+        <div class="card-body">
+          {% if district.district_type == 'SCHOOL' %}
+          <p>
+            School districts are responsible for providing K-12 education within
+            their boundaries. They receive funding from local property taxes,
+            state allocations, and federal programs.
+          </p>
+          <p>School district levy rates typically include:</p>
+          <ul>
+            <li>General education levies</li>
+            <li>Bond levies for capital improvements</li>
+            <li>Technology levies</li>
+            <li>Enrichment levies for programs beyond basic education</li>
+          </ul>
+          {% elif district.district_type == 'CITY' %}
+          <p>Cities levy property taxes to fund municipal services such as:</p>
+          <ul>
+            <li>Police and public safety</li>
+            <li>Street maintenance</li>
+            <li>Parks and recreation</li>
+            <li>General government operations</li>
+            <li>Municipal facilities</li>
+          </ul>
+          {% elif district.district_type == 'FIRE' %}
+          <p>
+            Fire districts provide fire protection and emergency medical
+            services. Their levies fund:
+          </p>
+          <ul>
+            <li>Firefighter salaries and training</li>
+            <li>Fire stations and equipment</li>
+            <li>Emergency medical services</li>
+            <li>Fire prevention programs</li>
+          </ul>
+          {% elif district.district_type == 'COUNTY' %}
+          <p>County levies support county-wide services including:</p>
+          <ul>
+            <li>Courts and legal systems</li>
+            <li>Sheriff and corrections</li>
+            <li>Roads and infrastructure</li>
+            <li>Public health</li>
+            <li>Elections</li>
+            <li>Property assessment and tax collection</li>
+          </ul>
+          {% elif district.district_type == 'LIBRARY' %}
+          <p>Library districts fund public libraries and related services:</p>
+          <ul>
+            <li>Book and media collections</li>
+            <li>Library facilities</li>
+            <li>Librarian salaries</li>
+            <li>Educational programs</li>
+            <li>Digital resources and technology</li>
+          </ul>
+          {% elif district.district_type == 'PORT' %}
+          <p>Port districts manage facilities like:</p>
+          <ul>
+            <li>Harbors and marinas</li>
+            <li>Airports</li>
+            <li>Industrial parks</li>
+            <li>Economic development initiatives</li>
+          </ul>
+          {% else %}
+          <p>
+            This is a {{ district.district_type }} district. Tax districts are
+            governmental entities authorized to levy property taxes to fund
+            specific public services within their jurisdictional boundaries.
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a
+              href="{{ url_for('public.search') }}?tax_code={{ tax_codes[0].tax_code if tax_codes else '' }}"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-search me-2"></i>Find Properties in This District
+            </a>
+            <a
+              href="{{ url_for('public.district_list') }}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="bi bi-building me-2"></i>View All Districts
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add any JavaScript specific to this page
-    });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add any JavaScript specific to this page
+  });
 </script>
-{% endblock %}
-
-{% block extra_css %}
+{% endblock %} {% block extra_css %}
 <style>
-    .icon-square {
-        width: 3rem;
-        height: 3rem;
-        border-radius: 0.75rem;
-    }
+  .icon-square {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+  }
 </style>
 {% endblock %}

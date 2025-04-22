@@ -1,245 +1,277 @@
-{% extends "levy_audit/base_levy_audit.html" %}
-
-{% block title %}Levy Audit Dashboard - LevyMaster{% endblock %}
-
-{% block levy_audit_content %}
+{% extends "levy_audit/base_levy_audit.html" %} {% block title %}Levy Audit
+Dashboard - LevyMaster{% endblock %} {% block levy_audit_content %}
 <div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="display-5 mb-3">Levy Audit & Expert Consulting</h1>
-            <p class="lead text-muted">
-                Leverage AI-powered insights and expertise to ensure compliance, optimize rates, and make informed decisions.
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 mb-3">Levy Audit & Expert Consulting</h1>
+      <p class="lead text-muted">
+        Leverage AI-powered insights and expertise to ensure compliance,
+        optimize rates, and make informed decisions.
+      </p>
+    </div>
+  </div>
+
+  <!-- Lev Profile -->
+  <div class="row mb-5">
+    <div class="col-lg-12">
+      <div class="lev-profile shadow-sm">
+        <div class="row align-items-center">
+          <div class="col-md-2 col-lg-1 text-center mb-3 mb-md-0">
+            <div class="audit-avatar mx-auto">
+              <i class="bi bi-robot"></i>
+            </div>
+          </div>
+          <div class="col-md-10 col-lg-11">
+            <h4 class="mb-1">Meet Lev - Your Property Tax & Levy Expert</h4>
+            <p class="mb-0">
+              Lev is your AI-powered levy expert consultant with deep knowledge
+              of property tax laws, levy calculations, and compliance
+              requirements. Ask Lev questions, run compliance audits, and get
+              expert recommendations to optimize your levy processes.
             </p>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Levy Audit Tools -->
+  <div class="row mb-5">
+    <div class="col-lg-12 mb-4">
+      <h2 class="h3 mb-4">Levy Audit Tools</h2>
     </div>
 
-    <!-- Lev Profile -->
-    <div class="row mb-5">
-        <div class="col-lg-12">
-            <div class="lev-profile shadow-sm">
-                <div class="row align-items-center">
-                    <div class="col-md-2 col-lg-1 text-center mb-3 mb-md-0">
-                        <div class="audit-avatar mx-auto">
-                            <i class="bi bi-robot"></i>
-                        </div>
-                    </div>
-                    <div class="col-md-10 col-lg-11">
-                        <h4 class="mb-1">Meet Lev - Your Property Tax & Levy Expert</h4>
-                        <p class="mb-0">
-                            Lev is your AI-powered levy expert consultant with deep knowledge of property tax laws, 
-                            levy calculations, and compliance requirements. Ask Lev questions, run compliance audits, 
-                            and get expert recommendations to optimize your levy processes.
-                        </p>
-                    </div>
-                </div>
-            </div>
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card audit-card h-100 shadow-sm">
+        <div class="card-header audit-card-header py-3">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-shield-check me-2"></i>Compliance Audit
+          </h5>
         </div>
+        <div class="card-body">
+          <p class="card-text">
+            Verify levy compliance with applicable laws and regulations.
+          </p>
+          <ul class="mb-0">
+            <li>Identify compliance issues</li>
+            <li>Review against legal requirements</li>
+            <li>Get detailed findings reports</li>
+          </ul>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('levy_audit.compliance_audit') }}"
+            class="btn btn-primary w-100"
+          >
+            <i class="bi bi-arrow-right-circle me-2"></i>Start Audit
+          </a>
+        </div>
+      </div>
     </div>
 
-    <!-- Levy Audit Tools -->
-    <div class="row mb-5">
-        <div class="col-lg-12 mb-4">
-            <h2 class="h3 mb-4">Levy Audit Tools</h2>
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card audit-card h-100 shadow-sm">
+        <div class="card-header audit-card-header py-3">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-chat-square-text me-2"></i>Levy Assistant
+          </h5>
         </div>
-
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="card audit-card h-100 shadow-sm">
-                <div class="card-header audit-card-header py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-shield-check me-2"></i>Compliance Audit
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Verify levy compliance with applicable laws and regulations.</p>
-                    <ul class="mb-0">
-                        <li>Identify compliance issues</li>
-                        <li>Review against legal requirements</li>
-                        <li>Get detailed findings reports</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('levy_audit.compliance_audit') }}" class="btn btn-primary w-100">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Start Audit
-                    </a>
-                </div>
-            </div>
+        <div class="card-body">
+          <p class="card-text">
+            Ask questions and get expert guidance on property tax topics.
+          </p>
+          <ul class="mb-0">
+            <li>Natural language interaction</li>
+            <li>Detailed explanations</li>
+            <li>Access expert knowledge</li>
+          </ul>
         </div>
-
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="card audit-card h-100 shadow-sm">
-                <div class="card-header audit-card-header py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-chat-square-text me-2"></i>Levy Assistant
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Ask questions and get expert guidance on property tax topics.</p>
-                    <ul class="mb-0">
-                        <li>Natural language interaction</li>
-                        <li>Detailed explanations</li>
-                        <li>Access expert knowledge</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('levy_audit.levy_assistant') }}" class="btn btn-primary w-100">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Ask Lev
-                    </a>
-                </div>
-            </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('levy_audit.levy_assistant') }}"
+            class="btn btn-primary w-100"
+          >
+            <i class="bi bi-arrow-right-circle me-2"></i>Ask Lev
+          </a>
         </div>
-
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="card audit-card h-100 shadow-sm">
-                <div class="card-header audit-card-header py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-calculator me-2"></i>Verify Calculation
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Double-check levy calculations with expert analysis.</p>
-                    <ul class="mb-0">
-                        <li>Verify accuracy</li>
-                        <li>Identify optimization opportunities</li>
-                        <li>Compare to similar properties</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('levy_audit.verify_calculation') }}" class="btn btn-primary w-100">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Verify
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="card audit-card h-100 shadow-sm">
-                <div class="card-header audit-card-header py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-lightbulb me-2"></i>Recommendations
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Get strategic recommendations for levy optimization.</p>
-                    <ul class="mb-0">
-                        <li>Personalized insights</li>
-                        <li>Actionable suggestions</li>
-                        <li>Prioritized improvements</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('levy_audit.levy_recommendations') }}" class="btn btn-primary w-100">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Get Insights
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-4">
-            <div class="card audit-card h-100 shadow-sm">
-                <div class="card-header audit-card-header py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-file-earmark-text me-2"></i>WA DOR Forms
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Complete Washington Department of Revenue forms.</p>
-                    <ul class="mb-0">
-                        <li>Standard DOR form templates</li>
-                        <li>Auto-populated data</li>
-                        <li>Calculate levy limits</li>
-                    </ul>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('levy_audit.wa_dor_forms') }}" class="btn btn-primary w-100">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Open Forms
-                    </a>
-                </div>
-            </div>
-        </div>
-
+      </div>
     </div>
 
-    <!-- Additional Tools -->
-    <div class="row mb-5">
-        <div class="col-lg-12 mb-4">
-            <h2 class="h3 mb-4">Knowledge Resources</h2>
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card audit-card h-100 shadow-sm">
+        <div class="card-header audit-card-header py-3">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-calculator me-2"></i>Verify Calculation
+          </h5>
         </div>
-
-        <div class="col-md-6 mb-4">
-            <div class="card audit-card h-100 shadow-sm">
-                <div class="card-header audit-card-header py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-book me-2"></i>Levy Law Explanation
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Get expert explanations of property tax and levy laws.</p>
-                    <p>Access Lev's comprehensive knowledge of property tax laws, regulations, and best practices. Get detailed explanations tailored to your jurisdiction and specific needs.</p>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('levy_audit.explain_levy_law') }}" class="btn btn-primary w-100">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Explore Laws
-                    </a>
-                </div>
-            </div>
+        <div class="card-body">
+          <p class="card-text">
+            Double-check levy calculations with expert analysis.
+          </p>
+          <ul class="mb-0">
+            <li>Verify accuracy</li>
+            <li>Identify optimization opportunities</li>
+            <li>Compare to similar properties</li>
+          </ul>
         </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('levy_audit.verify_calculation') }}"
+            class="btn btn-primary w-100"
+          >
+            <i class="bi bi-arrow-right-circle me-2"></i>Verify
+          </a>
+        </div>
+      </div>
+    </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card audit-card h-100 shadow-sm">
-                <div class="card-header audit-card-header py-3">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-clock-history me-2"></i>Recent Audit History
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">View your recent levy audit activities and results.</p>
-                    
-                    {% if recent_audits %}
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>District/Code</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for audit in recent_audits %}
-                                <tr>
-                                    <td>{{ audit.audit_type }}</td>
-                                    <td>
-                                        {% if audit.tax_district_id %}
-                                        District #{{ audit.tax_district_id }}
-                                        {% elif audit.tax_code_id %}
-                                        Code #{{ audit.tax_code_id }}
-                                        {% else %}
-                                        -
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ audit.created_at.strftime('%m/%d/%Y') }}</td>
-                                    <td>
-                                        {% if audit.status == 'COMPLETED' %}
-                                        <span class="badge bg-success">Completed</span>
-                                        {% elif audit.status == 'PENDING' %}
-                                        <span class="badge bg-warning">Pending</span>
-                                        {% elif audit.status == 'FAILED' %}
-                                        <span class="badge bg-danger">Failed</span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">{{ audit.status }}</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card audit-card h-100 shadow-sm">
+        <div class="card-header audit-card-header py-3">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-lightbulb me-2"></i>Recommendations
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            Get strategic recommendations for levy optimization.
+          </p>
+          <ul class="mb-0">
+            <li>Personalized insights</li>
+            <li>Actionable suggestions</li>
+            <li>Prioritized improvements</li>
+          </ul>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('levy_audit.levy_recommendations') }}"
+            class="btn btn-primary w-100"
+          >
+            <i class="bi bi-arrow-right-circle me-2"></i>Get Insights
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-4">
+      <div class="card audit-card h-100 shadow-sm">
+        <div class="card-header audit-card-header py-3">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-file-earmark-text me-2"></i>WA DOR Forms
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            Complete Washington Department of Revenue forms.
+          </p>
+          <ul class="mb-0">
+            <li>Standard DOR form templates</li>
+            <li>Auto-populated data</li>
+            <li>Calculate levy limits</li>
+          </ul>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('levy_audit.wa_dor_forms') }}"
+            class="btn btn-primary w-100"
+          >
+            <i class="bi bi-arrow-right-circle me-2"></i>Open Forms
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Tools -->
+  <div class="row mb-5">
+    <div class="col-lg-12 mb-4">
+      <h2 class="h3 mb-4">Knowledge Resources</h2>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card audit-card h-100 shadow-sm">
+        <div class="card-header audit-card-header py-3">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-book me-2"></i>Levy Law Explanation
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            Get expert explanations of property tax and levy laws.
+          </p>
+          <p>
+            Access Lev's comprehensive knowledge of property tax laws,
+            regulations, and best practices. Get detailed explanations tailored
+            to your jurisdiction and specific needs.
+          </p>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('levy_audit.explain_levy_law') }}"
+            class="btn btn-primary w-100"
+          >
+            <i class="bi bi-arrow-right-circle me-2"></i>Explore Laws
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card audit-card h-100 shadow-sm">
+        <div class="card-header audit-card-header py-3">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-clock-history me-2"></i>Recent Audit History
+          </h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            View your recent levy audit activities and results.
+          </p>
+
+          {% if recent_audits %}
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>District/Code</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for audit in recent_audits %}
+                <tr>
+                  <td>{{ audit.audit_type }}</td>
+                  <td>
+                    {% if audit.tax_district_id %} District #{{
+                    audit.tax_district_id }} {% elif audit.tax_code_id %} Code
+                    #{{ audit.tax_code_id }} {% else %} - {% endif %}
+                  </td>
+                  <td>{{ audit.created_at.strftime('%m/%d/%Y') }}</td>
+                  <td>
+                    {% if audit.status == 'COMPLETED' %}
+                    <span class="badge bg-success">Completed</span>
+                    {% elif audit.status == 'PENDING' %}
+                    <span class="badge bg-warning">Pending</span>
+                    {% elif audit.status == 'FAILED' %}
+                    <span class="badge bg-danger">Failed</span>
                     {% else %}
-                    <p class="text-muted fst-italic">No recent audit history available.</p>
+                    <span class="badge bg-secondary">{{ audit.status }}</span>
                     {% endif %}
-                </div>
-            </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted fst-italic">
+            No recent audit history available.
+          </p>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

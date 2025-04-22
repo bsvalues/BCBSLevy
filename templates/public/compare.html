@@ -1,437 +1,553 @@
-{% extends 'simple_base.html' %}
-
-{% block title %}Compare Properties - Benton County Property Tax Portal{% endblock %}
-
-{% block content %}
+{% extends 'simple_base.html' %} {% block title %}Compare Properties - Benton
+County Property Tax Portal{% endblock %} {% block content %}
 <div class="container py-5">
-    <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('public.search') }}">Property Search</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Compare Properties</li>
-                </ol>
-            </nav>
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h1 class="h2 mb-3">Compare Properties</h1>
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="yearDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        View {{ year }} Data
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="yearDropdown">
-                        {% for available_year in available_years %}
-                            <li><a class="dropdown-item {% if available_year == year %}active{% endif %}" href="{{ url_for('public.compare_properties', property_ids=property_ids, year=available_year) }}">{{ available_year }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('public.index') }}">Home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('public.search') }}">Property Search</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Compare Properties
+          </li>
+        </ol>
+      </nav>
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <h1 class="h2 mb-3">Compare Properties</h1>
+        <div class="dropdown">
+          <button
+            class="btn btn-outline-secondary dropdown-toggle"
+            type="button"
+            id="yearDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            View {{ year }} Data
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="yearDropdown">
+            {% for available_year in available_years %}
+            <li>
+              <a
+                class="dropdown-item {% if available_year == year %}active{% endif %}"
+                href="{{ url_for('public.compare_properties', property_ids=property_ids, year=available_year) }}"
+                >{{ available_year }}</a
+              >
+            </li>
+            {% endfor %}
+          </ul>
         </div>
+      </div>
     </div>
-    
-    <!-- Property Selection -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Select Properties to Compare</h2>
-                </div>
-                <div class="card-body">
-                    <form action="{{ url_for('public.compare_properties') }}" method="post" id="compareForm">
-                        <div class="row align-items-end g-3">
-                            <div class="col-md-4">
-                                <label for="propertySearch1" class="form-label">Property 1</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control property-search" id="propertySearch1" placeholder="Search by parcel ID">
-                                    <input type="hidden" name="property_ids" id="property1" value="{{ property_ids[0] if property_ids|length > 0 else '' }}">
-                                    <button class="btn btn-outline-secondary clear-button" type="button" data-target="property1"><i class="bi bi-x"></i></button>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="propertySearch2" class="form-label">Property 2</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control property-search" id="propertySearch2" placeholder="Search by parcel ID">
-                                    <input type="hidden" name="property_ids" id="property2" value="{{ property_ids[1] if property_ids|length > 1 else '' }}">
-                                    <button class="btn btn-outline-secondary clear-button" type="button" data-target="property2"><i class="bi bi-x"></i></button>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="propertySearch3" class="form-label">Property 3 (Optional)</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control property-search" id="propertySearch3" placeholder="Search by parcel ID">
-                                    <input type="hidden" name="property_ids" id="property3" value="{{ property_ids[2] if property_ids|length > 2 else '' }}">
-                                    <button class="btn btn-outline-secondary clear-button" type="button" data-target="property3"><i class="bi bi-x"></i></button>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="year" class="form-label">Tax Year</label>
-                                <select class="form-select" id="year" name="year">
-                                    {% for available_year in available_years %}
-                                        <option value="{{ available_year }}" {% if available_year == year %}selected{% endif %}>{{ available_year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-8 d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-bar-chart me-2"></i>Compare Properties
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Comparison Results -->
-    {% if properties|length > 0 %}
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-transparent py-3">
-                        <h2 class="h5 mb-0">Comparison Results for {{ year }}</h2>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 20%">Property</th>
-                                    {% for property in properties %}
-                                        <th class="text-center">
-                                            <a href="{{ url_for('public.property_detail', property_id=property.property_id, year=year) }}">
-                                                {{ property.property_id }}
-                                            </a>
-                                        </th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Basic Information -->
-                                <tr class="table-secondary">
-                                    <th colspan="{{ properties|length + 1 }}">Basic Information</th>
-                                </tr>
-                                <tr>
-                                    <th>Address</th>
-                                    {% for property in properties %}
-                                        <td>{{ property.address }}</td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Owner</th>
-                                    {% for property in properties %}
-                                        <td>{{ property.owner_name }}</td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Property Type</th>
-                                    {% for property in properties %}
-                                        <td>
-                                            {% if property.property_type %}
-                                                {{ property.property_type.name }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Year Built</th>
-                                    {% for property in properties %}
-                                        <td>{{ property.year_built if property.year_built else 'N/A' }}</td>
-                                    {% endfor %}
-                                </tr>
-                                
-                                <!-- Valuation -->
-                                <tr class="table-secondary">
-                                    <th colspan="{{ properties|length + 1 }}">Valuation</th>
-                                </tr>
-                                <tr>
-                                    <th>Land Value</th>
-                                    {% for property in properties %}
-                                        <td>${{ "{:,.2f}".format(property.land_value) if property.land_value else 'N/A' }}</td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Improvement Value</th>
-                                    {% for property in properties %}
-                                        <td>${{ "{:,.2f}".format(property.improvement_value) if property.improvement_value else 'N/A' }}</td>
-                                    {% endfor %}
-                                </tr>
-                                <tr class="fw-bold">
-                                    <th>Total Assessed Value</th>
-                                    {% for property in properties %}
-                                        <td>${{ "{:,.2f}".format(property.assessed_value) if property.assessed_value else 'N/A' }}</td>
-                                    {% endfor %}
-                                </tr>
-                                
-                                <!-- Tax Information -->
-                                <tr class="table-secondary">
-                                    <th colspan="{{ properties|length + 1 }}">Tax Information</th>
-                                </tr>
-                                <tr>
-                                    <th>Tax Code</th>
-                                    {% for property in properties %}
-                                        <td>
-                                            {% if hasattr(property, 'tax_code_obj') and property.tax_code_obj %}
-                                                {{ property.tax_code_obj.tax_code }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Levy Rate</th>
-                                    {% for property in properties %}
-                                        <td>
-                                            {% if hasattr(property, 'historical_rate') and property.historical_rate and property.historical_rate.levy_rate %}
-                                                {{ "{:.4f}".format(property.historical_rate.levy_rate) }} per $1,000
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                                <tr class="fw-bold">
-                                    <th>Estimated Taxes</th>
-                                    {% for property in properties %}
-                                        <td>
-                                            {% if hasattr(property, 'tax_amount') and property.tax_amount %}
-                                                ${{ "{:,.2f}".format(property.tax_amount) }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    {% endfor %}
-                                </tr>
-                                
-                                <!-- Property Characteristics -->
-                                <tr class="table-secondary">
-                                    <th colspan="{{ properties|length + 1 }}">Property Characteristics</th>
-                                </tr>
-                                <tr>
-                                    <th>Land Area</th>
-                                    {% for property in properties %}
-                                        <td>{{ property.land_area if property.land_area else 'N/A' }} {% if property.land_area %}acres{% endif %}</td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Building Area</th>
-                                    {% for property in properties %}
-                                        <td>{{ property.building_area if property.building_area else 'N/A' }} {% if property.building_area %}sq ft{% endif %}</td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Bedrooms</th>
-                                    {% for property in properties %}
-                                        <td>{{ property.bedrooms if property.bedrooms else 'N/A' }}</td>
-                                    {% endfor %}
-                                </tr>
-                                <tr>
-                                    <th>Bathrooms</th>
-                                    {% for property in properties %}
-                                        <td>{{ property.bathrooms if property.bathrooms else 'N/A' }}</td>
-                                    {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Value Comparison Chart -->
-        {% if properties|length > 1 %}
-            <div class="row mb-5">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-transparent py-3">
-                            <h2 class="h5 mb-0">Value Comparison</h2>
-                        </div>
-                        <div class="card-body">
-                            <div id="valueComparisonChart" style="height: 400px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    {% else %}
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-5 text-center">
-                        <div class="mb-4">
-                            <i class="bi bi-bar-chart text-primary display-1"></i>
-                        </div>
-                        <h3 class="h4 mb-3">Select Properties to Compare</h3>
-                        <p class="text-muted mb-4">Enter at least one property parcel ID to see comparison data.</p>
-                        <a href="{{ url_for('public.search') }}" class="btn btn-primary">
-                            <i class="bi bi-search me-2"></i>Search Properties
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-    
-    <!-- Compare Tips -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm bg-light">
-                <div class="card-body p-4">
-                    <h3 class="h5 mb-3"><i class="bi bi-lightbulb me-2 text-warning"></i>Comparison Tips</h3>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <ul class="mb-0">
-                                <li>Compare up to three properties at once to see differences in values and tax amounts</li>
-                                <li>Use the year dropdown to compare the same properties across different tax years</li>
-                                <li>Click on a property ID to view its detailed information</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <ul class="mb-0">
-                                <li>Property values and tax rates can vary significantly based on location and property characteristics</li>
-                                <li>Tax codes indicate which taxing districts apply to each property</li>
-                                <li>For more detailed tax history, view the individual property detail page</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  </div>
 
-{% block extra_js %}
+  <!-- Property Selection -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Select Properties to Compare</h2>
+        </div>
+        <div class="card-body">
+          <form
+            action="{{ url_for('public.compare_properties') }}"
+            method="post"
+            id="compareForm"
+          >
+            <div class="row align-items-end g-3">
+              <div class="col-md-4">
+                <label for="propertySearch1" class="form-label"
+                  >Property 1</label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control property-search"
+                    id="propertySearch1"
+                    placeholder="Search by parcel ID"
+                  />
+                  <input
+                    type="hidden"
+                    name="property_ids"
+                    id="property1"
+                    value="{{ property_ids[0] if property_ids|length > 0 else '' }}"
+                  />
+                  <button
+                    class="btn btn-outline-secondary clear-button"
+                    type="button"
+                    data-target="property1"
+                  >
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label for="propertySearch2" class="form-label"
+                  >Property 2</label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control property-search"
+                    id="propertySearch2"
+                    placeholder="Search by parcel ID"
+                  />
+                  <input
+                    type="hidden"
+                    name="property_ids"
+                    id="property2"
+                    value="{{ property_ids[1] if property_ids|length > 1 else '' }}"
+                  />
+                  <button
+                    class="btn btn-outline-secondary clear-button"
+                    type="button"
+                    data-target="property2"
+                  >
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label for="propertySearch3" class="form-label"
+                  >Property 3 (Optional)</label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control property-search"
+                    id="propertySearch3"
+                    placeholder="Search by parcel ID"
+                  />
+                  <input
+                    type="hidden"
+                    name="property_ids"
+                    id="property3"
+                    value="{{ property_ids[2] if property_ids|length > 2 else '' }}"
+                  />
+                  <button
+                    class="btn btn-outline-secondary clear-button"
+                    type="button"
+                    data-target="property3"
+                  >
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label for="year" class="form-label">Tax Year</label>
+                <select class="form-select" id="year" name="year">
+                  {% for available_year in available_years %}
+                  <option
+                    value="{{ available_year }}"
+                    {%
+                    if
+                    available_year=""
+                    ="year"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ available_year }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-8 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-bar-chart me-2"></i>Compare Properties
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Results -->
+  {% if properties|length > 0 %}
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Comparison Results for {{ year }}</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 20%">Property</th>
+                {% for property in properties %}
+                <th class="text-center">
+                  <a
+                    href="{{ url_for('public.property_detail', property_id=property.property_id, year=year) }}"
+                  >
+                    {{ property.property_id }}
+                  </a>
+                </th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Basic Information -->
+              <tr class="table-secondary">
+                <th colspan="{{ properties|length + 1 }}">Basic Information</th>
+              </tr>
+              <tr>
+                <th>Address</th>
+                {% for property in properties %}
+                <td>{{ property.address }}</td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Owner</th>
+                {% for property in properties %}
+                <td>{{ property.owner_name }}</td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Property Type</th>
+                {% for property in properties %}
+                <td>
+                  {% if property.property_type %} {{ property.property_type.name
+                  }} {% else %} N/A {% endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Year Built</th>
+                {% for property in properties %}
+                <td>
+                  {{ property.year_built if property.year_built else 'N/A' }}
+                </td>
+                {% endfor %}
+              </tr>
+
+              <!-- Valuation -->
+              <tr class="table-secondary">
+                <th colspan="{{ properties|length + 1 }}">Valuation</th>
+              </tr>
+              <tr>
+                <th>Land Value</th>
+                {% for property in properties %}
+                <td>
+                  ${{ "{:,.2f}".format(property.land_value) if
+                  property.land_value else 'N/A' }}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Improvement Value</th>
+                {% for property in properties %}
+                <td>
+                  ${{ "{:,.2f}".format(property.improvement_value) if
+                  property.improvement_value else 'N/A' }}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr class="fw-bold">
+                <th>Total Assessed Value</th>
+                {% for property in properties %}
+                <td>
+                  ${{ "{:,.2f}".format(property.assessed_value) if
+                  property.assessed_value else 'N/A' }}
+                </td>
+                {% endfor %}
+              </tr>
+
+              <!-- Tax Information -->
+              <tr class="table-secondary">
+                <th colspan="{{ properties|length + 1 }}">Tax Information</th>
+              </tr>
+              <tr>
+                <th>Tax Code</th>
+                {% for property in properties %}
+                <td>
+                  {% if hasattr(property, 'tax_code_obj') and
+                  property.tax_code_obj %} {{ property.tax_code_obj.tax_code }}
+                  {% else %} N/A {% endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Levy Rate</th>
+                {% for property in properties %}
+                <td>
+                  {% if hasattr(property, 'historical_rate') and
+                  property.historical_rate and
+                  property.historical_rate.levy_rate %} {{
+                  "{:.4f}".format(property.historical_rate.levy_rate) }} per
+                  $1,000 {% else %} N/A {% endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr class="fw-bold">
+                <th>Estimated Taxes</th>
+                {% for property in properties %}
+                <td>
+                  {% if hasattr(property, 'tax_amount') and property.tax_amount
+                  %} ${{ "{:,.2f}".format(property.tax_amount) }} {% else %} N/A
+                  {% endif %}
+                </td>
+                {% endfor %}
+              </tr>
+
+              <!-- Property Characteristics -->
+              <tr class="table-secondary">
+                <th colspan="{{ properties|length + 1 }}">
+                  Property Characteristics
+                </th>
+              </tr>
+              <tr>
+                <th>Land Area</th>
+                {% for property in properties %}
+                <td>
+                  {{ property.land_area if property.land_area else 'N/A' }} {%
+                  if property.land_area %}acres{% endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Building Area</th>
+                {% for property in properties %}
+                <td>
+                  {{ property.building_area if property.building_area else 'N/A'
+                  }} {% if property.building_area %}sq ft{% endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Bedrooms</th>
+                {% for property in properties %}
+                <td>{{ property.bedrooms if property.bedrooms else 'N/A' }}</td>
+                {% endfor %}
+              </tr>
+              <tr>
+                <th>Bathrooms</th>
+                {% for property in properties %}
+                <td>
+                  {{ property.bathrooms if property.bathrooms else 'N/A' }}
+                </td>
+                {% endfor %}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Value Comparison Chart -->
+  {% if properties|length > 1 %}
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Value Comparison</h2>
+        </div>
+        <div class="card-body">
+          <div id="valueComparisonChart" style="height: 400px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %} {% else %}
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-5 text-center">
+          <div class="mb-4">
+            <i class="bi bi-bar-chart text-primary display-1"></i>
+          </div>
+          <h3 class="h4 mb-3">Select Properties to Compare</h3>
+          <p class="text-muted mb-4">
+            Enter at least one property parcel ID to see comparison data.
+          </p>
+          <a href="{{ url_for('public.search') }}" class="btn btn-primary">
+            <i class="bi bi-search me-2"></i>Search Properties
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Compare Tips -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm bg-light">
+        <div class="card-body p-4">
+          <h3 class="h5 mb-3">
+            <i class="bi bi-lightbulb me-2 text-warning"></i>Comparison Tips
+          </h3>
+          <div class="row">
+            <div class="col-md-6">
+              <ul class="mb-0">
+                <li>
+                  Compare up to three properties at once to see differences in
+                  values and tax amounts
+                </li>
+                <li>
+                  Use the year dropdown to compare the same properties across
+                  different tax years
+                </li>
+                <li>Click on a property ID to view its detailed information</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <ul class="mb-0">
+                <li>
+                  Property values and tax rates can vary significantly based on
+                  location and property characteristics
+                </li>
+                <li>
+                  Tax codes indicate which taxing districts apply to each
+                  property
+                </li>
+                <li>
+                  For more detailed tax history, view the individual property
+                  detail page
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Handle property search
-        const propertySearchInputs = document.querySelectorAll('.property-search');
-        propertySearchInputs.forEach((input, index) => {
-            const hiddenField = document.getElementById(`property${index+1}`);
-            
-            // Set initial value in the search field if a property ID exists
-            if (hiddenField.value) {
-                input.value = hiddenField.value;
-            }
-            
-            // Update hidden field when search input changes
-            input.addEventListener('change', function() {
-                hiddenField.value = this.value;
-            });
-        });
-        
-        // Handle clear buttons
-        const clearButtons = document.querySelectorAll('.clear-button');
-        clearButtons.forEach(button => {
-            const targetId = button.dataset.target;
-            const targetField = document.getElementById(targetId);
-            const inputField = document.querySelector(`input.property-search[id$="${targetId.slice(-1)}"]`);
-            
-            button.addEventListener('click', function() {
-                targetField.value = '';
-                if (inputField) {
-                    inputField.value = '';
-                }
-            });
-        });
-        
-        // Form validation
-        const compareForm = document.getElementById('compareForm');
-        if (compareForm) {
-            compareForm.addEventListener('submit', function(e) {
-                let validForm = false;
-                
-                // Check if at least one property is selected
-                const propertyFields = document.querySelectorAll('input[name="property_ids"]');
-                for (const field of propertyFields) {
-                    if (field.value.trim()) {
-                        validForm = true;
-                        break;
-                    }
-                }
-                
-                if (!validForm) {
-                    e.preventDefault();
-                    alert('Please select at least one property to compare.');
-                }
-            });
-        }
-        
-        {% if properties|length > 1 %}
-            // Create value comparison chart
-            const valueComparisonChartEl = document.getElementById('valueComparisonChart');
-            if (valueComparisonChartEl) {
-                const labels = [
-                    'Assessed Value', 
-                    'Land Value', 
-                    'Improvement Value',
-                    {% if properties[0].tax_amount %}'Tax Amount'{% endif %}
-                ];
-                
-                const datasets = [
-                    {% for property in properties %}
-                    {
-                        label: '{{ property.property_id }}',
-                        data: [
-                            {{ property.assessed_value or 0 }},
-                            {{ property.land_value or 0 }},
-                            {{ property.improvement_value or 0 }},
-                            {% if property.tax_amount %}{{ property.tax_amount }}{% endif %}
-                        ],
-                        backgroundColor: '{{ ["rgba(13, 110, 253, 0.7)", "rgba(25, 135, 84, 0.7)", "rgba(220, 53, 69, 0.7)"][loop.index0] }}',
-                    }{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                ];
-                
-                new Chart(valueComparisonChartEl, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: datasets
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return '$' + value.toLocaleString();
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed.y !== null) {
-                                            label += '$' + context.parsed.y.toLocaleString();
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        {% endif %}
-        
-        // API endpoint for property search autocomplete
-        function setupPropertyAutocomplete() {
-            // If you add autocomplete functionality in the future,
-            // this is where you would implement it
-        }
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      // Handle property search
+      const propertySearchInputs = document.querySelectorAll('.property-search');
+      propertySearchInputs.forEach((input, index) => {
+          const hiddenField = document.getElementById(`property${index+1}`);
+
+          // Set initial value in the search field if a property ID exists
+          if (hiddenField.value) {
+              input.value = hiddenField.value;
+          }
+
+          // Update hidden field when search input changes
+          input.addEventListener('change', function() {
+              hiddenField.value = this.value;
+          });
+      });
+
+      // Handle clear buttons
+      const clearButtons = document.querySelectorAll('.clear-button');
+      clearButtons.forEach(button => {
+          const targetId = button.dataset.target;
+          const targetField = document.getElementById(targetId);
+          const inputField = document.querySelector(`input.property-search[id$="${targetId.slice(-1)}"]`);
+
+          button.addEventListener('click', function() {
+              targetField.value = '';
+              if (inputField) {
+                  inputField.value = '';
+              }
+          });
+      });
+
+      // Form validation
+      const compareForm = document.getElementById('compareForm');
+      if (compareForm) {
+          compareForm.addEventListener('submit', function(e) {
+              let validForm = false;
+
+              // Check if at least one property is selected
+              const propertyFields = document.querySelectorAll('input[name="property_ids"]');
+              for (const field of propertyFields) {
+                  if (field.value.trim()) {
+                      validForm = true;
+                      break;
+                  }
+              }
+
+              if (!validForm) {
+                  e.preventDefault();
+                  alert('Please select at least one property to compare.');
+              }
+          });
+      }
+
+      {% if properties|length > 1 %}
+          // Create value comparison chart
+          const valueComparisonChartEl = document.getElementById('valueComparisonChart');
+          if (valueComparisonChartEl) {
+              const labels = [
+                  'Assessed Value',
+                  'Land Value',
+                  'Improvement Value',
+                  {% if properties[0].tax_amount %}'Tax Amount'{% endif %}
+              ];
+
+              const datasets = [
+                  {% for property in properties %}
+                  {
+                      label: '{{ property.property_id }}',
+                      data: [
+                          {{ property.assessed_value or 0 }},
+                          {{ property.land_value or 0 }},
+                          {{ property.improvement_value or 0 }},
+                          {% if property.tax_amount %}{{ property.tax_amount }}{% endif %}
+                      ],
+                      backgroundColor: '{{ ["rgba(13, 110, 253, 0.7)", "rgba(25, 135, 84, 0.7)", "rgba(220, 53, 69, 0.7)"][loop.index0] }}',
+                  }{% if not loop.last %},{% endif %}
+                  {% endfor %}
+              ];
+
+              new Chart(valueComparisonChartEl, {
+                  type: 'bar',
+                  data: {
+                      labels: labels,
+                      datasets: datasets
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                          y: {
+                              beginAtZero: true,
+                              ticks: {
+                                  callback: function(value) {
+                                      return '$' + value.toLocaleString();
+                                  }
+                              }
+                          }
+                      },
+                      plugins: {
+                          tooltip: {
+                              callbacks: {
+                                  label: function(context) {
+                                      let label = context.dataset.label || '';
+                                      if (label) {
+                                          label += ': ';
+                                      }
+                                      if (context.parsed.y !== null) {
+                                          label += '$' + context.parsed.y.toLocaleString();
+                                      }
+                                      return label;
+                                  }
+                              }
+                          }
+                      }
+                  }
+              });
+          }
+      {% endif %}
+
+      // API endpoint for property search autocomplete
+      function setupPropertyAutocomplete() {
+          // If you add autocomplete functionality in the future,
+          // this is where you would implement it
+      }
+  });
 </script>
 {% endblock %}

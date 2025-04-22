@@ -1,533 +1,617 @@
-{% extends "base.html" %}
-
-{% block title %}AI-Enhanced Comprehensive Analysis{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}AI-Enhanced Comprehensive Analysis{%
+endblock %} {% block head %} {{ super() }}
 <style>
+  <style > .card-top-border-primary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3da5bd, #7cbfcc);
+  }
 
-<style>
-    .card-top-border-primary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3DA5BD, #7CBFCC);
-    }
-    
-    .card-top-border-success:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #66A355, #78c265);
-    }
-    
-    .card-top-border-yellow:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #F0C75C, #f5d78a);
-    }
-    
-    .card-top-border-secondary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #6c757d, #adb5bd);
-    }
-    
-    .card-top-border-danger:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #e74a3b, #f08a81);
-    }
-    
-    .hover-card {
-        position: relative;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border-radius: 16px; 
-        overflow: hidden;
-    }
-    
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-    
-    .insight-card {
-        transition: transform 0.2s;
-    }
-    .insight-card {
-        transition: transform 0.2s;
-        border-left: 4px solid #4e73df;
-    }
-    .insight-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .trend-card {
-        border-left: 4px solid #1cc88a;
-    }
-    
-    .anomaly-card {
-        border-left: 4px solid #f6c23e;
-    }
-    
-    .recommendation-card {
-        border-left: 4px solid #36b9cc;
-    }
-    
-    .visualization-card {
-        border-left: 4px solid #e74a3b;
-    }
-    
-    .api-status {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-    
-    .api-status.active {
-        background-color: #28a745;
-    }
-    
-    .api-status.inactive {
-        background-color: #dc3545;
-    }
-    
-    .loading-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 400px;
-    }
-    
-    .pulse {
-        animation: pulse 1.5s infinite;
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(0.95); opacity: 0.7; }
-        50% { transform: scale(1); opacity: 1; }
-        100% { transform: scale(0.95); opacity: 0.7; }
-    }
+  .card-top-border-success:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66a355, #78c265);
+  }
 
-    .district-badge {
-        cursor: pointer;
-        transition: transform 0.2s;
+  .card-top-border-yellow:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f0c75c, #f5d78a);
+  }
+
+  .card-top-border-secondary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6c757d, #adb5bd);
+  }
+
+  .card-top-border-danger:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #e74a3b, #f08a81);
+  }
+
+  .hover-card {
+    position: relative;
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .insight-card {
+    transition: transform 0.2s;
+  }
+  .insight-card {
+    transition: transform 0.2s;
+    border-left: 4px solid #4e73df;
+  }
+  .insight-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .trend-card {
+    border-left: 4px solid #1cc88a;
+  }
+
+  .anomaly-card {
+    border-left: 4px solid #f6c23e;
+  }
+
+  .recommendation-card {
+    border-left: 4px solid #36b9cc;
+  }
+
+  .visualization-card {
+    border-left: 4px solid #e74a3b;
+  }
+
+  .api-status {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+
+  .api-status.active {
+    background-color: #28a745;
+  }
+
+  .api-status.inactive {
+    background-color: #dc3545;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+  }
+
+  .pulse {
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      opacity: 0.7;
     }
-    .district-badge:hover {
-        transform: scale(1.05);
+    50% {
+      transform: scale(1);
+      opacity: 1;
     }
-    .district-badge.active {
-        border-width: 3px !important;
+    100% {
+      transform: scale(0.95);
+      opacity: 0.7;
     }
+  }
+
+  .district-badge {
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .district-badge:hover {
+    transform: scale(1.05);
+  }
+  .district-badge.active {
+    border-width: 3px !important;
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <!-- Header Section with Gradient Background -->
 <div class="app-header-bg py-4 mb-4 rounded-4 mx-3">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-5 fw-bold text-white mb-3">AI-Enhanced Analysis</h1>
-                <p class="lead text-light opacity-90 mb-0">Deep insights into tax districts powered by advanced AI</p>
-            </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <a href="{{ url_for('forecasting.index') }}" class="btn btn-light rounded-pill px-4">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Forecasting
-                </a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="display-5 fw-bold text-white mb-3">AI-Enhanced Analysis</h1>
+        <p class="lead text-light opacity-90 mb-0">
+          Deep insights into tax districts powered by advanced AI
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <a
+          href="{{ url_for('forecasting.index') }}"
+          class="btn btn-light rounded-pill px-4"
+        >
+          <i class="bi bi-arrow-left me-2"></i>Back to Forecasting
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="container">
-
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Configure Analysis</h5>
-                </div>
-                <div class="card-body">
-                    <form id="analysisForm">
-                        <div class="mb-3">
-                            <label for="districtSelect" class="form-label">Tax District</label>
-                            <select class="form-select" id="districtSelect" name="district_id" required>
-                                <option value="">Select a tax district</option>
-                                {% for district in districts %}
-                                <option value="{{ district.id }}">{{ district.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="yearsInput" class="form-label">Years to Analyze</label>
-                            <input type="range" class="form-range" id="yearsInput" name="years" min="1" max="10" value="3">
-                            <div class="d-flex justify-content-between">
-                                <small>1 year</small>
-                                <small id="yearsValue">3 years</small>
-                                <small>10 years</small>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Analysis Type</label>
-                            <div class="d-flex justify-content-between mt-2">
-                                <div class="district-badge border border-primary rounded p-2 text-center active" data-analysis="comprehensive">
-                                    <i class="bi bi-graph-up-arrow text-primary fs-4"></i>
-                                    <div class="small">Comprehensive</div>
-                                </div>
-                                <div class="district-badge border border-success rounded p-2 text-center" data-analysis="trend">
-                                    <i class="bi bi-arrow-up-right text-success fs-4"></i>
-                                    <div class="small">Trend</div>
-                                </div>
-                                <div class="district-badge border border-warning rounded p-2 text-center" data-analysis="compliance">
-                                    <i class="bi bi-check2-circle text-warning fs-4"></i>
-                                    <div class="small">Compliance</div>
-                                </div>
-                            </div>
-                            <input type="hidden" name="analysis_type" id="analysisTypeInput" value="comprehensive">
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary" id="analyzeBtn">
-                                <i class="bi bi-cpu me-2"></i>Execute Analysis
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">About AI Analysis</h5>
-                </div>
-                <div class="card-body">
-                    <p class="small">
-                        Our AI-enhanced analysis uses Claude to perform a multi-step analysis of your tax district data:
-                    </p>
-                    <ul class="small">
-                        <li>Collects comprehensive district information</li>
-                        <li>Analyzes historical tax code patterns</li>
-                        <li>Identifies anomalies and trends</li>
-                        <li>Provides strategic recommendations</li>
-                        <li>Suggests effective data visualizations</li>
-                    </ul>
-                    <p class="small mb-0">
-                        <span class="api-status {{ 'active' if ai_available else 'inactive' }}"></span>
-                        <span>AI services are currently {{ 'available' if ai_available else 'unavailable' }}</span>
-                    </p>
-                </div>
-            </div>
-            
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Direct District Analysis</h5>
-                </div>
-                <div class="card-body">
-                    <p class="small">
-                        You can also view detailed statistical analysis for any district without using AI:
-                    </p>
-                    <div class="list-group small">
-                        {% for district in districts %}
-                            <a href="{{ url_for('forecasting.district_analysis', district_id=district.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                {{ district.name }}
-                                <span class="badge bg-primary rounded-pill">
-                                    <i class="bi bi-graph-up"></i>
-                                </span>
-                            </a>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Configure Analysis</h5>
         </div>
-
-        <div class="col-md-9">
-            <div id="resultsContainer" style="display: none;">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="mb-0">Analysis Results: <span id="districtTitle"></span></h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-3">
-                            <div>
-                                <span class="badge bg-primary me-2">District: <span id="resultDistrict"></span></span>
-                                <span class="badge bg-secondary me-2">Analysis: <span id="resultAnalysisType"></span></span>
-                                <span class="badge bg-info">Years Analyzed: <span id="resultYears"></span></span>
-                            </div>
-                            <div>
-                                <button class="btn btn-sm btn-outline-secondary" id="downloadDataBtn">
-                                    <i class="bi bi-download me-1"></i>Download Analysis
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>Analysis Summary:</strong> <span id="analysisSummary"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">Key Insights</h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="keyInsightsContainer" class="row">
-                                    <!-- Key insights will be added here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-success text-white">
-                                <h5 class="mb-0">Trends</h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="trendsContainer">
-                                    <!-- Trends will be added here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-warning text-dark">
-                                <h5 class="mb-0">Anomalies</h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="anomaliesContainer">
-                                    <!-- Anomalies will be added here -->
-                                </div>
-                                <div id="noAnomaliesMessage" class="alert alert-success" style="display: none;">
-                                    <i class="bi bi-check-circle me-2"></i>
-                                    No anomalies were detected in the analyzed data.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-info text-white">
-                                <h5 class="mb-0">Recommendations</h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="recommendationsContainer">
-                                    <!-- Recommendations will be added here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-header bg-danger text-white">
-                                <h5 class="mb-0">Visualization Suggestions</h5>
-                            </div>
-                            <div class="card-body">
-                                <div id="visualizationsContainer">
-                                    <!-- Visualization suggestions will be added here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="mb-0">Statistical Data</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="statisticalDataContainer">
-                            <!-- Statistical data will be added here -->
-                        </div>
-                    </div>
-                </div>
+        <div class="card-body">
+          <form id="analysisForm">
+            <div class="mb-3">
+              <label for="districtSelect" class="form-label"
+                >Tax District</label
+              >
+              <select
+                class="form-select"
+                id="districtSelect"
+                name="district_id"
+                required
+              >
+                <option value="">Select a tax district</option>
+                {% for district in districts %}
+                <option value="{{ district.id }}">{{ district.name }}</option>
+                {% endfor %}
+              </select>
             </div>
 
-            <div id="loadingContainer" style="display: none;">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="loading-container">
-                            <div class="spinner-border text-primary mb-3 pulse" role="status" style="width: 3rem; height: 3rem;">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <h4 class="text-center">Performing AI-Enhanced Analysis</h4>
-                            <p class="text-muted">The AI is analyzing multiple datasets and preparing insights...</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="mb-3">
+              <label for="yearsInput" class="form-label"
+                >Years to Analyze</label
+              >
+              <input
+                type="range"
+                class="form-range"
+                id="yearsInput"
+                name="years"
+                min="1"
+                max="10"
+                value="3"
+              />
+              <div class="d-flex justify-content-between">
+                <small>1 year</small>
+                <small id="yearsValue">3 years</small>
+                <small>10 years</small>
+              </div>
             </div>
 
-            <div id="errorContainer" style="display: none;">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="alert alert-danger mb-0">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <span id="errorMessage">An error occurred during the analysis.</span>
-                        </div>
-                    </div>
+            <div class="mb-3">
+              <label class="form-label">Analysis Type</label>
+              <div class="d-flex justify-content-between mt-2">
+                <div
+                  class="district-badge border border-primary rounded p-2 text-center active"
+                  data-analysis="comprehensive"
+                >
+                  <i class="bi bi-graph-up-arrow text-primary fs-4"></i>
+                  <div class="small">Comprehensive</div>
                 </div>
+                <div
+                  class="district-badge border border-success rounded p-2 text-center"
+                  data-analysis="trend"
+                >
+                  <i class="bi bi-arrow-up-right text-success fs-4"></i>
+                  <div class="small">Trend</div>
+                </div>
+                <div
+                  class="district-badge border border-warning rounded p-2 text-center"
+                  data-analysis="compliance"
+                >
+                  <i class="bi bi-check2-circle text-warning fs-4"></i>
+                  <div class="small">Compliance</div>
+                </div>
+              </div>
+              <input
+                type="hidden"
+                name="analysis_type"
+                id="analysisTypeInput"
+                value="comprehensive"
+              />
             </div>
 
-            <div id="initialMessage" class="card shadow-sm">
-                <div class="card-body p-5 text-center">
-                    <i class="bi bi-cpu text-primary" style="font-size: 4rem;"></i>
-                    <h3 class="mt-3">AI-Enhanced Comprehensive Analysis</h3>
-                    <p class="lead text-muted">
-                        Select a tax district and configure your analysis parameters to get started.
-                    </p>
-                </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary" id="analyzeBtn">
+                <i class="bi bi-cpu me-2"></i>Execute Analysis
+              </button>
             </div>
+          </form>
         </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">About AI Analysis</h5>
+        </div>
+        <div class="card-body">
+          <p class="small">
+            Our AI-enhanced analysis uses Claude to perform a multi-step
+            analysis of your tax district data:
+          </p>
+          <ul class="small">
+            <li>Collects comprehensive district information</li>
+            <li>Analyzes historical tax code patterns</li>
+            <li>Identifies anomalies and trends</li>
+            <li>Provides strategic recommendations</li>
+            <li>Suggests effective data visualizations</li>
+          </ul>
+          <p class="small mb-0">
+            <span
+              class="api-status {{ 'active' if ai_available else 'inactive' }}"
+            ></span>
+            <span
+              >AI services are currently {{ 'available' if ai_available else
+              'unavailable' }}</span
+            >
+          </p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Direct District Analysis</h5>
+        </div>
+        <div class="card-body">
+          <p class="small">
+            You can also view detailed statistical analysis for any district
+            without using AI:
+          </p>
+          <div class="list-group small">
+            {% for district in districts %}
+            <a
+              href="{{ url_for('forecasting.district_analysis', district_id=district.id) }}"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              {{ district.name }}
+              <span class="badge bg-primary rounded-pill">
+                <i class="bi bi-graph-up"></i>
+              </span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div class="col-md-9">
+      <div id="resultsContainer" style="display: none">
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">
+              Analysis Results: <span id="districtTitle"></span>
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-3">
+              <div>
+                <span class="badge bg-primary me-2"
+                  >District: <span id="resultDistrict"></span
+                ></span>
+                <span class="badge bg-secondary me-2"
+                  >Analysis: <span id="resultAnalysisType"></span
+                ></span>
+                <span class="badge bg-info"
+                  >Years Analyzed: <span id="resultYears"></span
+                ></span>
+              </div>
+              <div>
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  id="downloadDataBtn"
+                >
+                  <i class="bi bi-download me-1"></i>Download Analysis
+                </button>
+              </div>
+            </div>
+
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              <strong>Analysis Summary:</strong>
+              <span id="analysisSummary"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card shadow-sm">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Key Insights</h5>
+              </div>
+              <div class="card-body">
+                <div id="keyInsightsContainer" class="row">
+                  <!-- Key insights will be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Trends</h5>
+              </div>
+              <div class="card-body">
+                <div id="trendsContainer">
+                  <!-- Trends will be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Anomalies</h5>
+              </div>
+              <div class="card-body">
+                <div id="anomaliesContainer">
+                  <!-- Anomalies will be added here -->
+                </div>
+                <div
+                  id="noAnomaliesMessage"
+                  class="alert alert-success"
+                  style="display: none"
+                >
+                  <i class="bi bi-check-circle me-2"></i>
+                  No anomalies were detected in the analyzed data.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Recommendations</h5>
+              </div>
+              <div class="card-body">
+                <div id="recommendationsContainer">
+                  <!-- Recommendations will be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+              <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Visualization Suggestions</h5>
+              </div>
+              <div class="card-body">
+                <div id="visualizationsContainer">
+                  <!-- Visualization suggestions will be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Statistical Data</h5>
+          </div>
+          <div class="card-body">
+            <div id="statisticalDataContainer">
+              <!-- Statistical data will be added here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="loadingContainer" style="display: none">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="loading-container">
+              <div
+                class="spinner-border text-primary mb-3 pulse"
+                role="status"
+                style="width: 3rem; height: 3rem"
+              >
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <h4 class="text-center">Performing AI-Enhanced Analysis</h4>
+              <p class="text-muted">
+                The AI is analyzing multiple datasets and preparing insights...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="errorContainer" style="display: none">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="alert alert-danger mb-0">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <span id="errorMessage"
+                >An error occurred during the analysis.</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="initialMessage" class="card shadow-sm">
+        <div class="card-body p-5 text-center">
+          <i class="bi bi-cpu text-primary" style="font-size: 4rem"></i>
+          <h3 class="mt-3">AI-Enhanced Comprehensive Analysis</h3>
+          <p class="lead text-muted">
+            Select a tax district and configure your analysis parameters to get
+            started.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize form elements
-        const yearsInput = document.getElementById('yearsInput');
-        const yearsValue = document.getElementById('yearsValue');
-        const analysisBadges = document.querySelectorAll('.district-badge');
-        const analysisTypeInput = document.getElementById('analysisTypeInput');
-        const analysisForm = document.getElementById('analysisForm');
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize form elements
+    const yearsInput = document.getElementById("yearsInput");
+    const yearsValue = document.getElementById("yearsValue");
+    const analysisBadges = document.querySelectorAll(".district-badge");
+    const analysisTypeInput = document.getElementById("analysisTypeInput");
+    const analysisForm = document.getElementById("analysisForm");
 
-        // Update years display
-        yearsInput.addEventListener('input', function() {
-            yearsValue.textContent = `${this.value} year${this.value > 1 ? 's' : ''}`;
-        });
+    // Update years display
+    yearsInput.addEventListener("input", function () {
+      yearsValue.textContent = `${this.value} year${this.value > 1 ? "s" : ""}`;
+    });
 
-        // Handle analysis type selection
-        analysisBadges.forEach(badge => {
-            badge.addEventListener('click', function() {
-                analysisBadges.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                analysisTypeInput.value = this.dataset.analysis;
+    // Handle analysis type selection
+    analysisBadges.forEach((badge) => {
+      badge.addEventListener("click", function () {
+        analysisBadges.forEach((b) => b.classList.remove("active"));
+        this.classList.add("active");
+        analysisTypeInput.value = this.dataset.analysis;
+      });
+    });
+
+    // Handle form submission
+    analysisForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      executeAnalysis();
+    });
+
+    function executeAnalysis() {
+      // Show loading state
+      document.getElementById("initialMessage").style.display = "none";
+      document.getElementById("resultsContainer").style.display = "none";
+      document.getElementById("errorContainer").style.display = "none";
+      document.getElementById("loadingContainer").style.display = "block";
+
+      // Get form data
+      const formData = new FormData(analysisForm);
+
+      // Make API call
+      fetch('{{ url_for("forecasting.execute_ai_comprehensive_analysis") }}', {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((data) => {
+              throw new Error(data.error || "An error occurred");
             });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          displayResults(data);
+        })
+        .catch((error) => {
+          document.getElementById("loadingContainer").style.display = "none";
+          document.getElementById("errorContainer").style.display = "block";
+          document.getElementById("errorMessage").textContent = error.message;
         });
+    }
 
-        // Handle form submission
-        analysisForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            executeAnalysis();
+    function displayResults(data) {
+      // Hide loading, show results
+      document.getElementById("loadingContainer").style.display = "none";
+      document.getElementById("resultsContainer").style.display = "block";
+
+      // Set basic info
+      document.getElementById("districtTitle").textContent =
+        data.district_info.name || data.district_id;
+      document.getElementById("resultDistrict").textContent =
+        data.district_info.name || data.district_id;
+      document.getElementById("resultAnalysisType").textContent =
+        capitalizeFirstLetter(data.analysis_type);
+      document.getElementById("resultYears").textContent = data.years_analyzed;
+
+      // Set analysis summary
+      let summaryText = `Analysis of ${data.tax_code_count} tax codes over ${data.years_analyzed} years`;
+      document.getElementById("analysisSummary").textContent = summaryText;
+
+      // Display insights
+      displayKeyInsights(data.insights);
+
+      // Display statistical data if available
+      if (
+        data.statistical_data &&
+        Object.keys(data.statistical_data).length > 0
+      ) {
+        displayStatisticalData(data.statistical_data);
+      } else {
+        document.getElementById("statisticalDataContainer").innerHTML =
+          '<div class="alert alert-info">No statistical data available for this analysis.</div>';
+      }
+
+      // Add download handler
+      document
+        .getElementById("downloadDataBtn")
+        .addEventListener("click", () => {
+          downloadAnalysisData(data);
         });
+    }
 
-        function executeAnalysis() {
-            // Show loading state
-            document.getElementById('initialMessage').style.display = 'none';
-            document.getElementById('resultsContainer').style.display = 'none';
-            document.getElementById('errorContainer').style.display = 'none';
-            document.getElementById('loadingContainer').style.display = 'block';
+    function displayKeyInsights(insights) {
+      const keyInsightsContainer = document.getElementById(
+        "keyInsightsContainer",
+      );
+      const trendsContainer = document.getElementById("trendsContainer");
+      const anomaliesContainer = document.getElementById("anomaliesContainer");
+      const recommendationsContainer = document.getElementById(
+        "recommendationsContainer",
+      );
+      const visualizationsContainer = document.getElementById(
+        "visualizationsContainer",
+      );
 
-            // Get form data
-            const formData = new FormData(analysisForm);
-            
-            // Make API call
-            fetch('{{ url_for("forecasting.execute_ai_comprehensive_analysis") }}', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(data => {
-                        throw new Error(data.error || 'An error occurred');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                displayResults(data);
-            })
-            .catch(error => {
-                document.getElementById('loadingContainer').style.display = 'none';
-                document.getElementById('errorContainer').style.display = 'block';
-                document.getElementById('errorMessage').textContent = error.message;
-            });
-        }
+      // Clear containers
+      keyInsightsContainer.innerHTML = "";
+      trendsContainer.innerHTML = "";
+      anomaliesContainer.innerHTML = "";
+      recommendationsContainer.innerHTML = "";
+      visualizationsContainer.innerHTML = "";
 
-        function displayResults(data) {
-            // Hide loading, show results
-            document.getElementById('loadingContainer').style.display = 'none';
-            document.getElementById('resultsContainer').style.display = 'block';
-            
-            // Set basic info
-            document.getElementById('districtTitle').textContent = data.district_info.name || data.district_id;
-            document.getElementById('resultDistrict').textContent = data.district_info.name || data.district_id;
-            document.getElementById('resultAnalysisType').textContent = capitalizeFirstLetter(data.analysis_type);
-            document.getElementById('resultYears').textContent = data.years_analyzed;
-            
-            // Set analysis summary
-            let summaryText = `Analysis of ${data.tax_code_count} tax codes over ${data.years_analyzed} years`;
-            document.getElementById('analysisSummary').textContent = summaryText;
-            
-            // Display insights
-            displayKeyInsights(data.insights);
-            
-            // Display statistical data if available
-            if (data.statistical_data && Object.keys(data.statistical_data).length > 0) {
-                displayStatisticalData(data.statistical_data);
-            } else {
-                document.getElementById('statisticalDataContainer').innerHTML = 
-                    '<div class="alert alert-info">No statistical data available for this analysis.</div>';
-            }
-            
-            // Add download handler
-            document.getElementById('downloadDataBtn').addEventListener('click', () => {
-                downloadAnalysisData(data);
-            });
-        }
-
-        function displayKeyInsights(insights) {
-            const keyInsightsContainer = document.getElementById('keyInsightsContainer');
-            const trendsContainer = document.getElementById('trendsContainer');
-            const anomaliesContainer = document.getElementById('anomaliesContainer');
-            const recommendationsContainer = document.getElementById('recommendationsContainer');
-            const visualizationsContainer = document.getElementById('visualizationsContainer');
-            
-            // Clear containers
-            keyInsightsContainer.innerHTML = '';
-            trendsContainer.innerHTML = '';
-            anomaliesContainer.innerHTML = '';
-            recommendationsContainer.innerHTML = '';
-            visualizationsContainer.innerHTML = '';
-            
-            // Display key insights
-            if (insights.key_insights && insights.key_insights.length > 0) {
-                insights.key_insights.forEach(insight => {
-                    keyInsightsContainer.innerHTML += `
+      // Display key insights
+      if (insights.key_insights && insights.key_insights.length > 0) {
+        insights.key_insights.forEach((insight) => {
+          keyInsightsContainer.innerHTML += `
                         <div class="col-md-6 mb-3">
                             <div class="card insight-card h-100">
                                 <div class="card-body">
@@ -536,78 +620,85 @@
                             </div>
                         </div>
                     `;
-                });
-            } else {
-                keyInsightsContainer.innerHTML = '<div class="alert alert-info">No key insights available.</div>';
-            }
-            
-            // Display trends
-            if (insights.trends && insights.trends.length > 0) {
-                insights.trends.forEach(trend => {
-                    trendsContainer.innerHTML += `
+        });
+      } else {
+        keyInsightsContainer.innerHTML =
+          '<div class="alert alert-info">No key insights available.</div>';
+      }
+
+      // Display trends
+      if (insights.trends && insights.trends.length > 0) {
+        insights.trends.forEach((trend) => {
+          trendsContainer.innerHTML += `
                         <div class="card insight-card trend-card mb-3">
                             <div class="card-body py-2">
                                 <p class="mb-0">${trend}</p>
                             </div>
                         </div>
                     `;
-                });
-            } else {
-                trendsContainer.innerHTML = '<div class="alert alert-info">No trend data available.</div>';
-            }
-            
-            // Display anomalies
-            if (insights.anomalies && insights.anomalies.length > 0) {
-                insights.anomalies.forEach(anomaly => {
-                    anomaliesContainer.innerHTML += `
+        });
+      } else {
+        trendsContainer.innerHTML =
+          '<div class="alert alert-info">No trend data available.</div>';
+      }
+
+      // Display anomalies
+      if (insights.anomalies && insights.anomalies.length > 0) {
+        insights.anomalies.forEach((anomaly) => {
+          anomaliesContainer.innerHTML += `
                         <div class="card insight-card anomaly-card mb-3">
                             <div class="card-body py-2">
                                 <p class="mb-0">${anomaly}</p>
                             </div>
                         </div>
                     `;
-                });
-            } else {
-                document.getElementById('noAnomaliesMessage').style.display = 'block';
-            }
-            
-            // Display recommendations
-            if (insights.recommendations && insights.recommendations.length > 0) {
-                insights.recommendations.forEach(recommendation => {
-                    recommendationsContainer.innerHTML += `
+        });
+      } else {
+        document.getElementById("noAnomaliesMessage").style.display = "block";
+      }
+
+      // Display recommendations
+      if (insights.recommendations && insights.recommendations.length > 0) {
+        insights.recommendations.forEach((recommendation) => {
+          recommendationsContainer.innerHTML += `
                         <div class="card insight-card recommendation-card mb-3">
                             <div class="card-body py-2">
                                 <p class="mb-0">${recommendation}</p>
                             </div>
                         </div>
                     `;
-                });
-            } else {
-                recommendationsContainer.innerHTML = '<div class="alert alert-info">No recommendations available.</div>';
-            }
-            
-            // Display visualization suggestions
-            if (insights.visualization_suggestions && insights.visualization_suggestions.length > 0) {
-                insights.visualization_suggestions.forEach(visualization => {
-                    visualizationsContainer.innerHTML += `
+        });
+      } else {
+        recommendationsContainer.innerHTML =
+          '<div class="alert alert-info">No recommendations available.</div>';
+      }
+
+      // Display visualization suggestions
+      if (
+        insights.visualization_suggestions &&
+        insights.visualization_suggestions.length > 0
+      ) {
+        insights.visualization_suggestions.forEach((visualization) => {
+          visualizationsContainer.innerHTML += `
                         <div class="card insight-card visualization-card mb-3">
                             <div class="card-body py-2">
                                 <p class="mb-0">${visualization}</p>
                             </div>
                         </div>
                     `;
-                });
-            } else {
-                visualizationsContainer.innerHTML = '<div class="alert alert-info">No visualization suggestions available.</div>';
-            }
-        }
-        
-        function displayStatisticalData(statisticalData) {
-            const container = document.getElementById('statisticalDataContainer');
-            container.innerHTML = '';
-            
-            // Create a table for the statistical data
-            let tableHtml = `
+        });
+      } else {
+        visualizationsContainer.innerHTML =
+          '<div class="alert alert-info">No visualization suggestions available.</div>';
+      }
+    }
+
+    function displayStatisticalData(statisticalData) {
+      const container = document.getElementById("statisticalDataContainer");
+      container.innerHTML = "";
+
+      // Create a table for the statistical data
+      let tableHtml = `
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered">
                         <thead class="table-dark">
@@ -618,66 +709,70 @@
                         </thead>
                         <tbody>
             `;
-            
-            // Add rows for each statistical metric
-            for (const [key, value] of Object.entries(statisticalData)) {
-                // Format the key for display
-                const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                
-                // Format the value based on type
-                let formattedValue;
-                if (typeof value === 'number') {
-                    // Format numbers with commas and up to 2 decimal places
-                    formattedValue = value.toLocaleString(undefined, {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 2
-                    });
-                } else if (typeof value === 'object' && value !== null) {
-                    // For objects/arrays, stringify with indentation
-                    formattedValue = `<pre class="mb-0">${JSON.stringify(value, null, 2)}</pre>`;
-                } else {
-                    formattedValue = value;
-                }
-                
-                tableHtml += `
+
+      // Add rows for each statistical metric
+      for (const [key, value] of Object.entries(statisticalData)) {
+        // Format the key for display
+        const formattedKey = key
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase());
+
+        // Format the value based on type
+        let formattedValue;
+        if (typeof value === "number") {
+          // Format numbers with commas and up to 2 decimal places
+          formattedValue = value.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+          });
+        } else if (typeof value === "object" && value !== null) {
+          // For objects/arrays, stringify with indentation
+          formattedValue = `<pre class="mb-0">${JSON.stringify(value, null, 2)}</pre>`;
+        } else {
+          formattedValue = value;
+        }
+
+        tableHtml += `
                     <tr>
                         <td><strong>${formattedKey}</strong></td>
                         <td>${formattedValue}</td>
                     </tr>
                 `;
-            }
-            
-            tableHtml += `
+      }
+
+      tableHtml += `
                         </tbody>
                     </table>
                 </div>
             `;
-            
-            container.innerHTML = tableHtml;
-        }
 
-        function downloadAnalysisData(data) {
-            // Create a JSON blob
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            
-            // Create a download link
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `analysis_${data.district_info.name || data.district_id}_${data.analysis_type}.json`;
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 0);
-        }
+      container.innerHTML = tableHtml;
+    }
 
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
-    });
+    function downloadAnalysisData(data) {
+      // Create a JSON blob
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
+
+      // Create a download link
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `analysis_${data.district_info.name || data.district_id}_${data.analysis_type}.json`;
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
+    }
+
+    function capitalizeFirstLetter(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+  });
 </script>
 {% endblock %}

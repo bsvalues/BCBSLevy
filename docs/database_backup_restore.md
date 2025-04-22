@@ -70,7 +70,8 @@ python pg_backup_simple.py
 
 The system supports two backup formats:
 
-1. **Simple Format** (pg_backup_simple.py): 
+1. **Simple Format** (pg_backup_simple.py):
+
    - Uses pure SQL commands generated with psycopg2
    - Compatible across PostgreSQL versions
    - Includes schema, data, constraints, and sequences
@@ -101,6 +102,7 @@ psql -h $PGHOST -U $PGUSER -d $PGDATABASE -f backups/pg_backup_20250402_004811.s
 ```
 
 The restoration process will:
+
 1. Detect the backup format automatically
 2. Use the appropriate method (psycopg2 or psql)
 3. Execute the SQL commands to recreate the database structure and data

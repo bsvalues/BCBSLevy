@@ -1,9 +1,5 @@
-{% extends "base.html" %}
-
-{% block title %}Bill Impact Calculator{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}Bill Impact Calculator{% endblock %}
+{% block head %} {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   .impact-card {
@@ -11,7 +7,7 @@
     margin-bottom: 20px;
     padding: 20px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   .impact-card.increase {
     background-color: rgba(220, 53, 69, 0.1);
@@ -56,7 +52,7 @@
   }
   .stat-card {
     background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border-radius: 4px;
     padding: 15px;
     margin-bottom: 15px;
@@ -87,33 +83,35 @@
     display: block;
   }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Bill Impact Calculator</h1>
     <div>
-      <a href="{{ url_for('historical_analysis.advanced_historical_analysis') }}" class="btn btn-primary">
+      <a
+        href="{{ url_for('historical_analysis.advanced_historical_analysis') }}"
+        class="btn btn-primary"
+      >
         <i class="bi bi-graph-up"></i> Advanced Analysis
       </a>
     </div>
   </div>
-  
+
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Tax Bill Impact Calculator</h5>
           <p class="card-text">
-            Estimate how changes in levy rates will affect your property tax bill. 
-            You can compare historical rates or test a custom rate to see the financial impact.
+            Estimate how changes in levy rates will affect your property tax
+            bill. You can compare historical rates or test a custom rate to see
+            the financial impact.
           </p>
         </div>
       </div>
     </div>
   </div>
-  
+
   <div class="row">
     <div class="col-lg-4">
       <div class="card mb-4">
@@ -121,39 +119,75 @@
           <h5 class="mb-0">Calculate Impact</h5>
         </div>
         <div class="card-body">
-          <form method="POST" action="{{ url_for('levy_calculator.impact_calculator') }}">
+          <form
+            method="POST"
+            action="{{ url_for('levy_calculator.impact_calculator') }}"
+          >
             <div class="mb-3">
               <label for="tax_code" class="form-label">Tax Code</label>
-              <select class="form-select" id="tax_code" name="tax_code" required>
+              <select
+                class="form-select"
+                id="tax_code"
+                name="tax_code"
+                required
+              >
                 <option value="">Select a tax code</option>
                 {% for tax_code in tax_codes %}
-                <option value="{{ tax_code.tax_code }}">{{ tax_code.tax_code }}</option>
+                <option value="{{ tax_code.tax_code }}">
+                  {{ tax_code.tax_code }}
+                </option>
                 {% endfor %}
               </select>
             </div>
-            
+
             <div class="mb-3">
-              <label for="property_value" class="form-label">Property Value ($)</label>
-              <input type="number" class="form-control" id="property_value" name="property_value" min="1" step="1000" placeholder="300000" required>
-              <div class="form-text">Enter the assessed value of your property</div>
+              <label for="property_value" class="form-label"
+                >Property Value ($)</label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="property_value"
+                name="property_value"
+                min="1"
+                step="1000"
+                placeholder="300000"
+                required
+              />
+              <div class="form-text">
+                Enter the assessed value of your property
+              </div>
             </div>
-            
+
             <div class="mb-3 calculation-type-selector">
               <label class="form-label">Calculation Type</label>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="calculation_type" id="historical" value="historical" checked>
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="calculation_type"
+                  id="historical"
+                  value="historical"
+                  checked
+                />
                 <label class="form-check-label" for="historical">
                   Compare Historical Years
                 </label>
               </div>
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="calculation_type" id="custom" value="custom">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="calculation_type"
+                  id="custom"
+                  value="custom"
+                />
                 <label class="form-check-label" for="custom">
                   Test Custom Rate
                 </label>
               </div>
             </div>
-            
+
             <div class="mb-3 year-selector" id="yearSelectorGroup">
               <div class="row">
                 <div class="col-md-6">
@@ -166,8 +200,14 @@
                   </select>
                 </div>
                 <div class="col-md-6">
-                  <label for="comparison_year" class="form-label">Comparison Year</label>
-                  <select class="form-select" id="comparison_year" name="comparison_year">
+                  <label for="comparison_year" class="form-label"
+                    >Comparison Year</label
+                  >
+                  <select
+                    class="form-select"
+                    id="comparison_year"
+                    name="comparison_year"
+                  >
                     <option value="">Select year</option>
                     {% for year in available_years %}
                     <option value="{{ year }}">{{ year }}</option>
@@ -176,13 +216,23 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="mb-3 custom-rate-input" id="customRateGroup">
               <label for="custom_rate" class="form-label">Custom Rate</label>
-              <input type="number" class="form-control" id="custom_rate" name="custom_rate" min="0.0001" step="0.0001" placeholder="5.9000">
-              <div class="form-text">Enter a custom levy rate to test (per $1,000 of assessed value)</div>
+              <input
+                type="number"
+                class="form-control"
+                id="custom_rate"
+                name="custom_rate"
+                min="0.0001"
+                step="0.0001"
+                placeholder="5.9000"
+              />
+              <div class="form-text">
+                Enter a custom levy rate to test (per $1,000 of assessed value)
+              </div>
             </div>
-            
+
             <div class="d-grid">
               <button type="submit" class="btn btn-success">
                 <i class="bi bi-calculator"></i> Calculate Impact
@@ -191,40 +241,53 @@
           </form>
         </div>
       </div>
-      
+
       <div class="card">
         <div class="card-header">
           <h5 class="mb-0">Understanding Property Tax</h5>
         </div>
         <div class="card-body">
-          <p><strong>Levy Rate:</strong> The rate at which property is taxed, typically expressed per $1,000 of assessed value.</p>
-          <p><strong>Bill Impact:</strong> How changes in levy rates affect your actual tax bill.</p>
-          <p><strong>Calculation:</strong> Property tax = (Property value / 1000) × Levy rate</p>
+          <p>
+            <strong>Levy Rate:</strong> The rate at which property is taxed,
+            typically expressed per $1,000 of assessed value.
+          </p>
+          <p>
+            <strong>Bill Impact:</strong> How changes in levy rates affect your
+            actual tax bill.
+          </p>
+          <p>
+            <strong>Calculation:</strong> Property tax = (Property value / 1000)
+            × Levy rate
+          </p>
         </div>
       </div>
     </div>
-    
+
     <div class="col-lg-8">
       {% if impact_results %}
-      <div class="impact-card {% if impact_results.difference > 0 %}increase{% elif impact_results.difference < 0 %}decrease{% else %}neutral{% endif %}">
+      <div
+        class="impact-card {% if impact_results.difference > 0 %}increase{% elif impact_results.difference < 0 %}decrease{% else %}neutral{% endif %}"
+      >
         <h3>Tax Bill Impact: {{ impact_results.tax_code }}</h3>
         <div class="property-info">
           <div class="row">
             <div class="col-md-6">
-              <strong>Property Value:</strong> ${{ '{:,.2f}'.format(impact_results.property_value) }}
+              <strong>Property Value:</strong> ${{
+              '{:,.2f}'.format(impact_results.property_value) }}
             </div>
             <div class="col-md-6">
-              <strong>Comparison:</strong> {{ impact_results.base_year }} vs {{ impact_results.comparison_year }}
+              <strong>Comparison:</strong> {{ impact_results.base_year }} vs {{
+              impact_results.comparison_year }}
             </div>
           </div>
         </div>
-        
+
         <div class="row">
           <div class="col-md-6 text-center">
             <div class="impact-label">Tax Change</div>
             <div class="impact-result">
-              ${{ '{:,.2f}'.format(impact_results.difference) }}
-              {% if impact_results.difference > 0 %}
+              ${{ '{:,.2f}'.format(impact_results.difference) }} {% if
+              impact_results.difference > 0 %}
               <i class="bi bi-arrow-up-right trend-up"></i>
               {% elif impact_results.difference < 0 %}
               <i class="bi bi-arrow-down-right trend-down"></i>
@@ -236,8 +299,8 @@
           <div class="col-md-6 text-center">
             <div class="impact-label">Percentage Change</div>
             <div class="impact-result">
-              {{ '{:.2f}'.format(impact_results.percent_change) }}%
-              {% if impact_results.percent_change > 0 %}
+              {{ '{:.2f}'.format(impact_results.percent_change) }}% {% if
+              impact_results.percent_change > 0 %}
               <i class="bi bi-arrow-up-right trend-up"></i>
               {% elif impact_results.percent_change < 0 %}
               <i class="bi bi-arrow-down-right trend-down"></i>
@@ -247,70 +310,122 @@
             </div>
           </div>
         </div>
-        
+
         <div class="comparison-detail mt-4">
           <div class="row">
             <div class="col-md-6">
               <div class="stat-card">
-                <div class="stat-title">{{ impact_results.base_year }} Rate</div>
-                <div class="stat-value">{{ '{:.4f}'.format(impact_results.base_rate) }}</div>
+                <div class="stat-title">
+                  {{ impact_results.base_year }} Rate
+                </div>
+                <div class="stat-value">
+                  {{ '{:.4f}'.format(impact_results.base_rate) }}
+                </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="stat-card">
-                <div class="stat-title">{{ impact_results.comparison_year }} Rate</div>
-                <div class="stat-value">{{ '{:.4f}'.format(impact_results.comparison_rate) }}</div>
+                <div class="stat-title">
+                  {{ impact_results.comparison_year }} Rate
+                </div>
+                <div class="stat-value">
+                  {{ '{:.4f}'.format(impact_results.comparison_rate) }}
+                </div>
               </div>
             </div>
           </div>
-          
+
           <div class="row">
             <div class="col-md-6">
               <div class="stat-card">
-                <div class="stat-title">{{ impact_results.base_year }} Tax Amount</div>
-                <div class="stat-value">${{ '{:,.2f}'.format(impact_results.base_amount) }}</div>
+                <div class="stat-title">
+                  {{ impact_results.base_year }} Tax Amount
+                </div>
+                <div class="stat-value">
+                  ${{ '{:,.2f}'.format(impact_results.base_amount) }}
+                </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="stat-card">
-                <div class="stat-title">{{ impact_results.comparison_year }} Tax Amount</div>
-                <div class="stat-value">${{ '{:,.2f}'.format(impact_results.comparison_amount) }}</div>
+                <div class="stat-title">
+                  {{ impact_results.comparison_year }} Tax Amount
+                </div>
+                <div class="stat-value">
+                  ${{ '{:,.2f}'.format(impact_results.comparison_amount) }}
+                </div>
               </div>
             </div>
           </div>
-          
+
           <div class="chart-container">
             <canvas id="taxComparisonChart"></canvas>
           </div>
         </div>
       </div>
-      
+
       <div class="card mt-4">
         <div class="card-header">
           <h5 class="mb-0">What This Means</h5>
         </div>
         <div class="card-body">
           {% if impact_results.difference > 0 %}
-          <p>With the increase in levy rate from {{ '{:.4f}'.format(impact_results.base_rate) }} to {{ '{:.4f}'.format(impact_results.comparison_rate) }}, your property tax bill would <strong class="text-danger">increase by ${{ '{:,.2f}'.format(impact_results.difference) }}</strong> ({{ '{:.2f}'.format(impact_results.percent_change) }}%).</p>
-          <p>This represents an additional tax burden of <strong>${{ '{:,.2f}'.format(impact_results.difference / 12) }}</strong> per month.</p>
+          <p>
+            With the increase in levy rate from {{
+            '{:.4f}'.format(impact_results.base_rate) }} to {{
+            '{:.4f}'.format(impact_results.comparison_rate) }}, your property
+            tax bill would
+            <strong class="text-danger"
+              >increase by ${{ '{:,.2f}'.format(impact_results.difference)
+              }}</strong
+            >
+            ({{ '{:.2f}'.format(impact_results.percent_change) }}%).
+          </p>
+          <p>
+            This represents an additional tax burden of
+            <strong
+              >${{ '{:,.2f}'.format(impact_results.difference / 12) }}</strong
+            >
+            per month.
+          </p>
           {% elif impact_results.difference < 0 %}
-          <p>With the decrease in levy rate from {{ '{:.4f}'.format(impact_results.base_rate) }} to {{ '{:.4f}'.format(impact_results.comparison_rate) }}, your property tax bill would <strong class="text-success">decrease by ${{ '{:,.2f}'.format(impact_results.difference|abs) }}</strong> ({{ '{:.2f}'.format(impact_results.percent_change|abs) }}%).</p>
-          <p>This represents a tax savings of <strong>${{ '{:,.2f}'.format((impact_results.difference|abs) / 12) }}</strong> per month.</p>
+          <p>
+            With the decrease in levy rate from {{
+            '{:.4f}'.format(impact_results.base_rate) }} to {{
+            '{:.4f}'.format(impact_results.comparison_rate) }}, your property
+            tax bill would
+            <strong class="text-success"
+              >decrease by ${{ '{:,.2f}'.format(impact_results.difference|abs)
+              }}</strong
+            >
+            ({{ '{:.2f}'.format(impact_results.percent_change|abs) }}%).
+          </p>
+          <p>
+            This represents a tax savings of
+            <strong
+              >${{ '{:,.2f}'.format((impact_results.difference|abs) / 12)
+              }}</strong
+            >
+            per month.
+          </p>
           {% else %}
-          <p>There is no change in your property tax bill as the levy rates remain the same.</p>
+          <p>
+            There is no change in your property tax bill as the levy rates
+            remain the same.
+          </p>
           {% endif %}
         </div>
       </div>
-      
+
       <script>
         document.addEventListener('DOMContentLoaded', function() {
           const ctx = document.getElementById('taxComparisonChart').getContext('2d');
-          
+
           const baseYear = "{{ impact_results.base_year }}";
           const compYear = "{{ impact_results.comparison_year }}";
           const baseAmount = {{ impact_results.base_amount }};
           const compAmount = {{ impact_results.comparison_amount }};
-          
+
           new Chart(ctx, {
             type: 'bar',
             data: {
@@ -392,77 +507,109 @@
         <div class="card-body">
           <div class="alert alert-info mb-0">
             <h5><i class="bi bi-info-circle"></i> Ready to calculate</h5>
-            <p>Select a tax code, enter your property value, and choose comparison years to calculate the impact on your tax bill.</p>
+            <p>
+              Select a tax code, enter your property value, and choose
+              comparison years to calculate the impact on your tax bill.
+            </p>
           </div>
         </div>
       </div>
-      
+
       <div class="card mt-4">
         <div class="card-header">
           <h5 class="mb-0">How to Use This Calculator</h5>
         </div>
         <div class="card-body">
           <ol>
-            <li><strong>Select a Tax Code</strong> - Choose the tax code for your property.</li>
-            <li><strong>Enter Property Value</strong> - Input the assessed value of your property.</li>
-            <li><strong>Choose Comparison Method</strong>:
+            <li>
+              <strong>Select a Tax Code</strong> - Choose the tax code for your
+              property.
+            </li>
+            <li>
+              <strong>Enter Property Value</strong> - Input the assessed value
+              of your property.
+            </li>
+            <li>
+              <strong>Choose Comparison Method</strong>:
               <ul>
-                <li><strong>Compare Historical Years</strong> - See how your tax bill changes between different years.</li>
-                <li><strong>Test Custom Rate</strong> - Enter a hypothetical rate to see its impact.</li>
+                <li>
+                  <strong>Compare Historical Years</strong> - See how your tax
+                  bill changes between different years.
+                </li>
+                <li>
+                  <strong>Test Custom Rate</strong> - Enter a hypothetical rate
+                  to see its impact.
+                </li>
               </ul>
             </li>
-            <li><strong>Calculate Impact</strong> - The calculator will show the difference in your tax bill.</li>
+            <li>
+              <strong>Calculate Impact</strong> - The calculator will show the
+              difference in your tax bill.
+            </li>
           </ol>
         </div>
       </div>
-      
+
       <div class="card mt-4">
         <div class="card-header">
           <h5 class="mb-0">About Property Taxes</h5>
         </div>
         <div class="card-body">
-          <p>Property taxes fund essential local services such as schools, roads, public safety, and more. They are calculated based on:</p>
+          <p>
+            Property taxes fund essential local services such as schools, roads,
+            public safety, and more. They are calculated based on:
+          </p>
           <ul>
-            <li><strong>Assessed Value</strong> - The value of your property as determined by your local assessor.</li>
-            <li><strong>Levy Rate</strong> - The tax rate applied to your property's assessed value.</li>
+            <li>
+              <strong>Assessed Value</strong> - The value of your property as
+              determined by your local assessor.
+            </li>
+            <li>
+              <strong>Levy Rate</strong> - The tax rate applied to your
+              property's assessed value.
+            </li>
           </ul>
-          <p>In most jurisdictions, levy rates are expressed per $1,000 of assessed value. For example, if your property is valued at $300,000 and the levy rate is 5.0, your annual property tax would be:</p>
+          <p>
+            In most jurisdictions, levy rates are expressed per $1,000 of
+            assessed value. For example, if your property is valued at $300,000
+            and the levy rate is 5.0, your annual property tax would be:
+          </p>
           <p class="text-center">($300,000 ÷ 1,000) × 5.0 = $1,500</p>
-          <p>Changes in either the levy rate or your property's assessed value will affect your final tax bill.</p>
+          <p>
+            Changes in either the levy rate or your property's assessed value
+            will affect your final tax bill.
+          </p>
         </div>
       </div>
       {% endif %}
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Toggle between historical and custom calculation types
-    const historicalRadio = document.getElementById('historical');
-    const customRadio = document.getElementById('custom');
-    const yearSelectorGroup = document.getElementById('yearSelectorGroup');
-    const customRateGroup = document.getElementById('customRateGroup');
-    
+    const historicalRadio = document.getElementById("historical");
+    const customRadio = document.getElementById("custom");
+    const yearSelectorGroup = document.getElementById("yearSelectorGroup");
+    const customRateGroup = document.getElementById("customRateGroup");
+
     function updateCalculationFields() {
       if (historicalRadio.checked) {
-        yearSelectorGroup.style.display = 'block';
-        customRateGroup.style.display = 'none';
+        yearSelectorGroup.style.display = "block";
+        customRateGroup.style.display = "none";
       } else {
-        yearSelectorGroup.style.display = 'none';
-        customRateGroup.style.display = 'block';
+        yearSelectorGroup.style.display = "none";
+        customRateGroup.style.display = "block";
       }
     }
-    
+
     // Initial setup
     updateCalculationFields();
-    
+
     // Add event listeners
-    historicalRadio.addEventListener('change', updateCalculationFields);
-    customRadio.addEventListener('change', updateCalculationFields);
+    historicalRadio.addEventListener("change", updateCalculationFields);
+    customRadio.addEventListener("change", updateCalculationFields);
   });
 </script>
 {% endblock %}

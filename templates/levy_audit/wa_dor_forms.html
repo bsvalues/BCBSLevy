@@ -1,428 +1,557 @@
-{% extends "levy_audit/base_levy_audit.html" %}
-
-{% block title %}Washington DOR Levy Forms - LevyMaster{% endblock %}
-
-{% block levy_audit_content %}
+{% extends "levy_audit/base_levy_audit.html" %} {% block title %}Washington DOR
+Levy Forms - LevyMaster{% endblock %} {% block levy_audit_content %}
 <div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('levy_audit.index') }}">Levy Audit</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">WA DOR Forms</li>
-                </ol>
-            </nav>
-            <h1 class="h2 mb-3">Washington DOR Levy Forms</h1>
-            <!-- Completely new back button approach using Bootstrap button -->
-            <div class="mb-3">
-                <a href="{{ url_for('levy_audit.index') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left"></i> Back to Levy Audit
-                </a>
-            </div>
-            <p class="lead text-muted">
-                Complete standard Washington Department of Revenue levy forms with auto-populated data.
-            </p>
-        </div>
+  <div class="row mb-4">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('levy_audit.index') }}">Levy Audit</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            WA DOR Forms
+          </li>
+        </ol>
+      </nav>
+      <h1 class="h2 mb-3">Washington DOR Levy Forms</h1>
+      <!-- Completely new back button approach using Bootstrap button -->
+      <div class="mb-3">
+        <a
+          href="{{ url_for('levy_audit.index') }}"
+          class="btn btn-outline-secondary btn-sm"
+        >
+          <i class="bi bi-arrow-left"></i> Back to Levy Audit
+        </a>
+      </div>
+      <p class="lead text-muted">
+        Complete standard Washington Department of Revenue levy forms with
+        auto-populated data.
+      </p>
     </div>
+  </div>
 
-    <!-- Form Selection -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Select District and Year</h5>
-                </div>
-                <div class="card-body">
-                    <form id="formSelection">
-                        <div class="row g-3">
-                            <div class="col-md-5">
-                                <label for="districtSelect" class="form-label">Tax District</label>
-                                <select class="form-select" id="districtSelect" required>
-                                    <option value="" selected disabled>Select a district...</option>
-                                    {% for district in districts %}
-                                    <option value="{{ district.id }}">{{ district.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="yearSelect" class="form-label">Tax Year</label>
-                                <select class="form-select" id="yearSelect" required>
-                                    <option value="" selected disabled>Select year...</option>
-                                    {% for year in available_years %}
-                                    <option value="{{ year }}">{{ year }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="formTypeSelect" class="form-label">Form Type</label>
-                                <select class="form-select" id="formTypeSelect" required>
-                                    <option value="levy-limit" selected>Levy Limit Worksheet</option>
-                                    <option value="highest-lawful-levy">Highest Lawful Levy</option>
-                                    <option value="new-construction">New Construction</option>
-                                    <option value="annexation">Annexation</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <button type="button" id="loadFormBtn" class="btn btn-primary">
-                                    <i class="bi bi-file-earmark-text me-2"></i>Load Form
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+  <!-- Form Selection -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Select District and Year</h5>
         </div>
-    </div>
-
-    <!-- Levy Limit Worksheet Form -->
-    <div id="levyLimitForm" class="row mb-5" style="display: none;">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div>
-                        <img src="/static/images/wa-dor-logo.svg" alt="Washington DOR Logo" style="height: 40px;" class="me-2">
-                        <h5 class="card-title d-inline-block mb-0">Levy Limit Worksheet</h5>
-                    </div>
-                    <div>
-                        <button id="printFormBtn" class="btn btn-sm btn-outline-secondary me-2">
-                            <i class="bi bi-printer me-1"></i>Print
-                        </button>
-                        <button id="saveFormBtn" class="btn btn-sm btn-success">
-                            <i class="bi bi-save me-1"></i>Save
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <form id="levyLimitWorksheet">
-                        <!-- District Information -->
-                        <div class="row mb-4 border-bottom pb-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">District Name</label>
-                                    <input type="text" class="form-control" id="districtName" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label class="form-label">County</label>
-                                    <input type="text" class="form-control" id="county" value="Benton" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label class="form-label">Tax Year</label>
-                                    <input type="text" class="form-control" id="taxYear" readonly>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Levy Limit Calculation -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="form-section-title">Levy Limit Calculation</h5>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">1. Highest Lawful Levy Since 1985 (Previous Year)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="highestLawfulLevy" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">2. Limit Factor</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="limitFactor" value="101" readonly>
-                                        <span class="input-group-text">%</span>
-                                    </div>
-                                    <small class="text-muted">Default 101% (1% increase)</small>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">3. Levy Limit (Line 1 × Line 2)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="levyLimit" readonly>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">4. New Construction Levy</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="newConstructionLevy">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">5. Annexation Levy</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="annexationLevy">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">6. Refund Levy</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="refundLevy">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">7. Total Statutory Maximum (Line 3 + 4 + 5 + 6)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="totalStatutoryMaximum" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Regular Levy -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="form-section-title">Regular Levy Amount</h5>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">8. Requested Regular Levy Amount</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="requestedRegularLevy">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">9. Excess Levy Amount (if applicable)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="excessLevy">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label class="form-label">10. Total Levy Amount (Line 8 + Line 9)</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control" id="totalLevyAmount" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Compliance Check -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="alert" id="complianceAlert" role="alert">
-                                    Please complete the form to check compliance.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Notes -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="notes" class="form-label">Notes & Justification</label>
-                                    <textarea class="form-control" id="notes" rows="3"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Form Controls -->
-                        <div class="row">
-                            <div class="col-12 d-flex justify-content-between">
-                                <button type="button" class="btn btn-secondary" id="resetFormBtn">
-                                    <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
-                                </button>
-                                <button type="button" class="btn btn-primary" id="calculateBtn">
-                                    <i class="bi bi-calculator me-2"></i>Calculate
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+        <div class="card-body">
+          <form id="formSelection">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label for="districtSelect" class="form-label"
+                  >Tax District</label
+                >
+                <select class="form-select" id="districtSelect" required>
+                  <option value="" selected disabled>
+                    Select a district...
+                  </option>
+                  {% for district in districts %}
+                  <option value="{{ district.id }}">{{ district.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="yearSelect" class="form-label">Tax Year</label>
+                <select class="form-select" id="yearSelect" required>
+                  <option value="" selected disabled>Select year...</option>
+                  {% for year in available_years %}
+                  <option value="{{ year }}">{{ year }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="formTypeSelect" class="form-label">Form Type</label>
+                <select class="form-select" id="formTypeSelect" required>
+                  <option value="levy-limit" selected>
+                    Levy Limit Worksheet
+                  </option>
+                  <option value="highest-lawful-levy">
+                    Highest Lawful Levy
+                  </option>
+                  <option value="new-construction">New Construction</option>
+                  <option value="annexation">Annexation</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <button type="button" id="loadFormBtn" class="btn btn-primary">
+                  <i class="bi bi-file-earmark-text me-2"></i>Load Form
+                </button>
+              </div>
             </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Levy Limit Worksheet Form -->
+  <div id="levyLimitForm" class="row mb-5" style="display: none">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <div>
+            <img
+              src="/static/images/wa-dor-logo.svg"
+              alt="Washington DOR Logo"
+              style="height: 40px"
+              class="me-2"
+            />
+            <h5 class="card-title d-inline-block mb-0">Levy Limit Worksheet</h5>
+          </div>
+          <div>
+            <button
+              id="printFormBtn"
+              class="btn btn-sm btn-outline-secondary me-2"
+            >
+              <i class="bi bi-printer me-1"></i>Print
+            </button>
+            <button id="saveFormBtn" class="btn btn-sm btn-success">
+              <i class="bi bi-save me-1"></i>Save
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="levyLimitWorksheet">
+            <!-- District Information -->
+            <div class="row mb-4 border-bottom pb-3">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">District Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="districtName"
+                    readonly
+                  />
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="mb-3">
+                  <label class="form-label">County</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="county"
+                    value="Benton"
+                    readonly
+                  />
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="mb-3">
+                  <label class="form-label">Tax Year</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="taxYear"
+                    readonly
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Levy Limit Calculation -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="form-section-title">Levy Limit Calculation</h5>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label"
+                    >1. Highest Lawful Levy Since 1985 (Previous Year)</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="highestLawfulLevy"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">2. Limit Factor</label>
+                  <div class="input-group">
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="limitFactor"
+                      value="101"
+                      readonly
+                    />
+                    <span class="input-group-text">%</span>
+                  </div>
+                  <small class="text-muted">Default 101% (1% increase)</small>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label"
+                    >3. Levy Limit (Line 1 × Line 2)</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="levyLimit"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label">4. New Construction Levy</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="newConstructionLevy"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label">5. Annexation Levy</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="annexationLevy"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label">6. Refund Levy</label>
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" id="refundLevy" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label"
+                    >7. Total Statutory Maximum (Line 3 + 4 + 5 + 6)</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="totalStatutoryMaximum"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Regular Levy -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <h5 class="form-section-title">Regular Levy Amount</h5>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label"
+                    >8. Requested Regular Levy Amount</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="requestedRegularLevy"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label"
+                    >9. Excess Levy Amount (if applicable)</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" id="excessLevy" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="mb-3">
+                  <label class="form-label"
+                    >10. Total Levy Amount (Line 8 + Line 9)</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="totalLevyAmount"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compliance Check -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <div class="alert" id="complianceAlert" role="alert">
+                  Please complete the form to check compliance.
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="notes" class="form-label"
+                    >Notes & Justification</label
+                  >
+                  <textarea class="form-control" id="notes" rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Controls -->
+            <div class="row">
+              <div class="col-12 d-flex justify-content-between">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="resetFormBtn"
+                >
+                  <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                </button>
+                <button type="button" class="btn btn-primary" id="calculateBtn">
+                  <i class="bi bi-calculator me-2"></i>Calculate
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block page_scripts %}
+{% endblock %} {% block page_scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Variables to store district data
     let districtData = {};
-    
+
     // Load Form Button Click Handler
-    document.getElementById("loadFormBtn").addEventListener("click", function() {
+    document
+      .getElementById("loadFormBtn")
+      .addEventListener("click", function () {
         console.log("Load Form button clicked");
         const districtId = document.getElementById("districtSelect").value;
         const year = document.getElementById("yearSelect").value;
         const formType = document.getElementById("formTypeSelect").value;
-        
+
         console.log("Selected values:", { districtId, year, formType });
-        
+
         if (!districtId || !year) {
-            alert('Please select both district and year');
-            return;
+          alert("Please select both district and year");
+          return;
         }
-        
+
         // Fetch district data for the selected year
         fetch(`/levy-audit/district-data/${districtId}/${year}`)
-            .then(response => { 
-                console.log("Response status:", response.status); 
-                return response.json(); 
-            })
-            .then(data => { 
-                console.log("Received data:", data);
-                if (data.status === 'success') {
-                    districtData = data;
-                    displayForm(formType);
-                } else {
-                    alert('Error loading district data: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error loading district data. Please try again.');
-            });
-    });
-    
+          .then((response) => {
+            console.log("Response status:", response.status);
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Received data:", data);
+            if (data.status === "success") {
+              districtData = data;
+              displayForm(formType);
+            } else {
+              alert("Error loading district data: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Error loading district data. Please try again.");
+          });
+      });
+
     // Display the appropriate form
     function displayForm(formType) {
-        // For now, we only have the levy limit worksheet
-        document.getElementById('levyLimitForm').style.display = 'block';
-        
-        // Populate district information
-        document.getElementById('districtName').value = districtData.district?.name || 'Unknown District';
-        document.getElementById('taxYear').value = document.getElementById('yearSelect').value;
-        
-        // Populate levy data
-        document.getElementById('highestLawfulLevy').value = districtData.highest_lawful_levy || 0;
-        
-        // For debugging: log what we're getting from the server
-        console.log("Populating form with data:", {
-            district: districtData.district,
-            highestLawfulLevy: districtData.highest_lawful_levy,
-            limitFactor: districtData.limit_factor,
-            newConstructionLevy: districtData.new_construction_levy,
-            annexationLevy: districtData.annexation_levy,
-            refundLevy: districtData.refund_levy
-        });
-        document.getElementById('newConstructionLevy').value = districtData.new_construction_levy || 0;
-        document.getElementById('annexationLevy').value = districtData.annexation_levy || 0;
-        document.getElementById('refundLevy').value = districtData.refund_levy || 0;
-        
-        // Remove any existing event listeners by cloning and replacing the elements
-        const calculateBtn = document.getElementById('calculateBtn');
-        const newCalculateBtn = calculateBtn.cloneNode(true);
-        calculateBtn.parentNode.replaceChild(newCalculateBtn, calculateBtn);
-        
-        const resetFormBtn = document.getElementById('resetFormBtn');
-        const newResetFormBtn = resetFormBtn.cloneNode(true);
-        resetFormBtn.parentNode.replaceChild(newResetFormBtn, resetFormBtn);
-        
-        // Setup calculation with fresh event listeners
-        document.getElementById('calculateBtn').addEventListener('click', calculateTotals);
-        document.getElementById('resetFormBtn').addEventListener('click', resetForm);
-        
-        // Initial calculation
-        calculateTotals();
+      // For now, we only have the levy limit worksheet
+      document.getElementById("levyLimitForm").style.display = "block";
+
+      // Populate district information
+      document.getElementById("districtName").value =
+        districtData.district?.name || "Unknown District";
+      document.getElementById("taxYear").value =
+        document.getElementById("yearSelect").value;
+
+      // Populate levy data
+      document.getElementById("highestLawfulLevy").value =
+        districtData.highest_lawful_levy || 0;
+
+      // For debugging: log what we're getting from the server
+      console.log("Populating form with data:", {
+        district: districtData.district,
+        highestLawfulLevy: districtData.highest_lawful_levy,
+        limitFactor: districtData.limit_factor,
+        newConstructionLevy: districtData.new_construction_levy,
+        annexationLevy: districtData.annexation_levy,
+        refundLevy: districtData.refund_levy,
+      });
+      document.getElementById("newConstructionLevy").value =
+        districtData.new_construction_levy || 0;
+      document.getElementById("annexationLevy").value =
+        districtData.annexation_levy || 0;
+      document.getElementById("refundLevy").value =
+        districtData.refund_levy || 0;
+
+      // Remove any existing event listeners by cloning and replacing the elements
+      const calculateBtn = document.getElementById("calculateBtn");
+      const newCalculateBtn = calculateBtn.cloneNode(true);
+      calculateBtn.parentNode.replaceChild(newCalculateBtn, calculateBtn);
+
+      const resetFormBtn = document.getElementById("resetFormBtn");
+      const newResetFormBtn = resetFormBtn.cloneNode(true);
+      resetFormBtn.parentNode.replaceChild(newResetFormBtn, resetFormBtn);
+
+      // Setup calculation with fresh event listeners
+      document
+        .getElementById("calculateBtn")
+        .addEventListener("click", calculateTotals);
+      document
+        .getElementById("resetFormBtn")
+        .addEventListener("click", resetForm);
+
+      // Initial calculation
+      calculateTotals();
     }
-    
+
     // Calculate totals
     function calculateTotals() {
-        console.log("Running calculation");
-        const highestLawfulLevy = parseFloat(document.getElementById('highestLawfulLevy').value) || 0;
-        const limitFactor = parseFloat(document.getElementById('limitFactor').value) / 100 || 1.01; // Default to 101%
-        const newConstructionLevy = parseFloat(document.getElementById('newConstructionLevy').value) || 0;
-        const annexationLevy = parseFloat(document.getElementById('annexationLevy').value) || 0;
-        const refundLevy = parseFloat(document.getElementById('refundLevy').value) || 0;
-        
-        console.log("Calculation values:", {highestLawfulLevy, limitFactor, newConstructionLevy, annexationLevy, refundLevy});
-        
-        // Calculate levy limit (line 3)
-        const levyLimit = highestLawfulLevy * limitFactor;
-        console.log("Calculated levy limit:", levyLimit);
-        document.getElementById('levyLimit').value = levyLimit.toFixed(2);
-        
-        // Calculate total statutory maximum (line 7)
-        const totalStatutoryMaximum = levyLimit + newConstructionLevy + annexationLevy + refundLevy;
-        document.getElementById('totalStatutoryMaximum').value = totalStatutoryMaximum.toFixed(2);
-        
-        // Get requested levy amounts
-        const requestedRegularLevy = parseFloat(document.getElementById('requestedRegularLevy').value) || 0;
-        const excessLevy = parseFloat(document.getElementById('excessLevy').value) || 0;
-        
-        // Calculate total levy amount (line 10)
-        const totalLevyAmount = requestedRegularLevy + excessLevy;
-        document.getElementById('totalLevyAmount').value = totalLevyAmount.toFixed(2);
-        
-        // Check compliance
-        checkCompliance(totalLevyAmount, totalStatutoryMaximum);
+      console.log("Running calculation");
+      const highestLawfulLevy =
+        parseFloat(document.getElementById("highestLawfulLevy").value) || 0;
+      const limitFactor =
+        parseFloat(document.getElementById("limitFactor").value) / 100 || 1.01; // Default to 101%
+      const newConstructionLevy =
+        parseFloat(document.getElementById("newConstructionLevy").value) || 0;
+      const annexationLevy =
+        parseFloat(document.getElementById("annexationLevy").value) || 0;
+      const refundLevy =
+        parseFloat(document.getElementById("refundLevy").value) || 0;
+
+      console.log("Calculation values:", {
+        highestLawfulLevy,
+        limitFactor,
+        newConstructionLevy,
+        annexationLevy,
+        refundLevy,
+      });
+
+      // Calculate levy limit (line 3)
+      const levyLimit = highestLawfulLevy * limitFactor;
+      console.log("Calculated levy limit:", levyLimit);
+      document.getElementById("levyLimit").value = levyLimit.toFixed(2);
+
+      // Calculate total statutory maximum (line 7)
+      const totalStatutoryMaximum =
+        levyLimit + newConstructionLevy + annexationLevy + refundLevy;
+      document.getElementById("totalStatutoryMaximum").value =
+        totalStatutoryMaximum.toFixed(2);
+
+      // Get requested levy amounts
+      const requestedRegularLevy =
+        parseFloat(document.getElementById("requestedRegularLevy").value) || 0;
+      const excessLevy =
+        parseFloat(document.getElementById("excessLevy").value) || 0;
+
+      // Calculate total levy amount (line 10)
+      const totalLevyAmount = requestedRegularLevy + excessLevy;
+      document.getElementById("totalLevyAmount").value =
+        totalLevyAmount.toFixed(2);
+
+      // Check compliance
+      checkCompliance(totalLevyAmount, totalStatutoryMaximum);
     }
-    
+
     // Check compliance
     function checkCompliance(totalLevyAmount, totalStatutoryMaximum) {
-        const complianceAlert = document.getElementById('complianceAlert');
-        
-        if (totalLevyAmount > totalStatutoryMaximum) {
-            complianceAlert.className = 'alert alert-danger';
-            complianceAlert.innerHTML = `<strong>Warning:</strong> The requested levy amount ($${totalLevyAmount.toFixed(2)}) exceeds the statutory maximum ($${totalStatutoryMaximum.toFixed(2)}) by $${(totalLevyAmount - totalStatutoryMaximum).toFixed(2)}.`;
-        } else if (totalLevyAmount === 0) {
-            complianceAlert.className = 'alert alert-warning';
-            complianceAlert.textContent = 'Please enter a requested levy amount.';
-        } else {
-            complianceAlert.className = 'alert alert-success';
-            complianceAlert.innerHTML = `<strong>Compliant:</strong> The requested levy amount ($${totalLevyAmount.toFixed(2)}) is within the statutory maximum ($${totalStatutoryMaximum.toFixed(2)}).`;
-        }
+      const complianceAlert = document.getElementById("complianceAlert");
+
+      if (totalLevyAmount > totalStatutoryMaximum) {
+        complianceAlert.className = "alert alert-danger";
+        complianceAlert.innerHTML = `<strong>Warning:</strong> The requested levy amount ($${totalLevyAmount.toFixed(2)}) exceeds the statutory maximum ($${totalStatutoryMaximum.toFixed(2)}) by $${(totalLevyAmount - totalStatutoryMaximum).toFixed(2)}.`;
+      } else if (totalLevyAmount === 0) {
+        complianceAlert.className = "alert alert-warning";
+        complianceAlert.textContent = "Please enter a requested levy amount.";
+      } else {
+        complianceAlert.className = "alert alert-success";
+        complianceAlert.innerHTML = `<strong>Compliant:</strong> The requested levy amount ($${totalLevyAmount.toFixed(2)}) is within the statutory maximum ($${totalStatutoryMaximum.toFixed(2)}).`;
+      }
     }
-    
+
     // Reset form
     function resetForm() {
-        document.getElementById('newConstructionLevy').value = '';
-        document.getElementById('annexationLevy').value = '';
-        document.getElementById('refundLevy').value = '';
-        document.getElementById('requestedRegularLevy').value = '';
-        document.getElementById('excessLevy').value = '';
-        document.getElementById('notes').value = '';
-        
-        document.getElementById('complianceAlert').className = 'alert alert-secondary';
-        document.getElementById('complianceAlert').textContent = 'Please complete the form to check compliance.';
+      document.getElementById("newConstructionLevy").value = "";
+      document.getElementById("annexationLevy").value = "";
+      document.getElementById("refundLevy").value = "";
+      document.getElementById("requestedRegularLevy").value = "";
+      document.getElementById("excessLevy").value = "";
+      document.getElementById("notes").value = "";
+
+      document.getElementById("complianceAlert").className =
+        "alert alert-secondary";
+      document.getElementById("complianceAlert").textContent =
+        "Please complete the form to check compliance.";
     }
-    
+
     // Print form
-    document.getElementById('printFormBtn').addEventListener('click', function() {
+    document
+      .getElementById("printFormBtn")
+      .addEventListener("click", function () {
         window.print();
-    });
-    
+      });
+
     // Save form
-    document.getElementById('saveFormBtn').addEventListener('click', function() {
-        alert('Form saved successfully!');
-    });
-});
+    document
+      .getElementById("saveFormBtn")
+      .addEventListener("click", function () {
+        alert("Form saved successfully!");
+      });
+  });
 </script>
 {% endblock %}

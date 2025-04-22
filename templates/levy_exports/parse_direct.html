@@ -1,134 +1,182 @@
-{% extends "levy_exports/base_levy.html" %}
-
-{% block title %}Parse Levy Export File{% endblock %}
-
-{% block page_title %}Levy Export File Parser{% endblock %}
-{% block page_subtitle %}Upload and parse levy export files without importing into the database{% endblock %}
-
-{% block header_actions %}
+{% extends "levy_exports/base_levy.html" %} {% block title %}Parse Levy Export
+File{% endblock %} {% block page_title %}Levy Export File Parser{% endblock %}
+{% block page_subtitle %}Upload and parse levy export files without importing
+into the database{% endblock %} {% block header_actions %}
 <a href="{{ url_for('levy_exports.index') }}" class="btn btn-secondary">
-    <i class="bi bi-arrow-left"></i> Back to Levy Exports
+  <i class="bi bi-arrow-left"></i> Back to Levy Exports
 </a>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mb-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="card shadow">
-                <div class="card-header bg-dark">
-                    <h5 class="card-title mb-0">Parse Levy Export File</h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                        <div class="mb-4">
-                            <label for="file" class="form-label">Levy Export File</label>
-                            <input type="file" class="form-control" id="file" name="file" required>
-                            <div class="form-text">
-                                Supported formats: XML, TXT, XLS, XLSX, CSV
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Processing Options</label>
-                            <div class="form-check form-switch mb-2">
-                                <input class="form-check-input" type="checkbox" role="switch" id="normalize" name="normalize" value="1">
-                                <label class="form-check-label" for="normalize">
-                                    Normalize column names (standardize tax district, levy code, etc.)
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Output Format</label>
-                            <div class="d-flex flex-wrap gap-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="output_format" id="preview" value="preview" checked>
-                                    <label class="form-check-label" for="preview">
-                                        Preview Only
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="output_format" id="csv" value="csv">
-                                    <label class="form-check-label" for="csv">
-                                        CSV
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="output_format" id="json" value="json">
-                                    <label class="form-check-label" for="json">
-                                        JSON
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="output_format" id="excel" value="excel">
-                                    <label class="form-check-label" for="excel">
-                                        Excel (XLSX)
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-file-earmark-arrow-up"></i> Upload & Parse
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="card shadow mt-4">
-                <div class="card-header bg-dark">
-                    <h5 class="card-title mb-0">About Levy Export Parsing</h5>
-                </div>
-                <div class="card-body">
-                    <p class="lead">This tool allows you to parse levy export files in various formats without importing the data into the database.</p>
-                    
-                    <h6 class="mt-3">Features:</h6>
-                    <ul>
-                        <li>Support for multiple file formats (XML, TXT, XLS, XLSX, CSV)</li>
-                        <li>Column name normalization</li>
-                        <li>Multiple output formats (CSV, JSON, Excel)</li>
-                        <li>Preview data before conversion</li>
-                    </ul>
-                    
-                    <div class="alert alert-info">
-                        <div class="d-flex">
-                            <i class="bi bi-info-circle fs-4 me-2"></i>
-                            <div>
-                                <strong>Note:</strong> This tool is for viewing and converting levy export files only. To import data into the database, use the <a href="{{ url_for('levy_exports.upload') }}" class="alert-link">Levy Export Upload</a> tool.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card shadow">
+        <div class="card-header bg-dark">
+          <h5 class="card-title mb-0">Parse Levy Export File</h5>
         </div>
+        <div class="card-body">
+          <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="needs-validation"
+            novalidate
+          >
+            <div class="mb-4">
+              <label for="file" class="form-label">Levy Export File</label>
+              <input
+                type="file"
+                class="form-control"
+                id="file"
+                name="file"
+                required
+              />
+              <div class="form-text">
+                Supported formats: XML, TXT, XLS, XLSX, CSV
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Processing Options</label>
+              <div class="form-check form-switch mb-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  role="switch"
+                  id="normalize"
+                  name="normalize"
+                  value="1"
+                />
+                <label class="form-check-label" for="normalize">
+                  Normalize column names (standardize tax district, levy code,
+                  etc.)
+                </label>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Output Format</label>
+              <div class="d-flex flex-wrap gap-2">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="output_format"
+                    id="preview"
+                    value="preview"
+                    checked
+                  />
+                  <label class="form-check-label" for="preview">
+                    Preview Only
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="output_format"
+                    id="csv"
+                    value="csv"
+                  />
+                  <label class="form-check-label" for="csv"> CSV </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="output_format"
+                    id="json"
+                    value="json"
+                  />
+                  <label class="form-check-label" for="json"> JSON </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="output_format"
+                    id="excel"
+                    value="excel"
+                  />
+                  <label class="form-check-label" for="excel">
+                    Excel (XLSX)
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-file-earmark-arrow-up"></i> Upload & Parse
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card shadow mt-4">
+        <div class="card-header bg-dark">
+          <h5 class="card-title mb-0">About Levy Export Parsing</h5>
+        </div>
+        <div class="card-body">
+          <p class="lead">
+            This tool allows you to parse levy export files in various formats
+            without importing the data into the database.
+          </p>
+
+          <h6 class="mt-3">Features:</h6>
+          <ul>
+            <li>
+              Support for multiple file formats (XML, TXT, XLS, XLSX, CSV)
+            </li>
+            <li>Column name normalization</li>
+            <li>Multiple output formats (CSV, JSON, Excel)</li>
+            <li>Preview data before conversion</li>
+          </ul>
+
+          <div class="alert alert-info">
+            <div class="d-flex">
+              <i class="bi bi-info-circle fs-4 me-2"></i>
+              <div>
+                <strong>Note:</strong> This tool is for viewing and converting
+                levy export files only. To import data into the database, use
+                the
+                <a
+                  href="{{ url_for('levy_exports.upload') }}"
+                  class="alert-link"
+                  >Levy Export Upload</a
+                >
+                tool.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script>
-// Form validation
-(function () {
-  'use strict'
+  // Form validation
+  (function () {
+    "use strict";
 
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-  var forms = document.querySelectorAll('.needs-validation')
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll(".needs-validation");
 
-  // Loop over them and prevent submission
-  Array.prototype.slice.call(forms)
-    .forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener(
+        "submit",
+        function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
 
-        form.classList.add('was-validated')
-      }, false)
-    })
-})()
+          form.classList.add("was-validated");
+        },
+        false,
+      );
+    });
+  })();
 </script>
 {% endblock %}

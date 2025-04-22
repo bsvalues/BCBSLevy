@@ -1,237 +1,382 @@
-{% extends "public/base_public.html" %}
-
-{% block title %}Tax Resources - Benton County Property Tax Portal{% endblock %}
-
-{% block content %}
+{% extends "public/base_public.html" %} {% block title %}Tax Resources - Benton
+County Property Tax Portal{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="mb-0"><i class="bi bi-info-circle me-2"></i>Tax Resources</h2>
-            </div>
-            <div class="card-body">
-                <p class="lead">Find helpful resources and information about property taxes in Benton County.</p>
-            </div>
-        </div>
-        
-        <!-- Tax Calculation Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0"><i class="bi bi-calculator me-2"></i>Understanding Tax Calculation</h3>
-            </div>
-            <div class="card-body">
-                <h4>How Property Taxes Are Calculated</h4>
-                <p>{{ "Property taxes are calculated by multiplying your property's assessed value by the levy rate for your tax code area. The levy rate is expressed in dollars per $1,000 of assessed value."|add_tooltips|safe }}</p>
-                
-                <div class="alert alert-info mb-4">
-                    <h5><i class="bi bi-lightbulb me-2"></i>Example Calculation:</h5>
-                    <p class="mb-0">For a property with an {{ "assessed value"|tooltip|safe }} of $300,000 in a tax code area with a {{ "levy rate"|tooltip|safe }} of $10.50 per $1,000:</p>
-                    <ul class="mb-0">
-                        <li>$300,000 ÷ $1,000 = 300</li>
-                        <li>300 × $10.50 = $3,150</li>
-                        <li>Annual property tax = $3,150</li>
-                    </ul>
-                </div>
-                
-                <h4>Factors That Affect Your Property Tax</h4>
-                <ul>
-                    <li><strong>{{ "Assessed Value"|tooltip|safe }}:</strong> The county assessor determines your property's value.</li>
-                    <li><strong>{{ "Tax Code Area"|tooltip|safe }}:</strong> Different areas have different combinations of taxing districts.</li>
-                    <li><strong>{{ "Levy Rates"|tooltip|safe }}:</strong> Each taxing district sets its own levy, subject to statutory limitations.</li>
-                    <li><strong>{{ "Voter-Approved Measures"|tooltip|safe }}:</strong> Special levies and bonds approved by voters in your area.</li>
-                    <li><strong>Tax Exemptions:</strong> You may qualify for exemptions that reduce your property tax.</li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Tax Calendar Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Property Tax Calendar</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Date</th>
-                                <th>Event</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>January 1</td>
-                                <td>Assessment Date</td>
-                                <td>Property values are established as of this date for the current tax year.</td>
-                            </tr>
-                            <tr>
-                                <td>February 15</td>
-                                <td>Tax Statements Mailed</td>
-                                <td>Annual property tax statements are mailed to property owners.</td>
-                            </tr>
-                            <tr>
-                                <td>April 30</td>
-                                <td>First Half Taxes Due</td>
-                                <td>First installment of property taxes must be paid by this date to avoid interest and penalties.</td>
-                            </tr>
-                            <tr>
-                                <td>July 1</td>
-                                <td>Appeal Deadline</td>
-                                <td>Last day to file appeals on property value with the Board of Equalization for the current assessment year.</td>
-                            </tr>
-                            <tr>
-                                <td>October 31</td>
-                                <td>Second Half Taxes Due</td>
-                                <td>Second installment of property taxes must be paid by this date to avoid interest and penalties.</td>
-                            </tr>
-                            <tr>
-                                <td>December 31</td>
-                                <td>Tax Year Ends</td>
-                                <td>End of the current tax year.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Exemptions Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0"><i class="bi bi-patch-check me-2"></i>Property Tax Exemptions</h3>
-            </div>
-            <div class="card-body">
-                <p>You may qualify for property tax exemptions or reductions if you meet certain criteria. The most common exemptions include:</p>
-                
-                <div class="accordion mb-4" id="exemptionsAccordion">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="seniorHeading">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#seniorCollapse" aria-expanded="true" aria-controls="seniorCollapse">
-                                Senior Citizen and Disabled Persons Exemption
-                            </button>
-                        </h2>
-                        <div id="seniorCollapse" class="accordion-collapse collapse show" aria-labelledby="seniorHeading" data-bs-parent="#exemptionsAccordion">
-                            <div class="accordion-body">
-                                <p>If you are 61 years or older, or permanently disabled, you may qualify for a reduction in property taxes if:</p>
-                                <ul>
-                                    <li>You own and occupy your home as your primary residence</li>
-                                    <li>Your household income is below certain thresholds</li>
-                                </ul>
-                                <p>The exemption freezes your assessed value and may exempt you from certain levies.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="veteranHeading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#veteranCollapse" aria-expanded="false" aria-controls="veteranCollapse">
-                                Disabled Veterans Exemption
-                            </button>
-                        </h2>
-                        <div id="veteranCollapse" class="accordion-collapse collapse" aria-labelledby="veteranHeading" data-bs-parent="#exemptionsAccordion">
-                            <div class="accordion-body">
-                                <p>Veterans with service-connected disabilities may qualify for property tax exemptions. Eligibility is based on:</p>
-                                <ul>
-                                    <li>Disability rating from the Department of Veterans Affairs</li>
-                                    <li>Income thresholds</li>
-                                    <li>Property usage as primary residence</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="otherHeading">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#otherCollapse" aria-expanded="false" aria-controls="otherCollapse">
-                                Other Exemptions
-                            </button>
-                        </h2>
-                        <div id="otherCollapse" class="accordion-collapse collapse" aria-labelledby="otherHeading" data-bs-parent="#exemptionsAccordion">
-                            <div class="accordion-body">
-                                <ul>
-                                    <li><strong>Historic Property:</strong> Properties on historic registers may qualify for special valuation.</li>
-                                    <li><strong>Nonprofit Organizations:</strong> Charitable, religious, and educational organizations may qualify for exemptions.</li>
-                                    <li><strong>Current Use Programs:</strong> Agricultural, timber, and open space lands may qualify for reduced assessments.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="alert alert-primary">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    <strong>How to Apply:</strong> Contact the Benton County Assessor's Office at (555) 123-4567 or visit the office to apply for exemptions. Applications and more information are also available online at the official county website.
-                </div>
-            </div>
-        </div>
-        
-        <!-- Appealing Your Assessment -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h3 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Appealing Your Assessment</h3>
-            </div>
-            <div class="card-body">
-                <p>If you believe the assessed value of your property is incorrect, you have the right to appeal to the County Board of Equalization.</p>
-                
-                <h4>Appeal Process</h4>
-                <ol>
-                    <li><strong>Review Your Assessment:</strong> Carefully review your property assessment notice or tax statement.</li>
-                    <li><strong>Gather Evidence:</strong> Collect information that supports your opinion of value (comparable sales, property issues, etc.).</li>
-                    <li><strong>File an Appeal:</strong> Complete and submit the appeal form to the County Board of Equalization within 30 days of receiving your assessment notice or by July 1, whichever is later.</li>
-                    <li><strong>Hearing:</strong> Present your evidence at a scheduled hearing before the Board.</li>
-                    <li><strong>Decision:</strong> The Board will issue a decision after reviewing all evidence.</li>
-                </ol>
-                
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <strong>Important:</strong> Appeals must focus on the property's market value, not on your ability to pay taxes or the tax rate itself.
-                </div>
-            </div>
-        </div>
-        
-        <!-- Helpful Links -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Helpful Links</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h4>County Resources</h4>
-                        <ul class="list-group mb-4">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Benton County Assessor's Office</span>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Property Tax Forms</span>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Download</a>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Map Search</span>
-                                <a href="#" class="btn btn-sm btn-outline-primary">View</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h4>State Resources</h4>
-                        <ul class="list-group">
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Washington Department of Revenue</span>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>State Property Tax Information</span>
-                                <a href="#" class="btn btn-sm btn-outline-primary">View</a>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>Washington Laws on Property Tax</span>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Read</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="col-lg-8 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">
+          <i class="bi bi-info-circle me-2"></i>Tax Resources
+        </h2>
+      </div>
+      <div class="card-body">
+        <p class="lead">
+          Find helpful resources and information about property taxes in Benton
+          County.
+        </p>
+      </div>
     </div>
+
+    <!-- Tax Calculation Section -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h3 class="mb-0">
+          <i class="bi bi-calculator me-2"></i>Understanding Tax Calculation
+        </h3>
+      </div>
+      <div class="card-body">
+        <h4>How Property Taxes Are Calculated</h4>
+        <p>
+          {{ "Property taxes are calculated by multiplying your property's
+          assessed value by the levy rate for your tax code area. The levy rate
+          is expressed in dollars per $1,000 of assessed
+          value."|add_tooltips|safe }}
+        </p>
+
+        <div class="alert alert-info mb-4">
+          <h5><i class="bi bi-lightbulb me-2"></i>Example Calculation:</h5>
+          <p class="mb-0">
+            For a property with an {{ "assessed value"|tooltip|safe }} of
+            $300,000 in a tax code area with a {{ "levy rate"|tooltip|safe }} of
+            $10.50 per $1,000:
+          </p>
+          <ul class="mb-0">
+            <li>$300,000 ÷ $1,000 = 300</li>
+            <li>300 × $10.50 = $3,150</li>
+            <li>Annual property tax = $3,150</li>
+          </ul>
+        </div>
+
+        <h4>Factors That Affect Your Property Tax</h4>
+        <ul>
+          <li>
+            <strong>{{ "Assessed Value"|tooltip|safe }}:</strong> The county
+            assessor determines your property's value.
+          </li>
+          <li>
+            <strong>{{ "Tax Code Area"|tooltip|safe }}:</strong> Different areas
+            have different combinations of taxing districts.
+          </li>
+          <li>
+            <strong>{{ "Levy Rates"|tooltip|safe }}:</strong> Each taxing
+            district sets its own levy, subject to statutory limitations.
+          </li>
+          <li>
+            <strong>{{ "Voter-Approved Measures"|tooltip|safe }}:</strong>
+            Special levies and bonds approved by voters in your area.
+          </li>
+          <li>
+            <strong>Tax Exemptions:</strong> You may qualify for exemptions that
+            reduce your property tax.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tax Calendar Section -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h3 class="mb-0">
+          <i class="bi bi-calendar-event me-2"></i>Property Tax Calendar
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>Date</th>
+                <th>Event</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>January 1</td>
+                <td>Assessment Date</td>
+                <td>
+                  Property values are established as of this date for the
+                  current tax year.
+                </td>
+              </tr>
+              <tr>
+                <td>February 15</td>
+                <td>Tax Statements Mailed</td>
+                <td>
+                  Annual property tax statements are mailed to property owners.
+                </td>
+              </tr>
+              <tr>
+                <td>April 30</td>
+                <td>First Half Taxes Due</td>
+                <td>
+                  First installment of property taxes must be paid by this date
+                  to avoid interest and penalties.
+                </td>
+              </tr>
+              <tr>
+                <td>July 1</td>
+                <td>Appeal Deadline</td>
+                <td>
+                  Last day to file appeals on property value with the Board of
+                  Equalization for the current assessment year.
+                </td>
+              </tr>
+              <tr>
+                <td>October 31</td>
+                <td>Second Half Taxes Due</td>
+                <td>
+                  Second installment of property taxes must be paid by this date
+                  to avoid interest and penalties.
+                </td>
+              </tr>
+              <tr>
+                <td>December 31</td>
+                <td>Tax Year Ends</td>
+                <td>End of the current tax year.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exemptions Section -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h3 class="mb-0">
+          <i class="bi bi-patch-check me-2"></i>Property Tax Exemptions
+        </h3>
+      </div>
+      <div class="card-body">
+        <p>
+          You may qualify for property tax exemptions or reductions if you meet
+          certain criteria. The most common exemptions include:
+        </p>
+
+        <div class="accordion mb-4" id="exemptionsAccordion">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="seniorHeading">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#seniorCollapse"
+                aria-expanded="true"
+                aria-controls="seniorCollapse"
+              >
+                Senior Citizen and Disabled Persons Exemption
+              </button>
+            </h2>
+            <div
+              id="seniorCollapse"
+              class="accordion-collapse collapse show"
+              aria-labelledby="seniorHeading"
+              data-bs-parent="#exemptionsAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  If you are 61 years or older, or permanently disabled, you may
+                  qualify for a reduction in property taxes if:
+                </p>
+                <ul>
+                  <li>
+                    You own and occupy your home as your primary residence
+                  </li>
+                  <li>Your household income is below certain thresholds</li>
+                </ul>
+                <p>
+                  The exemption freezes your assessed value and may exempt you
+                  from certain levies.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="veteranHeading">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#veteranCollapse"
+                aria-expanded="false"
+                aria-controls="veteranCollapse"
+              >
+                Disabled Veterans Exemption
+              </button>
+            </h2>
+            <div
+              id="veteranCollapse"
+              class="accordion-collapse collapse"
+              aria-labelledby="veteranHeading"
+              data-bs-parent="#exemptionsAccordion"
+            >
+              <div class="accordion-body">
+                <p>
+                  Veterans with service-connected disabilities may qualify for
+                  property tax exemptions. Eligibility is based on:
+                </p>
+                <ul>
+                  <li>
+                    Disability rating from the Department of Veterans Affairs
+                  </li>
+                  <li>Income thresholds</li>
+                  <li>Property usage as primary residence</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="otherHeading">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#otherCollapse"
+                aria-expanded="false"
+                aria-controls="otherCollapse"
+              >
+                Other Exemptions
+              </button>
+            </h2>
+            <div
+              id="otherCollapse"
+              class="accordion-collapse collapse"
+              aria-labelledby="otherHeading"
+              data-bs-parent="#exemptionsAccordion"
+            >
+              <div class="accordion-body">
+                <ul>
+                  <li>
+                    <strong>Historic Property:</strong> Properties on historic
+                    registers may qualify for special valuation.
+                  </li>
+                  <li>
+                    <strong>Nonprofit Organizations:</strong> Charitable,
+                    religious, and educational organizations may qualify for
+                    exemptions.
+                  </li>
+                  <li>
+                    <strong>Current Use Programs:</strong> Agricultural, timber,
+                    and open space lands may qualify for reduced assessments.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-primary">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          <strong>How to Apply:</strong> Contact the Benton County Assessor's
+          Office at (555) 123-4567 or visit the office to apply for exemptions.
+          Applications and more information are also available online at the
+          official county website.
+        </div>
+      </div>
+    </div>
+
+    <!-- Appealing Your Assessment -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h3 class="mb-0">
+          <i class="bi bi-file-earmark-text me-2"></i>Appealing Your Assessment
+        </h3>
+      </div>
+      <div class="card-body">
+        <p>
+          If you believe the assessed value of your property is incorrect, you
+          have the right to appeal to the County Board of Equalization.
+        </p>
+
+        <h4>Appeal Process</h4>
+        <ol>
+          <li>
+            <strong>Review Your Assessment:</strong> Carefully review your
+            property assessment notice or tax statement.
+          </li>
+          <li>
+            <strong>Gather Evidence:</strong> Collect information that supports
+            your opinion of value (comparable sales, property issues, etc.).
+          </li>
+          <li>
+            <strong>File an Appeal:</strong> Complete and submit the appeal form
+            to the County Board of Equalization within 30 days of receiving your
+            assessment notice or by July 1, whichever is later.
+          </li>
+          <li>
+            <strong>Hearing:</strong> Present your evidence at a scheduled
+            hearing before the Board.
+          </li>
+          <li>
+            <strong>Decision:</strong> The Board will issue a decision after
+            reviewing all evidence.
+          </li>
+        </ol>
+
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Important:</strong> Appeals must focus on the property's
+          market value, not on your ability to pay taxes or the tax rate itself.
+        </div>
+      </div>
+    </div>
+
+    <!-- Helpful Links -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="mb-0"><i class="bi bi-link-45deg me-2"></i>Helpful Links</h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h4>County Resources</h4>
+            <ul class="list-group mb-4">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Benton County Assessor's Office</span>
+                <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Property Tax Forms</span>
+                <a href="#" class="btn btn-sm btn-outline-primary">Download</a>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Map Search</span>
+                <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h4>State Resources</h4>
+            <ul class="list-group">
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Washington Department of Revenue</span>
+                <a href="#" class="btn btn-sm btn-outline-primary">Visit</a>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>State Property Tax Information</span>
+                <a href="#" class="btn btn-sm btn-outline-primary">View</a>
+              </li>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>Washington Laws on Property Tax</span>
+                <a href="#" class="btn btn-sm btn-outline-primary">Read</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

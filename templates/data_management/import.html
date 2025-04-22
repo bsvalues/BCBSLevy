@@ -1,287 +1,477 @@
-{% extends 'base.html' %}
-
-{% block title %}Import Data - Levy Calculation System{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends 'base.html' %} {% block title %}Import Data - Levy Calculation
+System{% endblock %} {% block head %} {{ super() }}
 <style>
-    .card-top-border-primary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3DA5BD, #7CBFCC);
-    }
-    
-    .card-top-border-success:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #66A355, #78c265);
-    }
-    
-    .card-top-border-yellow:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #F0C75C, #f5d78a);
-    }
-    
-    .card-top-border-info:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #36b9cc, #5dcfdf);
-    }
-    
-    .hover-card {
-        position: relative;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border-radius: 16px; 
-        overflow: hidden;
-    }
-    
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-</style>
-{% endblock %}
+  .card-top-border-primary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3da5bd, #7cbfcc);
+  }
 
-{% block content %}
+  .card-top-border-success:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66a355, #78c265);
+  }
+
+  .card-top-border-yellow:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f0c75c, #f5d78a);
+  }
+
+  .card-top-border-info:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #36b9cc, #5dcfdf);
+  }
+
+  .hover-card {
+    position: relative;
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+</style>
+{% endblock %} {% block content %}
 <!-- Header Section with Gradient Background -->
 <div class="app-header-bg py-4 mb-4 rounded-4 mx-3">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-5 fw-bold text-white mb-3">Import Data</h1>
-                <p class="lead text-light opacity-90 mb-0">Import property and tax district data from various file formats</p>
-            </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <a href="{{ url_for('data_management.data_management_index') }}" class="btn btn-light rounded-pill px-4">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Data Management
-                </a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="display-5 fw-bold text-white mb-3">Import Data</h1>
+        <p class="lead text-light opacity-90 mb-0">
+          Import property and tax district data from various file formats
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <a
+          href="{{ url_for('data_management.data_management_index') }}"
+          class="btn btn-light rounded-pill px-4"
+        >
+          <i class="bi bi-arrow-left me-2"></i>Back to Data Management
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Property Import Card -->
-            <div class="card hover-card card-top-border-primary position-relative mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-building"></i> Import Property Data</h5>
-                </div>
-                <div class="card-body">
-                    <p>Upload property assessment data including property IDs, assessed values, and tax codes.</p>
-                    <p class="text-muted">Supported formats: CSV, Excel, XML, TXT</p>
-                    
-                    <form action="{{ url_for('data_management.import_data') }}" method="post" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="propertyFile" class="form-label">Select Property File</label>
-                            <input class="form-control" type="file" id="propertyFile" name="file" required>
-                            <div class="form-text">Required columns: property_id, assessed_value, tax_code</div>
-                        </div>
-                        <input type="hidden" name="import_type" value="property">
-                        <input type="hidden" name="year" value="{{ current_year }}">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-upload"></i> Import</button>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Required Columns Information -->
-            <div class="card hover-card card-top-border-info position-relative mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Required Columns</h5>
-                </div>
-                <div class="card-body">
-                    <h6>Property Data</h6>
-                    <ul>
-                        <li><strong>property_id</strong> - Unique identifier for each property</li>
-                        <li><strong>assessed_value</strong> - Assessed value of the property</li>
-                        <li><strong>tax_code</strong> - Tax code associated with the property</li>
-                    </ul>
-                    
-                    <h6 class="mt-3">Tax District Data</h6>
-                    <ul>
-                        <li><strong>district_id</strong> - Unique identifier for each tax district</li>
-                        <li><strong>name</strong> - Name of the tax district</li>
-                        <li><strong>levy_rate</strong> - Current levy rate for the district</li>
-                    </ul>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-6">
+      <!-- Property Import Card -->
+      <div
+        class="card hover-card card-top-border-primary position-relative mb-4"
+      >
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-building"></i> Import Property Data
+          </h5>
         </div>
-        
-        <div class="col-md-6">
-            <!-- Tax District Import Card -->
-            <div class="card hover-card card-top-border-success position-relative mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-map"></i> Import Tax District Data</h5>
-                </div>
-                <div class="card-body">
-                    <p>Upload tax district information including district IDs, names, and levy rates.</p>
-                    <p class="text-muted">Supported formats: CSV, Excel, XML, TXT</p>
-                    
-                    <form action="{{ url_for('data_management.import_data') }}" method="post" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="districtFile" class="form-label">Select District File</label>
-                            <input class="form-control" type="file" id="districtFile" name="file" required>
-                            <div class="form-text">Required columns: district_id, name, levy_rate</div>
-                        </div>
-                        <input type="hidden" name="import_type" value="tax_district">
-                        <input type="hidden" name="year" value="{{ current_year }}">
-                        <button type="submit" class="btn btn-success"><i class="bi bi-upload"></i> Import</button>
-                    </form>
-                </div>
+        <div class="card-body">
+          <p>
+            Upload property assessment data including property IDs, assessed
+            values, and tax codes.
+          </p>
+          <p class="text-muted">Supported formats: CSV, Excel, XML, TXT</p>
+
+          <form
+            action="{{ url_for('data_management.import_data') }}"
+            method="post"
+            enctype="multipart/form-data"
+          >
+            <div class="mb-3">
+              <label for="propertyFile" class="form-label"
+                >Select Property File</label
+              >
+              <input
+                class="form-control"
+                type="file"
+                id="propertyFile"
+                name="file"
+                required
+              />
+              <div class="form-text">
+                Required columns: property_id, assessed_value, tax_code
+              </div>
             </div>
-            
-            <!-- Benton County Data Import Card -->
-            <div class="card hover-card card-top-border-primary position-relative mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-database-fill"></i> Benton County Data Import</h5>
-                </div>
-                <div class="card-body">
-                    <p>Import all Benton County, Washington property tax data in a single operation.</p>
-                    <p class="text-muted">This automated process will import districts, tax codes, levy rates, and assessed values from multiple files.</p>
-                    
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i> This utility imports data from multiple file sources including levy worksheets, certification reports, and preliminary values.
-                    </div>
-                    
-                    <form action="{{ url_for('data_management.import_form') }}" method="post" class="mb-3">
-                        <input type="hidden" name="benton_county_import" value="1">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-lightning-charge"></i> Import Benton County Data</button>
-                    </form>
-                </div>
+            <input type="hidden" name="import_type" value="property" />
+            <input type="hidden" name="year" value="{{ current_year }}" />
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-upload"></i> Import
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Required Columns Information -->
+      <div class="card hover-card card-top-border-info position-relative mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-info-circle"></i> Required Columns
+          </h5>
+        </div>
+        <div class="card-body">
+          <h6>Property Data</h6>
+          <ul>
+            <li>
+              <strong>property_id</strong> - Unique identifier for each property
+            </li>
+            <li>
+              <strong>assessed_value</strong> - Assessed value of the property
+            </li>
+            <li>
+              <strong>tax_code</strong> - Tax code associated with the property
+            </li>
+          </ul>
+
+          <h6 class="mt-3">Tax District Data</h6>
+          <ul>
+            <li>
+              <strong>district_id</strong> - Unique identifier for each tax
+              district
+            </li>
+            <li><strong>name</strong> - Name of the tax district</li>
+            <li>
+              <strong>levy_rate</strong> - Current levy rate for the district
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <!-- Tax District Import Card -->
+      <div
+        class="card hover-card card-top-border-success position-relative mb-4"
+      >
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-map"></i> Import Tax District Data
+          </h5>
+        </div>
+        <div class="card-body">
+          <p>
+            Upload tax district information including district IDs, names, and
+            levy rates.
+          </p>
+          <p class="text-muted">Supported formats: CSV, Excel, XML, TXT</p>
+
+          <form
+            action="{{ url_for('data_management.import_data') }}"
+            method="post"
+            enctype="multipart/form-data"
+          >
+            <div class="mb-3">
+              <label for="districtFile" class="form-label"
+                >Select District File</label
+              >
+              <input
+                class="form-control"
+                type="file"
+                id="districtFile"
+                name="file"
+                required
+              />
+              <div class="form-text">
+                Required columns: district_id, name, levy_rate
+              </div>
+            </div>
+            <input type="hidden" name="import_type" value="tax_district" />
+            <input type="hidden" name="year" value="{{ current_year }}" />
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-upload"></i> Import
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Benton County Data Import Card -->
+      <div
+        class="card hover-card card-top-border-primary position-relative mb-4"
+      >
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-database-fill"></i> Benton County Data Import
+          </h5>
+        </div>
+        <div class="card-body">
+          <p>
+            Import all Benton County, Washington property tax data in a single
+            operation.
+          </p>
+          <p class="text-muted">
+            This automated process will import districts, tax codes, levy rates,
+            and assessed values from multiple files.
+          </p>
+
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i> This utility imports data
+            from multiple file sources including levy worksheets, certification
+            reports, and preliminary values.
+          </div>
+
+          <form
+            action="{{ url_for('data_management.import_form') }}"
+            method="post"
+            class="mb-3"
+          >
+            <input type="hidden" name="benton_county_import" value="1" />
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-lightning-charge"></i> Import Benton County Data
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Advanced Import Options -->
+      <div
+        class="card hover-card card-top-border-yellow position-relative mb-4"
+      >
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-gear"></i> Advanced Import Options
+          </h5>
+        </div>
+        <div class="card-body">
+          <p>Configure additional options for importing data.</p>
+
+          <form
+            action="{{ url_for('data_management.import_data') }}"
+            method="post"
+            enctype="multipart/form-data"
+            class="mb-3"
+          >
+            <div class="mb-3">
+              <label for="file" class="form-label">Select File to Import</label>
+              <input
+                class="form-control"
+                type="file"
+                id="file"
+                name="file"
+                required
+              />
             </div>
 
-            <!-- Advanced Import Options -->
-            <div class="card hover-card card-top-border-yellow position-relative mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-gear"></i> Advanced Import Options</h5>
-                </div>
-                <div class="card-body">
-                    <p>Configure additional options for importing data.</p>
-                    
-                    <form action="{{ url_for('data_management.import_data') }}" method="post" enctype="multipart/form-data" class="mb-3">
-                        <div class="mb-3">
-                            <label for="file" class="form-label">Select File to Import</label>
-                            <input class="form-control" type="file" id="file" name="file" required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="import_type" class="form-label">Import Type</label>
-                            <select class="form-select" id="import_type" name="import_type" required>
-                                {% for import_type in import_types %}
-                                <option value="{{ import_type.id }}">{{ import_type.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="year" class="form-label">Tax Year</label>
-                            <select class="form-select" id="year" name="year">
-                                {% for year in years %}
-                                <option value="{{ year }}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Import Notes</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="Optional notes about this import"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-warning"><i class="bi bi-upload"></i> Advanced Import</button>
-                    </form>
-                </div>
+            <div class="mb-3">
+              <label for="import_type" class="form-label">Import Type</label>
+              <select
+                class="form-select"
+                id="import_type"
+                name="import_type"
+                required
+              >
+                {% for import_type in import_types %}
+                <option value="{{ import_type.id }}">
+                  {{ import_type.name }}
+                </option>
+                {% endfor %}
+              </select>
             </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col-12">
-            <div class="card hover-card card-top-border-info position-relative mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-question-circle"></i> Import Help</h5>
-                </div>
-                <div class="card-body">
-                    <div class="accordion" id="importHelpAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="helpFileFormats">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFileFormats" aria-expanded="false" aria-controls="collapseFileFormats">
-                                    Supported File Formats
-                                </button>
-                            </h2>
-                            <div id="collapseFileFormats" class="accordion-collapse collapse" aria-labelledby="helpFileFormats" data-bs-parent="#importHelpAccordion">
-                                <div class="accordion-body">
-                                    <p>The system supports the following file formats for data import:</p>
-                                    <ul>
-                                        <li><strong>CSV</strong> - Comma-separated values file with column headers</li>
-                                        <li><strong>Excel</strong> - XLS or XLSX format with data in the first sheet</li>
-                                        <li><strong>XML</strong> - XML files with properly structured data</li>
-                                        <li><strong>TXT</strong> - Tab-delimited text files with column headers</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="helpImportProcess">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportProcess" aria-expanded="false" aria-controls="collapseImportProcess">
-                                    Import Process
-                                </button>
-                            </h2>
-                            <div id="collapseImportProcess" class="accordion-collapse collapse" aria-labelledby="helpImportProcess" data-bs-parent="#importHelpAccordion">
-                                <div class="accordion-body">
-                                    <p>The import process follows these steps:</p>
-                                    <ol>
-                                        <li>Upload your file using one of the import forms</li>
-                                        <li>The system validates the file format and column structure</li>
-                                        <li>Data is extracted and prepared for import</li>
-                                        <li>Records are created or updated in the database</li>
-                                        <li>A summary of the import results is displayed</li>
-                                    </ol>
-                                    <p>Import logs are maintained for all data imports, allowing you to review past imports.</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="helpTroubleshooting">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTroubleshooting" aria-expanded="false" aria-controls="collapseTroubleshooting">
-                                    Troubleshooting
-                                </button>
-                            </h2>
-                            <div id="collapseTroubleshooting" class="accordion-collapse collapse" aria-labelledby="helpTroubleshooting" data-bs-parent="#importHelpAccordion">
-                                <div class="accordion-body">
-                                    <p>Common issues and solutions:</p>
-                                    <ul>
-                                        <li><strong>File format errors</strong> - Ensure your file is in one of the supported formats and is not corrupted</li>
-                                        <li><strong>Missing columns</strong> - Check that your file contains all required columns with the correct headers</li>
-                                        <li><strong>Data type errors</strong> - Verify that data in each column is of the correct type (e.g., numeric values for rates)</li>
-                                        <li><strong>Duplicate records</strong> - Check for duplicate IDs in your import file</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+            <div class="mb-3">
+              <label for="year" class="form-label">Tax Year</label>
+              <select class="form-select" id="year" name="year">
+                {% for year in years %}
+                <option
+                  value="{{ year }}"
+                  {%
+                  if
+                  year=""
+                  ="current_year"
+                  %}selected{%
+                  endif
+                  %}
+                >
+                  {{ year }}
+                </option>
+                {% endfor %}
+              </select>
             </div>
+
+            <div class="mb-3">
+              <label for="notes" class="form-label">Import Notes</label>
+              <textarea
+                class="form-control"
+                id="notes"
+                name="notes"
+                rows="2"
+                placeholder="Optional notes about this import"
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-warning">
+              <i class="bi bi-upload"></i> Advanced Import
+            </button>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card hover-card card-top-border-info position-relative mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-question-circle"></i> Import Help
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="accordion" id="importHelpAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="helpFileFormats">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseFileFormats"
+                  aria-expanded="false"
+                  aria-controls="collapseFileFormats"
+                >
+                  Supported File Formats
+                </button>
+              </h2>
+              <div
+                id="collapseFileFormats"
+                class="accordion-collapse collapse"
+                aria-labelledby="helpFileFormats"
+                data-bs-parent="#importHelpAccordion"
+              >
+                <div class="accordion-body">
+                  <p>
+                    The system supports the following file formats for data
+                    import:
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>CSV</strong> - Comma-separated values file with
+                      column headers
+                    </li>
+                    <li>
+                      <strong>Excel</strong> - XLS or XLSX format with data in
+                      the first sheet
+                    </li>
+                    <li>
+                      <strong>XML</strong> - XML files with properly structured
+                      data
+                    </li>
+                    <li>
+                      <strong>TXT</strong> - Tab-delimited text files with
+                      column headers
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="helpImportProcess">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseImportProcess"
+                  aria-expanded="false"
+                  aria-controls="collapseImportProcess"
+                >
+                  Import Process
+                </button>
+              </h2>
+              <div
+                id="collapseImportProcess"
+                class="accordion-collapse collapse"
+                aria-labelledby="helpImportProcess"
+                data-bs-parent="#importHelpAccordion"
+              >
+                <div class="accordion-body">
+                  <p>The import process follows these steps:</p>
+                  <ol>
+                    <li>Upload your file using one of the import forms</li>
+                    <li>
+                      The system validates the file format and column structure
+                    </li>
+                    <li>Data is extracted and prepared for import</li>
+                    <li>Records are created or updated in the database</li>
+                    <li>A summary of the import results is displayed</li>
+                  </ol>
+                  <p>
+                    Import logs are maintained for all data imports, allowing
+                    you to review past imports.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="helpTroubleshooting">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseTroubleshooting"
+                  aria-expanded="false"
+                  aria-controls="collapseTroubleshooting"
+                >
+                  Troubleshooting
+                </button>
+              </h2>
+              <div
+                id="collapseTroubleshooting"
+                class="accordion-collapse collapse"
+                aria-labelledby="helpTroubleshooting"
+                data-bs-parent="#importHelpAccordion"
+              >
+                <div class="accordion-body">
+                  <p>Common issues and solutions:</p>
+                  <ul>
+                    <li>
+                      <strong>File format errors</strong> - Ensure your file is
+                      in one of the supported formats and is not corrupted
+                    </li>
+                    <li>
+                      <strong>Missing columns</strong> - Check that your file
+                      contains all required columns with the correct headers
+                    </li>
+                    <li>
+                      <strong>Data type errors</strong> - Verify that data in
+                      each column is of the correct type (e.g., numeric values
+                      for rates)
+                    </li>
+                    <li>
+                      <strong>Duplicate records</strong> - Check for duplicate
+                      IDs in your import file
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

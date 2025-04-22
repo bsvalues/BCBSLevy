@@ -44,22 +44,26 @@ The MCP Army system follows a modular architecture composed of these key compone
 ### Key Components
 
 1. **Agent Manager**
+
    - Central orchestration system for agent registration and monitoring
    - Handles task delegation and performance tracking
    - Coordinates collaborative workflows between agents
 
 2. **Agent Types**
+
    - **LevyAnalysisAgent**: Specializes in tax distribution and levy rate analysis
    - **LevyPredictionAgent**: Focuses on forecasting and predictive modeling
    - **WorkflowCoordinatorAgent**: Orchestrates multi-agent complex workflows
    - Additional specialized agents as needed
 
 3. **Communication Bus**
+
    - Message-based communication system for agent interaction
    - Event publishing and subscription mechanism
    - Standardized message format per protocol specification
 
 4. **Experience Replay Buffer**
+
    - Central repository for agent experiences and learning
    - Enables knowledge sharing between agents
    - Supports prioritized replay for focused learning
@@ -114,10 +118,18 @@ The Experience Replay Buffer allows agents to share and learn from each other's 
   "experienceId": "unique_uuid",
   "agentId": "agent_logging_experience",
   "timestamp": "ISO_8601_date_time_utc",
-  "state": { /* Representation of state before action */ },
-  "action": { /* Representation of action taken */ },
-  "result": { /* Outcome of the action */ },
-  "nextState": { /* Representation of state after action */ },
+  "state": {
+    /* Representation of state before action */
+  },
+  "action": {
+    /* Representation of action taken */
+  },
+  "result": {
+    /* Outcome of the action */
+  },
+  "nextState": {
+    /* Representation of state after action */
+  },
   "rewardSignal": "optional_numeric_reward_if_using_RL",
   "metadata": { "priority": "calculated_or_assigned_priority" }
 }
@@ -135,6 +147,7 @@ The system uses a prioritized experience replay mechanism, where experiences are
 ### Training Process
 
 The training process is triggered:
+
 - On reaching a buffer size threshold (configurable)
 - At regular time intervals (default: hourly)
 - Manually via the MCP Army dashboard
@@ -146,6 +159,7 @@ The training process is triggered:
 **Purpose**: Specializes in analyzing tax distributions and levy rates
 
 **Capabilities**:
+
 - `analyze_levy_rates`: Analyze historical levy rates for patterns and anomalies
 - `analyze_tax_distribution`: Evaluate tax burden distribution across districts
 - `compare_assessed_values`: Compare property assessments across similar properties
@@ -155,6 +169,7 @@ The training process is triggered:
 **Purpose**: Focuses on forecasting and predictive modeling
 
 **Capabilities**:
+
 - `predict_levy_rates`: Forecast future levy rates based on historical data
 - `predict_levy_rates_with_scenario`: Forecast rates under specific conditions
 - `calculate_budget_impact`: Estimate budget impact of levy rate changes
@@ -164,6 +179,7 @@ The training process is triggered:
 **Purpose**: Orchestrates multi-agent workflows for complex tasks
 
 **Capabilities**:
+
 - `execute_workflow_levy_compliance_audit`: Coordinated levy compliance check
 - `execute_workflow_cross_district_analysis`: Analysis across multiple districts
 - `execute_workflow_historical_trend_forecasting`: Historical trend analysis
@@ -189,11 +205,11 @@ class ComplianceAuditAgent(MCPAgent):
             'audit_compliance': self.audit_compliance,
             'verify_regulatory_requirements': self.verify_regulatory_requirements
         }
-    
+
     def audit_compliance(self, parameters):
         # Implementation
         pass
-    
+
     def verify_regulatory_requirements(self, parameters):
         # Implementation
         pass
@@ -231,28 +247,28 @@ def execute_workflow_compliance_audit(self, parameters):
     """Execute a compliance audit workflow."""
     district_id = parameters.get('district_id')
     year = parameters.get('year')
-    
+
     # Step 1: Get district details
     district = self.execute_capability(
         'levy_analysis',
         'get_district_details',
         {'district_id': district_id}
     )
-    
+
     # Step 2: Analyze historical rates
     historical_analysis = self.execute_capability(
         'levy_analysis',
         'analyze_levy_rates',
         {'district_id': district_id, 'year': year}
     )
-    
+
     # Step 3: Predict future rates
     predictions = self.execute_capability(
         'levy_prediction',
         'predict_levy_rates',
         {'district_id': district_id, 'base_year': year}
     )
-    
+
     # Compile results
     return {
         'district': district,
@@ -267,16 +283,19 @@ def execute_workflow_compliance_audit(self, parameters):
 The MCP Army Dashboard provides real-time visualization and control of the agent system. Key features include:
 
 1. **Agent Status Monitoring**
+
    - Current status of all agents
    - Performance metrics and error rates
    - Activity logs
 
 2. **Experience Replay Metrics**
+
    - Total experiences collected
    - Experience distribution by agent
    - Training cycle statistics
 
 3. **Workflow Execution**
+
    - Execute collaborative workflows
    - Monitor workflow progress
    - View workflow results
@@ -291,12 +310,14 @@ The MCP Army Dashboard provides real-time visualization and control of the agent
 The MCP Army system implements a robust error handling strategy:
 
 1. **Error Classification**
+
    - API/External Service Errors: Issues with external services
    - Agent Internal Errors: Issues within agent logic
    - Communication Errors: Issues with message delivery
    - Configuration Errors: Issues with system configuration
 
 2. **Recovery Mechanisms**
+
    - Automatic retry for transient errors
    - Agent fallback for critical failures
    - Graceful degradation when components fail
@@ -312,11 +333,13 @@ The MCP Army system implements a robust error handling strategy:
 The MCP Army implementation includes several security measures:
 
 1. **Message Validation**
+
    - Strict validation of all inter-agent messages
    - Input sanitization to prevent injection attacks
    - Message source verification
 
 2. **Access Control**
+
    - Role-based access to agent capabilities
    - Authentication for dashboard access
    - Audit logging of all agent actions
@@ -331,11 +354,13 @@ The MCP Army implementation includes several security measures:
 The system is designed for optimal performance:
 
 1. **Resource Management**
+
    - Dynamic agent allocation based on workload
    - Resource throttling for busy agents
    - Performance monitoring and automatic optimization
 
 2. **Caching**
+
    - Experience caching for frequent patterns
    - Result caching for common queries
    - Configuration caching for optimal startup

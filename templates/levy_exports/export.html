@@ -1,299 +1,438 @@
-{% extends 'base.html' %}
-
-{% block title %}Export Levy Data - Levy Calculation System{% endblock %}
-
-{% block page_title %}Export Levy Data{% endblock %}
-{% block page_subtitle %}Export levy data to various formats for analysis and reporting{% endblock %}
-
-{% block header_actions %}
+{% extends 'base.html' %} {% block title %}Export Levy Data - Levy Calculation
+System{% endblock %} {% block page_title %}Export Levy Data{% endblock %} {%
+block page_subtitle %}Export levy data to various formats for analysis and
+reporting{% endblock %} {% block header_actions %}
 <a href="{{ url_for('levy_exports.index') }}" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left me-1"></i>Back to Levy Exports
+  <i class="bi bi-arrow-left me-1"></i>Back to Levy Exports
 </a>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <h5 class="card-title mb-4">
-                    <i class="bi bi-download me-2 text-primary"></i>Export Levy Data
-                </h5>
-                
-                <form action="{{ url_for('levy_exports.export_data') }}" method="get">
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="year" name="year" required>
-                                    {% for y in available_years %}
-                                        <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label for="year">Tax Year</label>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="district_id" name="district_id">
-                                    <option value="">All Districts</option>
-                                    {% for district in all_districts %}
-                                        <option value="{{ district.id }}" {% if district.id == district_id %}selected{% endif %}>
-                                            {{ district.district_name }} ({{ district.district_code }})
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                <label for="district_id">Tax District</label>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3">
-                                <select class="form-select" id="format" name="format">
-                                    <option value="csv" {% if format == 'csv' %}selected{% endif %}>CSV</option>
-                                    <option value="excel" {% if format == 'excel' %}selected{% endif %}>Excel</option>
-                                    <option value="json" {% if format == 'json' %}selected{% endif %}>JSON</option>
-                                </select>
-                                <label for="format">Export Format</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h6 class="mb-3">Data to Include</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="include_district_info" name="include_district_info" value="1" checked>
-                                    <label class="form-check-label" for="include_district_info">
-                                        District Information
-                                    </label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="include_tax_codes" name="include_tax_codes" value="1" checked>
-                                    <label class="form-check-label" for="include_tax_codes">
-                                        Tax Codes
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="include_levy_rates" name="include_levy_rates" value="1" checked>
-                                    <label class="form-check-label" for="include_levy_rates">
-                                        Levy Rates
-                                    </label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="include_assessed_values" name="include_assessed_values" value="1" checked>
-                                    <label class="form-check-label" for="include_assessed_values">
-                                        Assessed Values
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button type="submit" name="export" value="true" class="btn btn-primary">
-                            <i class="bi bi-download me-1"></i>Export Data
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Recent Exports -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title mb-4">
-                    <i class="bi bi-clock-history me-2 text-secondary"></i>Recent Exports
-                </h5>
-                
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Filename</th>
-                                <th>Date</th>
-                                <th>Format</th>
-                                <th>Records</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for i in range(5) %}
-                                <tr>
-                                    <td>levy_data_2024_{{ "%.10d"|format(i) }}.{{ ['csv', 'xlsx', 'json'][i % 3] }}</td>
-                                    <td>{{ (now|default('2025-04-01 00:00:00')|string)[:10] }}</td>
-                                    <td>
-                                        <span class="badge bg-secondary">{{ ['CSV', 'Excel', 'JSON'][i % 3] }}</span>
-                                    </td>
-                                    <td>{{ [125, 250, 347, 215, 180][i] }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-download"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4">
-        <!-- Format Information -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <h5 class="card-title mb-3">
-                    <i class="bi bi-info-circle me-2 text-info"></i>Export Format Details
-                </h5>
-                
-                <div class="accordion" id="formatAccordion">
-                    <div class="accordion-item bg-transparent border-0 mb-2">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#csvFormat" aria-expanded="false" aria-controls="csvFormat">
-                                <i class="bi bi-filetype-csv me-2 text-primary"></i>CSV Format
-                            </button>
-                        </h2>
-                        <div id="csvFormat" class="accordion-collapse collapse" data-bs-parent="#formatAccordion">
-                            <div class="accordion-body pt-0">
-                                <p class="mb-2">Comma-Separated Values format:</p>
-                                <ul class="mb-0">
-                                    <li>Simple text format compatible with Excel and other spreadsheets</li>
-                                    <li>Best for data analysis in Excel or similar tools</li>
-                                    <li>Easy to import into databases</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item bg-transparent border-0 mb-2">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#excelFormat" aria-expanded="false" aria-controls="excelFormat">
-                                <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel Format
-                            </button>
-                        </h2>
-                        <div id="excelFormat" class="accordion-collapse collapse" data-bs-parent="#formatAccordion">
-                            <div class="accordion-body pt-0">
-                                <p class="mb-2">Microsoft Excel format (XLSX):</p>
-                                <ul class="mb-0">
-                                    <li>Native Excel format with all formatting preserved</li>
-                                    <li>Best for creating reports and presentations</li>
-                                    <li>Supports multiple sheets and complex formatting</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="accordion-item bg-transparent border-0">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#jsonFormat" aria-expanded="false" aria-controls="jsonFormat">
-                                <i class="bi bi-filetype-json me-2 text-warning"></i>JSON Format
-                            </button>
-                        </h2>
-                        <div id="jsonFormat" class="accordion-collapse collapse" data-bs-parent="#formatAccordion">
-                            <div class="accordion-body pt-0">
-                                <p class="mb-2">JavaScript Object Notation format:</p>
-                                <ul class="mb-0">
-                                    <li>Hierarchical data structure for developers</li>
-                                    <li>Best for integration with web applications</li>
-                                    <li>Preserves complex data relationships</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Quick Exports -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <h5 class="card-title mb-3">
-                    <i class="bi bi-lightning-charge me-2 text-warning"></i>Quick Exports
-                </h5>
-                
-                <div class="list-group list-group-flush mb-3">
-                    <a href="{{ url_for('levy_exports.export_data', year=available_years[-1], format='excel', export=True) }}" class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-file-earmark-excel me-2 text-success"></i>Latest Year (Excel)
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                    
-                    <a href="{{ url_for('levy_exports.export_data', year=available_years[-1], format='csv', export=True) }}" class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-filetype-csv me-2 text-primary"></i>Latest Year (CSV)
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                    
-                    <a href="{{ url_for('levy_exports.export_data', start_year=available_years[0], end_year=available_years[-1], format='excel', export=True) }}" class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-calendar-range me-2 text-info"></i>All Years Summary
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                </div>
-                
-                <div class="alert alert-info mb-0">
-                    <div class="d-flex">
-                        <div class="me-3">
-                            <i class="bi bi-info-circle-fill"></i>
-                        </div>
-                        <div>
-                            <p class="mb-0">Need a custom export format? Contact the system administrator for specialized export options.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Export Usage Tips -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title mb-3">
-                    <i class="bi bi-lightbulb me-2 text-warning"></i>Export Usage Tips
-                </h5>
-                
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item bg-transparent px-0">
-                        <i class="bi bi-bar-chart me-2 text-primary"></i>
-                        <strong>Data Analysis:</strong> Use CSV for quick analysis in Excel or other spreadsheet programs.
-                    </li>
-                    <li class="list-group-item bg-transparent px-0">
-                        <i class="bi bi-file-earmark-text me-2 text-primary"></i>
-                        <strong>Reports:</strong> Use Excel format for creating formatted reports with charts and tables.
-                    </li>
-                    <li class="list-group-item bg-transparent px-0">
-                        <i class="bi bi-code-square me-2 text-primary"></i>
-                        <strong>Integration:</strong> Use JSON format for integrating with web applications or APIs.
-                    </li>
-                    <li class="list-group-item bg-transparent px-0">
-                        <i class="bi bi-database me-2 text-primary"></i>
-                        <strong>Database Import:</strong> CSV is the most compatible format for importing into other databases.
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-4">
+          <i class="bi bi-download me-2 text-primary"></i>Export Levy Data
+        </h5>
 
-{% block extra_css %}
+        <form action="{{ url_for('levy_exports.export_data') }}" method="get">
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <select class="form-select" id="year" name="year" required>
+                  {% for y in available_years %}
+                  <option
+                    value="{{ y }}"
+                    {%
+                    if
+                    y=""
+                    ="year"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ y }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <label for="year">Tax Year</label>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <select class="form-select" id="district_id" name="district_id">
+                  <option value="">All Districts</option>
+                  {% for district in all_districts %}
+                  <option
+                    value="{{ district.id }}"
+                    {%
+                    if
+                    district.id=""
+                    ="district_id"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ district.district_name }} ({{ district.district_code }})
+                  </option>
+                  {% endfor %}
+                </select>
+                <label for="district_id">Tax District</label>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="form-floating mb-3">
+                <select class="form-select" id="format" name="format">
+                  <option
+                    value="csv"
+                    {%
+                    if
+                    format=""
+                    ="csv"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    CSV
+                  </option>
+                  <option
+                    value="excel"
+                    {%
+                    if
+                    format=""
+                    ="excel"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    Excel
+                  </option>
+                  <option
+                    value="json"
+                    {%
+                    if
+                    format=""
+                    ="json"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    JSON
+                  </option>
+                </select>
+                <label for="format">Export Format</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <h6 class="mb-3">Data to Include</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="include_district_info"
+                    name="include_district_info"
+                    value="1"
+                    checked
+                  />
+                  <label class="form-check-label" for="include_district_info">
+                    District Information
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="include_tax_codes"
+                    name="include_tax_codes"
+                    value="1"
+                    checked
+                  />
+                  <label class="form-check-label" for="include_tax_codes">
+                    Tax Codes
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mb-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="include_levy_rates"
+                    name="include_levy_rates"
+                    value="1"
+                    checked
+                  />
+                  <label class="form-check-label" for="include_levy_rates">
+                    Levy Rates
+                  </label>
+                </div>
+                <div class="form-check mb-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="include_assessed_values"
+                    name="include_assessed_values"
+                    value="1"
+                    checked
+                  />
+                  <label class="form-check-label" for="include_assessed_values">
+                    Assessed Values
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <button
+              type="submit"
+              name="export"
+              value="true"
+              class="btn btn-primary"
+            >
+              <i class="bi bi-download me-1"></i>Export Data
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Recent Exports -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-4">
+          <i class="bi bi-clock-history me-2 text-secondary"></i>Recent Exports
+        </h5>
+
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th>Filename</th>
+                <th>Date</th>
+                <th>Format</th>
+                <th>Records</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for i in range(5) %}
+              <tr>
+                <td>
+                  levy_data_2024_{{ "%.10d"|format(i) }}.{{ ['csv', 'xlsx',
+                  'json'][i % 3] }}
+                </td>
+                <td>{{ (now|default('2025-04-01 00:00:00')|string)[:10] }}</td>
+                <td>
+                  <span class="badge bg-secondary"
+                    >{{ ['CSV', 'Excel', 'JSON'][i % 3] }}</span
+                  >
+                </td>
+                <td>{{ [125, 250, 347, 215, 180][i] }}</td>
+                <td>
+                  <button type="button" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-download"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Format Information -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">
+          <i class="bi bi-info-circle me-2 text-info"></i>Export Format Details
+        </h5>
+
+        <div class="accordion" id="formatAccordion">
+          <div class="accordion-item bg-transparent border-0 mb-2">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed bg-transparent"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#csvFormat"
+                aria-expanded="false"
+                aria-controls="csvFormat"
+              >
+                <i class="bi bi-filetype-csv me-2 text-primary"></i>CSV Format
+              </button>
+            </h2>
+            <div
+              id="csvFormat"
+              class="accordion-collapse collapse"
+              data-bs-parent="#formatAccordion"
+            >
+              <div class="accordion-body pt-0">
+                <p class="mb-2">Comma-Separated Values format:</p>
+                <ul class="mb-0">
+                  <li>
+                    Simple text format compatible with Excel and other
+                    spreadsheets
+                  </li>
+                  <li>Best for data analysis in Excel or similar tools</li>
+                  <li>Easy to import into databases</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item bg-transparent border-0 mb-2">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed bg-transparent"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#excelFormat"
+                aria-expanded="false"
+                aria-controls="excelFormat"
+              >
+                <i class="bi bi-file-earmark-excel me-2 text-success"></i>Excel
+                Format
+              </button>
+            </h2>
+            <div
+              id="excelFormat"
+              class="accordion-collapse collapse"
+              data-bs-parent="#formatAccordion"
+            >
+              <div class="accordion-body pt-0">
+                <p class="mb-2">Microsoft Excel format (XLSX):</p>
+                <ul class="mb-0">
+                  <li>Native Excel format with all formatting preserved</li>
+                  <li>Best for creating reports and presentations</li>
+                  <li>Supports multiple sheets and complex formatting</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item bg-transparent border-0">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed bg-transparent"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#jsonFormat"
+                aria-expanded="false"
+                aria-controls="jsonFormat"
+              >
+                <i class="bi bi-filetype-json me-2 text-warning"></i>JSON Format
+              </button>
+            </h2>
+            <div
+              id="jsonFormat"
+              class="accordion-collapse collapse"
+              data-bs-parent="#formatAccordion"
+            >
+              <div class="accordion-body pt-0">
+                <p class="mb-2">JavaScript Object Notation format:</p>
+                <ul class="mb-0">
+                  <li>Hierarchical data structure for developers</li>
+                  <li>Best for integration with web applications</li>
+                  <li>Preserves complex data relationships</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Exports -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title mb-3">
+          <i class="bi bi-lightning-charge me-2 text-warning"></i>Quick Exports
+        </h5>
+
+        <div class="list-group list-group-flush mb-3">
+          <a
+            href="{{ url_for('levy_exports.export_data', year=available_years[-1], format='excel', export=True) }}"
+            class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center"
+          >
+            <div>
+              <i class="bi bi-file-earmark-excel me-2 text-success"></i>Latest
+              Year (Excel)
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+
+          <a
+            href="{{ url_for('levy_exports.export_data', year=available_years[-1], format='csv', export=True) }}"
+            class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center"
+          >
+            <div>
+              <i class="bi bi-filetype-csv me-2 text-primary"></i>Latest Year
+              (CSV)
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+
+          <a
+            href="{{ url_for('levy_exports.export_data', start_year=available_years[0], end_year=available_years[-1], format='excel', export=True) }}"
+            class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center"
+          >
+            <div>
+              <i class="bi bi-calendar-range me-2 text-info"></i>All Years
+              Summary
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </a>
+        </div>
+
+        <div class="alert alert-info mb-0">
+          <div class="d-flex">
+            <div class="me-3">
+              <i class="bi bi-info-circle-fill"></i>
+            </div>
+            <div>
+              <p class="mb-0">
+                Need a custom export format? Contact the system administrator
+                for specialized export options.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Export Usage Tips -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">
+          <i class="bi bi-lightbulb me-2 text-warning"></i>Export Usage Tips
+        </h5>
+
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item bg-transparent px-0">
+            <i class="bi bi-bar-chart me-2 text-primary"></i>
+            <strong>Data Analysis:</strong> Use CSV for quick analysis in Excel
+            or other spreadsheet programs.
+          </li>
+          <li class="list-group-item bg-transparent px-0">
+            <i class="bi bi-file-earmark-text me-2 text-primary"></i>
+            <strong>Reports:</strong> Use Excel format for creating formatted
+            reports with charts and tables.
+          </li>
+          <li class="list-group-item bg-transparent px-0">
+            <i class="bi bi-code-square me-2 text-primary"></i>
+            <strong>Integration:</strong> Use JSON format for integrating with
+            web applications or APIs.
+          </li>
+          <li class="list-group-item bg-transparent px-0">
+            <i class="bi bi-database me-2 text-primary"></i>
+            <strong>Database Import:</strong> CSV is the most compatible format
+            for importing into other databases.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_css %}
 <style>
-    .accordion-button:not(.collapsed) {
-        color: var(--bs-primary);
-        background-color: rgba(var(--bs-primary-rgb), 0.1);
-        box-shadow: none;
-    }
-    
-    .accordion-button:focus {
-        box-shadow: none;
-        border-color: rgba(var(--bs-primary-rgb), 0.5);
-    }
+  .accordion-button:not(.collapsed) {
+    color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    box-shadow: none;
+  }
+
+  .accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+  }
 </style>
 {% endblock %}

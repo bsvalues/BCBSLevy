@@ -1,193 +1,226 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-bs-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Levy Export Tool{% endblock %} | Levy Calculation System</title>
-    
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}Levy Export Tool{% endblock %} | Levy Calculation System
+    </title>
+
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
-    
+    <link
+      href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css"
+      rel="stylesheet"
+    />
+
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+    />
+
     <!-- Custom CSS -->
     <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        main {
-            flex: 1;
-        }
-        
-        .page-header {
-            background-color: var(--bs-dark);
-            padding: 1.5rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--bs-border-color);
-        }
-        
-        .footer {
-            background-color: var(--bs-dark);
-            padding: 1rem 0;
-            border-top: 1px solid var(--bs-border-color);
-            margin-top: 2rem;
-        }
-        
-        .nav-link.active {
-            font-weight: bold;
-            color: var(--bs-primary) !important;
-        }
-        
-        .logo {
-            height: 2.5rem;
-            margin-right: 0.5rem;
-        }
-        
-        /* Tax code cards */
-        .tax-code-card {
-            transition: all 0.2s ease;
-        }
-        
-        .tax-code-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Progress bars */
-        .progress {
-            height: 0.5rem;
-            margin-top: 0.25rem;
-        }
-        
-        /* Tables */
-        .table-hover tbody tr:hover {
-            background-color: rgba(var(--bs-primary-rgb), 0.1);
-        }
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      main {
+        flex: 1;
+      }
+
+      .page-header {
+        background-color: var(--bs-dark);
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--bs-border-color);
+      }
+
+      .footer {
+        background-color: var(--bs-dark);
+        padding: 1rem 0;
+        border-top: 1px solid var(--bs-border-color);
+        margin-top: 2rem;
+      }
+
+      .nav-link.active {
+        font-weight: bold;
+        color: var(--bs-primary) !important;
+      }
+
+      .logo {
+        height: 2.5rem;
+        margin-right: 0.5rem;
+      }
+
+      /* Tax code cards */
+      .tax-code-card {
+        transition: all 0.2s ease;
+      }
+
+      .tax-code-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      }
+
+      /* Progress bars */
+      .progress {
+        height: 0.5rem;
+        margin-top: 0.25rem;
+      }
+
+      /* Tables */
+      .table-hover tbody tr:hover {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+      }
     </style>
-    
+
     {% block head_extra %}{% endblock %}
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home.index') }}">
-                <i class="bi bi-database-check me-2"></i>
-                Levy Calculation System
+      <div class="container">
+        <a
+          class="navbar-brand d-flex align-items-center"
+          href="{{ url_for('home.index') }}"
+        >
+          <i class="bi bi-database-check me-2"></i>
+          Levy Calculation System
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a
+                class="nav-link {% if request.path == '/' %}active{% endif %}"
+                href="{{ url_for('home.index') }}"
+              >
+                <i class="bi bi-house"></i> Dashboard
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a
+                class="nav-link {% if '/levy-exports' in request.path %}active{% endif %}"
+                href="{{ url_for('levy_exports.index') }}"
+              >
+                <i class="bi bi-file-earmark-spreadsheet"></i> Levy Exports
+              </a>
+            </li>
+          </ul>
+
+          <div class="d-flex">
+            <a href="#" class="btn btn-sm btn-outline-light me-2">
+              <i class="bi bi-question-circle"></i> Help
             </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{{ url_for('home.index') }}">
-                            <i class="bi bi-house"></i> Dashboard
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link {% if '/levy-exports' in request.path %}active{% endif %}" href="{{ url_for('levy_exports.index') }}">
-                            <i class="bi bi-file-earmark-spreadsheet"></i> Levy Exports
-                        </a>
-                    </li>
-                </ul>
-                
-                <div class="d-flex">
-                    <a href="#" class="btn btn-sm btn-outline-light me-2">
-                        <i class="bi bi-question-circle"></i> Help
-                    </a>
-                    <a href="#" class="btn btn-sm btn-primary">
-                        <i class="bi bi-person-circle"></i> Account
-                    </a>
-                </div>
-            </div>
+            <a href="#" class="btn btn-sm btn-primary">
+              <i class="bi bi-person-circle"></i> Account
+            </a>
+          </div>
         </div>
+      </div>
     </nav>
-    
+
     {% if request.path != '/' %}
     <!-- Page Header -->
     <div class="page-header">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="mb-0">{% block page_title %}{% endblock %}</h2>
-                    <p class="text-muted mb-0">{% block page_subtitle %}{% endblock %}</p>
-                </div>
-                <div>
-                    {% block header_actions %}{% endblock %}
-                </div>
-            </div>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 class="mb-0">{% block page_title %}{% endblock %}</h2>
+            <p class="text-muted mb-0">
+              {% block page_subtitle %}{% endblock %}
+            </p>
+          </div>
+          <div>{% block header_actions %}{% endblock %}</div>
         </div>
+      </div>
     </div>
     {% endif %}
-    
+
     <!-- Flash Messages -->
     <div class="container mt-3">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category if category not in ['message', 'error'] else ('info' if category == 'message' else 'danger') }} alert-dismissible fade show" role="alert">
-            {% if category == 'success' %}
-            <i class="bi bi-check-circle me-2"></i>
-            {% elif category == 'error' %}
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            {% elif category == 'warning' %}
-            <i class="bi bi-exclamation-circle me-2"></i>
-            {% else %}
-            <i class="bi bi-info-circle me-2"></i>
-            {% endif %}
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="alert alert-{{ category if category not in ['message', 'error'] else ('info' if category == 'message' else 'danger') }} alert-dismissible fade show"
+        role="alert"
+      >
+        {% if category == 'success' %}
+        <i class="bi bi-check-circle me-2"></i>
+        {% elif category == 'error' %}
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {% elif category == 'warning' %}
+        <i class="bi bi-exclamation-circle me-2"></i>
+        {% else %}
+        <i class="bi bi-info-circle me-2"></i>
+        {% endif %} {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
     </div>
-    
+
     <!-- Main Content -->
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-    
+    <main>{% block content %}{% endblock %}</main>
+
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-0 text-muted">&copy; 2025 Benton County Assessor's Office. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <p class="mb-0 text-muted">Levy Calculation System v1.0.0</p>
-                </div>
-            </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <p class="mb-0 text-muted">
+              &copy; 2025 Benton County Assessor's Office. All rights reserved.
+            </p>
+          </div>
+          <div class="col-md-6 text-end">
+            <p class="mb-0 text-muted">Levy Calculation System v1.0.0</p>
+          </div>
         </div>
+      </div>
     </footer>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Common Scripts -->
     <script>
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-        
-        // Initialize popovers
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-            return new bootstrap.Popover(popoverTriggerEl)
-        })
+      // Initialize tooltips
+      var tooltipTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+      );
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+
+      // Initialize popovers
+      var popoverTriggerList = [].slice.call(
+        document.querySelectorAll('[data-bs-toggle="popover"]'),
+      );
+      var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+      });
     </script>
-    
+
     {% block scripts %}{% endblock %}
-</body>
+  </body>
 </html>

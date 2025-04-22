@@ -1,194 +1,209 @@
-{% extends "base.html" %}
-
-{% block title %}Property Lookup - Benton County Levy Calculator{% endblock %}
-
-{% block page_title %}Property Tax Lookup{% endblock %}
-{% block page_subtitle %}Look up property tax information by property ID{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Property Lookup - Benton County Levy
+Calculator{% endblock %} {% block page_title %}Property Tax Lookup{% endblock %}
+{% block page_subtitle %}Look up property tax information by property ID{%
+endblock %} {% block content %}
 <div class="row">
-    <div class="col-lg-8 mx-auto">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Property Lookup</h5>
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Property Lookup</h5>
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('property_lookup') }}" method="post">
+          <div class="row mb-4">
+            <div class="col-md-8 mx-auto">
+              <div class="input-group input-group-lg">
+                <span class="input-group-text"
+                  ><i class="fas fa-search"></i
+                ></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="property_id"
+                  placeholder="Enter Property ID"
+                  required
+                />
+                <button type="submit" class="btn btn-primary">Lookup</button>
+              </div>
+              <div class="help-text">
+                Enter a property ID to find its assessed value, tax code, and
+                calculated tax.
+              </div>
             </div>
-            <div class="card-body">
-                <form action="{{ url_for('property_lookup') }}" method="post">
-                    <div class="row mb-4">
-                        <div class="col-md-8 mx-auto">
-                            <div class="input-group input-group-lg">
-                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control" name="property_id" placeholder="Enter Property ID" required>
-                                <button type="submit" class="btn btn-primary">Lookup</button>
-                            </div>
-                            <div class="help-text">
-                                Enter a property ID to find its assessed value, tax code, and calculated tax.
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                
-                {% if property_data %}
-                <div class="property-result">
-                    <h4 class="mb-4">Property Information</h4>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Property ID</label>
-                                <div class="property-value">{{ property_data.property_id }}</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Assessed Value</label>
-                                <div class="property-value">${{ '%0.2f'|format(property_data.assessed_value|float) }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Tax Code</label>
-                                <div class="property-value">{{ property_data.tax_code }}</div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Levy Rate (per $1,000)</label>
-                                <div class="property-value">{{ '%0.4f'|format(property_data.levy_rate|float) }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="card bg-light mt-4">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Calculated Property Tax</h5>
-                            <div class="display-4 my-3">${{ '%0.2f'|format(property_data.calculated_tax|float) }}</div>
-                            <p class="card-text text-muted">
-                                Calculated as: ${{ '%0.2f'|format(property_data.assessed_value|float) }} ÷ 1,000 × {{ '%0.4f'|format(property_data.levy_rate|float) }}
-                            </p>
-                        </div>
-                    </div>
-                    
-                    {% if property_data.linked_levy_codes %}
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Linked Levy Codes</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted mb-3">
-                                The following levy codes are linked to this property's tax code ({{ property_data.tax_code }}):
-                            </p>
-                            <div class="row">
-                                {% for code in property_data.linked_levy_codes %}
-                                <div class="col-md-4 mb-2">
-                                    <span class="badge bg-info text-dark p-2">{{ code }}</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <p class="text-muted mt-3 small">
-                                <i class="fas fa-info-circle me-1"></i> Linked levy codes represent different taxing authorities 
-                                that apply to this property's tax district.
-                            </p>
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- AI-Powered Property Insights (MCP) -->
-                    {% if property_data.mcp_insights %}
-                    <div class="card mt-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0"><i class="fas fa-brain me-2"></i> AI-Powered Property Insights</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if property_data.mcp_insights.summary %}
-                            <div class="mb-3">
-                                <h6>Summary</h6>
-                                <p>{{ property_data.mcp_insights.summary }}</p>
-                            </div>
-                            {% endif %}
-                            
-                            {% if property_data.mcp_insights.comparisons %}
-                            <div class="mb-3">
-                                <h6>Comparisons</h6>
-                                <p>{{ property_data.mcp_insights.comparisons }}</p>
-                            </div>
-                            {% endif %}
-                            
-                            {% if property_data.mcp_insights.factors %}
-                            <div class="mb-3">
-                                <h6>Key Factors</h6>
-                                <p>{{ property_data.mcp_insights.factors }}</p>
-                            </div>
-                            {% endif %}
-                            
-                            {% if property_data.mcp_insights.recommendations %}
-                            <div class="mb-3">
-                                <h6>Recommendations</h6>
-                                <p>{{ property_data.mcp_insights.recommendations }}</p>
-                            </div>
-                            {% endif %}
-                            
-                            <div class="text-end mt-2">
-                                <small class="text-muted">
-                                    Analysis powered by Model Content Protocol (MCP) and Claude AI
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0">About Property Tax Calculations</h5>
-            </div>
-            <div class="card-body">
-                <p>
-                    Property taxes in Benton County are calculated based on the assessed value of the property and the levy rate for the
-                    tax code area where the property is located.
-                </p>
-                
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Assessed Value</h5>
-                                <p class="card-text">
-                                    The assessed value is the dollar value assigned to a property by the County Assessor's Office
-                                    for the purpose of calculating property taxes. This value is determined based on market
-                                    conditions, property improvements, and other factors.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">Tax Code Areas</h5>
-                                <p class="card-text">
-                                    Tax code areas are geographic districts that determine which taxing jurisdictions can
-                                    levy taxes on a property. Each area has its own levy rate based on the combined levy
-                                    amounts of all taxing districts that serve that area.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="alert alert-secondary mt-4">
-                    <h6 class="mb-2">How Property Tax is Calculated</h6>
-                    <p class="mb-0">
-                        The property tax is calculated using the following formula:
-                    </p>
-                    <pre class="bg-dark text-light p-2 rounded my-2"><code>property_tax = (assessed_value / 1000) * levy_rate</code></pre>
-                    <p class="mb-0">
-                        The levy rate is expressed in dollars per $1,000 of assessed value.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+          </div>
+        </form>
 
-{% block mcp_insights %}
-{% include 'partials/mcp_insights.html' %}
-{% endblock %}
+        {% if property_data %}
+        <div class="property-result">
+          <h4 class="mb-4">Property Information</h4>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Property ID</label>
+                <div class="property-value">
+                  {{ property_data.property_id }}
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Assessed Value</label>
+                <div class="property-value">
+                  ${{ '%0.2f'|format(property_data.assessed_value|float) }}
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Tax Code</label>
+                <div class="property-value">{{ property_data.tax_code }}</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Levy Rate (per $1,000)</label>
+                <div class="property-value">
+                  {{ '%0.4f'|format(property_data.levy_rate|float) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-light mt-4">
+            <div class="card-body text-center">
+              <h5 class="card-title">Calculated Property Tax</h5>
+              <div class="display-4 my-3">
+                ${{ '%0.2f'|format(property_data.calculated_tax|float) }}
+              </div>
+              <p class="card-text text-muted">
+                Calculated as: ${{
+                '%0.2f'|format(property_data.assessed_value|float) }} ÷ 1,000 ×
+                {{ '%0.4f'|format(property_data.levy_rate|float) }}
+              </p>
+            </div>
+          </div>
+
+          {% if property_data.linked_levy_codes %}
+          <div class="card mt-4">
+            <div class="card-header">
+              <h5 class="mb-0">Linked Levy Codes</h5>
+            </div>
+            <div class="card-body">
+              <p class="text-muted mb-3">
+                The following levy codes are linked to this property's tax code
+                ({{ property_data.tax_code }}):
+              </p>
+              <div class="row">
+                {% for code in property_data.linked_levy_codes %}
+                <div class="col-md-4 mb-2">
+                  <span class="badge bg-info text-dark p-2">{{ code }}</span>
+                </div>
+                {% endfor %}
+              </div>
+              <p class="text-muted mt-3 small">
+                <i class="fas fa-info-circle me-1"></i> Linked levy codes
+                represent different taxing authorities that apply to this
+                property's tax district.
+              </p>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- AI-Powered Property Insights (MCP) -->
+          {% if property_data.mcp_insights %}
+          <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-brain me-2"></i> AI-Powered Property Insights
+              </h5>
+            </div>
+            <div class="card-body">
+              {% if property_data.mcp_insights.summary %}
+              <div class="mb-3">
+                <h6>Summary</h6>
+                <p>{{ property_data.mcp_insights.summary }}</p>
+              </div>
+              {% endif %} {% if property_data.mcp_insights.comparisons %}
+              <div class="mb-3">
+                <h6>Comparisons</h6>
+                <p>{{ property_data.mcp_insights.comparisons }}</p>
+              </div>
+              {% endif %} {% if property_data.mcp_insights.factors %}
+              <div class="mb-3">
+                <h6>Key Factors</h6>
+                <p>{{ property_data.mcp_insights.factors }}</p>
+              </div>
+              {% endif %} {% if property_data.mcp_insights.recommendations %}
+              <div class="mb-3">
+                <h6>Recommendations</h6>
+                <p>{{ property_data.mcp_insights.recommendations }}</p>
+              </div>
+              {% endif %}
+
+              <div class="text-end mt-2">
+                <small class="text-muted">
+                  Analysis powered by Model Content Protocol (MCP) and Claude AI
+                </small>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="mb-0">About Property Tax Calculations</h5>
+      </div>
+      <div class="card-body">
+        <p>
+          Property taxes in Benton County are calculated based on the assessed
+          value of the property and the levy rate for the tax code area where
+          the property is located.
+        </p>
+
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Assessed Value</h5>
+                <p class="card-text">
+                  The assessed value is the dollar value assigned to a property
+                  by the County Assessor's Office for the purpose of calculating
+                  property taxes. This value is determined based on market
+                  conditions, property improvements, and other factors.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">Tax Code Areas</h5>
+                <p class="card-text">
+                  Tax code areas are geographic districts that determine which
+                  taxing jurisdictions can levy taxes on a property. Each area
+                  has its own levy rate based on the combined levy amounts of
+                  all taxing districts that serve that area.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-secondary mt-4">
+          <h6 class="mb-2">How Property Tax is Calculated</h6>
+          <p class="mb-0">
+            The property tax is calculated using the following formula:
+          </p>
+          <pre
+            class="bg-dark text-light p-2 rounded my-2"
+          ><code>property_tax = (assessed_value / 1000) * levy_rate</code></pre>
+          <p class="mb-0">
+            The levy rate is expressed in dollars per $1,000 of assessed value.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block mcp_insights %} {% include 'partials/mcp_insights.html'
+%} {% endblock %}

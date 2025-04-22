@@ -1,400 +1,446 @@
 /* Immersive Map View Styles */
 .map-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 .map-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 10;
 }
 
 .map-controls {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    pointer-events: auto;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: auto;
 }
 
 .map-control-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .map-control-btn:hover {
-    transform: scale(1.1);
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+  background: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .map-header {
-    pointer-events: auto;
-    background: rgba(0, 32, 91, 0.85);
-    color: white;
-    padding: 20px;
-    border-radius: 0 0 20px 20px;
-    backdrop-filter: blur(5px);
-    margin: 0 auto;
-    max-width: 700px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  background: rgba(0, 32, 91, 0.85);
+  color: white;
+  padding: 20px;
+  border-radius: 0 0 20px 20px;
+  backdrop-filter: blur(5px);
+  margin: 0 auto;
+  max-width: 700px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .map-legend {
-    position: fixed;
-    bottom: 30px;
-    left: 30px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 20;
-    max-width: 300px;
-    pointer-events: auto;
-    backdrop-filter: blur(5px);
-    border-top: 4px solid #00a3e0;
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  max-width: 300px;
+  pointer-events: auto;
+  backdrop-filter: blur(5px);
+  border-top: 4px solid #00a3e0;
 }
 
 .district-info-panel {
-    position: fixed;
-    top: 90px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 20;
-    width: 400px;
-    max-width: 100%;
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
-    pointer-events: auto;
-    transform: translateX(420px);
-    transition: transform 0.3s ease;
-    backdrop-filter: blur(8px);
+  position: fixed;
+  top: 90px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  width: 400px;
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  pointer-events: auto;
+  transform: translateX(420px);
+  transition: transform 0.3s ease;
+  backdrop-filter: blur(8px);
 }
 
 .district-info-panel.visible {
-    transform: translateX(0);
+  transform: translateX(0);
 }
 
 .info-panel-header {
-    position: sticky;
-    top: 0;
-    background: linear-gradient(135deg, #00a3e0, #3dc682);
-    margin: -20px -20px 15px -20px;
-    padding: 15px 20px;
-    border-radius: 10px 10px 0 0;
-    color: white;
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #00a3e0, #3dc682);
+  margin: -20px -20px 15px -20px;
+  padding: 15px 20px;
+  border-radius: 10px 10px 0 0;
+  color: white;
 }
 
 .info-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(255, 255, 255, 0.3);
-    border: none;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .info-close-btn:hover {
-    background: rgba(255, 255, 255, 0.5);
-    transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
 }
 
 .district-card {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 15px;
-    cursor: pointer;
-    border-top: 4px solid;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  margin-bottom: 15px;
+  cursor: pointer;
+  border-top: 4px solid;
 }
 
 .district-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .district-card-school {
-    border-color: #E57373;
+  border-color: #e57373;
 }
 
 .district-card-city {
-    border-color: #64B5F6;
+  border-color: #64b5f6;
 }
 
 .district-card-fire {
-    border-color: #FFB74D;
+  border-color: #ffb74d;
 }
 
 .district-card-county {
-    border-color: #81C784;
+  border-color: #81c784;
 }
 
 .district-card-library {
-    border-color: #9575CD;
+  border-color: #9575cd;
 }
 
 .district-card-port {
-    border-color: #4FC3F7;
+  border-color: #4fc3f7;
 }
 
 .district-card-hospital {
-    border-color: #F06292;
+  border-color: #f06292;
 }
 
 .district-card-cemetery {
-    border-color: #90A4AE;
+  border-color: #90a4ae;
 }
 
 .district-card-other {
-    border-color: #7E57C2;
+  border-color: #7e57c2;
 }
 
 .district-carousel {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    display: flex;
-    gap: 15px;
-    overflow-x: auto;
-    padding: 10px;
-    max-width: 80%;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    pointer-events: auto;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding: 10px;
+  max-width: 80%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .carousel-toggle {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 25;
-    background: rgba(0, 32, 91, 0.9);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 15px;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s ease;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  background: rgba(0, 32, 91, 0.9);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
 }
 
 .carousel-toggle:hover {
-    background: #00205B;
+  background: #00205b;
 }
 
 .carousel-toggle.expanded {
-    bottom: 85%;
+  bottom: 85%;
 }
 
 .district-carousel.expanded {
-    bottom: 15%;
-    height: 70%;
-    flex-direction: column;
-    align-items: center;
-    max-width: 90%;
-    padding: 20px;
-    overflow-y: auto;
+  bottom: 15%;
+  height: 70%;
+  flex-direction: column;
+  align-items: center;
+  max-width: 90%;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 .district-carousel.expanded .district-card {
-    width: 100%;
-    max-width: 500px;
+  width: 100%;
+  max-width: 500px;
 }
 
 .district-carousel:not(.expanded) .district-card {
-    min-width: 250px;
-    max-width: 250px;
+  min-width: 250px;
+  max-width: 250px;
 }
 
 @media (max-width: 768px) {
-    .district-info-panel {
-        width: 90%;
-        left: 5%;
-        right: 5%;
-        transform: translateY(120%);
-    }
-    
-    .district-info-panel.visible {
-        transform: translateY(0);
-    }
-    
-    .map-controls {
-        top: auto;
-        bottom: 20px;
-        right: 20px;
-    }
-    
-    .map-legend {
-        bottom: 20px;
-        left: 20px;
-        max-width: 200px;
-    }
-    
-    .district-carousel {
-        max-width: 100%;
-    }
-    
-    .district-carousel:not(.expanded) .district-card {
-        min-width: 200px;
-    }
+  .district-info-panel {
+    width: 90%;
+    left: 5%;
+    right: 5%;
+    transform: translateY(120%);
+  }
+
+  .district-info-panel.visible {
+    transform: translateY(0);
+  }
+
+  .map-controls {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .map-legend {
+    bottom: 20px;
+    left: 20px;
+    max-width: 200px;
+  }
+
+  .district-carousel {
+    max-width: 100%;
+  }
+
+  .district-carousel:not(.expanded) .district-card {
+    min-width: 200px;
+  }
 }
 
 /* District Marker Animations */
 @keyframes markerPulse {
-    0% { transform: scale(1); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
-    50% { transform: scale(1.15); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); }
-    100% { transform: scale(1); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
 }
 
 @keyframes markerGlow {
-    0% { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
-    50% { box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.6), 0 2px 10px rgba(0, 0, 0, 0.3); }
-    100% { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); }
+  0% {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 15px 5px rgba(255, 255, 255, 0.6),
+      0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
 }
 
 @keyframes markerBounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes markerSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes ripple {
-    0% {
-        transform: scale(0.8);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(2.5);
-        opacity: 0;
-    }
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
 }
 
 .ripple-animation::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-    animation: ripple 1s ease-out forwards;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  animation: ripple 1s ease-out forwards;
 }
 
 .district-marker {
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    border: 2px solid white;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
-    position: relative;
-    z-index: 5;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 2px solid white;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
 }
 
 .district-marker:hover {
-    transform: scale(1.25);
-    z-index: 100;
-    border-width: 3px;
+  transform: scale(1.25);
+  z-index: 100;
+  border-width: 3px;
 }
 
 .district-marker.pulse-effect:hover {
-    animation: markerPulse 1.5s infinite ease-in-out;
+  animation: markerPulse 1.5s infinite ease-in-out;
 }
 
 .district-marker.glow-effect:hover {
-    animation: markerGlow 1.5s infinite ease-in-out;
+  animation: markerGlow 1.5s infinite ease-in-out;
 }
 
 .district-marker.bounce-effect:hover {
-    animation: markerBounce 0.8s infinite ease-in-out;
+  animation: markerBounce 0.8s infinite ease-in-out;
 }
 
 .district-marker.spin-effect:hover {
-    animation: markerSpin 1.5s infinite linear;
-    transform: scale(1.15);
+  animation: markerSpin 1.5s infinite linear;
+  transform: scale(1.15);
 }
 
 .district-marker::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: -1;
-    transition: all 0.3s ease;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  transition: all 0.3s ease;
 }
 
 .district-marker:hover::after {
-    width: 60px;
-    height: 60px;
+  width: 60px;
+  height: 60px;
 }
 
-.marker-SCHOOL { background-color: #E57373; }
-.marker-CITY { background-color: #64B5F6; }
-.marker-FIRE { background-color: #FFB74D; }
-.marker-COUNTY { background-color: #81C784; }
-.marker-LIBRARY { background-color: #9575CD; }
-.marker-PORT { background-color: #4FC3F7; }
-.marker-HOSPITAL { background-color: #F06292; }
-.marker-CEMETERY { background-color: #90A4AE; }
-.marker-OTHER { background-color: #7E57C2; }
+.marker-SCHOOL {
+  background-color: #e57373;
+}
+.marker-CITY {
+  background-color: #64b5f6;
+}
+.marker-FIRE {
+  background-color: #ffb74d;
+}
+.marker-COUNTY {
+  background-color: #81c784;
+}
+.marker-LIBRARY {
+  background-color: #9575cd;
+}
+.marker-PORT {
+  background-color: #4fc3f7;
+}
+.marker-HOSPITAL {
+  background-color: #f06292;
+}
+.marker-CEMETERY {
+  background-color: #90a4ae;
+}
+.marker-OTHER {
+  background-color: #7e57c2;
+}
 
 /* District polygon styles */
 .district-polygon {
@@ -408,15 +454,42 @@
   filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
 }
 
-.district-polygon-SCHOOL { fill: rgba(229, 115, 115, 0.15); stroke: #D32F2F; }
-.district-polygon-CITY { fill: rgba(100, 181, 246, 0.15); stroke: #1976D2; }
-.district-polygon-FIRE { fill: rgba(255, 183, 77, 0.15); stroke: #EF6C00; }
-.district-polygon-COUNTY { fill: rgba(129, 199, 132, 0.15); stroke: #388E3C; }
-.district-polygon-LIBRARY { fill: rgba(149, 117, 205, 0.15); stroke: #5E35B1; }
-.district-polygon-PORT { fill: rgba(79, 195, 247, 0.15); stroke: #0288D1; }
-.district-polygon-HOSPITAL { fill: rgba(240, 98, 146, 0.15); stroke: #C2185B; }
-.district-polygon-CEMETERY { fill: rgba(144, 164, 174, 0.15); stroke: #455A64; }
-.district-polygon-OTHER { fill: rgba(126, 87, 194, 0.15); stroke: #4527A0; }
+.district-polygon-SCHOOL {
+  fill: rgba(229, 115, 115, 0.15);
+  stroke: #d32f2f;
+}
+.district-polygon-CITY {
+  fill: rgba(100, 181, 246, 0.15);
+  stroke: #1976d2;
+}
+.district-polygon-FIRE {
+  fill: rgba(255, 183, 77, 0.15);
+  stroke: #ef6c00;
+}
+.district-polygon-COUNTY {
+  fill: rgba(129, 199, 132, 0.15);
+  stroke: #388e3c;
+}
+.district-polygon-LIBRARY {
+  fill: rgba(149, 117, 205, 0.15);
+  stroke: #5e35b1;
+}
+.district-polygon-PORT {
+  fill: rgba(79, 195, 247, 0.15);
+  stroke: #0288d1;
+}
+.district-polygon-HOSPITAL {
+  fill: rgba(240, 98, 146, 0.15);
+  stroke: #c2185b;
+}
+.district-polygon-CEMETERY {
+  fill: rgba(144, 164, 174, 0.15);
+  stroke: #455a64;
+}
+.district-polygon-OTHER {
+  fill: rgba(126, 87, 194, 0.15);
+  stroke: #4527a0;
+}
 
 /* Active polygon styles */
 .district-polygon.active {
@@ -427,9 +500,18 @@
 
 /* Polygon animation */
 @keyframes pulseBorder {
-  0% { stroke-width: 2px; stroke-opacity: 0.8; }
-  50% { stroke-width: 4px; stroke-opacity: 1; }
-  100% { stroke-width: 2px; stroke-opacity: 0.8; }
+  0% {
+    stroke-width: 2px;
+    stroke-opacity: 0.8;
+  }
+  50% {
+    stroke-width: 4px;
+    stroke-opacity: 1;
+  }
+  100% {
+    stroke-width: 2px;
+    stroke-opacity: 0.8;
+  }
 }
 
 .polygon-active {
@@ -438,110 +520,130 @@
 
 /* 3D-styled modern UI elements */
 .card-3d {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 
-        0 5px 15px rgba(0, 0, 0, 0.08),
-        0 15px 35px rgba(0, 0, 0, 0.12);
-    overflow: hidden;
-    transform: perspective(800px) rotateX(0deg);
-    transition: all 0.3s ease;
-    border: none;
+  background: white;
+  border-radius: 15px;
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.08),
+    0 15px 35px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transform: perspective(800px) rotateX(0deg);
+  transition: all 0.3s ease;
+  border: none;
 }
 
 .card-3d:hover {
-    transform: perspective(800px) rotateX(2deg) translateY(-5px);
-    box-shadow: 
-        0 10px 20px rgba(0, 0, 0, 0.12),
-        0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: perspective(800px) rotateX(2deg) translateY(-5px);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.12),
+    0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .gradient-header {
-    background: linear-gradient(135deg, #00205B, #00a3e0);
-    color: white;
-    padding: 20px;
-    border-radius: 15px 15px 0 0;
+  background: linear-gradient(135deg, #00205b, #00a3e0);
+  color: white;
+  padding: 20px;
+  border-radius: 15px 15px 0 0;
 }
 
 .filter-controls {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 20;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    max-width: 350px;
-    pointer-events: auto;
-    backdrop-filter: blur(5px);
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  max-width: 350px;
+  pointer-events: auto;
+  backdrop-filter: blur(5px);
 }
 
 .filter-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    margin: 0 5px 5px 0;
-    border-radius: 20px;
-    color: white;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 0 5px 5px 0;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .filter-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.filter-SCHOOL { background-color: #E57373; }
-.filter-CITY { background-color: #64B5F6; }
-.filter-FIRE { background-color: #FFB74D; }
-.filter-COUNTY { background-color: #81C784; }
-.filter-LIBRARY { background-color: #9575CD; }
-.filter-PORT { background-color: #4FC3F7; }
-.filter-HOSPITAL { background-color: #F06292; }
-.filter-CEMETERY { background-color: #90A4AE; }
-.filter-OTHER { background-color: #7E57C2; }
+.filter-SCHOOL {
+  background-color: #e57373;
+}
+.filter-CITY {
+  background-color: #64b5f6;
+}
+.filter-FIRE {
+  background-color: #ffb74d;
+}
+.filter-COUNTY {
+  background-color: #81c784;
+}
+.filter-LIBRARY {
+  background-color: #9575cd;
+}
+.filter-PORT {
+  background-color: #4fc3f7;
+}
+.filter-HOSPITAL {
+  background-color: #f06292;
+}
+.filter-CEMETERY {
+  background-color: #90a4ae;
+}
+.filter-OTHER {
+  background-color: #7e57c2;
+}
 
 .filter-badge.inactive {
-    opacity: 0.5;
-    background-color: #ccc;
+  opacity: 0.5;
+  background-color: #ccc;
 }
 
 .back-to-list {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 30;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 10px 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    pointer-events: auto;
-    text-decoration: none;
-    color: #00205B;
-    font-weight: 500;
-    transition: all 0.2s ease;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  text-decoration: none;
+  color: #00205b;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .back-to-list:hover {
-    background: white;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Ripple animation for map marker clicks */
 @keyframes ripple {
   0% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3),
-                0 0 0 0 rgba(255, 255, 255, 0.3);
+    box-shadow:
+      0 0 0 0 rgba(255, 255, 255, 0.3),
+      0 0 0 0 rgba(255, 255, 255, 0.3);
   }
   100% {
-    box-shadow: 0 0 0 20px rgba(255, 255, 255, 0),
-                0 0 0 40px rgba(255, 255, 255, 0);
+    box-shadow:
+      0 0 0 20px rgba(255, 255, 255, 0),
+      0 0 0 40px rgba(255, 255, 255, 0);
   }
 }
 

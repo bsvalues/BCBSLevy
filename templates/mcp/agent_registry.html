@@ -1,228 +1,307 @@
-{% extends "base.html" %}
-
-{% block title %}Agent Registry - LevyMaster{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Agent Registry - LevyMaster{%
+endblock %} {% block content %}
 <div class="container py-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-5 fw-bold">Agent Registry</h1>
-            <p class="lead text-secondary">Manage and monitor AI agents in the LevyMaster system</p>
-            <hr class="my-4">
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="display-5 fw-bold">Agent Registry</h1>
+      <p class="lead text-secondary">
+        Manage and monitor AI agents in the LevyMaster system
+      </p>
+      <hr class="my-4" />
     </div>
+  </div>
 
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Registered Agents</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="agentRegistryTable">
-                            <thead>
-                                <tr>
-                                    <th>Agent ID</th>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
-                                    <th>Last Active</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>AGT-001</td>
-                                    <td>Levy Analysis Agent</td>
-                                    <td><span class="badge bg-info">Analyst</span></td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>2025-04-15 23:00:02</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary">Details</button>
-                                        <button class="btn btn-sm btn-outline-secondary">Logs</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>AGT-002</td>
-                                    <td>Compliance Checker</td>
-                                    <td><span class="badge bg-warning">Validator</span></td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>2025-04-15 22:45:18</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary">Details</button>
-                                        <button class="btn btn-sm btn-outline-secondary">Logs</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>AGT-003</td>
-                                    <td>Forecasting Specialist</td>
-                                    <td><span class="badge bg-primary">Predictor</span></td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>2025-04-15 22:58:45</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary">Details</button>
-                                        <button class="btn btn-sm btn-outline-secondary">Logs</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>AGT-004</td>
-                                    <td>Workflow Coordinator</td>
-                                    <td><span class="badge bg-danger">Orchestrator</span></td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>2025-04-15 23:02:12</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary">Details</button>
-                                        <button class="btn btn-sm btn-outline-secondary">Logs</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Registered Agents</h5>
         </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover" id="agentRegistryTable">
+              <thead>
+                <tr>
+                  <th>Agent ID</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Last Active</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>AGT-001</td>
+                  <td>Levy Analysis Agent</td>
+                  <td><span class="badge bg-info">Analyst</span></td>
+                  <td><span class="badge bg-success">Active</span></td>
+                  <td>2025-04-15 23:00:02</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                      Details
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary">
+                      Logs
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AGT-002</td>
+                  <td>Compliance Checker</td>
+                  <td><span class="badge bg-warning">Validator</span></td>
+                  <td><span class="badge bg-success">Active</span></td>
+                  <td>2025-04-15 22:45:18</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                      Details
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary">
+                      Logs
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AGT-003</td>
+                  <td>Forecasting Specialist</td>
+                  <td><span class="badge bg-primary">Predictor</span></td>
+                  <td><span class="badge bg-success">Active</span></td>
+                  <td>2025-04-15 22:58:45</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                      Details
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary">
+                      Logs
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>AGT-004</td>
+                  <td>Workflow Coordinator</td>
+                  <td><span class="badge bg-danger">Orchestrator</span></td>
+                  <td><span class="badge bg-success">Active</span></td>
+                  <td>2025-04-15 23:02:12</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary">
+                      Details
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary">
+                      Logs
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">Agent Performance</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Real-time performance metrics for all active agents in the system.</p>
-                    <div class="progress mb-3">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">Levy Analysis: 85%</div>
-                    </div>
-                    <div class="progress mb-3">
-                        <div class="progress-bar bg-info" role="progressbar" style="width: 92%;" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100">Compliance: 92%</div>
-                    </div>
-                    <div class="progress mb-3">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 78%;" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">Forecasting: 78%</div>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-bar bg-danger" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">Coordination: 95%</div>
-                    </div>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="card-title mb-0">Agent Performance</h5>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">Agent Activities</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">Recent agent activities and system events.</p>
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Levy Analysis completed for District #123
-                            <span class="badge bg-primary rounded-pill">2m ago</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Compliance check passed for Tax Code #456
-                            <span class="badge bg-primary rounded-pill">15m ago</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Forecast generated for 2026 tax year
-                            <span class="badge bg-primary rounded-pill">28m ago</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            New workflow initiated by coordinator
-                            <span class="badge bg-primary rounded-pill">1h ago</span>
-                        </li>
-                    </ul>
-                </div>
+        <div class="card-body">
+          <p class="card-text">
+            Real-time performance metrics for all active agents in the system.
+          </p>
+          <div class="progress mb-3">
+            <div
+              class="progress-bar bg-success"
+              role="progressbar"
+              style="width: 85%"
+              aria-valuenow="85"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              Levy Analysis: 85%
             </div>
+          </div>
+          <div class="progress mb-3">
+            <div
+              class="progress-bar bg-info"
+              role="progressbar"
+              style="width: 92%"
+              aria-valuenow="92"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              Compliance: 92%
+            </div>
+          </div>
+          <div class="progress mb-3">
+            <div
+              class="progress-bar bg-warning"
+              role="progressbar"
+              style="width: 78%"
+              aria-valuenow="78"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              Forecasting: 78%
+            </div>
+          </div>
+          <div class="progress">
+            <div
+              class="progress-bar bg-danger"
+              role="progressbar"
+              style="width: 95%"
+              aria-valuenow="95"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              Coordination: 95%
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Agent Activities</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Recent agent activities and system events.</p>
+          <ul class="list-group">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              Levy Analysis completed for District #123
+              <span class="badge bg-primary rounded-pill">2m ago</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              Compliance check passed for Tax Code #456
+              <span class="badge bg-primary rounded-pill">15m ago</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              Forecast generated for 2026 tax year
+              <span class="badge bg-primary rounded-pill">28m ago</span>
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              New workflow initiated by coordinator
+              <span class="badge bg-primary rounded-pill">1h ago</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-    <!-- Auto Demo Button - Added directly to the page -->
-    <button id="autoDemoButton"
-            class="demo-button-pulse"
-            title="Start automated demo"
-            style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background-color: #FF5722; 
-                   color: white; border: none; border-radius: 50%; width: 70px; height: 70px; 
-                   display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-                   cursor: pointer; font-weight: bold; font-size: 14px;">
-        <span>DEMO</span>
-    </button>
-{% endblock %}
-
-{% block extra_js %}
+<!-- Auto Demo Button - Added directly to the page -->
+<button
+  id="autoDemoButton"
+  class="demo-button-pulse"
+  title="Start automated demo"
+  style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+  "
+>
+  <span>DEMO</span>
+</button>
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('Agent Registry page initialized');
-        
-        // Initialize the demo button
-        const demoButton = document.getElementById('demoModeButton');
-        if (demoButton) {
-            console.log('Demo button found in Agent Registry page');
-            demoButton.addEventListener('click', function(event) {
-                event.preventDefault();
-                console.log('Demo button clicked - starting Agent Registry tour');
-                if (typeof startTour === 'function') {
-                    startTour('agent-registry');
-                } else {
-                    console.error('startTour function not found');
-                    alert('Demo tour system is initializing. Please try again in a moment.');
-                }
-                return false;
-            });
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("Agent Registry page initialized");
+
+    // Initialize the demo button
+    const demoButton = document.getElementById("demoModeButton");
+    if (demoButton) {
+      console.log("Demo button found in Agent Registry page");
+      demoButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        console.log("Demo button clicked - starting Agent Registry tour");
+        if (typeof startTour === "function") {
+          startTour("agent-registry");
         } else {
-            console.error('Demo button not found in the Agent Registry page DOM');
+          console.error("startTour function not found");
+          alert(
+            "Demo tour system is initializing. Please try again in a moment.",
+          );
         }
-        
-        // Set up detail buttons to show agent details modal
-        const detailButtons = document.querySelectorAll('.btn-outline-primary');
-        detailButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Get the agent row
-                const row = this.closest('tr');
-                const agentId = row.cells[0].textContent;
-                const agentName = row.cells[1].textContent;
-                const agentType = row.cells[2].textContent;
-                
-                // Show agent details modal
-                showAgentDetailsModal(agentId, agentName, agentType);
-            });
-        });
-        
-        // Set up log buttons to show agent logs modal
-        const logButtons = document.querySelectorAll('.btn-outline-secondary');
-        logButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                // Get the agent row
-                const row = this.closest('tr');
-                const agentId = row.cells[0].textContent;
-                const agentName = row.cells[1].textContent;
-                
-                // Show agent logs modal
-                showAgentLogsModal(agentId, agentName);
-            });
-        });
+        return false;
+      });
+    } else {
+      console.error("Demo button not found in the Agent Registry page DOM");
+    }
+
+    // Set up detail buttons to show agent details modal
+    const detailButtons = document.querySelectorAll(".btn-outline-primary");
+    detailButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        // Get the agent row
+        const row = this.closest("tr");
+        const agentId = row.cells[0].textContent;
+        const agentName = row.cells[1].textContent;
+        const agentType = row.cells[2].textContent;
+
+        // Show agent details modal
+        showAgentDetailsModal(agentId, agentName, agentType);
+      });
     });
-    
-    // Function to show agent details modal
-    function showAgentDetailsModal(agentId, agentName, agentType) {
-        // Create modal container
-        const modalContainer = document.createElement('div');
-        modalContainer.className = 'modal fade';
-        modalContainer.id = 'agentDetailsModal';
-        modalContainer.setAttribute('tabindex', '-1');
-        modalContainer.setAttribute('aria-labelledby', 'agentDetailsModalLabel');
-        modalContainer.setAttribute('aria-hidden', 'true');
-        
-        // Create modal content based on agent type
-        let capabilityList = '';
-        let statusDetails = '';
-        let agentDescription = '';
-        
-        // Different content based on agent ID
-        switch(agentId) {
-            case 'AGT-001':
-                agentDescription = 'Specialized agent for analyzing levy rates and tax district financial data.';
-                capabilityList = `
+
+    // Set up log buttons to show agent logs modal
+    const logButtons = document.querySelectorAll(".btn-outline-secondary");
+    logButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        // Get the agent row
+        const row = this.closest("tr");
+        const agentId = row.cells[0].textContent;
+        const agentName = row.cells[1].textContent;
+
+        // Show agent logs modal
+        showAgentLogsModal(agentId, agentName);
+      });
+    });
+  });
+
+  // Function to show agent details modal
+  function showAgentDetailsModal(agentId, agentName, agentType) {
+    // Create modal container
+    const modalContainer = document.createElement("div");
+    modalContainer.className = "modal fade";
+    modalContainer.id = "agentDetailsModal";
+    modalContainer.setAttribute("tabindex", "-1");
+    modalContainer.setAttribute("aria-labelledby", "agentDetailsModalLabel");
+    modalContainer.setAttribute("aria-hidden", "true");
+
+    // Create modal content based on agent type
+    let capabilityList = "";
+    let statusDetails = "";
+    let agentDescription = "";
+
+    // Different content based on agent ID
+    switch (agentId) {
+      case "AGT-001":
+        agentDescription =
+          "Specialized agent for analyzing levy rates and tax district financial data.";
+        capabilityList = `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Levy Rate Analysis
                         <span class="badge bg-success">Active</span>
@@ -239,7 +318,7 @@
                         Anomaly Detection
                         <span class="badge bg-warning">Limited</span>
                     </li>`;
-                statusDetails = `
+        statusDetails = `
                     <div class="mb-3">
                         <h6>Memory Usage</h6>
                         <div class="progress">
@@ -258,10 +337,11 @@
                             <div class="progress-bar bg-success" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">95%</div>
                         </div>
                     </div>`;
-                break;
-            case 'AGT-002':
-                agentDescription = 'Dedicated compliance verification agent for ensuring tax districts meet all regulatory requirements.';
-                capabilityList = `
+        break;
+      case "AGT-002":
+        agentDescription =
+          "Dedicated compliance verification agent for ensuring tax districts meet all regulatory requirements.";
+        capabilityList = `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Regulatory Compliance
                         <span class="badge bg-success">Active</span>
@@ -278,7 +358,7 @@
                         Exception Handling
                         <span class="badge bg-success">Active</span>
                     </li>`;
-                statusDetails = `
+        statusDetails = `
                     <div class="mb-3">
                         <h6>Memory Usage</h6>
                         <div class="progress">
@@ -297,10 +377,11 @@
                             <div class="progress-bar bg-success" role="progressbar" style="width: 97%;" aria-valuenow="97" aria-valuemin="0" aria-valuemax="100">97%</div>
                         </div>
                     </div>`;
-                break;
-            case 'AGT-003':
-                agentDescription = 'Prediction specialist agent for forecasting future levy rates and tax district changes.';
-                capabilityList = `
+        break;
+      case "AGT-003":
+        agentDescription =
+          "Prediction specialist agent for forecasting future levy rates and tax district changes.";
+        capabilityList = `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Time Series Forecasting
                         <span class="badge bg-success">Active</span>
@@ -317,7 +398,7 @@
                         Trend Impact Analysis
                         <span class="badge bg-warning">Limited</span>
                     </li>`;
-                statusDetails = `
+        statusDetails = `
                     <div class="mb-3">
                         <h6>Memory Usage</h6>
                         <div class="progress">
@@ -336,10 +417,11 @@
                             <div class="progress-bar bg-warning" role="progressbar" style="width: 78%;" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">78%</div>
                         </div>
                     </div>`;
-                break;
-            case 'AGT-004':
-                agentDescription = 'Master coordination agent that orchestrates interactions between all other agents in the system.';
-                capabilityList = `
+        break;
+      case "AGT-004":
+        agentDescription =
+          "Master coordination agent that orchestrates interactions between all other agents in the system.";
+        capabilityList = `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Workflow Orchestration
                         <span class="badge bg-success">Active</span>
@@ -356,7 +438,7 @@
                         Agent Communication
                         <span class="badge bg-success">Active</span>
                     </li>`;
-                statusDetails = `
+        statusDetails = `
                     <div class="mb-3">
                         <h6>Memory Usage</h6>
                         <div class="progress">
@@ -375,25 +457,25 @@
                             <div class="progress-bar bg-success" role="progressbar" style="width: 98%;" aria-valuenow="98" aria-valuemin="0" aria-valuemax="100">98%</div>
                         </div>
                     </div>`;
-                break;
-            default:
-                agentDescription = 'Standard agent in the MCP framework.';
-                capabilityList = `
+        break;
+      default:
+        agentDescription = "Standard agent in the MCP framework.";
+        capabilityList = `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         Basic Processing
                         <span class="badge bg-success">Active</span>
                     </li>`;
-                statusDetails = `
+        statusDetails = `
                     <div class="mb-3">
                         <h6>Memory Usage</h6>
                         <div class="progress">
                             <div class="progress-bar bg-success" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
                         </div>
                     </div>`;
-        }
-        
-        // Create modal HTML
-        modalContainer.innerHTML = `
+    }
+
+    // Create modal HTML
+    modalContainer.innerHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
@@ -460,32 +542,32 @@
                 </div>
             </div>
         `;
-        
-        // Add to document
-        document.body.appendChild(modalContainer);
-        
-        // Initialize and show modal
-        const modal = new bootstrap.Modal(modalContainer);
-        modal.show();
-        
-        // Remove modal from DOM when hidden
-        modalContainer.addEventListener('hidden.bs.modal', function() {
-            modalContainer.remove();
-        });
-    }
-    
-    // Function to show agent logs modal
-    function showAgentLogsModal(agentId, agentName) {
-        // Create modal container
-        const modalContainer = document.createElement('div');
-        modalContainer.className = 'modal fade';
-        modalContainer.id = 'agentLogsModal';
-        modalContainer.setAttribute('tabindex', '-1');
-        modalContainer.setAttribute('aria-labelledby', 'agentLogsModalLabel');
-        modalContainer.setAttribute('aria-hidden', 'true');
-        
-        // Create modal HTML
-        modalContainer.innerHTML = `
+
+    // Add to document
+    document.body.appendChild(modalContainer);
+
+    // Initialize and show modal
+    const modal = new bootstrap.Modal(modalContainer);
+    modal.show();
+
+    // Remove modal from DOM when hidden
+    modalContainer.addEventListener("hidden.bs.modal", function () {
+      modalContainer.remove();
+    });
+  }
+
+  // Function to show agent logs modal
+  function showAgentLogsModal(agentId, agentName) {
+    // Create modal container
+    const modalContainer = document.createElement("div");
+    modalContainer.className = "modal fade";
+    modalContainer.id = "agentLogsModal";
+    modalContainer.setAttribute("tabindex", "-1");
+    modalContainer.setAttribute("aria-labelledby", "agentLogsModalLabel");
+    modalContainer.setAttribute("aria-hidden", "true");
+
+    // Create modal HTML
+    modalContainer.innerHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header bg-secondary text-white">
@@ -527,18 +609,18 @@
                 </div>
             </div>
         `;
-        
-        // Add to document
-        document.body.appendChild(modalContainer);
-        
-        // Initialize and show modal
-        const modal = new bootstrap.Modal(modalContainer);
-        modal.show();
-        
-        // Remove modal from DOM when hidden
-        modalContainer.addEventListener('hidden.bs.modal', function() {
-            modalContainer.remove();
-        });
-    }
+
+    // Add to document
+    document.body.appendChild(modalContainer);
+
+    // Initialize and show modal
+    const modal = new bootstrap.Modal(modalContainer);
+    modal.show();
+
+    // Remove modal from DOM when hidden
+    modalContainer.addEventListener("hidden.bs.modal", function () {
+      modalContainer.remove();
+    });
+  }
 </script>
 {% endblock %}

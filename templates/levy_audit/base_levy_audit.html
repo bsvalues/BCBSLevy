@@ -1,165 +1,167 @@
-{% extends "base.html" %}
-
-{% block title %}Levy Audit - LevyMaster{% endblock %}
-
+{% extends "base.html" %} {% block title %}Levy Audit - LevyMaster{% endblock %}
 {% block extra_css %}
 <style>
-    /* Levy Audit Module Styling */
-    .audit-section {
-        background-color: #f8f9fa;
-        border-radius: 0.5rem;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        border-left: 4px solid var(--primary-color);
-    }
-    
-    .audit-card {
-        transition: all 0.3s ease;
-        border: 1px solid var(--border-color);
-        margin-bottom: 1.5rem;
-    }
-    
-    .audit-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .audit-card-header {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-        background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-        font-weight: 600;
-    }
-    
-    .compliance-high {
-        color: #198754;
-    }
-    
-    .compliance-medium {
-        color: #0d6efd;
-    }
-    
-    .compliance-low {
-        color: #ffc107;
-    }
-    
-    .compliance-critical {
-        color: #dc3545;
-    }
-    
-    .audit-avatar {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.2rem;
-    }
-    
-    .chat-container {
-        height: 60vh;
-        overflow-y: auto;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-radius: 0.5rem;
-        border: 1px solid var(--border-color);
-    }
-    
-    .chat-message {
-        margin-bottom: 1rem;
-        padding: 1rem;
-        border-radius: 0.5rem;
-        max-width: 80%;
-    }
-    
-    .chat-message.user {
-        background-color: var(--bg-light);
-        margin-left: auto;
-        border: 1px solid var(--border-color);
-    }
-    
-    .chat-message.assistant {
-        background-color: var(--primary-color);
-        color: white;
-        margin-right: auto;
-    }
-    
-    .chat-form {
-        margin-top: 1rem;
-    }
-    
-    .lev-profile {
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-        color: white;
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .lev-profile img {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        border: 3px solid white;
-        object-fit: cover;
-    }
-    
-    .recommendation-card {
-        border-left: 4px solid;
-        margin-bottom: 1rem;
-    }
-    
-    .recommendation-card.critical {
-        border-left-color: #dc3545;
-    }
-    
-    .recommendation-card.high {
-        border-left-color: #fd7e14;
-    }
-    
-    .recommendation-card.medium {
-        border-left-color: #0d6efd;
-    }
-    
-    .recommendation-card.low {
-        border-left-color: #198754;
-    }
+  /* Levy Audit Module Styling */
+  .audit-section {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--primary-color);
+  }
+
+  .audit-card {
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+  }
+
+  .audit-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .audit-card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    background: linear-gradient(
+      90deg,
+      var(--primary-color) 0%,
+      var(--secondary-color) 100%
+    );
+    color: white;
+    font-weight: 600;
+  }
+
+  .compliance-high {
+    color: #198754;
+  }
+
+  .compliance-medium {
+    color: #0d6efd;
+  }
+
+  .compliance-low {
+    color: #ffc107;
+  }
+
+  .compliance-critical {
+    color: #dc3545;
+  }
+
+  .audit-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .chat-container {
+    height: 60vh;
+    overflow-y: auto;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .chat-message {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    max-width: 80%;
+  }
+
+  .chat-message.user {
+    background-color: var(--bg-light);
+    margin-left: auto;
+    border: 1px solid var(--border-color);
+  }
+
+  .chat-message.assistant {
+    background-color: var(--primary-color);
+    color: white;
+    margin-right: auto;
+  }
+
+  .chat-form {
+    margin-top: 1rem;
+  }
+
+  .lev-profile {
+    background: linear-gradient(
+      135deg,
+      var(--primary-color) 0%,
+      var(--secondary-color) 100%
+    );
+    color: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .lev-profile img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    object-fit: cover;
+  }
+
+  .recommendation-card {
+    border-left: 4px solid;
+    margin-bottom: 1rem;
+  }
+
+  .recommendation-card.critical {
+    border-left-color: #dc3545;
+  }
+
+  .recommendation-card.high {
+    border-left-color: #fd7e14;
+  }
+
+  .recommendation-card.medium {
+    border-left-color: #0d6efd;
+  }
+
+  .recommendation-card.low {
+    border-left-color: #198754;
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <!-- Custom levy audit content replaced by child templates -->
-{% block levy_audit_content %}{% endblock %}
-{% endblock %}
-
-{% block scripts %}
+{% block levy_audit_content %}{% endblock %} {% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Scroll chat to bottom when loaded
-        const chatContainer = document.querySelector('.chat-container');
-        if (chatContainer) {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+  document.addEventListener("DOMContentLoaded", function () {
+    // Scroll chat to bottom when loaded
+    const chatContainer = document.querySelector(".chat-container");
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Add loading indicator for audit operations
+    const auditForms = document.querySelectorAll(".audit-form");
+    auditForms.forEach((form) => {
+      form.addEventListener("submit", function () {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.innerHTML =
+            '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+          submitBtn.disabled = true;
         }
-        
-        // Add loading indicator for audit operations
-        const auditForms = document.querySelectorAll('.audit-form');
-        auditForms.forEach(form => {
-            form.addEventListener('submit', function() {
-                const submitBtn = this.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
-                    submitBtn.disabled = true;
-                }
-                
-                // Show loading overlay
-                const loadingOverlay = document.createElement('div');
-                loadingOverlay.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50';
-                loadingOverlay.style.zIndex = '9999';
-                loadingOverlay.innerHTML = `
+
+        // Show loading overlay
+        const loadingOverlay = document.createElement("div");
+        loadingOverlay.className =
+          "position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50";
+        loadingOverlay.style.zIndex = "9999";
+        loadingOverlay.innerHTML = `
                     <div class="card p-4">
                         <div class="text-center">
                             <div class="spinner-border text-primary mb-3" role="status">
@@ -170,15 +172,19 @@
                         </div>
                     </div>
                 `;
-                document.body.appendChild(loadingOverlay);
-            });
-        });
-        
-        // Initialize tooltips
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-        
-        console.log("Levy Audit Module JS initialized");
+        document.body.appendChild(loadingOverlay);
+      });
     });
+
+    // Initialize tooltips
+    const tooltipTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="tooltip"]',
+    );
+    const tooltipList = [...tooltipTriggerList].map(
+      (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+    );
+
+    console.log("Levy Audit Module JS initialized");
+  });
 </script>
 {% endblock %}

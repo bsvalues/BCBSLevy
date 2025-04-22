@@ -1,235 +1,310 @@
-{% extends 'simple_base.html' %}
-
-{% block title %}Property Tax Information Portal - Benton County{% endblock %}
-
-{% block content %}
+{% extends 'simple_base.html' %} {% block title %}Property Tax Information
+Portal - Benton County{% endblock %} {% block content %}
 <div class="container py-5">
-    <!-- Hero Section -->
-    <div class="row mb-5 align-items-center">
-        <div class="col-lg-6">
-            <h1 class="display-4 fw-bold mb-3">Benton County Property Tax Portal</h1>
-            <p class="lead mb-4">Find information about your property taxes, search for properties, and explore tax districts in Benton County, Washington.</p>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                <a href="{{ url_for('public.search') }}" class="btn btn-primary btn-lg px-4 me-md-2">
-                    <i class="bi bi-search me-2"></i>Search Properties
+  <!-- Hero Section -->
+  <div class="row mb-5 align-items-center">
+    <div class="col-lg-6">
+      <h1 class="display-4 fw-bold mb-3">Benton County Property Tax Portal</h1>
+      <p class="lead mb-4">
+        Find information about your property taxes, search for properties, and
+        explore tax districts in Benton County, Washington.
+      </p>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+        <a
+          href="{{ url_for('public.search') }}"
+          class="btn btn-primary btn-lg px-4 me-md-2"
+        >
+          <i class="bi bi-search me-2"></i>Search Properties
+        </a>
+        <a
+          href="{{ url_for('public.district_list') }}"
+          class="btn btn-outline-secondary btn-lg px-4"
+        >
+          <i class="bi bi-building me-2"></i>View Tax Districts
+        </a>
+      </div>
+    </div>
+    <div class="col-lg-6 d-none d-lg-block">
+      <img
+        src="{{ url_for('static', filename='images/property-search.svg') }}"
+        alt="Property Search Illustration"
+        class="img-fluid"
+      />
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="row mb-5">
+    <div class="col-md-4 mb-4 mb-md-0">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="display-4 fw-bold text-primary mb-3">
+            {{ "{:,}".format(property_count) }}
+          </div>
+          <h3 class="h5">Properties</h3>
+          <p class="text-muted small">Searchable properties in Benton County</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-4 mb-md-0">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="display-4 fw-bold text-primary mb-3">
+            {{ district_count }}
+          </div>
+          <h3 class="h5">Tax Districts</h3>
+          <p class="text-muted small">
+            Special purpose districts in the county
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="display-4 fw-bold text-primary mb-3">
+            {{ latest_year }}
+          </div>
+          <h3 class="h5">Current Tax Year</h3>
+          <p class="text-muted small">Most recent assessment data available</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Search Box -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow">
+        <div class="card-body p-4">
+          <h2 class="h4 mb-4">Quick Property Search</h2>
+          <form action="{{ url_for('public.search') }}" method="post">
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label for="property_id" class="form-label">Property ID</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="property_id"
+                  name="property_id"
+                  placeholder="Enter property ID"
+                />
+              </div>
+              <div class="col-md-4">
+                <label for="address" class="form-label">Property Address</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="address"
+                  name="address"
+                  placeholder="Enter street address"
+                />
+              </div>
+              <div class="col-md-4">
+                <label for="owner_name" class="form-label">Owner Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="owner_name"
+                  name="owner_name"
+                  placeholder="Enter owner's name"
+                />
+              </div>
+              <div
+                class="col-12 d-grid gap-2 d-md-flex justify-content-md-end mt-4"
+              >
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-search me-2"></i>Search Properties
+                </button>
+                <a
+                  href="{{ url_for('public.search') }}"
+                  class="btn btn-outline-secondary"
+                >
+                  <i class="bi bi-sliders me-2"></i>Advanced Search
                 </a>
-                <a href="{{ url_for('public.district_list') }}" class="btn btn-outline-secondary btn-lg px-4">
-                    <i class="bi bi-building me-2"></i>View Tax Districts
-                </a>
+              </div>
             </div>
+          </form>
         </div>
-        <div class="col-lg-6 d-none d-lg-block">
-            <img src="{{ url_for('static', filename='images/property-search.svg') }}" alt="Property Search Illustration" class="img-fluid">
-        </div>
+      </div>
     </div>
-    
-    <!-- Stats Section -->
-    <div class="row mb-5">
-        <div class="col-md-4 mb-4 mb-md-0">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-4 fw-bold text-primary mb-3">{{ "{:,}".format(property_count) }}</div>
-                    <h3 class="h5">Properties</h3>
-                    <p class="text-muted small">Searchable properties in Benton County</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4 mb-md-0">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-4 fw-bold text-primary mb-3">{{ district_count }}</div>
-                    <h3 class="h5">Tax Districts</h3>
-                    <p class="text-muted small">Special purpose districts in the county</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center">
-                    <div class="display-4 fw-bold text-primary mb-3">{{ latest_year }}</div>
-                    <h3 class="h5">Current Tax Year</h3>
-                    <p class="text-muted small">Most recent assessment data available</p>
-                </div>
-            </div>
-        </div>
+  </div>
+
+  <!-- Features -->
+  <div class="row mb-5">
+    <div class="col-12 mb-4">
+      <h2 class="h3 text-center">Property Tax Information Portal Features</h2>
     </div>
-    
-    <!-- Quick Search Box -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow">
-                <div class="card-body p-4">
-                    <h2 class="h4 mb-4">Quick Property Search</h2>
-                    <form action="{{ url_for('public.search') }}" method="post">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label for="property_id" class="form-label">Property ID</label>
-                                <input type="text" class="form-control" id="property_id" name="property_id" placeholder="Enter property ID">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="address" class="form-label">Property Address</label>
-                                <input type="text" class="form-control" id="address" name="address" placeholder="Enter street address">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="owner_name" class="form-label">Owner Name</label>
-                                <input type="text" class="form-control" id="owner_name" name="owner_name" placeholder="Enter owner's name">
-                            </div>
-                            <div class="col-12 d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-search me-2"></i>Search Properties
-                                </button>
-                                <a href="{{ url_for('public.search') }}" class="btn btn-outline-secondary">
-                                    <i class="bi bi-sliders me-2"></i>Advanced Search
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center p-4">
+          <div
+            class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3"
+          >
+            <i class="bi bi-search text-primary fs-2"></i>
+          </div>
+          <h3 class="h5">Property Search</h3>
+          <p class="card-text">
+            Search for properties by parcel ID, address, or owner name to view
+            detailed tax information.
+          </p>
+          <a
+            href="{{ url_for('public.search') }}"
+            class="btn btn-sm btn-outline-primary"
+            >Search Now</a
+          >
         </div>
+      </div>
     </div>
-    
-    <!-- Features -->
-    <div class="row mb-5">
-        <div class="col-12 mb-4">
-            <h2 class="h3 text-center">Property Tax Information Portal Features</h2>
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center p-4">
+          <div
+            class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3"
+          >
+            <i class="bi bi-bar-chart text-primary fs-2"></i>
+          </div>
+          <h3 class="h5">Tax Comparison</h3>
+          <p class="card-text">
+            Compare property tax information across multiple years or between
+            different properties.
+          </p>
+          <a
+            href="{{ url_for('public.compare_properties') }}"
+            class="btn btn-sm btn-outline-primary"
+            >Compare Properties</a
+          >
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-4">
-                    <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3">
-                        <i class="bi bi-search text-primary fs-2"></i>
-                    </div>
-                    <h3 class="h5">Property Search</h3>
-                    <p class="card-text">Search for properties by parcel ID, address, or owner name to view detailed tax information.</p>
-                    <a href="{{ url_for('public.search') }}" class="btn btn-sm btn-outline-primary">Search Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-4">
-                    <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3">
-                        <i class="bi bi-bar-chart text-primary fs-2"></i>
-                    </div>
-                    <h3 class="h5">Tax Comparison</h3>
-                    <p class="card-text">Compare property tax information across multiple years or between different properties.</p>
-                    <a href="{{ url_for('public.compare_properties') }}" class="btn btn-sm btn-outline-primary">Compare Properties</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body text-center p-4">
-                    <div class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3">
-                        <i class="bi bi-building text-primary fs-2"></i>
-                    </div>
-                    <h3 class="h5">Tax District Information</h3>
-                    <p class="card-text">View detailed information about tax districts, their levy rates, and statutory limits.</p>
-                    <a href="{{ url_for('public.district_list') }}" class="btn btn-sm btn-outline-primary">View Districts</a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    
-    <!-- Information Resources -->
-    <div class="row mb-5">
-        <div class="col-12 mb-4">
-            <h2 class="h3 text-center">Property Tax Information & Resources</h2>
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center p-4">
+          <div
+            class="icon-square text-bg-light d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3"
+          >
+            <i class="bi bi-building text-primary fs-2"></i>
+          </div>
+          <h3 class="h5">Tax District Information</h3>
+          <p class="card-text">
+            View detailed information about tax districts, their levy rates, and
+            statutory limits.
+          </p>
+          <a
+            href="{{ url_for('public.district_list') }}"
+            class="btn btn-sm btn-outline-primary"
+            >View Districts</a
+          >
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <h3 class="h5 card-title mb-3">Understanding Your Property Tax</h3>
-                    <p>Property taxes fund essential services such as schools, fire protection, and other local government services. Your tax bill is calculated based on:</p>
-                    <ul>
-                        <li>Your property's assessed value</li>
-                        <li>The levy rates for each taxing district where your property is located</li>
-                        <li>Any applicable exemptions or special programs</li>
-                    </ul>
-                    <div class="text-center mt-3">
-                        <a href="#" class="btn btn-sm btn-outline-primary">Learn More</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <h3 class="h5 card-title mb-3">Property Tax Calendar</h3>
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Event</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>January 1</td>
-                                    <td>Assessment date for property valuation</td>
-                                </tr>
-                                <tr>
-                                    <td>April 30</td>
-                                    <td>First half property taxes due</td>
-                                </tr>
-                                <tr>
-                                    <td>October 31</td>
-                                    <td>Second half property taxes due</td>
-                                </tr>
-                                <tr>
-                                    <td>November-December</td>
-                                    <td>Levy certification for next tax year</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="#" class="btn btn-sm btn-outline-primary">Full Calendar</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    
-    <!-- Contact Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow bg-light">
-                <div class="card-body p-4">
-                    <div class="row align-items-center">
-                        <div class="col-lg-8">
-                            <h2 class="h4 mb-3">Need Assistance?</h2>
-                            <p class="mb-lg-0">For questions about your property tax assessment, payments, or other inquiries, please contact the Benton County Assessor's Office.</p>
-                        </div>
-                        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                            <a href="#" class="btn btn-primary">Contact Us</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  </div>
+
+  <!-- Information Resources -->
+  <div class="row mb-5">
+    <div class="col-12 mb-4">
+      <h2 class="h3 text-center">Property Tax Information & Resources</h2>
     </div>
+    <div class="col-md-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <h3 class="h5 card-title mb-3">Understanding Your Property Tax</h3>
+          <p>
+            Property taxes fund essential services such as schools, fire
+            protection, and other local government services. Your tax bill is
+            calculated based on:
+          </p>
+          <ul>
+            <li>Your property's assessed value</li>
+            <li>
+              The levy rates for each taxing district where your property is
+              located
+            </li>
+            <li>Any applicable exemptions or special programs</li>
+          </ul>
+          <div class="text-center mt-3">
+            <a href="#" class="btn btn-sm btn-outline-primary">Learn More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <h3 class="h5 card-title mb-3">Property Tax Calendar</h3>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Event</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>January 1</td>
+                  <td>Assessment date for property valuation</td>
+                </tr>
+                <tr>
+                  <td>April 30</td>
+                  <td>First half property taxes due</td>
+                </tr>
+                <tr>
+                  <td>October 31</td>
+                  <td>Second half property taxes due</td>
+                </tr>
+                <tr>
+                  <td>November-December</td>
+                  <td>Levy certification for next tax year</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center mt-3">
+            <a href="#" class="btn btn-sm btn-outline-primary">Full Calendar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow bg-light">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <div class="col-lg-8">
+              <h2 class="h4 mb-3">Need Assistance?</h2>
+              <p class="mb-lg-0">
+                For questions about your property tax assessment, payments, or
+                other inquiries, please contact the Benton County Assessor's
+                Office.
+              </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+              <a href="#" class="btn btn-primary">Contact Us</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
-    // Add any JavaScript specific to this page
-    document.addEventListener('DOMContentLoaded', function() {
-        // You can add functionality like autocomplete for search boxes here
-    });
+  // Add any JavaScript specific to this page
+  document.addEventListener("DOMContentLoaded", function () {
+    // You can add functionality like autocomplete for search boxes here
+  });
 </script>
-{% endblock %}
-
-{% block extra_css %}
+{% endblock %} {% block extra_css %}
 <style>
-    /* Custom styles specific to the public portal */
-    .icon-square {
-        width: 3rem;
-        height: 3rem;
-        border-radius: 0.75rem;
-    }
+  /* Custom styles specific to the public portal */
+  .icon-square {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+  }
 </style>
 {% endblock %}

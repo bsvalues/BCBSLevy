@@ -1,74 +1,103 @@
-{% extends 'base.html' %}
-
-{% block title %}Create Year-End Archive{% endblock %}
-
+{% extends 'base.html' %} {% block title %}Create Year-End Archive{% endblock %}
 {% block content %}
 <div class="container my-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="mb-3"><i class="bi bi-archive"></i> Create Year-End Archive</h1>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('data_archives') }}">Data Archives</a></li>
-                    <li class="breadcrumb-item active">Create Year-End Archive</li>
-                </ol>
-            </nav>
-        </div>
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="mb-3">
+        <i class="bi bi-archive"></i> Create Year-End Archive
+      </h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('data_archives') }}">Data Archives</a>
+          </li>
+          <li class="breadcrumb-item active">Create Year-End Archive</li>
+        </ol>
+      </nav>
     </div>
-    
-    <!-- Create Year-End Archive Form -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Year-End Archive Details</h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('create_year_end_archive') }}">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="year" class="form-label">Year to Archive</label>
-                                <select name="year" id="year" class="form-select" required>
-                                    {% for year in years %}
-                                    <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
-                                    {% endfor %}
-                                </select>
-                                <div class="form-text">Select the tax year to archive.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="retention_years" class="form-label">Retention Period (years)</label>
-                                <select name="retention_years" id="retention_years" class="form-select">
-                                    <option value="1">1 Year</option>
-                                    <option value="3">3 Years</option>
-                                    <option value="5" selected>5 Years</option>
-                                    <option value="7">7 Years</option>
-                                    <option value="10">10 Years</option>
-                                    <option value="0">Indefinite (No Expiration)</option>
-                                </select>
-                                <div class="form-text">How long to keep these archives.</div>
-                            </div>
-                        </div>
-                        
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> 
-                            <p>This will create the following archives for the selected year:</p>
-                            <ul>
-                                <li>All Properties</li>
-                                <li>All Tax Codes</li>
-                                <li>Tax Districts for the selected year</li>
-                                <li>Historical Rates for the selected year</li>
-                            </ul>
-                            <p class="mb-0">For compliance and audit purposes, it's recommended to create year-end archives before starting a new tax year.</p>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ url_for('data_archives') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Year-End Archives</button>
-                        </div>
-                    </form>
-                </div>
+  </div>
+
+  <!-- Create Year-End Archive Form -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-calendar-check"></i> Year-End Archive Details
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('create_year_end_archive') }}">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="year" class="form-label">Year to Archive</label>
+                <select name="year" id="year" class="form-select" required>
+                  {% for year in years %}
+                  <option
+                    value="{{ year }}"
+                    {%
+                    if
+                    year=""
+                    ="selected_year"
+                    %}selected{%
+                    endif
+                    %}
+                  >
+                    {{ year }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="form-text">Select the tax year to archive.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="retention_years" class="form-label"
+                  >Retention Period (years)</label
+                >
+                <select
+                  name="retention_years"
+                  id="retention_years"
+                  class="form-select"
+                >
+                  <option value="1">1 Year</option>
+                  <option value="3">3 Years</option>
+                  <option value="5" selected>5 Years</option>
+                  <option value="7">7 Years</option>
+                  <option value="10">10 Years</option>
+                  <option value="0">Indefinite (No Expiration)</option>
+                </select>
+                <div class="form-text">How long to keep these archives.</div>
+              </div>
             </div>
+
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              <p>
+                This will create the following archives for the selected year:
+              </p>
+              <ul>
+                <li>All Properties</li>
+                <li>All Tax Codes</li>
+                <li>Tax Districts for the selected year</li>
+                <li>Historical Rates for the selected year</li>
+              </ul>
+              <p class="mb-0">
+                For compliance and audit purposes, it's recommended to create
+                year-end archives before starting a new tax year.
+              </p>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{{ url_for('data_archives') }}" class="btn btn-secondary"
+                >Cancel</a
+              >
+              <button type="submit" class="btn btn-primary">
+                Create Year-End Archives
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

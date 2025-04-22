@@ -1,10 +1,13 @@
-{% extends 'base.html' %}
-
-{% block title %}Interactive Forecasting Dashboard{% endblock %}
-
-{% block styles %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/gridstack@7.2.3/dist/gridstack.min.css" rel="stylesheet">
+{% extends 'base.html' %} {% block title %}Interactive Forecasting Dashboard{%
+endblock %} {% block styles %}
+<link
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
+  rel="stylesheet"
+/>
+<link
+  href="https://cdn.jsdelivr.net/npm/gridstack@7.2.3/dist/gridstack.min.css"
+  rel="stylesheet"
+/>
 <style>
   .panel-card {
     height: 100%;
@@ -35,7 +38,7 @@
     top: 10px;
     right: 10px;
     z-index: 10;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
     border-radius: 4px;
     padding: 5px;
   }
@@ -45,14 +48,14 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
   }
   .chart-tooltip {
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 4px;
     padding: 10px;
     color: white;
@@ -70,7 +73,7 @@
   }
   .data-metric:hover {
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   }
   .data-metric h3 {
     font-size: 1.2rem;
@@ -121,13 +124,11 @@
     z-index: 1000;
   }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container-fluid py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>
-      <i class="bi bi-graph-up-arrow"></i> 
+      <i class="bi bi-graph-up-arrow"></i>
       Interactive Forecasting Dashboard
     </h1>
     <div>
@@ -143,14 +144,18 @@
   <!-- Filters Panel -->
   <div class="card mb-4 filter-panel" id="filters-panel">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">
-        <i class="bi bi-funnel"></i> Dashboard Filters
-      </h5>
+      <h5 class="mb-0"><i class="bi bi-funnel"></i> Dashboard Filters</h5>
       <div>
-        <button class="btn btn-sm btn-outline-secondary me-2" id="apply-filters">
+        <button
+          class="btn btn-sm btn-outline-secondary me-2"
+          id="apply-filters"
+        >
           <i class="bi bi-check-lg"></i> Apply
         </button>
-        <button class="btn btn-sm btn-outline-secondary me-2" id="reset-filters">
+        <button
+          class="btn btn-sm btn-outline-secondary me-2"
+          id="reset-filters"
+        >
           <i class="bi bi-arrow-counterclockwise"></i> Reset
         </button>
         <span class="toggle-filters">
@@ -164,16 +169,34 @@
           <label for="tax-code-filter" class="form-label">Tax Code</label>
           <select class="form-select" id="tax-code-filter" multiple>
             {% for tax_code in tax_codes %}
-            <option value="{{ tax_code.code }}">{{ tax_code.code }} - {{ tax_code.description }}</option>
+            <option value="{{ tax_code.code }}">
+              {{ tax_code.code }} - {{ tax_code.description }}
+            </option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-3 mb-3">
           <label for="year-range-filter" class="form-label">Year Range</label>
           <div class="input-group">
-            <input type="number" class="form-control" id="year-start" placeholder="Start" min="2000" max="{{ current_year + 10 }}" value="{{ current_year - 5 }}">
+            <input
+              type="number"
+              class="form-control"
+              id="year-start"
+              placeholder="Start"
+              min="2000"
+              max="{{ current_year + 10 }}"
+              value="{{ current_year - 5 }}"
+            />
             <span class="input-group-text">to</span>
-            <input type="number" class="form-control" id="year-end" placeholder="End" min="2000" max="{{ current_year + 10 }}" value="{{ current_year + 3 }}">
+            <input
+              type="number"
+              class="form-control"
+              id="year-end"
+              placeholder="End"
+              min="2000"
+              max="{{ current_year + 10 }}"
+              value="{{ current_year + 3 }}"
+            />
           </div>
         </div>
         <div class="col-md-3 mb-3">
@@ -203,7 +226,9 @@
           </select>
         </div>
         <div class="col-md-3 mb-3">
-          <label for="visualization-type" class="form-label">Visualization Type</label>
+          <label for="visualization-type" class="form-label"
+            >Visualization Type</label
+          >
           <select class="form-select" id="visualization-type">
             <option value="line" selected>Line Chart</option>
             <option value="bar">Bar Chart</option>
@@ -212,7 +237,9 @@
           </select>
         </div>
         <div class="col-md-3 mb-3">
-          <label for="comparison-type" class="form-label">Comparison Type</label>
+          <label for="comparison-type" class="form-label"
+            >Comparison Type</label
+          >
           <select class="form-select" id="comparison-type">
             <option value="overlay" selected>Overlay</option>
             <option value="sideBySide">Side by Side</option>
@@ -220,27 +247,45 @@
           </select>
         </div>
         <div class="col-md-3 mb-3">
-          <label for="confidence-intervals" class="form-label">Display Options</label>
+          <label for="confidence-intervals" class="form-label"
+            >Display Options</label
+          >
           <div class="form-check form-switch mt-2">
-            <input class="form-check-input" type="checkbox" role="switch" id="show-confidence-intervals" checked>
-            <label class="form-check-label" for="show-confidence-intervals">Show Confidence Intervals</label>
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="show-confidence-intervals"
+              checked
+            />
+            <label class="form-check-label" for="show-confidence-intervals"
+              >Show Confidence Intervals</label
+            >
           </div>
           <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="show-anomalies" checked>
-            <label class="form-check-label" for="show-anomalies">Highlight Anomalies</label>
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="show-anomalies"
+              checked
+            />
+            <label class="form-check-label" for="show-anomalies"
+              >Highlight Anomalies</label
+            >
           </div>
         </div>
       </div>
     </div>
   </div>
-  
+
   <!-- Dynamic Dashboard Grid -->
   <div class="grid-stack" id="dashboard-grid">
     <!-- Panels will be created dynamically -->
   </div>
-  
+
   <!-- Loading State -->
-  <div id="dashboard-loading" class="loading-overlay" style="display: none;">
+  <div id="dashboard-loading" class="loading-overlay" style="display: none">
     <div class="text-center">
       <div class="spinner-border text-primary mb-3" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -249,78 +294,131 @@
       <p class="text-light">This may take a few moments</p>
     </div>
   </div>
-  
+
   <!-- Dashboard Controls -->
   <div id="dashboard-controls" class="d-flex flex-column gap-2">
-    <button class="btn btn-primary rounded-circle" data-bs-toggle="tooltip" title="Add Panel" id="add-panel-btn">
+    <button
+      class="btn btn-primary rounded-circle"
+      data-bs-toggle="tooltip"
+      title="Add Panel"
+      id="add-panel-btn"
+    >
       <i class="bi bi-plus-lg"></i>
     </button>
-    <button class="btn btn-info rounded-circle" data-bs-toggle="tooltip" title="Save Layout" id="save-layout-btn">
+    <button
+      class="btn btn-info rounded-circle"
+      data-bs-toggle="tooltip"
+      title="Save Layout"
+      id="save-layout-btn"
+    >
       <i class="bi bi-save"></i>
     </button>
-    <button class="btn btn-secondary rounded-circle" data-bs-toggle="tooltip" title="Reset Layout" id="reset-layout-btn">
+    <button
+      class="btn btn-secondary rounded-circle"
+      data-bs-toggle="tooltip"
+      title="Reset Layout"
+      id="reset-layout-btn"
+    >
       <i class="bi bi-arrow-repeat"></i>
     </button>
   </div>
-  
+
   <!-- Panel Templates (Hidden) -->
   <div class="d-none" id="panel-templates">
     <!-- Time Series Panel Template -->
     <div id="time-series-template">
       <div class="panel-card card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
           <h5 class="panel-title mb-0">Time Series Chart</h5>
           <div class="btn-group">
-            <button class="btn btn-sm btn-outline-secondary panel-settings" data-bs-toggle="tooltip" title="Settings">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-settings"
+              data-bs-toggle="tooltip"
+              title="Settings"
+            >
               <i class="bi bi-gear"></i>
             </button>
-            <button class="btn btn-sm btn-outline-secondary panel-export" data-bs-toggle="tooltip" title="Export">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-export"
+              data-bs-toggle="tooltip"
+              title="Export"
+            >
               <i class="bi bi-download"></i>
             </button>
-            <button class="btn btn-sm btn-outline-secondary panel-close" data-bs-toggle="tooltip" title="Close">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-close"
+              data-bs-toggle="tooltip"
+              title="Close"
+            >
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
         </div>
         <div class="card-body panel-body">
-          <div class="chart-container" style="height: 100%;"></div>
+          <div class="chart-container" style="height: 100%"></div>
         </div>
       </div>
     </div>
-    
+
     <!-- Map Panel Template -->
     <div id="map-template">
       <div class="panel-card card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
           <h5 class="panel-title mb-0">District Map</h5>
           <div class="btn-group">
-            <button class="btn btn-sm btn-outline-secondary panel-settings" data-bs-toggle="tooltip" title="Settings">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-settings"
+              data-bs-toggle="tooltip"
+              title="Settings"
+            >
               <i class="bi bi-gear"></i>
             </button>
-            <button class="btn btn-sm btn-outline-secondary panel-export" data-bs-toggle="tooltip" title="Export">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-export"
+              data-bs-toggle="tooltip"
+              title="Export"
+            >
               <i class="bi bi-download"></i>
             </button>
-            <button class="btn btn-sm btn-outline-secondary panel-close" data-bs-toggle="tooltip" title="Close">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-close"
+              data-bs-toggle="tooltip"
+              title="Close"
+            >
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
         </div>
         <div class="card-body panel-body">
-          <div class="map-container" style="height: 100%;"></div>
+          <div class="map-container" style="height: 100%"></div>
         </div>
       </div>
     </div>
-    
+
     <!-- Statistics Panel Template -->
     <div id="statistics-template">
       <div class="panel-card card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
           <h5 class="panel-title mb-0">Summary Statistics</h5>
           <div class="btn-group">
-            <button class="btn btn-sm btn-outline-secondary panel-export" data-bs-toggle="tooltip" title="Export">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-export"
+              data-bs-toggle="tooltip"
+              title="Export"
+            >
               <i class="bi bi-download"></i>
             </button>
-            <button class="btn btn-sm btn-outline-secondary panel-close" data-bs-toggle="tooltip" title="Close">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-close"
+              data-bs-toggle="tooltip"
+              title="Close"
+            >
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
@@ -330,17 +428,27 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Recommendations Panel Template -->
     <div id="recommendations-template">
       <div class="panel-card card">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
           <h5 class="panel-title mb-0">AI Recommendations</h5>
           <div class="btn-group">
-            <button class="btn btn-sm btn-outline-secondary panel-export" data-bs-toggle="tooltip" title="Export">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-export"
+              data-bs-toggle="tooltip"
+              title="Export"
+            >
               <i class="bi bi-download"></i>
             </button>
-            <button class="btn btn-sm btn-outline-secondary panel-close" data-bs-toggle="tooltip" title="Close">
+            <button
+              class="btn btn-sm btn-outline-secondary panel-close"
+              data-bs-toggle="tooltip"
+              title="Close"
+            >
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
@@ -351,19 +459,34 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Panel Settings Modal -->
-  <div class="modal fade" id="panel-settings-modal" tabindex="-1" aria-labelledby="panel-settings-modal-label" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="panel-settings-modal"
+    tabindex="-1"
+    aria-labelledby="panel-settings-modal-label"
+    aria-hidden="true"
+  >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="panel-settings-modal-label">Panel Settings</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="panel-settings-modal-label">
+            Panel Settings
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="panel-title-input" class="form-label">Panel Title</label>
-            <input type="text" class="form-control" id="panel-title-input">
+            <label for="panel-title-input" class="form-label"
+              >Panel Title</label
+            >
+            <input type="text" class="form-control" id="panel-title-input" />
           </div>
           <div class="mb-3">
             <label for="panel-chart-type" class="form-label">Chart Type</label>
@@ -375,41 +498,77 @@
             </select>
           </div>
           <div class="mb-3">
-            <label for="panel-data-source" class="form-label">Data Source</label>
+            <label for="panel-data-source" class="form-label"
+              >Data Source</label
+            >
             <select class="form-select" id="panel-data-source">
               <option value="filter">Use Dashboard Filters</option>
               <option value="custom">Custom Data Source</option>
             </select>
           </div>
           <div class="mb-3 form-check">
-            <input type="checkbox" class="form-check-input" id="panel-auto-update">
-            <label class="form-check-label" for="panel-auto-update">Auto-update with filter changes</label>
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="panel-auto-update"
+            />
+            <label class="form-check-label" for="panel-auto-update"
+              >Auto-update with filter changes</label
+            >
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" id="save-panel-settings">Save Settings</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="save-panel-settings"
+          >
+            Save Settings
+          </button>
         </div>
       </div>
     </div>
   </div>
-  
+
   <!-- Add Panel Modal -->
-  <div class="modal fade" id="add-panel-modal" tabindex="-1" aria-labelledby="add-panel-modal-label" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="add-panel-modal"
+    tabindex="-1"
+    aria-labelledby="add-panel-modal-label"
+    aria-hidden="true"
+  >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="add-panel-modal-label">Add Panel</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
         <div class="modal-body">
           <div class="row">
             <div class="col-md-6 mb-3">
-              <div class="card h-100 panel-option" data-panel-type="time_series">
+              <div
+                class="card h-100 panel-option"
+                data-panel-type="time_series"
+              >
                 <div class="card-body text-center">
                   <i class="bi bi-graph-up-arrow fs-2 mb-3"></i>
                   <h5>Time Series Chart</h5>
-                  <p class="small text-muted">Display forecast trends and historical data</p>
+                  <p class="small text-muted">
+                    Display forecast trends and historical data
+                  </p>
                 </div>
               </div>
             </div>
@@ -418,7 +577,9 @@
                 <div class="card-body text-center">
                   <i class="bi bi-map fs-2 mb-3"></i>
                   <h5>District Map</h5>
-                  <p class="small text-muted">Geographic visualization of tax districts</p>
+                  <p class="small text-muted">
+                    Geographic visualization of tax districts
+                  </p>
                 </div>
               </div>
             </div>
@@ -427,396 +588,464 @@
                 <div class="card-body text-center">
                   <i class="bi bi-clipboard-data fs-2 mb-3"></i>
                   <h5>Summary Statistics</h5>
-                  <p class="small text-muted">Key metrics and statistical data</p>
+                  <p class="small text-muted">
+                    Key metrics and statistical data
+                  </p>
                 </div>
               </div>
             </div>
             <div class="col-md-6 mb-3">
-              <div class="card h-100 panel-option" data-panel-type="recommendations">
+              <div
+                class="card h-100 panel-option"
+                data-panel-type="recommendations"
+              >
                 <div class="card-body text-center">
                   <i class="bi bi-lightbulb fs-2 mb-3"></i>
                   <h5>AI Recommendations</h5>
-                  <p class="small text-muted">AI-generated insights and suggestions</p>
+                  <p class="small text-muted">
+                    AI-generated insights and suggestions
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
+{% endblock %} {% block scripts %}
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gridstack@7.2.3/dist/gridstack-all.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize tooltips
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
-  
-  // Initialize GridStack for the dashboard
-  const grid = GridStack.init({
-    column: 12,
-    margin: 10,
-    cellHeight: 80,
-    animate: true,
-    draggable: {
-      handle: '.card-header'
-    },
-    resizable: {
-      handles: 'e,se,s,sw,w'
-    }
-  });
-  
-  // Toggle filters panel
-  const toggleFilters = document.querySelector('.toggle-filters');
-  const filtersPanel = document.getElementById('filters-panel');
-  
-  toggleFilters.addEventListener('click', function() {
-    filtersPanel.classList.toggle('collapsed');
-    this.querySelector('i').classList.toggle('bi-chevron-up');
-    this.querySelector('i').classList.toggle('bi-chevron-down');
-  });
-  
-  // Dashboard state
-  let dashboardState = {
-    filters: {
-      taxCodes: [],
-      years: [2020, 2025],
-      modelType: 'auto',
-      scenarios: ['baseline'],
-      districts: [],
-      visualization: 'line',
-      comparison: 'overlay',
-      showConfidenceIntervals: true,
-      showAnomalies: true
-    },
-    panels: []
-  };
-  
-  // Panel management
-  function addPanel(type, x, y, width, height) {
-    // Get the template for the panel type
-    const templateId = `${type.replace('_', '-')}-template`;
-    const template = document.getElementById(templateId);
-    
-    if (!template) {
-      console.error(`Template not found for panel type: ${type}`);
-      return;
-    }
-    
-    // Create a new panel
-    const panelHtml = template.innerHTML;
-    const panelElement = document.createElement('div');
-    panelElement.className = 'grid-stack-item';
-    panelElement.innerHTML = panelHtml;
-    panelElement.setAttribute('data-panel-type', type);
-    
-    // Add the panel to the grid
-    grid.addWidget({
-      el: panelElement,
-      x: x || 0,
-      y: y || 0,
-      width: width || 6,
-      height: height || 5
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+    );
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-    
-    // Initialize the panel content
-    initializePanelContent(panelElement, type);
-    
-    // Add panel to dashboard state
-    dashboardState.panels.push({
-      type: type,
-      id: `panel-${Date.now()}`,
-      settings: {
-        title: panelElement.querySelector('.panel-title').textContent,
-        chartType: type === 'time_series' ? 'line' : undefined,
-        dataSource: 'filter',
-        autoUpdate: true
+
+    // Initialize GridStack for the dashboard
+    const grid = GridStack.init({
+      column: 12,
+      margin: 10,
+      cellHeight: 80,
+      animate: true,
+      draggable: {
+        handle: ".card-header",
+      },
+      resizable: {
+        handles: "e,se,s,sw,w",
+      },
+    });
+
+    // Toggle filters panel
+    const toggleFilters = document.querySelector(".toggle-filters");
+    const filtersPanel = document.getElementById("filters-panel");
+
+    toggleFilters.addEventListener("click", function () {
+      filtersPanel.classList.toggle("collapsed");
+      this.querySelector("i").classList.toggle("bi-chevron-up");
+      this.querySelector("i").classList.toggle("bi-chevron-down");
+    });
+
+    // Dashboard state
+    let dashboardState = {
+      filters: {
+        taxCodes: [],
+        years: [2020, 2025],
+        modelType: "auto",
+        scenarios: ["baseline"],
+        districts: [],
+        visualization: "line",
+        comparison: "overlay",
+        showConfidenceIntervals: true,
+        showAnomalies: true,
+      },
+      panels: [],
+    };
+
+    // Panel management
+    function addPanel(type, x, y, width, height) {
+      // Get the template for the panel type
+      const templateId = `${type.replace("_", "-")}-template`;
+      const template = document.getElementById(templateId);
+
+      if (!template) {
+        console.error(`Template not found for panel type: ${type}`);
+        return;
       }
-    });
-    
-    // Add event listeners to panel buttons
-    setupPanelEventListeners(panelElement);
-    
-    return panelElement;
-  }
-  
-  function setupPanelEventListeners(panelElement) {
-    const closeBtn = panelElement.querySelector('.panel-close');
-    const settingsBtn = panelElement.querySelector('.panel-settings');
-    const exportBtn = panelElement.querySelector('.panel-export');
-    
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function() {
-        const gridItem = this.closest('.grid-stack-item');
-        grid.removeWidget(gridItem);
-        
-        // Remove from dashboard state
-        const panelId = gridItem.getAttribute('data-panel-id');
-        dashboardState.panels = dashboardState.panels.filter(p => p.id !== panelId);
+
+      // Create a new panel
+      const panelHtml = template.innerHTML;
+      const panelElement = document.createElement("div");
+      panelElement.className = "grid-stack-item";
+      panelElement.innerHTML = panelHtml;
+      panelElement.setAttribute("data-panel-type", type);
+
+      // Add the panel to the grid
+      grid.addWidget({
+        el: panelElement,
+        x: x || 0,
+        y: y || 0,
+        width: width || 6,
+        height: height || 5,
       });
-    }
-    
-    if (settingsBtn) {
-      settingsBtn.addEventListener('click', function() {
-        const gridItem = this.closest('.grid-stack-item');
-        const panelId = gridItem.getAttribute('data-panel-id');
-        const panelType = gridItem.getAttribute('data-panel-type');
-        
-        // Find panel in state
-        const panelState = dashboardState.panels.find(p => p.id === panelId);
-        
-        // Populate settings modal
-        const titleInput = document.getElementById('panel-title-input');
-        const chartTypeSelect = document.getElementById('panel-chart-type');
-        const dataSourceSelect = document.getElementById('panel-data-source');
-        const autoUpdateCheckbox = document.getElementById('panel-auto-update');
-        
-        titleInput.value = panelState.settings.title;
-        if (panelType === 'time_series' && chartTypeSelect) {
-          chartTypeSelect.value = panelState.settings.chartType || 'line';
-          chartTypeSelect.parentElement.style.display = 'block';
-        } else {
-          chartTypeSelect.parentElement.style.display = 'none';
-        }
-        
-        dataSourceSelect.value = panelState.settings.dataSource || 'filter';
-        autoUpdateCheckbox.checked = panelState.settings.autoUpdate !== false;
-        
-        // Store current panel reference for the save button
-        document.getElementById('save-panel-settings').setAttribute('data-panel-id', panelId);
-        
-        // Show the modal
-        const modal = new bootstrap.Modal(document.getElementById('panel-settings-modal'));
-        modal.show();
+
+      // Initialize the panel content
+      initializePanelContent(panelElement, type);
+
+      // Add panel to dashboard state
+      dashboardState.panels.push({
+        type: type,
+        id: `panel-${Date.now()}`,
+        settings: {
+          title: panelElement.querySelector(".panel-title").textContent,
+          chartType: type === "time_series" ? "line" : undefined,
+          dataSource: "filter",
+          autoUpdate: true,
+        },
       });
+
+      // Add event listeners to panel buttons
+      setupPanelEventListeners(panelElement);
+
+      return panelElement;
     }
-    
-    if (exportBtn) {
-      exportBtn.addEventListener('click', function() {
-        const gridItem = this.closest('.grid-stack-item');
-        const panelType = gridItem.getAttribute('data-panel-type');
-        
-        // Export logic based on panel type
-        if (panelType === 'time_series') {
-          const chartContainer = gridItem.querySelector('.chart-container');
-          if (chartContainer && chartContainer._plotly) {
-            Plotly.downloadImage(chartContainer, {
-              format: 'png',
-              width: 1200,
-              height: 800,
-              filename: 'forecast-chart'
-            });
+
+    function setupPanelEventListeners(panelElement) {
+      const closeBtn = panelElement.querySelector(".panel-close");
+      const settingsBtn = panelElement.querySelector(".panel-settings");
+      const exportBtn = panelElement.querySelector(".panel-export");
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", function () {
+          const gridItem = this.closest(".grid-stack-item");
+          grid.removeWidget(gridItem);
+
+          // Remove from dashboard state
+          const panelId = gridItem.getAttribute("data-panel-id");
+          dashboardState.panels = dashboardState.panels.filter(
+            (p) => p.id !== panelId,
+          );
+        });
+      }
+
+      if (settingsBtn) {
+        settingsBtn.addEventListener("click", function () {
+          const gridItem = this.closest(".grid-stack-item");
+          const panelId = gridItem.getAttribute("data-panel-id");
+          const panelType = gridItem.getAttribute("data-panel-type");
+
+          // Find panel in state
+          const panelState = dashboardState.panels.find(
+            (p) => p.id === panelId,
+          );
+
+          // Populate settings modal
+          const titleInput = document.getElementById("panel-title-input");
+          const chartTypeSelect = document.getElementById("panel-chart-type");
+          const dataSourceSelect = document.getElementById("panel-data-source");
+          const autoUpdateCheckbox =
+            document.getElementById("panel-auto-update");
+
+          titleInput.value = panelState.settings.title;
+          if (panelType === "time_series" && chartTypeSelect) {
+            chartTypeSelect.value = panelState.settings.chartType || "line";
+            chartTypeSelect.parentElement.style.display = "block";
+          } else {
+            chartTypeSelect.parentElement.style.display = "none";
           }
-        } else if (panelType === 'map') {
-          const mapContainer = gridItem.querySelector('.map-container');
-          if (mapContainer && mapContainer._plotly) {
-            Plotly.downloadImage(mapContainer, {
-              format: 'png',
-              width: 1200,
-              height: 800,
-              filename: 'district-map'
-            });
-          }
-        } else {
-          // For other panel types, export as JSON
-          const panelId = gridItem.getAttribute('data-panel-id');
-          const panelState = dashboardState.panels.find(p => p.id === panelId);
-          
-          if (panelState) {
-            const dataStr = JSON.stringify(panelState, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportLink = document.createElement('a');
-            exportLink.setAttribute('href', dataUri);
-            exportLink.setAttribute('download', `${panelState.type}_export.json`);
-            exportLink.click();
-          }
-        }
-      });
-    }
-  }
-  
-  function initializePanelContent(panelElement, type) {
-    // Set a unique ID for the panel
-    const panelId = `panel-${Date.now()}`;
-    panelElement.setAttribute('data-panel-id', panelId);
-    
-    // Update the panel based on its type
-    if (type === 'time_series') {
-      const chartContainer = panelElement.querySelector('.chart-container');
-      
-      // Show loading state
-      chartContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-      
-      // Create sample data for initial rendering
-      const trace1 = {
-        x: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
-        y: [0.09, 0.085, 0.088, 0.092, 0.095, 0.098, 0.1, 0.103, 0.105, 0.108],
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: 'Historical',
-        line: {
-          color: '#3366cc',
-          width: 2
-        },
-        marker: {
-          size: 6,
-          color: '#3366cc'
-        }
-      };
-      
-      const trace2 = {
-        x: [2024, 2025, 2026, 2027],
-        y: [0.108, 0.111, 0.114, 0.118],
-        type: 'scatter',
-        mode: 'lines+markers',
-        name: 'Forecast',
-        line: {
-          color: '#ff6600',
-          width: 2
-        },
-        marker: {
-          size: 6,
-          color: '#ff6600'
-        }
-      };
-      
-      // Create confidence interval
-      const x_ci = [2024, 2025, 2026, 2027].concat([2027, 2026, 2025, 2024]);
-      const y_ci = [0.108, 0.111, 0.114, 0.118].map(y => y + 0.005)
-                   .concat([0.118, 0.114, 0.111, 0.108].map(y => y - 0.005).reverse());
-      
-      const trace3 = {
-        x: x_ci,
-        y: y_ci,
-        fill: 'toself',
-        fillcolor: 'rgba(255, 102, 0, 0.2)',
-        line: {
-          color: 'transparent'
-        },
-        name: 'Confidence Interval',
-        showlegend: true,
-        hoverinfo: 'skip'
-      };
-      
-      const layout = {
-        title: 'Levy Rate Forecast',
-        xaxis: {
-          title: 'Year',
-          tickmode: 'array',
-          tickvals: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027]
-        },
-        yaxis: {
-          title: 'Levy Rate',
-          tickformat: '.3f'
-        },
-        legend: {
-          orientation: 'h',
-          y: -0.2
-        },
-        margin: {
-          l: 60,
-          r: 30,
-          b: 80,
-          t: 60
-        },
-        hovermode: 'closest',
-        template: 'plotly_dark',
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)'
-      };
-      
-      Plotly.newPlot(chartContainer, [trace1, trace2, trace3], layout, {responsive: true});
-    } else if (type === 'map') {
-      const mapContainer = panelElement.querySelector('.map-container');
-      
-      // Show loading state
-      mapContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-      
-      // Fetch sample district data for demo
-      setTimeout(() => {
-        // Create a simple rectangle for demo purposes
-        const data = [{
-          type: 'choroplethmapbox',
-          locations: ['district1', 'district2', 'district3'],
-          z: [0.098, 0.105, 0.112],
-          geojson: {
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                properties: { id: 'district1' },
-                geometry: {
-                  type: 'Polygon',
-                  coordinates: [[[-119.3, 46.1], [-119.1, 46.1], [-119.1, 46.3], [-119.3, 46.3], [-119.3, 46.1]]]
-                }
-              },
-              {
-                type: 'Feature',
-                properties: { id: 'district2' },
-                geometry: {
-                  type: 'Polygon',
-                  coordinates: [[[-119.6, 46.2], [-119.4, 46.2], [-119.4, 46.4], [-119.6, 46.4], [-119.6, 46.2]]]
-                }
-              },
-              {
-                type: 'Feature',
-                properties: { id: 'district3' },
-                geometry: {
-                  type: 'Polygon',
-                  coordinates: [[[-119.5, 46.0], [-119.3, 46.0], [-119.3, 46.2], [-119.5, 46.2], [-119.5, 46.0]]]
-                }
-              }
-            ]
-          },
-          featureidkey: 'properties.id',
-          colorscale: 'Viridis',
-          name: 'Tax Districts',
-          hovertemplate: '<b>District %{location}</b><br>Levy Rate: %{z:.4f}<extra></extra>'
-        }];
-        
-        const layout = {
-          mapbox: {
-            style: "dark",
-            center: { lon: -119.4, lat: 46.2 },
-            zoom: 9
-          },
-          paper_bgcolor: 'rgba(0,0,0,0)',
-          plot_bgcolor: 'rgba(0,0,0,0)',
-          margin: { l: 0, r: 0, b: 0, t: 0 },
-          coloraxis: {
-            colorscale: 'Viridis',
-            colorbar: {
-              title: 'Levy Rate'
+
+          dataSourceSelect.value = panelState.settings.dataSource || "filter";
+          autoUpdateCheckbox.checked = panelState.settings.autoUpdate !== false;
+
+          // Store current panel reference for the save button
+          document
+            .getElementById("save-panel-settings")
+            .setAttribute("data-panel-id", panelId);
+
+          // Show the modal
+          const modal = new bootstrap.Modal(
+            document.getElementById("panel-settings-modal"),
+          );
+          modal.show();
+        });
+      }
+
+      if (exportBtn) {
+        exportBtn.addEventListener("click", function () {
+          const gridItem = this.closest(".grid-stack-item");
+          const panelType = gridItem.getAttribute("data-panel-type");
+
+          // Export logic based on panel type
+          if (panelType === "time_series") {
+            const chartContainer = gridItem.querySelector(".chart-container");
+            if (chartContainer && chartContainer._plotly) {
+              Plotly.downloadImage(chartContainer, {
+                format: "png",
+                width: 1200,
+                height: 800,
+                filename: "forecast-chart",
+              });
+            }
+          } else if (panelType === "map") {
+            const mapContainer = gridItem.querySelector(".map-container");
+            if (mapContainer && mapContainer._plotly) {
+              Plotly.downloadImage(mapContainer, {
+                format: "png",
+                width: 1200,
+                height: 800,
+                filename: "district-map",
+              });
+            }
+          } else {
+            // For other panel types, export as JSON
+            const panelId = gridItem.getAttribute("data-panel-id");
+            const panelState = dashboardState.panels.find(
+              (p) => p.id === panelId,
+            );
+
+            if (panelState) {
+              const dataStr = JSON.stringify(panelState, null, 2);
+              const dataUri =
+                "data:application/json;charset=utf-8," +
+                encodeURIComponent(dataStr);
+
+              const exportLink = document.createElement("a");
+              exportLink.setAttribute("href", dataUri);
+              exportLink.setAttribute(
+                "download",
+                `${panelState.type}_export.json`,
+              );
+              exportLink.click();
             }
           }
+        });
+      }
+    }
+
+    function initializePanelContent(panelElement, type) {
+      // Set a unique ID for the panel
+      const panelId = `panel-${Date.now()}`;
+      panelElement.setAttribute("data-panel-id", panelId);
+
+      // Update the panel based on its type
+      if (type === "time_series") {
+        const chartContainer = panelElement.querySelector(".chart-container");
+
+        // Show loading state
+        chartContainer.innerHTML =
+          '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        // Create sample data for initial rendering
+        const trace1 = {
+          x: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+          y: [
+            0.09, 0.085, 0.088, 0.092, 0.095, 0.098, 0.1, 0.103, 0.105, 0.108,
+          ],
+          type: "scatter",
+          mode: "lines+markers",
+          name: "Historical",
+          line: {
+            color: "#3366cc",
+            width: 2,
+          },
+          marker: {
+            size: 6,
+            color: "#3366cc",
+          },
         };
-        
-        const config = {
-          mapboxAccessToken: 'pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A'
+
+        const trace2 = {
+          x: [2024, 2025, 2026, 2027],
+          y: [0.108, 0.111, 0.114, 0.118],
+          type: "scatter",
+          mode: "lines+markers",
+          name: "Forecast",
+          line: {
+            color: "#ff6600",
+            width: 2,
+          },
+          marker: {
+            size: 6,
+            color: "#ff6600",
+          },
         };
-        
-        Plotly.newPlot(mapContainer, data, layout, config);
-      }, 500);
-    } else if (type === 'statistics') {
-      const statsContainer = panelElement.querySelector('.stats-container');
-      
-      // Show loading state
-      statsContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-      
-      // Sample statistics
-      setTimeout(() => {
-        statsContainer.innerHTML = `
+
+        // Create confidence interval
+        const x_ci = [2024, 2025, 2026, 2027].concat([2027, 2026, 2025, 2024]);
+        const y_ci = [0.108, 0.111, 0.114, 0.118]
+          .map((y) => y + 0.005)
+          .concat([0.118, 0.114, 0.111, 0.108].map((y) => y - 0.005).reverse());
+
+        const trace3 = {
+          x: x_ci,
+          y: y_ci,
+          fill: "toself",
+          fillcolor: "rgba(255, 102, 0, 0.2)",
+          line: {
+            color: "transparent",
+          },
+          name: "Confidence Interval",
+          showlegend: true,
+          hoverinfo: "skip",
+        };
+
+        const layout = {
+          title: "Levy Rate Forecast",
+          xaxis: {
+            title: "Year",
+            tickmode: "array",
+            tickvals: [
+              2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025,
+              2026, 2027,
+            ],
+          },
+          yaxis: {
+            title: "Levy Rate",
+            tickformat: ".3f",
+          },
+          legend: {
+            orientation: "h",
+            y: -0.2,
+          },
+          margin: {
+            l: 60,
+            r: 30,
+            b: 80,
+            t: 60,
+          },
+          hovermode: "closest",
+          template: "plotly_dark",
+          paper_bgcolor: "rgba(0,0,0,0)",
+          plot_bgcolor: "rgba(0,0,0,0)",
+        };
+
+        Plotly.newPlot(chartContainer, [trace1, trace2, trace3], layout, {
+          responsive: true,
+        });
+      } else if (type === "map") {
+        const mapContainer = panelElement.querySelector(".map-container");
+
+        // Show loading state
+        mapContainer.innerHTML =
+          '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        // Fetch sample district data for demo
+        setTimeout(() => {
+          // Create a simple rectangle for demo purposes
+          const data = [
+            {
+              type: "choroplethmapbox",
+              locations: ["district1", "district2", "district3"],
+              z: [0.098, 0.105, 0.112],
+              geojson: {
+                type: "FeatureCollection",
+                features: [
+                  {
+                    type: "Feature",
+                    properties: { id: "district1" },
+                    geometry: {
+                      type: "Polygon",
+                      coordinates: [
+                        [
+                          [-119.3, 46.1],
+                          [-119.1, 46.1],
+                          [-119.1, 46.3],
+                          [-119.3, 46.3],
+                          [-119.3, 46.1],
+                        ],
+                      ],
+                    },
+                  },
+                  {
+                    type: "Feature",
+                    properties: { id: "district2" },
+                    geometry: {
+                      type: "Polygon",
+                      coordinates: [
+                        [
+                          [-119.6, 46.2],
+                          [-119.4, 46.2],
+                          [-119.4, 46.4],
+                          [-119.6, 46.4],
+                          [-119.6, 46.2],
+                        ],
+                      ],
+                    },
+                  },
+                  {
+                    type: "Feature",
+                    properties: { id: "district3" },
+                    geometry: {
+                      type: "Polygon",
+                      coordinates: [
+                        [
+                          [-119.5, 46.0],
+                          [-119.3, 46.0],
+                          [-119.3, 46.2],
+                          [-119.5, 46.2],
+                          [-119.5, 46.0],
+                        ],
+                      ],
+                    },
+                  },
+                ],
+              },
+              featureidkey: "properties.id",
+              colorscale: "Viridis",
+              name: "Tax Districts",
+              hovertemplate:
+                "<b>District %{location}</b><br>Levy Rate: %{z:.4f}<extra></extra>",
+            },
+          ];
+
+          const layout = {
+            mapbox: {
+              style: "dark",
+              center: { lon: -119.4, lat: 46.2 },
+              zoom: 9,
+            },
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            margin: { l: 0, r: 0, b: 0, t: 0 },
+            coloraxis: {
+              colorscale: "Viridis",
+              colorbar: {
+                title: "Levy Rate",
+              },
+            },
+          };
+
+          const config = {
+            mapboxAccessToken:
+              "pk.eyJ1IjoicGxvdGx5bWFwYm94IiwiYSI6ImNrOWJqb2F4djBnMjEzbG50amg0dnJieG4ifQ.Zme1-Uzoi75IaFbieBDl3A",
+          };
+
+          Plotly.newPlot(mapContainer, data, layout, config);
+        }, 500);
+      } else if (type === "statistics") {
+        const statsContainer = panelElement.querySelector(".stats-container");
+
+        // Show loading state
+        statsContainer.innerHTML =
+          '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        // Sample statistics
+        setTimeout(() => {
+          statsContainer.innerHTML = `
           <div class="row">
             <div class="col-md-6">
               <div class="data-metric">
@@ -856,16 +1085,19 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
         `;
-      }, 500);
-    } else if (type === 'recommendations') {
-      const recommendationsContainer = panelElement.querySelector('.recommendations-container');
-      
-      // Show loading state
-      recommendationsContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-      
-      // Sample recommendations
-      setTimeout(() => {
-        recommendationsContainer.innerHTML = `
+        }, 500);
+      } else if (type === "recommendations") {
+        const recommendationsContainer = panelElement.querySelector(
+          ".recommendations-container",
+        );
+
+        // Show loading state
+        recommendationsContainer.innerHTML =
+          '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+        // Sample recommendations
+        setTimeout(() => {
+          recommendationsContainer.innerHTML = `
           <div class="recommendation-card mb-3 p-3 rounded high-priority">
             <h5 class="mb-2">
               Review Growth Projections
@@ -888,518 +1120,601 @@ document.addEventListener('DOMContentLoaded', function() {
             <p class="mb-0">Explore additional economic scenarios to account for potential market fluctuations and provide more robust planning options.</p>
           </div>
         `;
-      }, 500);
-    }
-  }
-  
-  // Initialize the dashboard with default panels
-  function initializeDashboard() {
-    // Add default panels
-    const timeSeriesPanel = addPanel('time_series', 0, 0, 12, 6);
-    const mapPanel = addPanel('map', 0, 6, 6, 6);
-    const statsPanel = addPanel('statistics', 6, 6, 6, 3);
-    const recsPanel = addPanel('recommendations', 6, 9, 6, 3);
-    
-    // Load districts for the district filter
-    loadDistricts();
-  }
-  
-  // Handle Add Panel button
-  document.getElementById('add-panel-btn').addEventListener('click', function() {
-    const modal = new bootstrap.Modal(document.getElementById('add-panel-modal'));
-    modal.show();
-  });
-  
-  // Handle Panel Option selection
-  document.querySelectorAll('.panel-option').forEach(option => {
-    option.addEventListener('click', function() {
-      const panelType = this.getAttribute('data-panel-type');
-      addPanel(panelType);
-      
-      // Hide the modal
-      bootstrap.Modal.getInstance(document.getElementById('add-panel-modal')).hide();
-    });
-  });
-  
-  // Handle Save Panel Settings
-  document.getElementById('save-panel-settings').addEventListener('click', function() {
-    const panelId = this.getAttribute('data-panel-id');
-    const titleInput = document.getElementById('panel-title-input');
-    const chartTypeSelect = document.getElementById('panel-chart-type');
-    const dataSourceSelect = document.getElementById('panel-data-source');
-    const autoUpdateCheckbox = document.getElementById('panel-auto-update');
-    
-    // Find panel in state
-    const panelState = dashboardState.panels.find(p => p.id === panelId);
-    if (panelState) {
-      // Update settings
-      panelState.settings.title = titleInput.value;
-      panelState.settings.chartType = chartTypeSelect.value;
-      panelState.settings.dataSource = dataSourceSelect.value;
-      panelState.settings.autoUpdate = autoUpdateCheckbox.checked;
-      
-      // Update panel in the UI
-      const panelElement = document.querySelector(`[data-panel-id="${panelId}"]`);
-      if (panelElement) {
-        panelElement.querySelector('.panel-title').textContent = titleInput.value;
-        
-        // Update chart type if needed
-        if (panelState.type === 'time_series') {
-          const chartContainer = panelElement.querySelector('.chart-container');
-          if (chartContainer && chartContainer._plotly) {
-            // In a real application, you would update the chart based on the new chart type
-            // For this example, we'll just log the change
-            console.log(`Changing chart type to ${chartTypeSelect.value}`);
-          }
-        }
+        }, 500);
       }
     }
-    
-    // Hide the modal
-    bootstrap.Modal.getInstance(document.getElementById('panel-settings-modal')).hide();
-  });
-  
-  // Handle Save Layout
-  document.getElementById('save-layout-btn').addEventListener('click', function() {
-    // Save layout to local storage
-    const layout = grid.save();
-    localStorage.setItem('dashboardLayout', JSON.stringify(layout));
-    localStorage.setItem('dashboardState', JSON.stringify(dashboardState));
-    
-    // Show feedback
-    alert('Dashboard layout saved!');
-  });
-  
-  // Handle Reset Layout
-  document.getElementById('reset-layout-btn').addEventListener('click', function() {
-    if (confirm('Reset dashboard to default layout? This will remove all current panels.')) {
-      // Clear the grid
-      grid.removeAll();
-      
-      // Reset state
-      dashboardState = {
-        filters: {
-          taxCodes: [],
-          years: [2020, 2025],
-          modelType: 'auto',
-          scenarios: ['baseline'],
-          districts: [],
-          visualization: 'line',
-          comparison: 'overlay',
-          showConfidenceIntervals: true,
-          showAnomalies: true
-        },
-        panels: []
-      };
-      
-      // Reinitialize with default panels
-      initializeDashboard();
+
+    // Initialize the dashboard with default panels
+    function initializeDashboard() {
+      // Add default panels
+      const timeSeriesPanel = addPanel("time_series", 0, 0, 12, 6);
+      const mapPanel = addPanel("map", 0, 6, 6, 6);
+      const statsPanel = addPanel("statistics", 6, 6, 6, 3);
+      const recsPanel = addPanel("recommendations", 6, 9, 6, 3);
+
+      // Load districts for the district filter
+      loadDistricts();
     }
-  });
-  
-  // Handle Apply Filters
-  document.getElementById('apply-filters').addEventListener('click', function() {
-    // Show loading state
-    document.getElementById('dashboard-loading').style.display = 'flex';
-    
-    // Update dashboard state with filter values
-    const taxCodeSelect = document.getElementById('tax-code-filter');
-    const yearStart = document.getElementById('year-start');
-    const yearEnd = document.getElementById('year-end');
-    const modelTypeSelect = document.getElementById('model-type-filter');
-    const scenarioSelect = document.getElementById('scenario-filter');
-    const districtSelect = document.getElementById('district-filter');
-    const visualizationTypeSelect = document.getElementById('visualization-type');
-    const comparisonTypeSelect = document.getElementById('comparison-type');
-    const showConfidenceIntervals = document.getElementById('show-confidence-intervals');
-    const showAnomalies = document.getElementById('show-anomalies');
-    
-    // Get selected tax codes
-    const selectedTaxCodes = Array.from(taxCodeSelect.selectedOptions).map(option => option.value);
-    dashboardState.filters.taxCodes = selectedTaxCodes;
-    
-    // Get year range
-    dashboardState.filters.years = [parseInt(yearStart.value), parseInt(yearEnd.value)];
-    
-    // Get model type
-    dashboardState.filters.modelType = modelTypeSelect.value;
-    
-    // Get scenarios
-    const selectedScenarios = Array.from(scenarioSelect.selectedOptions).map(option => option.value);
-    dashboardState.filters.scenarios = selectedScenarios.length ? selectedScenarios : ['baseline'];
-    
-    // Get districts
-    const selectedDistricts = Array.from(districtSelect.selectedOptions)
-                               .filter(option => option.value !== 'loading')
-                               .map(option => option.value);
-    dashboardState.filters.districts = selectedDistricts;
-    
-    // Get visualization type
-    dashboardState.filters.visualization = visualizationTypeSelect.value;
-    
-    // Get comparison type
-    dashboardState.filters.comparison = comparisonTypeSelect.value;
-    
-    // Get display options
-    dashboardState.filters.showConfidenceIntervals = showConfidenceIntervals.checked;
-    dashboardState.filters.showAnomalies = showAnomalies.checked;
-    
-    // Update panels that are set to auto-update
-    updatePanelsWithFilterChanges();
-    
-    // Hide loading state after a delay (for demo purposes)
-    setTimeout(() => {
-      document.getElementById('dashboard-loading').style.display = 'none';
-    }, 1000);
-  });
-  
-  // Handle Reset Filters
-  document.getElementById('reset-filters').addEventListener('click', function() {
-    // Reset filter form to defaults
-    document.getElementById('tax-code-filter').selectedIndex = -1;
-    document.getElementById('year-start').value = current_year - 5;
-    document.getElementById('year-end').value = current_year + 3;
-    document.getElementById('model-type-filter').value = 'auto';
-    
-    const scenarioSelect = document.getElementById('scenario-filter');
-    for (let i = 0; i < scenarioSelect.options.length; i++) {
-      scenarioSelect.options[i].selected = scenarioSelect.options[i].value === 'baseline';
-    }
-    
-    document.getElementById('district-filter').selectedIndex = -1;
-    document.getElementById('visualization-type').value = 'line';
-    document.getElementById('comparison-type').value = 'overlay';
-    document.getElementById('show-confidence-intervals').checked = true;
-    document.getElementById('show-anomalies').checked = true;
-  });
-  
-  function updatePanelsWithFilterChanges() {
-    dashboardState.panels.forEach(panel => {
-      if (panel.settings.autoUpdate) {
-        const panelElement = document.querySelector(`[data-panel-id="${panel.id}"]`);
-        if (!panelElement) return;
-        
-        if (panel.type === 'time_series') {
-          const chartContainer = panelElement.querySelector('.chart-container');
-          if (!chartContainer) return;
-          
-          // Show loading state
-          chartContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-          
-          // In a real application, you would fetch new data based on the filters
-          // and update the chart accordingly
-          setTimeout(() => {
-            // For demo purposes, we'll just create a new chart with slight variations
-            const historical = [];
-            const forecast = [];
-            const confidenceUpper = [];
-            const confidenceLower = [];
-            
-            // Generate historical data
-            const startYear = dashboardState.filters.years[0];
-            const endYear = new Date().getFullYear();
-            for (let year = startYear; year <= endYear; year++) {
-              const baseRate = 0.09;
-              const trend = 0.002 * (year - startYear);
-              const seasonal = dashboardState.filters.visualization === 'line' ? 
-                               0.001 * Math.sin((year - startYear) * Math.PI / 2) : 0;
-              const random = (Math.random() - 0.5) * 0.002;
-              
-              historical.push({
-                year: year,
-                rate: baseRate + trend + seasonal + random
-              });
+
+    // Handle Add Panel button
+    document
+      .getElementById("add-panel-btn")
+      .addEventListener("click", function () {
+        const modal = new bootstrap.Modal(
+          document.getElementById("add-panel-modal"),
+        );
+        modal.show();
+      });
+
+    // Handle Panel Option selection
+    document.querySelectorAll(".panel-option").forEach((option) => {
+      option.addEventListener("click", function () {
+        const panelType = this.getAttribute("data-panel-type");
+        addPanel(panelType);
+
+        // Hide the modal
+        bootstrap.Modal.getInstance(
+          document.getElementById("add-panel-modal"),
+        ).hide();
+      });
+    });
+
+    // Handle Save Panel Settings
+    document
+      .getElementById("save-panel-settings")
+      .addEventListener("click", function () {
+        const panelId = this.getAttribute("data-panel-id");
+        const titleInput = document.getElementById("panel-title-input");
+        const chartTypeSelect = document.getElementById("panel-chart-type");
+        const dataSourceSelect = document.getElementById("panel-data-source");
+        const autoUpdateCheckbox = document.getElementById("panel-auto-update");
+
+        // Find panel in state
+        const panelState = dashboardState.panels.find((p) => p.id === panelId);
+        if (panelState) {
+          // Update settings
+          panelState.settings.title = titleInput.value;
+          panelState.settings.chartType = chartTypeSelect.value;
+          panelState.settings.dataSource = dataSourceSelect.value;
+          panelState.settings.autoUpdate = autoUpdateCheckbox.checked;
+
+          // Update panel in the UI
+          const panelElement = document.querySelector(
+            `[data-panel-id="${panelId}"]`,
+          );
+          if (panelElement) {
+            panelElement.querySelector(".panel-title").textContent =
+              titleInput.value;
+
+            // Update chart type if needed
+            if (panelState.type === "time_series") {
+              const chartContainer =
+                panelElement.querySelector(".chart-container");
+              if (chartContainer && chartContainer._plotly) {
+                // In a real application, you would update the chart based on the new chart type
+                // For this example, we'll just log the change
+                console.log(`Changing chart type to ${chartTypeSelect.value}`);
+              }
             }
-            
-            // Generate forecast data
-            const forecastEndYear = dashboardState.filters.years[1];
-            for (let year = endYear + 1; year <= forecastEndYear; year++) {
-              const baseRate = 0.09;
-              const trend = 0.002 * (year - startYear);
-              const seasonal = dashboardState.filters.visualization === 'line' ? 
-                               0.001 * Math.sin((year - startYear) * Math.PI / 2) : 0;
-              
-              const forecastRate = baseRate + trend + seasonal;
-              forecast.push({
-                year: year,
-                rate: forecastRate
-              });
-              
-              // Generate confidence intervals
-              const interval = 0.002 + 0.001 * (year - endYear);
-              confidenceUpper.push({
-                year: year,
-                rate: forecastRate + interval
-              });
-              confidenceLower.push({
-                year: year,
-                rate: forecastRate - interval
-              });
-            }
-            
-            // Create traces based on visualization type
-            let traces = [];
-            
-            if (dashboardState.filters.visualization === 'line') {
-              traces.push({
-                x: historical.map(d => d.year),
-                y: historical.map(d => d.rate),
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Historical',
-                line: {
-                  color: '#3366cc',
-                  width: 2
-                },
-                marker: {
-                  size: 6,
-                  color: '#3366cc'
-                }
-              });
-              
-              // Add scenario traces
-              dashboardState.filters.scenarios.forEach((scenario, index) => {
-                const colors = ['#ff6600', '#33cc33', '#cc3333'];
-                const scenarioFactor = scenario === 'optimistic' ? 1.05 : 
-                                       scenario === 'pessimistic' ? 0.95 : 1;
-                
+          }
+        }
+
+        // Hide the modal
+        bootstrap.Modal.getInstance(
+          document.getElementById("panel-settings-modal"),
+        ).hide();
+      });
+
+    // Handle Save Layout
+    document
+      .getElementById("save-layout-btn")
+      .addEventListener("click", function () {
+        // Save layout to local storage
+        const layout = grid.save();
+        localStorage.setItem("dashboardLayout", JSON.stringify(layout));
+        localStorage.setItem("dashboardState", JSON.stringify(dashboardState));
+
+        // Show feedback
+        alert("Dashboard layout saved!");
+      });
+
+    // Handle Reset Layout
+    document
+      .getElementById("reset-layout-btn")
+      .addEventListener("click", function () {
+        if (
+          confirm(
+            "Reset dashboard to default layout? This will remove all current panels.",
+          )
+        ) {
+          // Clear the grid
+          grid.removeAll();
+
+          // Reset state
+          dashboardState = {
+            filters: {
+              taxCodes: [],
+              years: [2020, 2025],
+              modelType: "auto",
+              scenarios: ["baseline"],
+              districts: [],
+              visualization: "line",
+              comparison: "overlay",
+              showConfidenceIntervals: true,
+              showAnomalies: true,
+            },
+            panels: [],
+          };
+
+          // Reinitialize with default panels
+          initializeDashboard();
+        }
+      });
+
+    // Handle Apply Filters
+    document
+      .getElementById("apply-filters")
+      .addEventListener("click", function () {
+        // Show loading state
+        document.getElementById("dashboard-loading").style.display = "flex";
+
+        // Update dashboard state with filter values
+        const taxCodeSelect = document.getElementById("tax-code-filter");
+        const yearStart = document.getElementById("year-start");
+        const yearEnd = document.getElementById("year-end");
+        const modelTypeSelect = document.getElementById("model-type-filter");
+        const scenarioSelect = document.getElementById("scenario-filter");
+        const districtSelect = document.getElementById("district-filter");
+        const visualizationTypeSelect =
+          document.getElementById("visualization-type");
+        const comparisonTypeSelect = document.getElementById("comparison-type");
+        const showConfidenceIntervals = document.getElementById(
+          "show-confidence-intervals",
+        );
+        const showAnomalies = document.getElementById("show-anomalies");
+
+        // Get selected tax codes
+        const selectedTaxCodes = Array.from(taxCodeSelect.selectedOptions).map(
+          (option) => option.value,
+        );
+        dashboardState.filters.taxCodes = selectedTaxCodes;
+
+        // Get year range
+        dashboardState.filters.years = [
+          parseInt(yearStart.value),
+          parseInt(yearEnd.value),
+        ];
+
+        // Get model type
+        dashboardState.filters.modelType = modelTypeSelect.value;
+
+        // Get scenarios
+        const selectedScenarios = Array.from(
+          scenarioSelect.selectedOptions,
+        ).map((option) => option.value);
+        dashboardState.filters.scenarios = selectedScenarios.length
+          ? selectedScenarios
+          : ["baseline"];
+
+        // Get districts
+        const selectedDistricts = Array.from(districtSelect.selectedOptions)
+          .filter((option) => option.value !== "loading")
+          .map((option) => option.value);
+        dashboardState.filters.districts = selectedDistricts;
+
+        // Get visualization type
+        dashboardState.filters.visualization = visualizationTypeSelect.value;
+
+        // Get comparison type
+        dashboardState.filters.comparison = comparisonTypeSelect.value;
+
+        // Get display options
+        dashboardState.filters.showConfidenceIntervals =
+          showConfidenceIntervals.checked;
+        dashboardState.filters.showAnomalies = showAnomalies.checked;
+
+        // Update panels that are set to auto-update
+        updatePanelsWithFilterChanges();
+
+        // Hide loading state after a delay (for demo purposes)
+        setTimeout(() => {
+          document.getElementById("dashboard-loading").style.display = "none";
+        }, 1000);
+      });
+
+    // Handle Reset Filters
+    document
+      .getElementById("reset-filters")
+      .addEventListener("click", function () {
+        // Reset filter form to defaults
+        document.getElementById("tax-code-filter").selectedIndex = -1;
+        document.getElementById("year-start").value = current_year - 5;
+        document.getElementById("year-end").value = current_year + 3;
+        document.getElementById("model-type-filter").value = "auto";
+
+        const scenarioSelect = document.getElementById("scenario-filter");
+        for (let i = 0; i < scenarioSelect.options.length; i++) {
+          scenarioSelect.options[i].selected =
+            scenarioSelect.options[i].value === "baseline";
+        }
+
+        document.getElementById("district-filter").selectedIndex = -1;
+        document.getElementById("visualization-type").value = "line";
+        document.getElementById("comparison-type").value = "overlay";
+        document.getElementById("show-confidence-intervals").checked = true;
+        document.getElementById("show-anomalies").checked = true;
+      });
+
+    function updatePanelsWithFilterChanges() {
+      dashboardState.panels.forEach((panel) => {
+        if (panel.settings.autoUpdate) {
+          const panelElement = document.querySelector(
+            `[data-panel-id="${panel.id}"]`,
+          );
+          if (!panelElement) return;
+
+          if (panel.type === "time_series") {
+            const chartContainer =
+              panelElement.querySelector(".chart-container");
+            if (!chartContainer) return;
+
+            // Show loading state
+            chartContainer.innerHTML =
+              '<div class="d-flex justify-content-center align-items-center h-100"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+            // In a real application, you would fetch new data based on the filters
+            // and update the chart accordingly
+            setTimeout(() => {
+              // For demo purposes, we'll just create a new chart with slight variations
+              const historical = [];
+              const forecast = [];
+              const confidenceUpper = [];
+              const confidenceLower = [];
+
+              // Generate historical data
+              const startYear = dashboardState.filters.years[0];
+              const endYear = new Date().getFullYear();
+              for (let year = startYear; year <= endYear; year++) {
+                const baseRate = 0.09;
+                const trend = 0.002 * (year - startYear);
+                const seasonal =
+                  dashboardState.filters.visualization === "line"
+                    ? 0.001 * Math.sin(((year - startYear) * Math.PI) / 2)
+                    : 0;
+                const random = (Math.random() - 0.5) * 0.002;
+
+                historical.push({
+                  year: year,
+                  rate: baseRate + trend + seasonal + random,
+                });
+              }
+
+              // Generate forecast data
+              const forecastEndYear = dashboardState.filters.years[1];
+              for (let year = endYear + 1; year <= forecastEndYear; year++) {
+                const baseRate = 0.09;
+                const trend = 0.002 * (year - startYear);
+                const seasonal =
+                  dashboardState.filters.visualization === "line"
+                    ? 0.001 * Math.sin(((year - startYear) * Math.PI) / 2)
+                    : 0;
+
+                const forecastRate = baseRate + trend + seasonal;
+                forecast.push({
+                  year: year,
+                  rate: forecastRate,
+                });
+
+                // Generate confidence intervals
+                const interval = 0.002 + 0.001 * (year - endYear);
+                confidenceUpper.push({
+                  year: year,
+                  rate: forecastRate + interval,
+                });
+                confidenceLower.push({
+                  year: year,
+                  rate: forecastRate - interval,
+                });
+              }
+
+              // Create traces based on visualization type
+              let traces = [];
+
+              if (dashboardState.filters.visualization === "line") {
                 traces.push({
-                  x: forecast.map(d => d.year),
-                  y: forecast.map(d => d.rate * scenarioFactor),
-                  type: 'scatter',
-                  mode: 'lines+markers',
-                  name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`,
+                  x: historical.map((d) => d.year),
+                  y: historical.map((d) => d.rate),
+                  type: "scatter",
+                  mode: "lines+markers",
+                  name: "Historical",
                   line: {
-                    color: colors[index % colors.length],
-                    width: 2
+                    color: "#3366cc",
+                    width: 2,
                   },
                   marker: {
                     size: 6,
-                    color: colors[index % colors.length]
-                  }
+                    color: "#3366cc",
+                  },
                 });
-                
-                // Add confidence intervals if enabled
-                if (dashboardState.filters.showConfidenceIntervals) {
-                  const upperCI = confidenceUpper.map(d => d.rate * scenarioFactor);
-                  const lowerCI = confidenceLower.map(d => d.rate * scenarioFactor);
-                  
+
+                // Add scenario traces
+                dashboardState.filters.scenarios.forEach((scenario, index) => {
+                  const colors = ["#ff6600", "#33cc33", "#cc3333"];
+                  const scenarioFactor =
+                    scenario === "optimistic"
+                      ? 1.05
+                      : scenario === "pessimistic"
+                        ? 0.95
+                        : 1;
+
                   traces.push({
-                    x: forecast.map(d => d.year).concat(forecast.map(d => d.year).reverse()),
-                    y: upperCI.concat(lowerCI.reverse()),
-                    fill: 'toself',
-                    fillcolor: `rgba(${colors[index % colors.length].replace(/[^\d,]/g, '')},0.2)`,
-                    line: { color: 'transparent' },
-                    name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} CI`,
-                    showlegend: false,
-                    hoverinfo: 'skip'
+                    x: forecast.map((d) => d.year),
+                    y: forecast.map((d) => d.rate * scenarioFactor),
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`,
+                    line: {
+                      color: colors[index % colors.length],
+                      width: 2,
+                    },
+                    marker: {
+                      size: 6,
+                      color: colors[index % colors.length],
+                    },
                   });
-                }
-              });
-            } else if (dashboardState.filters.visualization === 'bar') {
-              traces.push({
-                x: historical.map(d => d.year),
-                y: historical.map(d => d.rate),
-                type: 'bar',
-                name: 'Historical',
-                marker: {
-                  color: '#3366cc'
-                }
-              });
-              
-              // Add scenario traces
-              dashboardState.filters.scenarios.forEach((scenario, index) => {
-                const colors = ['#ff6600', '#33cc33', '#cc3333'];
-                const scenarioFactor = scenario === 'optimistic' ? 1.05 : 
-                                       scenario === 'pessimistic' ? 0.95 : 1;
-                
-                traces.push({
-                  x: forecast.map(d => d.year),
-                  y: forecast.map(d => d.rate * scenarioFactor),
-                  type: 'bar',
-                  name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`,
-                  marker: {
-                    color: colors[index % colors.length]
-                  }
-                });
-              });
-            } else if (dashboardState.filters.visualization === 'scatter') {
-              traces.push({
-                x: historical.map(d => d.year),
-                y: historical.map(d => d.rate),
-                type: 'scatter',
-                mode: 'markers',
-                name: 'Historical',
-                marker: {
-                  size: 10,
-                  color: '#3366cc'
-                }
-              });
-              
-              // Add scenario traces
-              dashboardState.filters.scenarios.forEach((scenario, index) => {
-                const colors = ['#ff6600', '#33cc33', '#cc3333'];
-                const scenarioFactor = scenario === 'optimistic' ? 1.05 : 
-                                       scenario === 'pessimistic' ? 0.95 : 1;
-                
-                traces.push({
-                  x: forecast.map(d => d.year),
-                  y: forecast.map(d => d.rate * scenarioFactor),
-                  type: 'scatter',
-                  mode: 'markers',
-                  name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`,
-                  marker: {
-                    size: 10,
-                    color: colors[index % colors.length]
-                  }
-                });
-              });
-            }
-            
-            // Create layout
-            const layout = {
-              title: panel.settings.title || 'Levy Rate Forecast',
-              xaxis: {
-                title: 'Year',
-                tickmode: 'array',
-                tickvals: [...new Set([...historical, ...forecast].map(d => d.year))].sort((a, b) => a - b)
-              },
-              yaxis: {
-                title: 'Levy Rate',
-                tickformat: '.3f'
-              },
-              legend: {
-                orientation: 'h',
-                y: -0.2
-              },
-              margin: {
-                l: 60,
-                r: 30,
-                b: 80,
-                t: 60
-              },
-              hovermode: 'closest',
-              template: 'plotly_dark',
-              paper_bgcolor: 'rgba(0,0,0,0)',
-              plot_bgcolor: 'rgba(0,0,0,0)'
-            };
-            
-            // If we're using a comparison view, adjust the layout
-            if (dashboardState.filters.comparison === 'sideBySide') {
-              layout.grid = {
-                rows: dashboardState.filters.scenarios.length,
-                columns: 1,
-                pattern: 'independent'
-              };
-              
-              // Split traces into separate subplots
-              const newTraces = [];
-              const historicalTrace = traces.find(t => t.name === 'Historical');
-              
-              dashboardState.filters.scenarios.forEach((scenario, index) => {
-                // Add historical trace to each subplot
-                newTraces.push({
-                  ...historicalTrace,
-                  name: 'Historical',
-                  xaxis: `x${index + 1}`,
-                  yaxis: `y${index + 1}`
-                });
-                
-                // Add forecast trace to its subplot
-                const forecastTrace = traces.find(t => t.name === `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`);
-                if (forecastTrace) {
-                  newTraces.push({
-                    ...forecastTrace,
-                    xaxis: `x${index + 1}`,
-                    yaxis: `y${index + 1}`
-                  });
-                }
-                
-                // Add CI trace if enabled
-                if (dashboardState.filters.showConfidenceIntervals) {
-                  const ciTrace = traces.find(t => t.name === `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} CI`);
-                  if (ciTrace) {
-                    newTraces.push({
-                      ...ciTrace,
-                      xaxis: `x${index + 1}`,
-                      yaxis: `y${index + 1}`
+
+                  // Add confidence intervals if enabled
+                  if (dashboardState.filters.showConfidenceIntervals) {
+                    const upperCI = confidenceUpper.map(
+                      (d) => d.rate * scenarioFactor,
+                    );
+                    const lowerCI = confidenceLower.map(
+                      (d) => d.rate * scenarioFactor,
+                    );
+
+                    traces.push({
+                      x: forecast
+                        .map((d) => d.year)
+                        .concat(forecast.map((d) => d.year).reverse()),
+                      y: upperCI.concat(lowerCI.reverse()),
+                      fill: "toself",
+                      fillcolor: `rgba(${colors[index % colors.length].replace(/[^\d,]/g, "")},0.2)`,
+                      line: { color: "transparent" },
+                      name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} CI`,
+                      showlegend: false,
+                      hoverinfo: "skip",
                     });
                   }
-                }
-                
-                // Add subplot title
-                layout[`title${index + 1}`] = `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Scenario`;
+                });
+              } else if (dashboardState.filters.visualization === "bar") {
+                traces.push({
+                  x: historical.map((d) => d.year),
+                  y: historical.map((d) => d.rate),
+                  type: "bar",
+                  name: "Historical",
+                  marker: {
+                    color: "#3366cc",
+                  },
+                });
+
+                // Add scenario traces
+                dashboardState.filters.scenarios.forEach((scenario, index) => {
+                  const colors = ["#ff6600", "#33cc33", "#cc3333"];
+                  const scenarioFactor =
+                    scenario === "optimistic"
+                      ? 1.05
+                      : scenario === "pessimistic"
+                        ? 0.95
+                        : 1;
+
+                  traces.push({
+                    x: forecast.map((d) => d.year),
+                    y: forecast.map((d) => d.rate * scenarioFactor),
+                    type: "bar",
+                    name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`,
+                    marker: {
+                      color: colors[index % colors.length],
+                    },
+                  });
+                });
+              } else if (dashboardState.filters.visualization === "scatter") {
+                traces.push({
+                  x: historical.map((d) => d.year),
+                  y: historical.map((d) => d.rate),
+                  type: "scatter",
+                  mode: "markers",
+                  name: "Historical",
+                  marker: {
+                    size: 10,
+                    color: "#3366cc",
+                  },
+                });
+
+                // Add scenario traces
+                dashboardState.filters.scenarios.forEach((scenario, index) => {
+                  const colors = ["#ff6600", "#33cc33", "#cc3333"];
+                  const scenarioFactor =
+                    scenario === "optimistic"
+                      ? 1.05
+                      : scenario === "pessimistic"
+                        ? 0.95
+                        : 1;
+
+                  traces.push({
+                    x: forecast.map((d) => d.year),
+                    y: forecast.map((d) => d.rate * scenarioFactor),
+                    type: "scatter",
+                    mode: "markers",
+                    name: `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`,
+                    marker: {
+                      size: 10,
+                      color: colors[index % colors.length],
+                    },
+                  });
+                });
+              }
+
+              // Create layout
+              const layout = {
+                title: panel.settings.title || "Levy Rate Forecast",
+                xaxis: {
+                  title: "Year",
+                  tickmode: "array",
+                  tickvals: [
+                    ...new Set([...historical, ...forecast].map((d) => d.year)),
+                  ].sort((a, b) => a - b),
+                },
+                yaxis: {
+                  title: "Levy Rate",
+                  tickformat: ".3f",
+                },
+                legend: {
+                  orientation: "h",
+                  y: -0.2,
+                },
+                margin: {
+                  l: 60,
+                  r: 30,
+                  b: 80,
+                  t: 60,
+                },
+                hovermode: "closest",
+                template: "plotly_dark",
+                paper_bgcolor: "rgba(0,0,0,0)",
+                plot_bgcolor: "rgba(0,0,0,0)",
+              };
+
+              // If we're using a comparison view, adjust the layout
+              if (dashboardState.filters.comparison === "sideBySide") {
+                layout.grid = {
+                  rows: dashboardState.filters.scenarios.length,
+                  columns: 1,
+                  pattern: "independent",
+                };
+
+                // Split traces into separate subplots
+                const newTraces = [];
+                const historicalTrace = traces.find(
+                  (t) => t.name === "Historical",
+                );
+
+                dashboardState.filters.scenarios.forEach((scenario, index) => {
+                  // Add historical trace to each subplot
+                  newTraces.push({
+                    ...historicalTrace,
+                    name: "Historical",
+                    xaxis: `x${index + 1}`,
+                    yaxis: `y${index + 1}`,
+                  });
+
+                  // Add forecast trace to its subplot
+                  const forecastTrace = traces.find(
+                    (t) =>
+                      t.name ===
+                      `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Forecast`,
+                  );
+                  if (forecastTrace) {
+                    newTraces.push({
+                      ...forecastTrace,
+                      xaxis: `x${index + 1}`,
+                      yaxis: `y${index + 1}`,
+                    });
+                  }
+
+                  // Add CI trace if enabled
+                  if (dashboardState.filters.showConfidenceIntervals) {
+                    const ciTrace = traces.find(
+                      (t) =>
+                        t.name ===
+                        `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} CI`,
+                    );
+                    if (ciTrace) {
+                      newTraces.push({
+                        ...ciTrace,
+                        xaxis: `x${index + 1}`,
+                        yaxis: `y${index + 1}`,
+                      });
+                    }
+                  }
+
+                  // Add subplot title
+                  layout[`title${index + 1}`] =
+                    `${scenario.charAt(0).toUpperCase() + scenario.slice(1)} Scenario`;
+                });
+
+                traces = newTraces;
+              }
+
+              Plotly.newPlot(chartContainer, traces, layout, {
+                responsive: true,
               });
-              
-              traces = newTraces;
-            }
-            
-            Plotly.newPlot(chartContainer, traces, layout, {responsive: true});
-          }, 800);
-        }
-      }
-    });
-  }
-  
-  // Helper function to load districts
-  function loadDistricts() {
-    const districtSelect = document.getElementById('district-filter');
-    
-    // In a real application, you would fetch this data from the server
-    // For this example, we'll use hardcoded data
-    setTimeout(() => {
-      // Remove loading option
-      const loadingOption = districtSelect.querySelector('option[value="loading"]');
-      if (loadingOption) {
-        districtSelect.removeChild(loadingOption);
-      }
-      
-      // Add district options
-      const districts = [
-        { id: 'district1', name: 'Kennewick School District' },
-        { id: 'district2', name: 'Richland School District' },
-        { id: 'district3', name: 'Pasco School District' },
-        { id: 'district4', name: 'West Richland Fire District' },
-        { id: 'district5', name: 'Benton County Rural Library' }
-      ];
-      
-      districts.forEach(district => {
-        const option = document.createElement('option');
-        option.value = district.id;
-        option.textContent = district.name;
-        districtSelect.appendChild(option);
-      });
-    }, 500);
-  }
-  
-  // Try to restore saved layout
-  const savedLayout = localStorage.getItem('dashboardLayout');
-  const savedState = localStorage.getItem('dashboardState');
-  
-  if (savedLayout && savedState) {
-    try {
-      dashboardState = JSON.parse(savedState);
-      grid.load(JSON.parse(savedLayout));
-      
-      // Re-initialize panel content
-      document.querySelectorAll('.grid-stack-item').forEach(item => {
-        const panelType = item.getAttribute('data-panel-type');
-        if (panelType) {
-          initializePanelContent(item, panelType);
-          setupPanelEventListeners(item);
+            }, 800);
+          }
         }
       });
-      
-      // Load districts
-      loadDistricts();
-    } catch (e) {
-      console.error('Error restoring layout:', e);
+    }
+
+    // Helper function to load districts
+    function loadDistricts() {
+      const districtSelect = document.getElementById("district-filter");
+
+      // In a real application, you would fetch this data from the server
+      // For this example, we'll use hardcoded data
+      setTimeout(() => {
+        // Remove loading option
+        const loadingOption = districtSelect.querySelector(
+          'option[value="loading"]',
+        );
+        if (loadingOption) {
+          districtSelect.removeChild(loadingOption);
+        }
+
+        // Add district options
+        const districts = [
+          { id: "district1", name: "Kennewick School District" },
+          { id: "district2", name: "Richland School District" },
+          { id: "district3", name: "Pasco School District" },
+          { id: "district4", name: "West Richland Fire District" },
+          { id: "district5", name: "Benton County Rural Library" },
+        ];
+
+        districts.forEach((district) => {
+          const option = document.createElement("option");
+          option.value = district.id;
+          option.textContent = district.name;
+          districtSelect.appendChild(option);
+        });
+      }, 500);
+    }
+
+    // Try to restore saved layout
+    const savedLayout = localStorage.getItem("dashboardLayout");
+    const savedState = localStorage.getItem("dashboardState");
+
+    if (savedLayout && savedState) {
+      try {
+        dashboardState = JSON.parse(savedState);
+        grid.load(JSON.parse(savedLayout));
+
+        // Re-initialize panel content
+        document.querySelectorAll(".grid-stack-item").forEach((item) => {
+          const panelType = item.getAttribute("data-panel-type");
+          if (panelType) {
+            initializePanelContent(item, panelType);
+            setupPanelEventListeners(item);
+          }
+        });
+
+        // Load districts
+        loadDistricts();
+      } catch (e) {
+        console.error("Error restoring layout:", e);
+        initializeDashboard();
+      }
+    } else {
+      // Initialize dashboard with default panels
       initializeDashboard();
     }
-  } else {
-    // Initialize dashboard with default panels
-    initializeDashboard();
-  }
-});
+  });
 </script>
 {% endblock %}

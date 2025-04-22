@@ -1,162 +1,188 @@
-{% extends "levy_exports/base_levy.html" %}
-
-{% block title %}Levy File Parsing Results{% endblock %}
-
-{% block page_title %}Levy Export File Parsing Results{% endblock %}
-{% block page_subtitle %}Preview and convert parsed levy data{% endblock %}
-
-{% block header_actions %}
+{% extends "levy_exports/base_levy.html" %} {% block title %}Levy File Parsing
+Results{% endblock %} {% block page_title %}Levy Export File Parsing Results{%
+endblock %} {% block page_subtitle %}Preview and convert parsed levy data{%
+endblock %} {% block header_actions %}
 <div class="d-flex gap-2">
-    <a href="{{ url_for('levy_exports.index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-grid"></i> Dashboard
-    </a>
-    <a href="{{ url_for('levy_exports.parse_direct') }}" class="btn btn-secondary">
-        <i class="bi bi-arrow-left"></i> Back to Parser
-    </a>
+  <a
+    href="{{ url_for('levy_exports.index') }}"
+    class="btn btn-outline-secondary"
+  >
+    <i class="bi bi-grid"></i> Dashboard
+  </a>
+  <a
+    href="{{ url_for('levy_exports.parse_direct') }}"
+    class="btn btn-secondary"
+  >
+    <i class="bi bi-arrow-left"></i> Back to Parser
+  </a>
 </div>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-header bg-dark">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">File Information</h5>
-                        <span class="badge bg-primary">{{ file_format }}</span>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <h6 class="text-muted">Filename</h6>
-                                <p class="mb-0">{{ filename }}</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <h6 class="text-muted">Total Records</h6>
-                                <p class="mb-0">{{ total_records | number_format }}</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <h6 class="text-muted">Columns</h6>
-                                <p class="mb-0">{{ columns | length }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow">
+        <div class="card-header bg-dark">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">File Information</h5>
+            <span class="badge bg-primary">{{ file_format }}</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <h6 class="text-muted">Filename</h6>
+                <p class="mb-0">{{ filename }}</p>
+              </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-header bg-dark">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Convert to Different Format</h5>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <form action="{{ url_for('levy_exports.convert_format') }}" method="POST" class="row g-3">
-                        <input type="hidden" name="session_id" value="{{ session_id }}">
-                        
-                        <div class="col-lg-9">
-                            <div class="d-flex gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="output_format" id="csv" value="csv" checked>
-                                    <label class="form-check-label" for="csv">
-                                        CSV
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="output_format" id="json" value="json">
-                                    <label class="form-check-label" for="json">
-                                        JSON
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="output_format" id="excel" value="excel">
-                                    <label class="form-check-label" for="excel">
-                                        Excel (XLSX)
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-3 text-end">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-download"></i> Download
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <h6 class="text-muted">Total Records</h6>
+                <p class="mb-0">{{ total_records | number_format }}</p>
+              </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="row mb-5">
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-header bg-dark">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Data Preview</h5>
-                        <span class="badge bg-secondary">Showing {{ preview_data | length }} of {{ total_records }} records</span>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                    {% for col in columns %}
-                                    <th>{{ col }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in preview_data %}
-                                <tr>
-                                    {% for col in columns %}
-                                    <td>{{ row[col] }}</td>
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <h6 class="text-muted">Columns</h6>
+                <p class="mb-0">{{ columns | length }}</p>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    
-    <div class="row mb-4">
-        <div class="col-md-12 text-center">
-            <a href="{{ url_for('levy_exports.parse_direct') }}" class="btn btn-outline-secondary me-2">
-                <i class="bi bi-arrow-left"></i> Parse Another File
-            </a>
-            <a href="{{ url_for('levy_exports.download_parsed', session_id=session_id) }}" class="btn btn-success">
-                <i class="bi bi-download"></i> Download Parsed Data
-            </a>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  </div>
 
-{% block scripts %}
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow">
+        <div class="card-header bg-dark">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Convert to Different Format</h5>
+          </div>
+        </div>
+        <div class="card-body">
+          <form
+            action="{{ url_for('levy_exports.convert_format') }}"
+            method="POST"
+            class="row g-3"
+          >
+            <input type="hidden" name="session_id" value="{{ session_id }}" />
+
+            <div class="col-lg-9">
+              <div class="d-flex gap-3">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="output_format"
+                    id="csv"
+                    value="csv"
+                    checked
+                  />
+                  <label class="form-check-label" for="csv"> CSV </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="output_format"
+                    id="json"
+                    value="json"
+                  />
+                  <label class="form-check-label" for="json"> JSON </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="output_format"
+                    id="excel"
+                    value="excel"
+                  />
+                  <label class="form-check-label" for="excel">
+                    Excel (XLSX)
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-3 text-end">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-download"></i> Download
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-5">
+    <div class="col-md-12">
+      <div class="card shadow">
+        <div class="card-header bg-dark">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Data Preview</h5>
+            <span class="badge bg-secondary"
+              >Showing {{ preview_data | length }} of {{ total_records }}
+              records</span
+            >
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+              <thead class="table-dark">
+                <tr>
+                  {% for col in columns %}
+                  <th>{{ col }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in preview_data %}
+                <tr>
+                  {% for col in columns %}
+                  <td>{{ row[col] }}</td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-12 text-center">
+      <a
+        href="{{ url_for('levy_exports.parse_direct') }}"
+        class="btn btn-outline-secondary me-2"
+      >
+        <i class="bi bi-arrow-left"></i> Parse Another File
+      </a>
+      <a
+        href="{{ url_for('levy_exports.download_parsed', session_id=session_id) }}"
+        class="btn btn-success"
+      >
+        <i class="bi bi-download"></i> Download Parsed Data
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Make table rows clickable
-    const tableRows = document.querySelectorAll('tbody tr');
-    tableRows.forEach(row => {
-        row.addEventListener('click', function() {
-            this.classList.toggle('table-primary');
-        });
+    const tableRows = document.querySelectorAll("tbody tr");
+    tableRows.forEach((row) => {
+      row.addEventListener("click", function () {
+        this.classList.toggle("table-primary");
+      });
     });
-});
+  });
 </script>
 {% endblock %}

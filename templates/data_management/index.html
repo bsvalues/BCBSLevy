@@ -1,373 +1,457 @@
-{% extends 'base.html' %}
-
-{% block title %}Data Management - Levy Calculation System{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends 'base.html' %} {% block title %}Data Management - Levy Calculation
+System{% endblock %} {% block head %} {{ super() }}
 <style>
-    .card-top-border-primary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3DA5BD, #7CBFCC);
-    }
-    
-    .card-top-border-success:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #66A355, #78c265);
-    }
-    
-    .card-top-border-yellow:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #F0C75C, #f5d78a);
-    }
-    
-    .card-top-border-secondary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #6c757d, #adb5bd);
-    }
-    
-    .hover-card {
-        position: relative;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border-radius: 16px; 
-        overflow: hidden;
-    }
-    
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-    
-    .stat-icon {
-        font-size: 3rem;
-        opacity: 0.2;
-        position: absolute;
-        right: 1rem;
-        bottom: 0.5rem;
-    }
-    
-    .activity-badge {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
-        margin-right: 5px;
-    }
-</style>
-{% endblock %}
+  .card-top-border-primary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3da5bd, #7cbfcc);
+  }
 
-{% block content %}
+  .card-top-border-success:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66a355, #78c265);
+  }
+
+  .card-top-border-yellow:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f0c75c, #f5d78a);
+  }
+
+  .card-top-border-secondary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6c757d, #adb5bd);
+  }
+
+  .hover-card {
+    position: relative;
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .stat-icon {
+    font-size: 3rem;
+    opacity: 0.2;
+    position: absolute;
+    right: 1rem;
+    bottom: 0.5rem;
+  }
+
+  .activity-badge {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+  }
+</style>
+{% endblock %} {% block content %}
 <!-- Header Section with Gradient Background -->
 <div class="app-header-bg py-4 mb-4 rounded-4 mx-3">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-5 fw-bold text-white mb-3">Data Management</h1>
-                <p class="lead text-light opacity-90 mb-0">Manage tax districts, tax codes, and property information</p>
-            </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <a href="{{ url_for('home.index') }}" class="btn btn-light rounded-pill px-4">
-                    <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-                </a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="display-5 fw-bold text-white mb-3">Data Management</h1>
+        <p class="lead text-light opacity-90 mb-0">
+          Manage tax districts, tax codes, and property information
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <a
+          href="{{ url_for('home.index') }}"
+          class="btn btn-light rounded-pill px-4"
+        >
+          <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="container">
-    <!-- Data Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card hover-card card-top-border-primary position-relative">
-                <div class="card-body">
-                    <h5 class="card-title">Tax Districts</h5>
-                    <h2 class="display-4 fw-bold">{{ district_count }}</h2>
-                    <p class="text-muted mb-0">Active tax districts</p>
-                    <i class="bi bi-building stat-icon text-primary"></i>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('data_management.tax_districts') }}" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-eye me-1"></i>View Districts
-                    </a>
-                </div>
-            </div>
+  <!-- Data Statistics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card hover-card card-top-border-primary position-relative">
+        <div class="card-body">
+          <h5 class="card-title">Tax Districts</h5>
+          <h2 class="display-4 fw-bold">{{ district_count }}</h2>
+          <p class="text-muted mb-0">Active tax districts</p>
+          <i class="bi bi-building stat-icon text-primary"></i>
         </div>
-        <div class="col-md-4">
-            <div class="card hover-card card-top-border-success position-relative">
-                <div class="card-body">
-                    <h5 class="card-title">Tax Codes</h5>
-                    <h2 class="display-4 fw-bold">{{ tax_code_count }}</h2>
-                    <p class="text-muted mb-0">Unique tax codes</p>
-                    <i class="bi bi-upc-scan stat-icon text-success"></i>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('data_management.tax_codes') }}" class="btn btn-sm btn-outline-success">
-                        <i class="bi bi-eye me-1"></i>View Tax Codes
-                    </a>
-                </div>
-            </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('data_management.tax_districts') }}"
+            class="btn btn-sm btn-outline-primary"
+          >
+            <i class="bi bi-eye me-1"></i>View Districts
+          </a>
         </div>
-        <div class="col-md-4">
-            <div class="card hover-card card-top-border-yellow position-relative">
-                <div class="card-body">
-                    <h5 class="card-title">Properties</h5>
-                    <h2 class="display-4 fw-bold">{{ property_count }}</h2>
-                    <p class="text-muted mb-0">Registered properties</p>
-                    <i class="bi bi-houses stat-icon text-warning"></i>
-                </div>
-                <div class="card-footer bg-transparent border-0">
-                    <a href="{{ url_for('data_management.properties') }}" class="btn btn-sm btn-outline-warning">
-                        <i class="bi bi-eye me-1"></i>View Properties
-                    </a>
-                </div>
-            </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card hover-card card-top-border-success position-relative">
+        <div class="card-body">
+          <h5 class="card-title">Tax Codes</h5>
+          <h2 class="display-4 fw-bold">{{ tax_code_count }}</h2>
+          <p class="text-muted mb-0">Unique tax codes</p>
+          <i class="bi bi-upc-scan stat-icon text-success"></i>
         </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('data_management.tax_codes') }}"
+            class="btn btn-sm btn-outline-success"
+          >
+            <i class="bi bi-eye me-1"></i>View Tax Codes
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card hover-card card-top-border-yellow position-relative">
+        <div class="card-body">
+          <h5 class="card-title">Properties</h5>
+          <h2 class="display-4 fw-bold">{{ property_count }}</h2>
+          <p class="text-muted mb-0">Registered properties</p>
+          <i class="bi bi-houses stat-icon text-warning"></i>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a
+            href="{{ url_for('data_management.properties') }}"
+            class="btn btn-sm btn-outline-warning"
+          >
+            <i class="bi bi-eye me-1"></i>View Properties
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions and Recent Activities -->
+  <div class="row">
+    <!-- Quick Actions -->
+    <div class="col-md-6">
+      <div class="card hover-card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a
+              href="{{ url_for('data_management.import_form') }}"
+              class="btn btn-primary"
+            >
+              <i class="bi bi-upload me-2"></i>Import Data
+            </a>
+            <a
+              href="{{ url_for('data_management.export_form') }}"
+              class="btn btn-success"
+            >
+              <i class="bi bi-download me-2"></i>Export Data
+            </a>
+            <a
+              href="{{ url_for('data_management.district_import') }}"
+              class="btn btn-warning"
+            >
+              <i class="bi bi-building-add me-2"></i>Import Tax Districts
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Quick Actions and Recent Activities -->
-    <div class="row">
-        <!-- Quick Actions -->
-        <div class="col-md-6">
-            <div class="card hover-card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('data_management.import_form') }}" class="btn btn-primary">
-                            <i class="bi bi-upload me-2"></i>Import Data
-                        </a>
-                        <a href="{{ url_for('data_management.export_form') }}" class="btn btn-success">
-                            <i class="bi bi-download me-2"></i>Export Data
-                        </a>
-                        <a href="{{ url_for('data_management.district_import') }}" class="btn btn-warning">
-                            <i class="bi bi-building-add me-2"></i>Import Tax Districts
-                        </a>
-                    </div>
-                </div>
-            </div>
+    <!-- Recent Activities -->
+    <div class="col-md-6">
+      <div class="card hover-card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-activity me-2"></i>Recent Activity
+          </h5>
         </div>
-        
-        <!-- Recent Activities -->
-        <div class="col-md-6">
-            <div class="card hover-card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
-                </div>
-                <div class="card-body p-0">
-                    <!-- Recent Imports -->
-                    <div class="list-group">
-                        <div class="list-group-item bg-light">
-                            <strong><i class="bi bi-upload me-1"></i>Recent Imports</strong>
-                        </div>
-                        {% if recent_imports %}
-                            {% for import_log in recent_imports %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="activity-badge bg-primary"></span>
-                                        {{ import_log.import_type_str }} Import
-                                        <small class="text-muted ms-2">{{ import_log.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                                    </div>
-                                    <span class="badge bg-primary rounded-pill">{{ import_log.record_count }}</span>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="list-group-item text-center text-muted py-3">
-                                <i class="bi bi-inbox me-2"></i>No recent imports
-                            </div>
-                        {% endif %}
-                    </div>
+        <div class="card-body p-0">
+          <!-- Recent Imports -->
+          <div class="list-group">
+            <div class="list-group-item bg-light">
+              <strong><i class="bi bi-upload me-1"></i>Recent Imports</strong>
+            </div>
+            {% if recent_imports %} {% for import_log in recent_imports %}
+            <div
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <span class="activity-badge bg-primary"></span>
+                {{ import_log.import_type_str }} Import
+                <small class="text-muted ms-2"
+                  >{{ import_log.created_at.strftime('%Y-%m-%d %H:%M') }}</small
+                >
+              </div>
+              <span class="badge bg-primary rounded-pill"
+                >{{ import_log.record_count }}</span
+              >
+            </div>
+            {% endfor %} {% else %}
+            <div class="list-group-item text-center text-muted py-3">
+              <i class="bi bi-inbox me-2"></i>No recent imports
+            </div>
+            {% endif %}
+          </div>
 
-                    <!-- Recent Exports -->
-                    <div class="list-group">
-                        <div class="list-group-item bg-light">
-                            <strong><i class="bi bi-download me-1"></i>Recent Exports</strong>
-                        </div>
-                        {% if recent_exports %}
-                            {% for export_log in recent_exports %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="activity-badge bg-success"></span>
-                                        {{ export_log.export_type_str }} Export
-                                        <small class="text-muted ms-2">{{ export_log.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
-                                    </div>
-                                    <span class="badge bg-success rounded-pill">{{ export_log.record_count }}</span>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="list-group-item text-center text-muted py-3">
-                                <i class="bi bi-inbox me-2"></i>No recent exports
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="card-footer bg-transparent">
-                    <div class="row">
-                        <div class="col-6">
-                            <a href="{{ url_for('data_management.import_history') }}" class="btn btn-sm btn-outline-primary w-100">
-                                <i class="bi bi-clock-history me-1"></i>Import History
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="{{ url_for('data_management.export_history') }}" class="btn btn-sm btn-outline-success w-100">
-                                <i class="bi bi-clock-history me-1"></i>Export History
-                            </a>
-                        </div>
-                    </div>
-                </div>
+          <!-- Recent Exports -->
+          <div class="list-group">
+            <div class="list-group-item bg-light">
+              <strong><i class="bi bi-download me-1"></i>Recent Exports</strong>
             </div>
+            {% if recent_exports %} {% for export_log in recent_exports %}
+            <div
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <span class="activity-badge bg-success"></span>
+                {{ export_log.export_type_str }} Export
+                <small class="text-muted ms-2"
+                  >{{ export_log.created_at.strftime('%Y-%m-%d %H:%M') }}</small
+                >
+              </div>
+              <span class="badge bg-success rounded-pill"
+                >{{ export_log.record_count }}</span
+              >
+            </div>
+            {% endfor %} {% else %}
+            <div class="list-group-item text-center text-muted py-3">
+              <i class="bi bi-inbox me-2"></i>No recent exports
+            </div>
+            {% endif %}
+          </div>
         </div>
+        <div class="card-footer bg-transparent">
+          <div class="row">
+            <div class="col-6">
+              <a
+                href="{{ url_for('data_management.import_history') }}"
+                class="btn btn-sm btn-outline-primary w-100"
+              >
+                <i class="bi bi-clock-history me-1"></i>Import History
+              </a>
+            </div>
+            <div class="col-6">
+              <a
+                href="{{ url_for('data_management.export_history') }}"
+                class="btn btn-sm btn-outline-success w-100"
+              >
+                <i class="bi bi-clock-history me-1"></i>Export History
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <!-- Data Management Tools -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card hover-card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Data Management Tools</h5>
-                </div>
+  </div>
+
+  <!-- Data Management Tools -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card hover-card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-tools me-2"></i>Data Management Tools
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <!-- Tax District Management -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-top-border-primary position-relative h-100">
                 <div class="card-body">
-                    <div class="row g-4">
-                        <!-- Tax District Management -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card card-top-border-primary position-relative h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="feature-icon bg-primary bg-opacity-10 text-primary me-3">
-                                            <i class="bi bi-building"></i>
-                                        </div>
-                                        <h5 class="card-title mb-0">Tax Districts</h5>
-                                    </div>
-                                    <p class="card-text">Manage tax districts, view district details, and update district information.</p>
-                                    <a href="{{ url_for('data_management.tax_districts') }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-arrow-right me-1"></i>Manage Districts
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tax Code Management -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card card-top-border-success position-relative h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="feature-icon bg-success bg-opacity-10 text-success me-3">
-                                            <i class="bi bi-upc-scan"></i>
-                                        </div>
-                                        <h5 class="card-title mb-0">Tax Codes</h5>
-                                    </div>
-                                    <p class="card-text">View and manage tax codes, including rate information and district associations.</p>
-                                    <a href="{{ url_for('data_management.tax_codes') }}" class="btn btn-sm btn-outline-success">
-                                        <i class="bi bi-arrow-right me-1"></i>Manage Tax Codes
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Property Management -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card card-top-border-yellow position-relative h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="feature-icon bg-warning bg-opacity-10 text-warning me-3">
-                                            <i class="bi bi-houses"></i>
-                                        </div>
-                                        <h5 class="card-title mb-0">Properties</h5>
-                                    </div>
-                                    <p class="card-text">View property records, update property information, and manage property tax codes.</p>
-                                    <a href="{{ url_for('data_management.properties') }}" class="btn btn-sm btn-outline-warning">
-                                        <i class="bi bi-arrow-right me-1"></i>Manage Properties
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Import Tool -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card card-top-border-primary position-relative h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="feature-icon bg-primary bg-opacity-10 text-primary me-3">
-                                            <i class="bi bi-upload"></i>
-                                        </div>
-                                        <h5 class="card-title mb-0">Import Tool</h5>
-                                    </div>
-                                    <p class="card-text">Import data from various file formats including CSV, Excel, XML, and TXT files.</p>
-                                    <a href="{{ url_for('data_management.import_form') }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-arrow-right me-1"></i>Import Data
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Export Tool -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card card-top-border-success position-relative h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="feature-icon bg-success bg-opacity-10 text-success me-3">
-                                            <i class="bi bi-download"></i>
-                                        </div>
-                                        <h5 class="card-title mb-0">Export Tool</h5>
-                                    </div>
-                                    <p class="card-text">Export data to various formats for external use, reporting, and analysis.</p>
-                                    <a href="{{ url_for('data_management.export_form') }}" class="btn btn-sm btn-outline-success">
-                                        <i class="bi bi-arrow-right me-1"></i>Export Data
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- District Import Tool -->
-                        <div class="col-md-6 col-lg-4">
-                            <div class="card card-top-border-yellow position-relative h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="feature-icon bg-warning bg-opacity-10 text-warning me-3">
-                                            <i class="bi bi-building-add"></i>
-                                        </div>
-                                        <h5 class="card-title mb-0">District Import</h5>
-                                    </div>
-                                    <p class="card-text">Specialized tool for importing tax district information from levy exports.</p>
-                                    <a href="{{ url_for('data_management.district_import') }}" class="btn btn-sm btn-outline-warning">
-                                        <i class="bi bi-arrow-right me-1"></i>Import Districts
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="feature-icon bg-primary bg-opacity-10 text-primary me-3"
+                    >
+                      <i class="bi bi-building"></i>
                     </div>
+                    <h5 class="card-title mb-0">Tax Districts</h5>
+                  </div>
+                  <p class="card-text">
+                    Manage tax districts, view district details, and update
+                    district information.
+                  </p>
+                  <a
+                    href="{{ url_for('data_management.tax_districts') }}"
+                    class="btn btn-sm btn-outline-primary"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i>Manage Districts
+                  </a>
                 </div>
+              </div>
             </div>
+
+            <!-- Tax Code Management -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-top-border-success position-relative h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="feature-icon bg-success bg-opacity-10 text-success me-3"
+                    >
+                      <i class="bi bi-upc-scan"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Tax Codes</h5>
+                  </div>
+                  <p class="card-text">
+                    View and manage tax codes, including rate information and
+                    district associations.
+                  </p>
+                  <a
+                    href="{{ url_for('data_management.tax_codes') }}"
+                    class="btn btn-sm btn-outline-success"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i>Manage Tax Codes
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Property Management -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-top-border-yellow position-relative h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="feature-icon bg-warning bg-opacity-10 text-warning me-3"
+                    >
+                      <i class="bi bi-houses"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Properties</h5>
+                  </div>
+                  <p class="card-text">
+                    View property records, update property information, and
+                    manage property tax codes.
+                  </p>
+                  <a
+                    href="{{ url_for('data_management.properties') }}"
+                    class="btn btn-sm btn-outline-warning"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i>Manage Properties
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Import Tool -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-top-border-primary position-relative h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="feature-icon bg-primary bg-opacity-10 text-primary me-3"
+                    >
+                      <i class="bi bi-upload"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Import Tool</h5>
+                  </div>
+                  <p class="card-text">
+                    Import data from various file formats including CSV, Excel,
+                    XML, and TXT files.
+                  </p>
+                  <a
+                    href="{{ url_for('data_management.import_form') }}"
+                    class="btn btn-sm btn-outline-primary"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i>Import Data
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Export Tool -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-top-border-success position-relative h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="feature-icon bg-success bg-opacity-10 text-success me-3"
+                    >
+                      <i class="bi bi-download"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Export Tool</h5>
+                  </div>
+                  <p class="card-text">
+                    Export data to various formats for external use, reporting,
+                    and analysis.
+                  </p>
+                  <a
+                    href="{{ url_for('data_management.export_form') }}"
+                    class="btn btn-sm btn-outline-success"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i>Export Data
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- District Import Tool -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-top-border-yellow position-relative h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="feature-icon bg-warning bg-opacity-10 text-warning me-3"
+                    >
+                      <i class="bi bi-building-add"></i>
+                    </div>
+                    <h5 class="card-title mb-0">District Import</h5>
+                  </div>
+                  <p class="card-text">
+                    Specialized tool for importing tax district information from
+                    levy exports.
+                  </p>
+                  <a
+                    href="{{ url_for('data_management.district_import') }}"
+                    class="btn btn-sm btn-outline-warning"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i>Import Districts
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
+{% endblock %} {% block scripts %} {{ super() }}
 <script>
-    // Initialize any JavaScript functionality here
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add any needed JavaScript for the data management dashboard
-    });
+  // Initialize any JavaScript functionality here
+  document.addEventListener("DOMContentLoaded", function () {
+    // Add any needed JavaScript for the data management dashboard
+  });
 </script>
 {% endblock %}

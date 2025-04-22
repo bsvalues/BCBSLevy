@@ -1,335 +1,502 @@
-{% extends "base.html" %}
-
-{% block title %}User Activity Logs{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}User Activity Logs{% endblock %} {%
+block content %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">User Activity Logs</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('user_audit.index') }}">User Audit</a></li>
-        <li class="breadcrumb-item active">Activity Logs</li>
-    </ol>
-    
-    <!-- Filter Card -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-filter me-1"></i>
-            Filter Options
-        </div>
-        <div class="card-body">
-            <form method="get" action="{{ url_for('user_audit.user_activity') }}" id="filterForm">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label for="user_id" class="form-label">User</label>
-                        <select class="form-select" id="user_id" name="user_id">
-                            <option value="">All Users</option>
-                            {% for user in users %}
-                            <option value="{{ user.id }}" {% if selected_user_id == user.id %}selected{% endif %}>
-                                {{ user.username }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="action_type" class="form-label">Action Type</label>
-                        <select class="form-select" id="action_type" name="action_type">
-                            <option value="">All Actions</option>
-                            {% for action_type, count in action_types %}
-                            <option value="{{ action_type }}" {% if selected_action_type == action_type %}selected{% endif %}>
-                                {{ action_type }} ({{ count }})
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="module" class="form-label">Module</label>
-                        <select class="form-select" id="module" name="module">
-                            <option value="">All Modules</option>
-                            {% for module, count in modules %}
-                            <option value="{{ module }}" {% if selected_module == module %}selected{% endif %}>
-                                {{ module }} ({{ count }})
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="days" class="form-label">Time Period</label>
-                        <select class="form-select" id="days" name="days">
-                            <option value="1" {% if selected_days == 1 %}selected{% endif %}>Last 24 Hours</option>
-                            <option value="7" {% if selected_days == 7 %}selected{% endif %}>Last 7 Days</option>
-                            <option value="30" {% if selected_days == 30 %}selected{% endif %}>Last 30 Days</option>
-                            <option value="90" {% if selected_days == 90 %}selected{% endif %}>Last 90 Days</option>
-                            <option value="365" {% if selected_days == 365 %}selected{% endif %}>Last Year</option>
-                            <option value="0" {% if selected_days == 0 %}selected{% endif %}>All Time</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 text-end">
-                        <button type="submit" class="btn btn-primary">Apply Filters</button>
-                        <a href="{{ url_for('user_audit.user_activity') }}" class="btn btn-secondary">Reset</a>
-                    </div>
-                </div>
-            </form>
-        </div>
+  <h1 class="mt-4">User Activity Logs</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('user_audit.index') }}">User Audit</a>
+    </li>
+    <li class="breadcrumb-item active">Activity Logs</li>
+  </ol>
+
+  <!-- Filter Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-filter me-1"></i>
+      Filter Options
     </div>
-    
-    <!-- Results Card -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <i class="fas fa-table me-1"></i>
-                    Activity Log Results
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-outline-secondary" id="exportBtn">
-                        <i class="fas fa-file-export me-1"></i> Export
-                    </button>
-                </div>
-            </div>
+    <div class="card-body">
+      <form
+        method="get"
+        action="{{ url_for('user_audit.user_activity') }}"
+        id="filterForm"
+      >
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label for="user_id" class="form-label">User</label>
+            <select class="form-select" id="user_id" name="user_id">
+              <option value="">All Users</option>
+              {% for user in users %}
+              <option
+                value="{{ user.id }}"
+                {%
+                if
+                selected_user_id=""
+                ="user.id"
+                %}selected{%
+                endif
+                %}
+              >
+                {{ user.username }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="action_type" class="form-label">Action Type</label>
+            <select class="form-select" id="action_type" name="action_type">
+              <option value="">All Actions</option>
+              {% for action_type, count in action_types %}
+              <option
+                value="{{ action_type }}"
+                {%
+                if
+                selected_action_type=""
+                ="action_type"
+                %}selected{%
+                endif
+                %}
+              >
+                {{ action_type }} ({{ count }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="module" class="form-label">Module</label>
+            <select class="form-select" id="module" name="module">
+              <option value="">All Modules</option>
+              {% for module, count in modules %}
+              <option
+                value="{{ module }}"
+                {%
+                if
+                selected_module=""
+                ="module"
+                %}selected{%
+                endif
+                %}
+              >
+                {{ module }} ({{ count }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 mb-3">
+            <label for="days" class="form-label">Time Period</label>
+            <select class="form-select" id="days" name="days">
+              <option
+                value="1"
+                {%
+                if
+                selected_days=""
+                ="1"
+                %}selected{%
+                endif
+                %}
+              >
+                Last 24 Hours
+              </option>
+              <option
+                value="7"
+                {%
+                if
+                selected_days=""
+                ="7"
+                %}selected{%
+                endif
+                %}
+              >
+                Last 7 Days
+              </option>
+              <option
+                value="30"
+                {%
+                if
+                selected_days=""
+                ="30"
+                %}selected{%
+                endif
+                %}
+              >
+                Last 30 Days
+              </option>
+              <option
+                value="90"
+                {%
+                if
+                selected_days=""
+                ="90"
+                %}selected{%
+                endif
+                %}
+              >
+                Last 90 Days
+              </option>
+              <option
+                value="365"
+                {%
+                if
+                selected_days=""
+                ="365"
+                %}selected{%
+                endif
+                %}
+              >
+                Last Year
+              </option>
+              <option
+                value="0"
+                {%
+                if
+                selected_days=""
+                ="0"
+                %}selected{%
+                endif
+                %}
+              >
+                All Time
+              </option>
+            </select>
+          </div>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="activityTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Action Type</th>
-                            <th>Module</th>
-                            <th>Submodule</th>
-                            <th>Entity</th>
-                            <th>Timestamp</th>
-                            <th>Status</th>
-                            <th>Duration</th>
-                            <th>Details</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for action in pagination.items %}
-                        <tr>
-                            <td>{{ action.id }}</td>
-                            <td>
-                                {% if action.user %}
-                                <a href="{{ url_for('user_audit.user_detail', user_id=action.user_id) }}">
-                                    {{ action.user.username }}
-                                </a>
-                                {% else %}
-                                Anonymous
-                                {% endif %}
-                            </td>
-                            <td>{{ action.action_type }}</td>
-                            <td>{{ action.module }}</td>
-                            <td>{{ action.submodule or '-' }}</td>
-                            <td>
-                                {% if action.entity_type and action.entity_id %}
-                                {{ action.entity_type }}:{{ action.entity_id }}
-                                {% else %}
-                                -
-                                {% endif %}
-                            </td>
-                            <td>{{ action.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                            <td>
-                                {% if action.success %}
-                                <span class="badge bg-success">Success</span>
-                                {% else %}
-                                <span class="badge bg-danger" data-bs-toggle="tooltip" title="{{ action.error_message }}">Failed</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if action.duration_ms %}
-                                {{ "%.2f"|format(action.duration_ms) }} ms
-                                {% else %}
-                                -
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if action.action_details %}
-                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ action.id }}">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                                
-                                <!-- Details Modal -->
-                                <div class="modal fade" id="detailsModal{{ action.id }}" tabindex="-1" aria-labelledby="detailsModalLabel{{ action.id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="detailsModalLabel{{ action.id }}">Action Details #{{ action.id }}</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="mb-3">
-                                                    <h6>Action Information</h6>
-                                                    <dl class="row">
-                                                        <dt class="col-sm-3">User:</dt>
-                                                        <dd class="col-sm-9">{{ action.user.username if action.user else 'Anonymous' }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Action Type:</dt>
-                                                        <dd class="col-sm-9">{{ action.action_type }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Module:</dt>
-                                                        <dd class="col-sm-9">{{ action.module }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Submodule:</dt>
-                                                        <dd class="col-sm-9">{{ action.submodule or '-' }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Timestamp:</dt>
-                                                        <dd class="col-sm-9">{{ action.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">IP Address:</dt>
-                                                        <dd class="col-sm-9">{{ action.ip_address or '-' }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">User Agent:</dt>
-                                                        <dd class="col-sm-9">{{ action.user_agent or '-' }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Session ID:</dt>
-                                                        <dd class="col-sm-9">{{ action.session_id or '-' }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Duration:</dt>
-                                                        <dd class="col-sm-9">{{ "%.2f"|format(action.duration_ms) + ' ms' if action.duration_ms else '-' }}</dd>
-                                                        
-                                                        <dt class="col-sm-3">Status:</dt>
-                                                        <dd class="col-sm-9">
-                                                            {% if action.success %}
-                                                            <span class="badge bg-success">Success</span>
-                                                            {% else %}
-                                                            <span class="badge bg-danger">Failed</span>
-                                                            {% endif %}
-                                                        </dd>
-                                                        
-                                                        {% if not action.success and action.error_message %}
-                                                        <dt class="col-sm-3">Error Message:</dt>
-                                                        <dd class="col-sm-9">{{ action.error_message }}</dd>
-                                                        {% endif %}
-                                                    </dl>
-                                                </div>
-                                                
-                                                <div class="mb-3">
-                                                    <h6>Action Details</h6>
-                                                    <pre class="bg-light p-3 rounded"><code>{{ action.action_details | tojson(indent=2) }}</code></pre>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% else %}
-                                -
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="10" class="text-center">No activity logs found matching the filters</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Pagination -->
-            {% if pagination.pages > 1 %}
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center mt-4">
-                    <!-- Previous page -->
-                    {% if pagination.has_prev %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('user_audit.user_activity', page=pagination.prev_num, user_id=selected_user_id, action_type=selected_action_type, module=selected_module, days=selected_days) }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                    
-                    <!-- Page numbers -->
-                    {% for page_num in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
-                        {% if page_num %}
-                            {% if page_num != pagination.page %}
-                            <li class="page-item">
-                                <a class="page-link" href="{{ url_for('user_audit.user_activity', page=page_num, user_id=selected_user_id, action_type=selected_action_type, module=selected_module, days=selected_days) }}">{{ page_num }}</a>
-                            </li>
-                            {% else %}
-                            <li class="page-item active"><a class="page-link" href="#">{{ page_num }}</a></li>
+        <div class="row">
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a
+              href="{{ url_for('user_audit.user_activity') }}"
+              class="btn btn-secondary"
+              >Reset</a
+            >
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <i class="fas fa-table me-1"></i>
+          Activity Log Results
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-secondary" id="exportBtn">
+            <i class="fas fa-file-export me-1"></i> Export
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover" id="activityTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Action Type</th>
+              <th>Module</th>
+              <th>Submodule</th>
+              <th>Entity</th>
+              <th>Timestamp</th>
+              <th>Status</th>
+              <th>Duration</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for action in pagination.items %}
+            <tr>
+              <td>{{ action.id }}</td>
+              <td>
+                {% if action.user %}
+                <a
+                  href="{{ url_for('user_audit.user_detail', user_id=action.user_id) }}"
+                >
+                  {{ action.user.username }}
+                </a>
+                {% else %} Anonymous {% endif %}
+              </td>
+              <td>{{ action.action_type }}</td>
+              <td>{{ action.module }}</td>
+              <td>{{ action.submodule or '-' }}</td>
+              <td>
+                {% if action.entity_type and action.entity_id %} {{
+                action.entity_type }}:{{ action.entity_id }} {% else %} - {%
+                endif %}
+              </td>
+              <td>{{ action.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+              <td>
+                {% if action.success %}
+                <span class="badge bg-success">Success</span>
+                {% else %}
+                <span
+                  class="badge bg-danger"
+                  data-bs-toggle="tooltip"
+                  title="{{ action.error_message }}"
+                  >Failed</span
+                >
+                {% endif %}
+              </td>
+              <td>
+                {% if action.duration_ms %} {{ "%.2f"|format(action.duration_ms)
+                }} ms {% else %} - {% endif %}
+              </td>
+              <td>
+                {% if action.action_details %}
+                <button
+                  type="button"
+                  class="btn btn-sm btn-info"
+                  data-bs-toggle="modal"
+                  data-bs-target="#detailsModal{{ action.id }}"
+                >
+                  <i class="fas fa-info-circle"></i>
+                </button>
+
+                <!-- Details Modal -->
+                <div
+                  class="modal fade"
+                  id="detailsModal{{ action.id }}"
+                  tabindex="-1"
+                  aria-labelledby="detailsModalLabel{{ action.id }}"
+                  aria-hidden="true"
+                >
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5
+                          class="modal-title"
+                          id="detailsModalLabel{{ action.id }}"
+                        >
+                          Action Details #{{ action.id }}
+                        </h5>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div class="modal-body">
+                        <div class="mb-3">
+                          <h6>Action Information</h6>
+                          <dl class="row">
+                            <dt class="col-sm-3">User:</dt>
+                            <dd class="col-sm-9">
+                              {{ action.user.username if action.user else
+                              'Anonymous' }}
+                            </dd>
+
+                            <dt class="col-sm-3">Action Type:</dt>
+                            <dd class="col-sm-9">{{ action.action_type }}</dd>
+
+                            <dt class="col-sm-3">Module:</dt>
+                            <dd class="col-sm-9">{{ action.module }}</dd>
+
+                            <dt class="col-sm-3">Submodule:</dt>
+                            <dd class="col-sm-9">
+                              {{ action.submodule or '-' }}
+                            </dd>
+
+                            <dt class="col-sm-3">Timestamp:</dt>
+                            <dd class="col-sm-9">
+                              {{ action.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                              }}
+                            </dd>
+
+                            <dt class="col-sm-3">IP Address:</dt>
+                            <dd class="col-sm-9">
+                              {{ action.ip_address or '-' }}
+                            </dd>
+
+                            <dt class="col-sm-3">User Agent:</dt>
+                            <dd class="col-sm-9">
+                              {{ action.user_agent or '-' }}
+                            </dd>
+
+                            <dt class="col-sm-3">Session ID:</dt>
+                            <dd class="col-sm-9">
+                              {{ action.session_id or '-' }}
+                            </dd>
+
+                            <dt class="col-sm-3">Duration:</dt>
+                            <dd class="col-sm-9">
+                              {{ "%.2f"|format(action.duration_ms) + ' ms' if
+                              action.duration_ms else '-' }}
+                            </dd>
+
+                            <dt class="col-sm-3">Status:</dt>
+                            <dd class="col-sm-9">
+                              {% if action.success %}
+                              <span class="badge bg-success">Success</span>
+                              {% else %}
+                              <span class="badge bg-danger">Failed</span>
+                              {% endif %}
+                            </dd>
+
+                            {% if not action.success and action.error_message %}
+                            <dt class="col-sm-3">Error Message:</dt>
+                            <dd class="col-sm-9">{{ action.error_message }}</dd>
                             {% endif %}
-                        {% else %}
-                            <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    <!-- Next page -->
-                    {% if pagination.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('user_audit.user_activity', page=pagination.next_num, user_id=selected_user_id, action_type=selected_action_type, module=selected_module, days=selected_days) }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-        </div>
+                          </dl>
+                        </div>
+
+                        <div class="mb-3">
+                          <h6>Action Details</h6>
+                          <pre
+                            class="bg-light p-3 rounded"
+                          ><code>{{ action.action_details | tojson(indent=2) }}</code></pre>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          data-bs-dismiss="modal"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% else %} - {% endif %}
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="10" class="text-center">
+                No activity logs found matching the filters
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if pagination.pages > 1 %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+          <!-- Previous page -->
+          {% if pagination.has_prev %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="{{ url_for('user_audit.user_activity', page=pagination.prev_num, user_id=selected_user_id, action_type=selected_action_type, module=selected_module, days=selected_days) }}"
+              aria-label="Previous"
+            >
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+
+          <!-- Page numbers -->
+          {% for page_num in pagination.iter_pages(left_edge=2, left_current=2,
+          right_current=3, right_edge=2) %} {% if page_num %} {% if page_num !=
+          pagination.page %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="{{ url_for('user_audit.user_activity', page=page_num, user_id=selected_user_id, action_type=selected_action_type, module=selected_module, days=selected_days) }}"
+              >{{ page_num }}</a
+            >
+          </li>
+          {% else %}
+          <li class="page-item active">
+            <a class="page-link" href="#">{{ page_num }}</a>
+          </li>
+          {% endif %} {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#">...</a>
+          </li>
+          {% endif %} {% endfor %}
+
+          <!-- Next page -->
+          {% if pagination.has_next %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="{{ url_for('user_audit.user_activity', page=pagination.next_num, user_id=selected_user_id, action_type=selected_action_type, module=selected_module, days=selected_days) }}"
+              aria-label="Next"
+            >
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
     </div>
+  </div>
 </div>
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-        
-        // Export functionality
-        document.getElementById('exportBtn').addEventListener('click', function() {
-            // Create CSV content
-            var table = document.getElementById('activityTable');
-            var rows = table.querySelectorAll('tr');
-            var csv = [];
-            
-            for (var i = 0; i < rows.length; i++) {
-                var row = [], cols = rows[i].querySelectorAll('td, th');
-                
-                for (var j = 0; j < cols.length; j++) {
-                    // Remove HTML and get text content
-                    var text = cols[j].textContent.trim();
-                    // Escape quotes and enclose in quotes
-                    text = text.replace(/"/g, '""');
-                    row.push('"' + text + '"');
-                }
-                
-                csv.push(row.join(','));
-            }
-            
-            // Create blob and download
-            var csvContent = csv.join('\n');
-            var blob = new Blob([csvContent], { type: 'text/csv' });
-            var url = window.URL.createObjectURL(blob);
-            
-            var a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'user_activity_log_' + new Date().toISOString().slice(0, 10) + '.csv');
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+    );
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+    // Export functionality
+    document.getElementById("exportBtn").addEventListener("click", function () {
+      // Create CSV content
+      var table = document.getElementById("activityTable");
+      var rows = table.querySelectorAll("tr");
+      var csv = [];
+
+      for (var i = 0; i < rows.length; i++) {
+        var row = [],
+          cols = rows[i].querySelectorAll("td, th");
+
+        for (var j = 0; j < cols.length; j++) {
+          // Remove HTML and get text content
+          var text = cols[j].textContent.trim();
+          // Escape quotes and enclose in quotes
+          text = text.replace(/"/g, '""');
+          row.push('"' + text + '"');
+        }
+
+        csv.push(row.join(","));
+      }
+
+      // Create blob and download
+      var csvContent = csv.join("\n");
+      var blob = new Blob([csvContent], { type: "text/csv" });
+      var url = window.URL.createObjectURL(blob);
+
+      var a = document.createElement("a");
+      a.setAttribute("hidden", "");
+      a.setAttribute("href", url);
+      a.setAttribute(
+        "download",
+        "user_activity_log_" + new Date().toISOString().slice(0, 10) + ".csv",
+      );
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  });
 </script>
-{% endblock %}
-{% endblock %}
+{% endblock %} {% endblock %}

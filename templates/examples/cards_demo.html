@@ -1,343 +1,472 @@
-{% extends "base.html" %}
-
-{% block title %}Keras-style Carousel Cards Demo{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Keras-style Carousel Cards Demo{%
+endblock %} {% block content %}
 <div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-primary text-white">
-                    <h2 class="h4 m-0">Keras-style Carousel Cards</h2>
-                </div>
-                <div class="card-body">
-                    <p class="lead">Modern, interactive card carousels with swipe gestures and responsive behavior.</p>
-                </div>
-            </div>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white">
+          <h2 class="h4 m-0">Keras-style Carousel Cards</h2>
         </div>
-    </div>
-
-    <!-- Basic Carousel Demo -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header">
-                    <h3 class="h5 m-0">Basic Carousel</h3>
-                </div>
-                <div class="card-body">
-                    <div class="keras-carousel" data-slides-to-show="3">
-                        <div class="keras-carousel-track">
-                            <!-- Card 1 -->
-                            <div class="keras-card keras-card-primary">
-                                <div class="keras-card-img-top" style="background-image: url('/static/images/benton-county-1.jpg')"></div>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Tax District Overview</h5>
-                                    <p class="keras-card-text">Detailed information about tax districts in Benton County with rates, collections, and historical data.</p>
-                                    <div class="keras-card-meta">
-                                        <span><i class="bi bi-calendar3"></i> Updated Apr 2025</span>
-                                        <span><i class="bi bi-graph-up"></i> 12% growth</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-outline-primary">View Details</button>
-                                    <span class="text-muted">District #142</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 2 -->
-                            <div class="keras-card keras-card-success">
-                                <div class="keras-card-img-top" style="background-image: url('/static/images/benton-county-2.jpg')"></div>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Property Value Analysis</h5>
-                                    <p class="keras-card-text">Assessment values and property tax calculations for residential areas with year-over-year comparison.</p>
-                                    <div class="keras-card-meta">
-                                        <span><i class="bi bi-calendar3"></i> Updated Mar 2025</span>
-                                        <span><i class="bi bi-house"></i> 1,540 properties</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-outline-success">View Analysis</button>
-                                    <span class="text-muted">Area #28</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 3 -->
-                            <div class="keras-card keras-card-info">
-                                <div class="keras-card-img-top" style="background-image: url('/static/images/benton-county-3.jpg')"></div>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Forecast Report</h5>
-                                    <p class="keras-card-text">Levy rate forecasts for the next 5 years with statistical model confidence intervals and trend analysis.</p>
-                                    <div class="keras-card-meta">
-                                        <span><i class="bi bi-calendar3"></i> Generated Apr 2025</span>
-                                        <span><i class="bi bi-clipboard-data"></i> 5-year projection</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-outline-info">View Forecast</button>
-                                    <span class="text-muted">Report #52</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 4 -->
-                            <div class="keras-card keras-card-warning">
-                                <div class="keras-card-img-top" style="background-image: url('/static/images/benton-county-4.jpg')"></div>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Rate Comparison</h5>
-                                    <p class="keras-card-text">Comparative analysis of levy rates across neighboring counties with visualizations and trend indicators.</p>
-                                    <div class="keras-card-meta">
-                                        <span><i class="bi bi-calendar3"></i> Updated Feb 2025</span>
-                                        <span><i class="bi bi-arrow-left-right"></i> 5 counties</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-outline-warning">Compare Rates</button>
-                                    <span class="text-muted">Analysis #18</span>
-                                </div>
-                            </div>
-
-                            <!-- Card 5 -->
-                            <div class="keras-card keras-card-danger">
-                                <div class="keras-card-img-top" style="background-image: url('/static/images/benton-county-5.jpg')"></div>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Historic Rate Trends</h5>
-                                    <p class="keras-card-text">Longitudinal study of tax rates over the past decade with key economic indicator correlations.</p>
-                                    <div class="keras-card-meta">
-                                        <span><i class="bi bi-calendar3"></i> Period 2015-2025</span>
-                                        <span><i class="bi bi-clock-history"></i> 10-year data</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-outline-danger">View History</button>
-                                    <span class="text-muted">Study #7</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="keras-carousel-dots"></div>
-                    </div>
-                </div>
-            </div>
+        <div class="card-body">
+          <p class="lead">
+            Modern, interactive card carousels with swipe gestures and
+            responsive behavior.
+          </p>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Gradient Cards Carousel -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header">
-                    <h3 class="h5 m-0">Gradient Cards</h3>
-                </div>
-                <div class="card-body">
-                    <div class="keras-carousel" data-slides-to-show="3" data-autoplay="true">
-                        <div class="keras-carousel-track">
-                            <!-- Gradient Card 1 -->
-                            <div class="keras-card keras-card-gradient" style="--gradient-start: #4158D0; --gradient-end: #C850C0">
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Property Tax Essentials</h5>
-                                    <p class="keras-card-text">Understanding the fundamentals of property tax calculation in Washington state.</p>
-                                    <div class="keras-card-meta text-white-50">
-                                        <span><i class="bi bi-book"></i> Educational</span>
-                                        <span><i class="bi bi-clock"></i> 5 min read</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer border-top border-white border-opacity-25">
-                                    <button class="btn btn-sm btn-light">Read Guide</button>
-                                    <span class="text-white-50">Guide #1</span>
-                                </div>
-                            </div>
-
-                            <!-- Gradient Card 2 -->
-                            <div class="keras-card keras-card-gradient" style="--gradient-start: #43cea2; --gradient-end: #185a9d">
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Rate Calculation Methods</h5>
-                                    <p class="keras-card-text">Learn about different methodologies used to calculate levy rates and their implications.</p>
-                                    <div class="keras-card-meta text-white-50">
-                                        <span><i class="bi bi-calculator"></i> Technical</span>
-                                        <span><i class="bi bi-clock"></i> 7 min read</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer border-top border-white border-opacity-25">
-                                    <button class="btn btn-sm btn-light">Read Guide</button>
-                                    <span class="text-white-50">Guide #2</span>
-                                </div>
-                            </div>
-
-                            <!-- Gradient Card 3 -->
-                            <div class="keras-card keras-card-gradient" style="--gradient-start: #ff9966; --gradient-end: #ff5e62">
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Tax District Formation</h5>
-                                    <p class="keras-card-text">The process, requirements, and implications of forming new tax districts.</p>
-                                    <div class="keras-card-meta text-white-50">
-                                        <span><i class="bi bi-building"></i> Administrative</span>
-                                        <span><i class="bi bi-clock"></i> 8 min read</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer border-top border-white border-opacity-25">
-                                    <button class="btn btn-sm btn-light">Read Guide</button>
-                                    <span class="text-white-50">Guide #3</span>
-                                </div>
-                            </div>
-
-                            <!-- Gradient Card 4 -->
-                            <div class="keras-card keras-card-gradient" style="--gradient-start: #2b5876; --gradient-end: #4e4376">
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Property Assessment</h5>
-                                    <p class="keras-card-text">How property values are determined and assessed for tax purposes in Benton County.</p>
-                                    <div class="keras-card-meta text-white-50">
-                                        <span><i class="bi bi-house-gear"></i> Process</span>
-                                        <span><i class="bi bi-clock"></i> 6 min read</span>
-                                    </div>
-                                </div>
-                                <div class="keras-card-footer border-top border-white border-opacity-25">
-                                    <button class="btn btn-sm btn-light">Read Guide</button>
-                                    <span class="text-white-50">Guide #4</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="keras-carousel-dots"></div>
-                    </div>
-                </div>
-            </div>
+  <!-- Basic Carousel Demo -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header">
+          <h3 class="h5 m-0">Basic Carousel</h3>
         </div>
-    </div>
-
-    <!-- Card with Badge Demo -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header">
-                    <h3 class="h5 m-0">Cards with Status Badges</h3>
+        <div class="card-body">
+          <div class="keras-carousel" data-slides-to-show="3">
+            <div class="keras-carousel-track">
+              <!-- Card 1 -->
+              <div class="keras-card keras-card-primary">
+                <div
+                  class="keras-card-img-top"
+                  style="
+                    background-image: url(&quot;/static/images/benton-county-1.jpg&quot;);
+                  "
+                ></div>
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Tax District Overview</h5>
+                  <p class="keras-card-text">
+                    Detailed information about tax districts in Benton County
+                    with rates, collections, and historical data.
+                  </p>
+                  <div class="keras-card-meta">
+                    <span
+                      ><i class="bi bi-calendar3"></i> Updated Apr 2025</span
+                    >
+                    <span><i class="bi bi-graph-up"></i> 12% growth</span>
+                  </div>
                 </div>
-                <div class="card-body bg-light py-4">
-                    <div class="keras-carousel" data-slides-to-show="4" data-slides-to-scroll="2">
-                        <div class="keras-carousel-track">
-                            <!-- Status Card 1 -->
-                            <div class="keras-card">
-                                <span class="keras-card-badge bg-success text-white">Active</span>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">School District #17</h5>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <span class="keras-card-status bg-success"></span>
-                                        <span class="text-success">Current Rate: 2.45%</span>
-                                    </div>
-                                    <p class="keras-card-text">Elementary and secondary school funding for eastern Benton County.</p>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-primary">View District</button>
-                                </div>
-                            </div>
-
-                            <!-- Status Card 2 -->
-                            <div class="keras-card">
-                                <span class="keras-card-badge bg-warning text-dark">Review</span>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Fire Protection #8</h5>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <span class="keras-card-status bg-warning"></span>
-                                        <span class="text-warning">Current Rate: 1.78%</span>
-                                    </div>
-                                    <p class="keras-card-text">Fire protection services for southwestern region communities.</p>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-primary">View District</button>
-                                </div>
-                            </div>
-
-                            <!-- Status Card 3 -->
-                            <div class="keras-card">
-                                <span class="keras-card-badge bg-danger text-white">Update Needed</span>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Library District #3</h5>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <span class="keras-card-status bg-danger"></span>
-                                        <span class="text-danger">Current Rate: 0.94%</span>
-                                    </div>
-                                    <p class="keras-card-text">Public library funding for central county communities.</p>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-primary">View District</button>
-                                </div>
-                            </div>
-
-                            <!-- Status Card 4 -->
-                            <div class="keras-card">
-                                <span class="keras-card-badge bg-info text-white">New</span>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Parks & Recreation #5</h5>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <span class="keras-card-status bg-info"></span>
-                                        <span class="text-info">Current Rate: 1.15%</span>
-                                    </div>
-                                    <p class="keras-card-text">Maintenance and development of county parks and recreational areas.</p>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-primary">View District</button>
-                                </div>
-                            </div>
-
-                            <!-- Status Card 5 -->
-                            <div class="keras-card">
-                                <span class="keras-card-badge bg-secondary text-white">Inactive</span>
-                                <div class="keras-card-body">
-                                    <h5 class="keras-card-title">Road Improvement #12</h5>
-                                    <div class="d-flex align-items-center mb-3">
-                                        <span class="keras-card-status bg-secondary"></span>
-                                        <span class="text-secondary">Current Rate: 0.00%</span>
-                                    </div>
-                                    <p class="keras-card-text">Special district for rural road maintenance and improvements.</p>
-                                </div>
-                                <div class="keras-card-footer">
-                                    <button class="btn btn-sm btn-primary">View District</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="keras-carousel-dots"></div>
-                    </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-outline-primary">
+                    View Details
+                  </button>
+                  <span class="text-muted">District #142</span>
                 </div>
+              </div>
+
+              <!-- Card 2 -->
+              <div class="keras-card keras-card-success">
+                <div
+                  class="keras-card-img-top"
+                  style="
+                    background-image: url(&quot;/static/images/benton-county-2.jpg&quot;);
+                  "
+                ></div>
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Property Value Analysis</h5>
+                  <p class="keras-card-text">
+                    Assessment values and property tax calculations for
+                    residential areas with year-over-year comparison.
+                  </p>
+                  <div class="keras-card-meta">
+                    <span
+                      ><i class="bi bi-calendar3"></i> Updated Mar 2025</span
+                    >
+                    <span><i class="bi bi-house"></i> 1,540 properties</span>
+                  </div>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-outline-success">
+                    View Analysis
+                  </button>
+                  <span class="text-muted">Area #28</span>
+                </div>
+              </div>
+
+              <!-- Card 3 -->
+              <div class="keras-card keras-card-info">
+                <div
+                  class="keras-card-img-top"
+                  style="
+                    background-image: url(&quot;/static/images/benton-county-3.jpg&quot;);
+                  "
+                ></div>
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Forecast Report</h5>
+                  <p class="keras-card-text">
+                    Levy rate forecasts for the next 5 years with statistical
+                    model confidence intervals and trend analysis.
+                  </p>
+                  <div class="keras-card-meta">
+                    <span
+                      ><i class="bi bi-calendar3"></i> Generated Apr 2025</span
+                    >
+                    <span
+                      ><i class="bi bi-clipboard-data"></i> 5-year
+                      projection</span
+                    >
+                  </div>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-outline-info">
+                    View Forecast
+                  </button>
+                  <span class="text-muted">Report #52</span>
+                </div>
+              </div>
+
+              <!-- Card 4 -->
+              <div class="keras-card keras-card-warning">
+                <div
+                  class="keras-card-img-top"
+                  style="
+                    background-image: url(&quot;/static/images/benton-county-4.jpg&quot;);
+                  "
+                ></div>
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Rate Comparison</h5>
+                  <p class="keras-card-text">
+                    Comparative analysis of levy rates across neighboring
+                    counties with visualizations and trend indicators.
+                  </p>
+                  <div class="keras-card-meta">
+                    <span
+                      ><i class="bi bi-calendar3"></i> Updated Feb 2025</span
+                    >
+                    <span
+                      ><i class="bi bi-arrow-left-right"></i> 5 counties</span
+                    >
+                  </div>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-outline-warning">
+                    Compare Rates
+                  </button>
+                  <span class="text-muted">Analysis #18</span>
+                </div>
+              </div>
+
+              <!-- Card 5 -->
+              <div class="keras-card keras-card-danger">
+                <div
+                  class="keras-card-img-top"
+                  style="
+                    background-image: url(&quot;/static/images/benton-county-5.jpg&quot;);
+                  "
+                ></div>
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Historic Rate Trends</h5>
+                  <p class="keras-card-text">
+                    Longitudinal study of tax rates over the past decade with
+                    key economic indicator correlations.
+                  </p>
+                  <div class="keras-card-meta">
+                    <span
+                      ><i class="bi bi-calendar3"></i> Period 2015-2025</span
+                    >
+                    <span
+                      ><i class="bi bi-clock-history"></i> 10-year data</span
+                    >
+                  </div>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-outline-danger">
+                    View History
+                  </button>
+                  <span class="text-muted">Study #7</span>
+                </div>
+              </div>
             </div>
+            <div class="keras-carousel-dots"></div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Loading State Demo -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header">
-                    <h3 class="h5 m-0">Loading State Cards</h3>
+  <!-- Gradient Cards Carousel -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header">
+          <h3 class="h5 m-0">Gradient Cards</h3>
+        </div>
+        <div class="card-body">
+          <div
+            class="keras-carousel"
+            data-slides-to-show="3"
+            data-autoplay="true"
+          >
+            <div class="keras-carousel-track">
+              <!-- Gradient Card 1 -->
+              <div
+                class="keras-card keras-card-gradient"
+                style="--gradient-start: #4158d0; --gradient-end: #c850c0"
+              >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Property Tax Essentials</h5>
+                  <p class="keras-card-text">
+                    Understanding the fundamentals of property tax calculation
+                    in Washington state.
+                  </p>
+                  <div class="keras-card-meta text-white-50">
+                    <span><i class="bi bi-book"></i> Educational</span>
+                    <span><i class="bi bi-clock"></i> 5 min read</span>
+                  </div>
                 </div>
-                <div class="card-body">
-                    <div class="keras-carousel" data-slides-to-show="3">
-                        <div class="keras-carousel-track">
-                            <!-- Loading Card 1 -->
-                            <div class="keras-card keras-card-skeleton">
-                                <div class="keras-card-img-top"></div>
-                                <div class="keras-card-body">
-                                    <div class="keras-card-title"></div>
-                                    <div class="keras-card-text"></div>
-                                </div>
-                            </div>
-
-                            <!-- Loading Card 2 -->
-                            <div class="keras-card keras-card-skeleton">
-                                <div class="keras-card-img-top"></div>
-                                <div class="keras-card-body">
-                                    <div class="keras-card-title"></div>
-                                    <div class="keras-card-text"></div>
-                                </div>
-                            </div>
-
-                            <!-- Loading Card 3 -->
-                            <div class="keras-card keras-card-skeleton">
-                                <div class="keras-card-img-top"></div>
-                                <div class="keras-card-body">
-                                    <div class="keras-card-title"></div>
-                                    <div class="keras-card-text"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div
+                  class="keras-card-footer border-top border-white border-opacity-25"
+                >
+                  <button class="btn btn-sm btn-light">Read Guide</button>
+                  <span class="text-white-50">Guide #1</span>
                 </div>
+              </div>
+
+              <!-- Gradient Card 2 -->
+              <div
+                class="keras-card keras-card-gradient"
+                style="--gradient-start: #43cea2; --gradient-end: #185a9d"
+              >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Rate Calculation Methods</h5>
+                  <p class="keras-card-text">
+                    Learn about different methodologies used to calculate levy
+                    rates and their implications.
+                  </p>
+                  <div class="keras-card-meta text-white-50">
+                    <span><i class="bi bi-calculator"></i> Technical</span>
+                    <span><i class="bi bi-clock"></i> 7 min read</span>
+                  </div>
+                </div>
+                <div
+                  class="keras-card-footer border-top border-white border-opacity-25"
+                >
+                  <button class="btn btn-sm btn-light">Read Guide</button>
+                  <span class="text-white-50">Guide #2</span>
+                </div>
+              </div>
+
+              <!-- Gradient Card 3 -->
+              <div
+                class="keras-card keras-card-gradient"
+                style="--gradient-start: #ff9966; --gradient-end: #ff5e62"
+              >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Tax District Formation</h5>
+                  <p class="keras-card-text">
+                    The process, requirements, and implications of forming new
+                    tax districts.
+                  </p>
+                  <div class="keras-card-meta text-white-50">
+                    <span><i class="bi bi-building"></i> Administrative</span>
+                    <span><i class="bi bi-clock"></i> 8 min read</span>
+                  </div>
+                </div>
+                <div
+                  class="keras-card-footer border-top border-white border-opacity-25"
+                >
+                  <button class="btn btn-sm btn-light">Read Guide</button>
+                  <span class="text-white-50">Guide #3</span>
+                </div>
+              </div>
+
+              <!-- Gradient Card 4 -->
+              <div
+                class="keras-card keras-card-gradient"
+                style="--gradient-start: #2b5876; --gradient-end: #4e4376"
+              >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Property Assessment</h5>
+                  <p class="keras-card-text">
+                    How property values are determined and assessed for tax
+                    purposes in Benton County.
+                  </p>
+                  <div class="keras-card-meta text-white-50">
+                    <span><i class="bi bi-house-gear"></i> Process</span>
+                    <span><i class="bi bi-clock"></i> 6 min read</span>
+                  </div>
+                </div>
+                <div
+                  class="keras-card-footer border-top border-white border-opacity-25"
+                >
+                  <button class="btn btn-sm btn-light">Read Guide</button>
+                  <span class="text-white-50">Guide #4</span>
+                </div>
+              </div>
             </div>
+            <div class="keras-carousel-dots"></div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Card with Badge Demo -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header">
+          <h3 class="h5 m-0">Cards with Status Badges</h3>
+        </div>
+        <div class="card-body bg-light py-4">
+          <div
+            class="keras-carousel"
+            data-slides-to-show="4"
+            data-slides-to-scroll="2"
+          >
+            <div class="keras-carousel-track">
+              <!-- Status Card 1 -->
+              <div class="keras-card">
+                <span class="keras-card-badge bg-success text-white"
+                  >Active</span
+                >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">School District #17</h5>
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="keras-card-status bg-success"></span>
+                    <span class="text-success">Current Rate: 2.45%</span>
+                  </div>
+                  <p class="keras-card-text">
+                    Elementary and secondary school funding for eastern Benton
+                    County.
+                  </p>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-primary">View District</button>
+                </div>
+              </div>
+
+              <!-- Status Card 2 -->
+              <div class="keras-card">
+                <span class="keras-card-badge bg-warning text-dark"
+                  >Review</span
+                >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Fire Protection #8</h5>
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="keras-card-status bg-warning"></span>
+                    <span class="text-warning">Current Rate: 1.78%</span>
+                  </div>
+                  <p class="keras-card-text">
+                    Fire protection services for southwestern region
+                    communities.
+                  </p>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-primary">View District</button>
+                </div>
+              </div>
+
+              <!-- Status Card 3 -->
+              <div class="keras-card">
+                <span class="keras-card-badge bg-danger text-white"
+                  >Update Needed</span
+                >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Library District #3</h5>
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="keras-card-status bg-danger"></span>
+                    <span class="text-danger">Current Rate: 0.94%</span>
+                  </div>
+                  <p class="keras-card-text">
+                    Public library funding for central county communities.
+                  </p>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-primary">View District</button>
+                </div>
+              </div>
+
+              <!-- Status Card 4 -->
+              <div class="keras-card">
+                <span class="keras-card-badge bg-info text-white">New</span>
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Parks & Recreation #5</h5>
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="keras-card-status bg-info"></span>
+                    <span class="text-info">Current Rate: 1.15%</span>
+                  </div>
+                  <p class="keras-card-text">
+                    Maintenance and development of county parks and recreational
+                    areas.
+                  </p>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-primary">View District</button>
+                </div>
+              </div>
+
+              <!-- Status Card 5 -->
+              <div class="keras-card">
+                <span class="keras-card-badge bg-secondary text-white"
+                  >Inactive</span
+                >
+                <div class="keras-card-body">
+                  <h5 class="keras-card-title">Road Improvement #12</h5>
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="keras-card-status bg-secondary"></span>
+                    <span class="text-secondary">Current Rate: 0.00%</span>
+                  </div>
+                  <p class="keras-card-text">
+                    Special district for rural road maintenance and
+                    improvements.
+                  </p>
+                </div>
+                <div class="keras-card-footer">
+                  <button class="btn btn-sm btn-primary">View District</button>
+                </div>
+              </div>
+            </div>
+            <div class="keras-carousel-dots"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State Demo -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header">
+          <h3 class="h5 m-0">Loading State Cards</h3>
+        </div>
+        <div class="card-body">
+          <div class="keras-carousel" data-slides-to-show="3">
+            <div class="keras-carousel-track">
+              <!-- Loading Card 1 -->
+              <div class="keras-card keras-card-skeleton">
+                <div class="keras-card-img-top"></div>
+                <div class="keras-card-body">
+                  <div class="keras-card-title"></div>
+                  <div class="keras-card-text"></div>
+                </div>
+              </div>
+
+              <!-- Loading Card 2 -->
+              <div class="keras-card keras-card-skeleton">
+                <div class="keras-card-img-top"></div>
+                <div class="keras-card-body">
+                  <div class="keras-card-title"></div>
+                  <div class="keras-card-text"></div>
+                </div>
+              </div>
+
+              <!-- Loading Card 3 -->
+              <div class="keras-card keras-card-skeleton">
+                <div class="keras-card-img-top"></div>
+                <div class="keras-card-body">
+                  <div class="keras-card-title"></div>
+                  <div class="keras-card-text"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

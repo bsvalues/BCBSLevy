@@ -29,6 +29,7 @@ The MCP Army System extends the existing Model Content Protocol (MCP) framework 
 ### Overall System Completion: 90%
 
 Remaining tasks:
+
 - Minor UI refinements
 - Additional agent capabilities
 - Training system enhancements

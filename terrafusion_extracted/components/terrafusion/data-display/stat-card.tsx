@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { ArrowUp, ArrowDown } from "lucide-react"
-import { useSmoothCounter } from "../animation/use-animation-hooks"
-import { GlassmorphicContainer } from "../animation/glassmorphic-effects"
+import { useState, useEffect } from "react";
+import { ArrowUp, ArrowDown } from "lucide-react";
+import { useSmoothCounter } from "../animation/use-animation-hooks";
+import { GlassmorphicContainer } from "../animation/glassmorphic-effects";
 
 interface StatCardProps {
-  title: string
-  value: number
-  previousValue?: number
-  unit?: string
-  icon?: React.ReactNode
-  description?: string
-  trend?: "up" | "down" | "neutral"
-  trendValue?: number
-  loading?: boolean
-  className?: string
+  title: string;
+  value: number;
+  previousValue?: number;
+  unit?: string;
+  icon?: React.ReactNode;
+  description?: string;
+  trend?: "up" | "down" | "neutral";
+  trendValue?: number;
+  loading?: boolean;
+  className?: string;
 }
 
 export function StatCard({
@@ -33,36 +33,57 @@ export function StatCard({
   className = "",
 }: StatCardProps) {
   // Calculate trend if not provided but previous value exists
-  const [calculatedTrend, setCalculatedTrend] = useState<"up" | "down" | "neutral" | undefined>(trend)
-  const [calculatedTrendValue, setCalculatedTrendValue] = useState<number | undefined>(trendValue)
+  const [calculatedTrend, setCalculatedTrend] = useState<
+    "up" | "down" | "neutral" | undefined
+  >(trend);
+  const [calculatedTrendValue, setCalculatedTrendValue] = useState<
+    number | undefined
+  >(trendValue);
 
   // Use smooth counter animation
-  const displayValue = useSmoothCounter(value, 2, 0, 1)
+  const displayValue = useSmoothCounter(value, 2, 0, 1);
 
   // Calculate trend if not provided
   useEffect(() => {
-    if (trend === undefined && previousValue !== undefined && value !== previousValue) {
-      const newTrend = value > previousValue ? "up" : value < previousValue ? "down" : "neutral"
-      setCalculatedTrend(newTrend)
+    if (
+      trend === undefined &&
+      previousValue !== undefined &&
+      value !== previousValue
+    ) {
+      const newTrend =
+        value > previousValue
+          ? "up"
+          : value < previousValue
+            ? "down"
+            : "neutral";
+      setCalculatedTrend(newTrend);
 
       if (trendValue === undefined) {
-        const percentChange = ((value - previousValue) / previousValue) * 100
-        setCalculatedTrendValue(Math.abs(percentChange))
+        const percentChange = ((value - previousValue) / previousValue) * 100;
+        setCalculatedTrendValue(Math.abs(percentChange));
       }
     }
-  }, [value, previousValue, trend, trendValue])
+  }, [value, previousValue, trend, trendValue]);
 
   // Determine which trend to display
-  const displayTrend = trend || calculatedTrend
-  const displayTrendValue = trendValue || calculatedTrendValue
+  const displayTrend = trend || calculatedTrend;
+  const displayTrendValue = trendValue || calculatedTrendValue;
 
   return (
-    <GlassmorphicContainer className={`p-6 ${className}`} interactive={true} hoverEffect={true}>
+    <GlassmorphicContainer
+      className={`p-6 ${className}`}
+      interactive={true}
+      hoverEffect={true}
+    >
       <div className="flex flex-col">
         {/* Header with title and icon */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-medium text-[#00e5ff]/70">{title}</h3>
-          {icon && <div className="text-[#00e5ff] p-1 rounded-md bg-[#00e5ff]/10">{icon}</div>}
+          {icon && (
+            <div className="text-[#00e5ff] p-1 rounded-md bg-[#00e5ff]/10">
+              {icon}
+            </div>
+          )}
         </div>
 
         {/* Value */}
@@ -98,8 +119,10 @@ export function StatCard({
         </div>
 
         {/* Description */}
-        {description && <p className="mt-2 text-xs text-[#00e5ff]/50">{description}</p>}
+        {description && (
+          <p className="mt-2 text-xs text-[#00e5ff]/50">{description}</p>
+        )}
       </div>
     </GlassmorphicContainer>
-  )
+  );
 }

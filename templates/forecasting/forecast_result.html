@@ -1,315 +1,370 @@
-{% extends "base.html" %}
-
-{% block title %}{{ page_title }}{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}{{ page_title }}{% endblock %} {%
+block head %} {{ super() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('forecasting.index') }}">Forecasting</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('forecasting.forecast') }}">Generate Forecast</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Forecast Results</li>
-        </ol>
-    </nav>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('forecasting.index') }}">Forecasting</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{{ url_for('forecasting.forecast') }}">Generate Forecast</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        Forecast Results
+      </li>
+    </ol>
+  </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Forecast Results <small class="text-muted">{{ result.tax_code }}</small></h1>
-        <div class="d-flex gap-2">
-            <a href="{{ url_for('forecasting.forecast') }}?tax_code_id={{ result.tax_code_id }}" class="btn btn-outline-primary">
-                <i class="bi bi-sliders me-2"></i>Adjust Forecast
-            </a>
-            <a href="{{ url_for('forecasting.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-2"></i>Back to Forecasting
-            </a>
-        </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>
+      Forecast Results <small class="text-muted">{{ result.tax_code }}</small>
+    </h1>
+    <div class="d-flex gap-2">
+      <a
+        href="{{ url_for('forecasting.forecast') }}?tax_code_id={{ result.tax_code_id }}"
+        class="btn btn-outline-primary"
+      >
+        <i class="bi bi-sliders me-2"></i>Adjust Forecast
+      </a>
+      <a
+        href="{{ url_for('forecasting.index') }}"
+        class="btn btn-outline-secondary"
+      >
+        <i class="bi bi-arrow-left me-2"></i>Back to Forecasting
+      </a>
     </div>
-    
-    <div class="row">
-        <div class="col-lg-9">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Levy Rate Forecast ({{ result.historical_years|last }} - {{ result.forecast_years|last }})</h5>
-                </div>
-                <div class="card-body">
-                    <canvas id="forecastChart" height="350"></canvas>
-                </div>
-            </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-9">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">
+            Levy Rate Forecast ({{ result.historical_years|last }} - {{
+            result.forecast_years|last }})
+          </h5>
         </div>
-        
-        <div class="col-lg-3">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Forecast Summary</h5>
-                </div>
-                <div class="card-body">
-                    <dl class="row">
-                        <dt class="col-sm-6">Tax Code</dt>
-                        <dd class="col-sm-6">{{ result.tax_code }}</dd>
-                        
-                        <dt class="col-sm-6">Years Forecast</dt>
-                        <dd class="col-sm-6">{{ result.forecast_years|length }}</dd>
-                        
-                        <dt class="col-sm-6">Best Model</dt>
-                        <dd class="col-sm-6">
-                            {% if result.best_model == 'linear' %}
-                            <span class="badge bg-primary">Linear</span>
-                            {% elif result.best_model == 'exponential' %}
-                            <span class="badge bg-success">Exponential</span>
-                            {% elif result.best_model == 'arima' %}
-                            <span class="badge bg-danger">ARIMA</span>
-                            {% endif %}
-                        </dd>
-                        
-                        <dt class="col-sm-6">Current Rate</dt>
-                        <dd class="col-sm-6">{{ '%.4f'|format(result.historical_rates[-1]) }}</dd>
-                        
-                        <dt class="col-sm-6">Final Forecast</dt>
-                        <dd class="col-sm-6">{{ '%.4f'|format(result.forecasts[result.best_model]['forecast'][-1]) }}</dd>
-                        
-                        {% set prev_rate = result.historical_rates[-1] %}
-                        {% set final_rate = result.forecasts[result.best_model]['forecast'][-1] %}
-                        {% set change = ((final_rate - prev_rate) / prev_rate * 100) if prev_rate > 0 else 0 %}
-                        {% set change_class = 'text-danger' if change > 0 else 'text-success' %}
-                        
-                        <dt class="col-sm-6">Projected Change</dt>
-                        <dd class="col-sm-6 {{ change_class }}">
-                            {{ '%+.2f'|format(change) }}%
-                            <i class="bi {{ 'bi-arrow-up' if change > 0 else 'bi-arrow-down' }}"></i>
-                        </dd>
-                    </dl>
-                    
-                    <hr>
-                    
-                    <h6>Model Accuracy Metrics</h6>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Model</th>
-                                    <th class="text-end">RMSE</th>
-                                    <th class="text-end">MAE</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for model_name, metrics in result.errors.items() %}
-                                <tr {% if model_name == result.best_model %}class="table-active"{% endif %}>
-                                    <td>
-                                        {% if model_name == 'linear' %}
-                                        <i class="bi bi-graph-up text-primary me-2"></i>Linear
-                                        {% elif model_name == 'exponential' %}
-                                        <i class="bi bi-graph-up-arrow text-success me-2"></i>Exponential
-                                        {% elif model_name == 'arima' %}
-                                        <i class="bi bi-activity text-danger me-2"></i>ARIMA
-                                        {% endif %}
-                                        {% if model_name == result.best_model %}
-                                        <i class="bi bi-star-fill text-warning ms-2" title="Best Model"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-end">{{ '%.4f'|format(metrics.rmse) }}</td>
-                                    <td class="text-end">{{ '%.4f'|format(metrics.mae) }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            
-            {% if result.anomalies %}
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Anomalies Detected</h5>
-                </div>
-                <div class="card-body">
-                    <p>The following anomalies were detected in historical data:</p>
-                    <ul class="list-group">
-                        {% for anomaly in result.anomalies %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
-                                {{ anomaly[0] }}: {{ '%.4f'|format(anomaly[1]) }}
-                                <span class="badge {% if anomaly[2] == 'high' %}bg-danger{% else %}bg-primary{% endif %} ms-2">
-                                    {{ anomaly[2] }}
-                                </span>
-                            </span>
-                            <span class="badge bg-secondary">z-score: {{ '%.2f'|format(anomaly[3]) }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            {% endif %}
+        <div class="card-body">
+          <canvas id="forecastChart" height="350"></canvas>
         </div>
+      </div>
     </div>
-    
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Forecast Data Table</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover mb-0">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Year</th>
-                                    <th class="text-end">Forecasted Rate</th>
-                                    <th class="text-end">Lower Bound ({{ confidence_level|int }}%)</th>
-                                    <th class="text-end">Upper Bound ({{ confidence_level|int }}%)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for i in range(result.forecast_years|length) %}
-                                <tr>
-                                    <td>{{ result.forecast_years[i] }}</td>
-                                    <td class="text-end">{{ '%.4f'|format(result.forecasts[result.best_model]['forecast'][i]) }}</td>
-                                    <td class="text-end">{{ '%.4f'|format(result.forecasts[result.best_model]['lower_bound'][i]) }}</td>
-                                    <td class="text-end">{{ '%.4f'|format(result.forecasts[result.best_model]['upper_bound'][i]) }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+
+    <div class="col-lg-3">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Forecast Summary</h5>
         </div>
-    </div>
-    
-    {% if ai_explanation %}
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="bi bi-robot me-2"></i>AI Analysis and Recommendations</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-4">
-                        <h5>Forecast Analysis</h5>
-                        <div class="p-3 bg-light rounded">
-                            {{ ai_explanation|safe }}
-                        </div>
-                    </div>
-                    
-                    {% if ai_recommendations %}
-                    <div>
-                        <h5>Strategic Recommendations</h5>
-                        <div class="p-3 bg-light rounded">
-                            {{ ai_recommendations|safe }}
-                        </div>
-                    </div>
+        <div class="card-body">
+          <dl class="row">
+            <dt class="col-sm-6">Tax Code</dt>
+            <dd class="col-sm-6">{{ result.tax_code }}</dd>
+
+            <dt class="col-sm-6">Years Forecast</dt>
+            <dd class="col-sm-6">{{ result.forecast_years|length }}</dd>
+
+            <dt class="col-sm-6">Best Model</dt>
+            <dd class="col-sm-6">
+              {% if result.best_model == 'linear' %}
+              <span class="badge bg-primary">Linear</span>
+              {% elif result.best_model == 'exponential' %}
+              <span class="badge bg-success">Exponential</span>
+              {% elif result.best_model == 'arima' %}
+              <span class="badge bg-danger">ARIMA</span>
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-6">Current Rate</dt>
+            <dd class="col-sm-6">
+              {{ '%.4f'|format(result.historical_rates[-1]) }}
+            </dd>
+
+            <dt class="col-sm-6">Final Forecast</dt>
+            <dd class="col-sm-6">
+              {{
+              '%.4f'|format(result.forecasts[result.best_model]['forecast'][-1])
+              }}
+            </dd>
+
+            {% set prev_rate = result.historical_rates[-1] %} {% set final_rate
+            = result.forecasts[result.best_model]['forecast'][-1] %} {% set
+            change = ((final_rate - prev_rate) / prev_rate * 100) if prev_rate >
+            0 else 0 %} {% set change_class = 'text-danger' if change > 0 else
+            'text-success' %}
+
+            <dt class="col-sm-6">Projected Change</dt>
+            <dd class="col-sm-6 {{ change_class }}">
+              {{ '%+.2f'|format(change) }}%
+              <i
+                class="bi {{ 'bi-arrow-up' if change > 0 else 'bi-arrow-down' }}"
+              ></i>
+            </dd>
+          </dl>
+
+          <hr />
+
+          <h6>Model Accuracy Metrics</h6>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th class="text-end">RMSE</th>
+                  <th class="text-end">MAE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for model_name, metrics in result.errors.items() %}
+                <tr
+                  {%
+                  if
+                  model_name=""
+                  ="result.best_model"
+                  %}class="table-active"
+                  {%
+                  endif
+                  %}
+                >
+                  <td>
+                    {% if model_name == 'linear' %}
+                    <i class="bi bi-graph-up text-primary me-2"></i>Linear {%
+                    elif model_name == 'exponential' %}
+                    <i class="bi bi-graph-up-arrow text-success me-2"></i
+                    >Exponential {% elif model_name == 'arima' %}
+                    <i class="bi bi-activity text-danger me-2"></i>ARIMA {%
+                    endif %} {% if model_name == result.best_model %}
+                    <i
+                      class="bi bi-star-fill text-warning ms-2"
+                      title="Best Model"
+                    ></i>
                     {% endif %}
-                </div>
-            </div>
+                  </td>
+                  <td class="text-end">{{ '%.4f'|format(metrics.rmse) }}</td>
+                  <td class="text-end">{{ '%.4f'|format(metrics.mae) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+
+      {% if result.anomalies %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="bi bi-exclamation-triangle me-2"></i>Anomalies Detected
+          </h5>
+        </div>
+        <div class="card-body">
+          <p>The following anomalies were detected in historical data:</p>
+          <ul class="list-group">
+            {% for anomaly in result.anomalies %}
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span>
+                {{ anomaly[0] }}: {{ '%.4f'|format(anomaly[1]) }}
+                <span
+                  class="badge {% if anomaly[2] == 'high' %}bg-danger{% else %}bg-primary{% endif %} ms-2"
+                >
+                  {{ anomaly[2] }}
+                </span>
+              </span>
+              <span class="badge bg-secondary"
+                >z-score: {{ '%.2f'|format(anomaly[3]) }}</span
+              >
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">Forecast Data Table</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Year</th>
+                  <th class="text-end">Forecasted Rate</th>
+                  <th class="text-end">
+                    Lower Bound ({{ confidence_level|int }}%)
+                  </th>
+                  <th class="text-end">
+                    Upper Bound ({{ confidence_level|int }}%)
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in range(result.forecast_years|length) %}
+                <tr>
+                  <td>{{ result.forecast_years[i] }}</td>
+                  <td class="text-end">
+                    {{
+                    '%.4f'|format(result.forecasts[result.best_model]['forecast'][i])
+                    }}
+                  </td>
+                  <td class="text-end">
+                    {{
+                    '%.4f'|format(result.forecasts[result.best_model]['lower_bound'][i])
+                    }}
+                  </td>
+                  <td class="text-end">
+                    {{
+                    '%.4f'|format(result.forecasts[result.best_model]['upper_bound'][i])
+                    }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if ai_explanation %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-robot me-2"></i>AI Analysis and Recommendations
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <h5>Forecast Analysis</h5>
+            <div class="p-3 bg-light rounded">{{ ai_explanation|safe }}</div>
+          </div>
+
+          {% if ai_recommendations %}
+          <div>
+            <h5>Strategic Recommendations</h5>
+            <div class="p-3 bg-light rounded">
+              {{ ai_recommendations|safe }}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Chart data
-    const years = {{ all_years_json|safe }};
-    const historicalRates = {{ historical_with_nulls_json|safe }};
-    const forecast = {{ forecast_json|safe }};
-    const lowerBound = {{ lower_bound_json|safe }};
-    const upperBound = {{ upper_bound_json|safe }};
-    
-    // Chart options
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            mode: 'index',
-            intersect: false,
-        },
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        const label = context.dataset.label || '';
-                        const value = context.parsed.y !== null ? context.parsed.y.toFixed(4) : 'N/A';
-                        return `${label}: ${value}`;
-                    }
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-                title: {
-                    display: true,
-                    text: 'Levy Rate'
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: 'Year'
-                }
-            }
-        }
-    };
-    
-    // Forecast chart
-    const forecastCtx = document.getElementById('forecastChart').getContext('2d');
-    new Chart(forecastCtx, {
-        type: 'line',
-        data: {
-            labels: years,
-            datasets: [
-                {
-                    label: 'Historical Rates',
-                    data: historicalRates,
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderWidth: 2,
-                    pointRadius: 4,
-                    fill: false,
-                    tension: 0.1
-                },
-                {
-                    label: 'Forecast',
-                    data: forecast,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.4)',
-                    borderWidth: 2,
-                    borderDash: [],
-                    fill: false,
-                    tension: 0.1
-                },
-                {
-                    label: 'Lower Bound',
-                    data: lowerBound,
-                    borderColor: 'rgba(201, 203, 207, 0.5)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: false,
-                    tension: 0.1
-                },
-                {
-                    label: 'Upper Bound',
-                    data: upperBound,
-                    borderColor: 'rgba(201, 203, 207, 0.5)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    fill: '-1',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.1
-                }
-            ]
-        },
-        options: chartOptions
-    });
-});
+  document.addEventListener('DOMContentLoaded', function() {
+      // Chart data
+      const years = {{ all_years_json|safe }};
+      const historicalRates = {{ historical_with_nulls_json|safe }};
+      const forecast = {{ forecast_json|safe }};
+      const lowerBound = {{ lower_bound_json|safe }};
+      const upperBound = {{ upper_bound_json|safe }};
+
+      // Chart options
+      const chartOptions = {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+              mode: 'index',
+              intersect: false,
+          },
+          plugins: {
+              legend: {
+                  position: 'top',
+              },
+              tooltip: {
+                  callbacks: {
+                      label: function(context) {
+                          const label = context.dataset.label || '';
+                          const value = context.parsed.y !== null ? context.parsed.y.toFixed(4) : 'N/A';
+                          return `${label}: ${value}`;
+                      }
+                  }
+              }
+          },
+          scales: {
+              y: {
+                  beginAtZero: false,
+                  title: {
+                      display: true,
+                      text: 'Levy Rate'
+                  }
+              },
+              x: {
+                  title: {
+                      display: true,
+                      text: 'Year'
+                  }
+              }
+          }
+      };
+
+      // Forecast chart
+      const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+      new Chart(forecastCtx, {
+          type: 'line',
+          data: {
+              labels: years,
+              datasets: [
+                  {
+                      label: 'Historical Rates',
+                      data: historicalRates,
+                      borderColor: 'rgba(54, 162, 235, 1)',
+                      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                      borderWidth: 2,
+                      pointRadius: 4,
+                      fill: false,
+                      tension: 0.1
+                  },
+                  {
+                      label: 'Forecast',
+                      data: forecast,
+                      borderColor: 'rgba(75, 192, 192, 1)',
+                      backgroundColor: 'rgba(75, 192, 192, 0.4)',
+                      borderWidth: 2,
+                      borderDash: [],
+                      fill: false,
+                      tension: 0.1
+                  },
+                  {
+                      label: 'Lower Bound',
+                      data: lowerBound,
+                      borderColor: 'rgba(201, 203, 207, 0.5)',
+                      borderWidth: 1,
+                      borderDash: [5, 5],
+                      pointRadius: 0,
+                      fill: false,
+                      tension: 0.1
+                  },
+                  {
+                      label: 'Upper Bound',
+                      data: upperBound,
+                      borderColor: 'rgba(201, 203, 207, 0.5)',
+                      borderWidth: 1,
+                      borderDash: [5, 5],
+                      pointRadius: 0,
+                      fill: '-1',
+                      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                      tension: 0.1
+                  }
+              ]
+          },
+          options: chartOptions
+      });
+  });
 </script>
 {% endblock %}

@@ -1,18 +1,18 @@
-{% extends "base.html" %}
-
-{% block title %}Tax-Themed Loading Animations{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/animations/loading-animations.css') }}">
+{% extends "base.html" %} {% block title %}Tax-Themed Loading Animations{%
+endblock %} {% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/animations/loading-animations.css') }}"
+/>
 <style>
   .demo-section {
     margin-bottom: 2rem;
     padding: 1.5rem;
     border-radius: 8px;
     background-color: #f8f9fa;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
-  
+
   .demo-box {
     height: 200px;
     background-color: #ffffff;
@@ -22,30 +22,30 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .animation-controls {
     display: flex;
     gap: 1rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
   }
-  
+
   .animation-card {
     flex: 1;
     min-width: 220px;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     padding: 1rem;
     background-color: #fff;
     text-align: center;
     transition: all 0.3s ease;
   }
-  
+
   .animation-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-  
+
   .animation-preview {
     height: 100px;
     display: flex;
@@ -53,7 +53,7 @@
     justify-content: center;
     margin-bottom: 1rem;
   }
-  
+
   .code-block {
     background-color: #f1f3f5;
     padding: 1rem;
@@ -62,7 +62,7 @@
     overflow-x: auto;
     margin: 1rem 0;
   }
-  
+
   .code-tab {
     background-color: #e9ecef;
     padding: 0.5rem 1rem;
@@ -73,282 +73,404 @@
     display: inline-block;
   }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container my-4">
   <h1 class="display-5 mb-4">Tax-Themed Loading Animations</h1>
-  <p class="lead mb-4">Playful, tax-themed loading animations for use throughout the Levy Calculation System.</p>
-  
+  <p class="lead mb-4">
+    Playful, tax-themed loading animations for use throughout the Levy
+    Calculation System.
+  </p>
+
   <!-- Demo Section -->
   <div class="demo-section">
     <h2>Animation Demo</h2>
     <p>Select a loading animation to preview it in the demo box below.</p>
-    
+
     <div class="animation-controls">
       <button class="btn btn-primary" id="showDollarBill">Dollar Bill</button>
-      <button class="btn btn-secondary" id="showTaxCalculator">Tax Calculator</button>
+      <button class="btn btn-secondary" id="showTaxCalculator">
+        Tax Calculator
+      </button>
       <button class="btn btn-success" id="showPropertyTax">Property Tax</button>
       <button class="btn btn-info" id="showCoins">Coins</button>
       <button class="btn btn-warning" id="showTaxForm">Tax Form</button>
       <button class="btn btn-dark" id="showRandom">Random</button>
     </div>
-    
+
     <div class="demo-box" id="demoBox">
       <div class="d-flex align-items-center justify-content-center h-100">
         <p class="text-muted">Click a button above to show an animation</p>
       </div>
     </div>
-    
+
     <div class="mt-3">
-      <button class="btn btn-danger" id="hideAllAnimations">Hide All Animations</button>
-      <button class="btn btn-primary" id="showFullscreenOverlay">Show Fullscreen Overlay</button>
+      <button class="btn btn-danger" id="hideAllAnimations">
+        Hide All Animations
+      </button>
+      <button class="btn btn-primary" id="showFullscreenOverlay">
+        Show Fullscreen Overlay
+      </button>
     </div>
   </div>
-  
+
   <!-- Gallery Section -->
   <div class="demo-section">
     <h2>Animation Gallery</h2>
     <p>All available tax-themed loading animations:</p>
-    
+
     <div class="row">
       <div class="col-md-4 mb-3">
         <div class="animation-card">
           <div class="animation-preview">
-            <img src="{{ url_for('static', filename='images/animations/dollar-bill.svg') }}" alt="Dollar Bill" height="80">
+            <img
+              src="{{ url_for('static', filename='images/animations/dollar-bill.svg') }}"
+              alt="Dollar Bill"
+              height="80"
+            />
           </div>
           <h5>Dollar Bill</h5>
-          <p class="small text-muted">Animated floating dollar bill with pulsing dollar sign</p>
+          <p class="small text-muted">
+            Animated floating dollar bill with pulsing dollar sign
+          </p>
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <div class="animation-card">
           <div class="animation-preview">
-            <img src="{{ url_for('static', filename='images/animations/tax-calculator.svg') }}" alt="Tax Calculator" height="80">
+            <img
+              src="{{ url_for('static', filename='images/animations/tax-calculator.svg') }}"
+              alt="Tax Calculator"
+              height="80"
+            />
           </div>
           <h5>Tax Calculator</h5>
-          <p class="small text-muted">Tax calculator with animated buttons and display</p>
+          <p class="small text-muted">
+            Tax calculator with animated buttons and display
+          </p>
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <div class="animation-card">
           <div class="animation-preview">
-            <img src="{{ url_for('static', filename='images/animations/property-tax.svg') }}" alt="Property Tax" height="80">
+            <img
+              src="{{ url_for('static', filename='images/animations/property-tax.svg') }}"
+              alt="Property Tax"
+              height="80"
+            />
           </div>
           <h5>Property Tax</h5>
-          <p class="small text-muted">Animated house with glowing windows and dollar sign</p>
+          <p class="small text-muted">
+            Animated house with glowing windows and dollar sign
+          </p>
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <div class="animation-card">
           <div class="animation-preview">
-            <img src="{{ url_for('static', filename='images/animations/loading-coins.svg') }}" alt="Loading Coins" height="80">
+            <img
+              src="{{ url_for('static', filename='images/animations/loading-coins.svg') }}"
+              alt="Loading Coins"
+              height="80"
+            />
           </div>
           <h5>Coins</h5>
-          <p class="small text-muted">Spinning and flipping gold coins animation</p>
+          <p class="small text-muted">
+            Spinning and flipping gold coins animation
+          </p>
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <div class="animation-card">
           <div class="animation-preview">
-            <img src="{{ url_for('static', filename='images/animations/tax-form.svg') }}" alt="Tax Form" height="80">
+            <img
+              src="{{ url_for('static', filename='images/animations/tax-form.svg') }}"
+              alt="Tax Form"
+              height="80"
+            />
           </div>
           <h5>Tax Form</h5>
-          <p class="small text-muted">Tax form with animated pencil and checkmark</p>
+          <p class="small text-muted">
+            Tax form with animated pencil and checkmark
+          </p>
         </div>
       </div>
     </div>
   </div>
-  
+
   <!-- Usage Guide Section -->
   <div class="demo-section">
     <h2>Usage Guide</h2>
     <p>How to implement these loading animations in your pages:</p>
-    
+
     <h5 class="mt-4">Option 1: Data Attributes (Recommended)</h5>
-    <p>Add data attributes to your HTML elements to automatically apply loading animations:</p>
-    
+    <p>
+      Add data attributes to your HTML elements to automatically apply loading
+      animations:
+    </p>
+
     <div class="code-tab">HTML</div>
     <div class="code-block">
-      &lt;form data-loading="true" data-loading-type="tax-calculator" data-loading-text="Processing your tax information"&gt;
-        &lt;!-- Form content here --&gt;
-        &lt;button type="submit"&gt;Submit&lt;/button&gt;
+      &lt;form data-loading="true" data-loading-type="tax-calculator"
+      data-loading-text="Processing your tax information"&gt; &lt;!-- Form
+      content here --&gt; &lt;button type="submit"&gt;Submit&lt;/button&gt;
       &lt;/form&gt;
     </div>
-    
+
     <h5 class="mt-4">Option 2: JavaScript API</h5>
     <p>Use the JavaScript API to manually control loading animations:</p>
-    
+
     <div class="code-tab">JavaScript</div>
     <div class="code-block">
-      // Show loading in a specific element
-      const loading = showLevyLoading('#myElement', 'dollar-bill', 'Calculating tax rates');
-      
-      // Later, hide the loading animation
-      loading.hide();
-      
-      // Show fullscreen overlay
-      const overlay = showLevyLoadingOverlay('property-tax', 'Processing your request');
-      
-      // Later, hide the overlay
-      overlay.hide();
-      
-      // Hide all loading animations at once
-      hideLevyLoadingAll();
+      // Show loading in a specific element const loading =
+      showLevyLoading('#myElement', 'dollar-bill', 'Calculating tax rates'); //
+      Later, hide the loading animation loading.hide(); // Show fullscreen
+      overlay const overlay = showLevyLoadingOverlay('property-tax', 'Processing
+      your request'); // Later, hide the overlay overlay.hide(); // Hide all
+      loading animations at once hideLevyLoadingAll();
     </div>
-    
+
     <h5 class="mt-4">Option 3: AJAX Loading</h5>
     <p>Automatically show loading animations during AJAX requests:</p>
-    
+
     <div class="code-tab">HTML</div>
     <div class="code-block">
-      &lt;button data-ajax-loading="true" data-loading-type="coins" data-loading-target="#resultContainer"&gt;
-        Load Tax Data
-      &lt;/button&gt;
-      
+      &lt;button data-ajax-loading="true" data-loading-type="coins"
+      data-loading-target="#resultContainer"&gt; Load Tax Data &lt;/button&gt;
       &lt;div id="resultContainer"&gt;&lt;/div&gt;
     </div>
   </div>
-  
+
   <!-- Animation Types Section -->
   <div class="demo-section">
     <h2>Animation Types</h2>
     <p>Available animation types for use with the loading system:</p>
-    
+
     <ul class="list-group mb-4">
-      <li class="list-group-item d-flex justify-content-between align-items-center">
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
         <div>
           <strong>dollar-bill</strong>
-          <span class="d-block text-muted small">Animated floating dollar bill with pulsing dollar sign</span>
+          <span class="d-block text-muted small"
+            >Animated floating dollar bill with pulsing dollar sign</span
+          >
         </div>
-        <button class="btn btn-sm btn-outline-primary preview-btn" data-type="dollar-bill">Preview</button>
+        <button
+          class="btn btn-sm btn-outline-primary preview-btn"
+          data-type="dollar-bill"
+        >
+          Preview
+        </button>
       </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
         <div>
           <strong>tax-calculator</strong>
-          <span class="d-block text-muted small">Tax calculator with animated buttons and display</span>
+          <span class="d-block text-muted small"
+            >Tax calculator with animated buttons and display</span
+          >
         </div>
-        <button class="btn btn-sm btn-outline-primary preview-btn" data-type="tax-calculator">Preview</button>
+        <button
+          class="btn btn-sm btn-outline-primary preview-btn"
+          data-type="tax-calculator"
+        >
+          Preview
+        </button>
       </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
         <div>
           <strong>property-tax</strong>
-          <span class="d-block text-muted small">Animated house with glowing windows and dollar sign</span>
+          <span class="d-block text-muted small"
+            >Animated house with glowing windows and dollar sign</span
+          >
         </div>
-        <button class="btn btn-sm btn-outline-primary preview-btn" data-type="property-tax">Preview</button>
+        <button
+          class="btn btn-sm btn-outline-primary preview-btn"
+          data-type="property-tax"
+        >
+          Preview
+        </button>
       </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
         <div>
           <strong>coins</strong>
-          <span class="d-block text-muted small">Spinning and flipping gold coins animation</span>
+          <span class="d-block text-muted small"
+            >Spinning and flipping gold coins animation</span
+          >
         </div>
-        <button class="btn btn-sm btn-outline-primary preview-btn" data-type="coins">Preview</button>
+        <button
+          class="btn btn-sm btn-outline-primary preview-btn"
+          data-type="coins"
+        >
+          Preview
+        </button>
       </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
         <div>
           <strong>tax-form</strong>
-          <span class="d-block text-muted small">Tax form with animated pencil and checkmark</span>
+          <span class="d-block text-muted small"
+            >Tax form with animated pencil and checkmark</span
+          >
         </div>
-        <button class="btn btn-sm btn-outline-primary preview-btn" data-type="tax-form">Preview</button>
+        <button
+          class="btn btn-sm btn-outline-primary preview-btn"
+          data-type="tax-form"
+        >
+          Preview
+        </button>
       </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+      >
         <div>
           <strong>default</strong>
-          <span class="d-block text-muted small">Randomly selects one of the available animations</span>
+          <span class="d-block text-muted small"
+            >Randomly selects one of the available animations</span
+          >
         </div>
-        <button class="btn btn-sm btn-outline-primary preview-btn" data-type="default">Preview</button>
+        <button
+          class="btn btn-sm btn-outline-primary preview-btn"
+          data-type="default"
+        >
+          Preview
+        </button>
       </li>
     </ul>
   </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script src="{{ url_for('static', filename='js/animations/loading-animations.js') }}"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     // Demo box for showing animations
-    const demoBox = document.getElementById('demoBox');
+    const demoBox = document.getElementById("demoBox");
     let currentLoading = null;
-    
+
     // Button event listeners for showing animations
-    document.getElementById('showDollarBill').addEventListener('click', function() {
-      // Hide any existing animation first
+    document
+      .getElementById("showDollarBill")
+      .addEventListener("click", function () {
+        // Hide any existing animation first
+        if (currentLoading) {
+          currentLoading.hide();
+        }
+        currentLoading = showLevyLoading(
+          demoBox,
+          "dollar-bill",
+          "Processing your tax dollars",
+        );
+      });
+
+    document
+      .getElementById("showTaxCalculator")
+      .addEventListener("click", function () {
+        if (currentLoading) {
+          currentLoading.hide();
+        }
+        currentLoading = showLevyLoading(
+          demoBox,
+          "tax-calculator",
+          "Calculating your tax rates",
+        );
+      });
+
+    document
+      .getElementById("showPropertyTax")
+      .addEventListener("click", function () {
+        if (currentLoading) {
+          currentLoading.hide();
+        }
+        currentLoading = showLevyLoading(
+          demoBox,
+          "property-tax",
+          "Evaluating property tax",
+        );
+      });
+
+    document.getElementById("showCoins").addEventListener("click", function () {
       if (currentLoading) {
         currentLoading.hide();
       }
-      currentLoading = showLevyLoading(demoBox, 'dollar-bill', 'Processing your tax dollars');
+      currentLoading = showLevyLoading(
+        demoBox,
+        "coins",
+        "Counting your tax dollars",
+      );
     });
-    
-    document.getElementById('showTaxCalculator').addEventListener('click', function() {
-      if (currentLoading) {
-        currentLoading.hide();
-      }
-      currentLoading = showLevyLoading(demoBox, 'tax-calculator', 'Calculating your tax rates');
-    });
-    
-    document.getElementById('showPropertyTax').addEventListener('click', function() {
-      if (currentLoading) {
-        currentLoading.hide();
-      }
-      currentLoading = showLevyLoading(demoBox, 'property-tax', 'Evaluating property tax');
-    });
-    
-    document.getElementById('showCoins').addEventListener('click', function() {
-      if (currentLoading) {
-        currentLoading.hide();
-      }
-      currentLoading = showLevyLoading(demoBox, 'coins', 'Counting your tax dollars');
-    });
-    
-    document.getElementById('showTaxForm').addEventListener('click', function() {
-      if (currentLoading) {
-        currentLoading.hide();
-      }
-      currentLoading = showLevyLoading(demoBox, 'tax-form', 'Filing your tax forms');
-    });
-    
-    document.getElementById('showRandom').addEventListener('click', function() {
-      if (currentLoading) {
-        currentLoading.hide();
-      }
-      currentLoading = showLevyLoading(demoBox, 'default', 'Processing...');
-    });
-    
+
+    document
+      .getElementById("showTaxForm")
+      .addEventListener("click", function () {
+        if (currentLoading) {
+          currentLoading.hide();
+        }
+        currentLoading = showLevyLoading(
+          demoBox,
+          "tax-form",
+          "Filing your tax forms",
+        );
+      });
+
+    document
+      .getElementById("showRandom")
+      .addEventListener("click", function () {
+        if (currentLoading) {
+          currentLoading.hide();
+        }
+        currentLoading = showLevyLoading(demoBox, "default", "Processing...");
+      });
+
     // Hide all animations
-    document.getElementById('hideAllAnimations').addEventListener('click', function() {
-      hideLevyLoadingAll();
-      currentLoading = null;
-      
-      // Reset demo box
-      demoBox.innerHTML = `
+    document
+      .getElementById("hideAllAnimations")
+      .addEventListener("click", function () {
+        hideLevyLoadingAll();
+        currentLoading = null;
+
+        // Reset demo box
+        demoBox.innerHTML = `
         <div class="d-flex align-items-center justify-content-center h-100">
           <p class="text-muted">Click a button above to show an animation</p>
         </div>
       `;
-    });
-    
+      });
+
     // Show fullscreen overlay
-    document.getElementById('showFullscreenOverlay').addEventListener('click', function() {
-      const overlay = showLevyLoadingOverlay('default', 'Processing your request');
-      
-      // Automatically hide after 3 seconds for demo purposes
-      setTimeout(() => {
-        overlay.hide();
-      }, 3000);
-    });
-    
+    document
+      .getElementById("showFullscreenOverlay")
+      .addEventListener("click", function () {
+        const overlay = showLevyLoadingOverlay(
+          "default",
+          "Processing your request",
+        );
+
+        // Automatically hide after 3 seconds for demo purposes
+        setTimeout(() => {
+          overlay.hide();
+        }, 3000);
+      });
+
     // Preview buttons in the animation types section
-    const previewButtons = document.querySelectorAll('.preview-btn');
-    previewButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const type = this.getAttribute('data-type');
-        const overlay = showLevyLoadingOverlay(type, `Demonstrating ${type} animation`);
-        
+    const previewButtons = document.querySelectorAll(".preview-btn");
+    previewButtons.forEach((button) => {
+      button.addEventListener("click", function () {
+        const type = this.getAttribute("data-type");
+        const overlay = showLevyLoadingOverlay(
+          type,
+          `Demonstrating ${type} animation`,
+        );
+
         // Automatically hide after 3 seconds
         setTimeout(() => {
           overlay.hide();

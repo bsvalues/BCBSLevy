@@ -1,628 +1,710 @@
-{% extends "base.html" %}
-
-{% block title %}District Analysis: {{ district.name }}{% endblock %}
-
-{% block head %}
-{{ super() }}
+{% extends "base.html" %} {% block title %}District Analysis: {{ district.name
+}}{% endblock %} {% block head %} {{ super() }}
 <style>
+  <style > .card-top-border-primary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3da5bd, #7cbfcc);
+  }
 
-<style>
-    .card-top-border-primary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3DA5BD, #7CBFCC);
-    }
-    
-    .card-top-border-success:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #66A355, #78c265);
-    }
-    
-    .card-top-border-yellow:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #F0C75C, #f5d78a);
-    }
-    
-    .card-top-border-secondary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #6c757d, #adb5bd);
-    }
-    
-    .hover-card {
-        position: relative;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border-radius: 16px; 
-        overflow: hidden;
-    }
-    
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-    
-    .trend-card {
-        position: relative;
-    }
-    .card-top-border-primary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3DA5BD, #7CBFCC);
-    }
-    
-    .card-top-border-success:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #66A355, #78c265);
-    }
-    
-    .card-top-border-yellow:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #F0C75C, #f5d78a);
-    }
-    
-    .card-top-border-secondary:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #6c757d, #adb5bd);
-    }
-    
-    .hover-card {
-        position: relative;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border-radius: 16px; 
-        overflow: hidden;
-    }
-    
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
-    }
-    
-    .trend-card {
-        position: relative;
-    }
-    .trend-card:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #66A355, #78c265);
-    }
-    
-    .compliance-card {
-        position: relative;
-    }
-    .compliance-card:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #F0C75C, #f5d78a);
-    }
-    
-    .recommendation-card {
-        position: relative;
-    }
-    .recommendation-card:before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3DA5BD, #7CBFCC);
-    }
-    
-    .api-status {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-right: 5px;
-    }
-    
-    .api-status.active {
-        background-color: #66A355;
-    }
-    
-    .api-status.inactive {
-        background-color: #dc3545;
-    }
-    
-    .chart-container {
-        height: 300px;
-    }
-    
-    .district-info-item {
-        padding: 12px;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-    
-    .district-info-item:last-child {
-        border-bottom: none;
-    }
-    
-    .tax-code-badge {
-        display: inline-block;
-        padding: 0.35rem 0.75rem;
-        border-radius: 30px;
-        background-color: rgba(61, 165, 189, 0.1);
-        color: #3DA5BD;
-        margin: 0.25rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    
-    .tax-code-badge:hover {
-        background-color: rgba(61, 165, 189, 0.2);
-        transform: translateY(-2px);
-    }
+  .card-top-border-success:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66a355, #78c265);
+  }
+
+  .card-top-border-yellow:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f0c75c, #f5d78a);
+  }
+
+  .card-top-border-secondary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6c757d, #adb5bd);
+  }
+
+  .hover-card {
+    position: relative;
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .trend-card {
+    position: relative;
+  }
+  .card-top-border-primary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3da5bd, #7cbfcc);
+  }
+
+  .card-top-border-success:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66a355, #78c265);
+  }
+
+  .card-top-border-yellow:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f0c75c, #f5d78a);
+  }
+
+  .card-top-border-secondary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6c757d, #adb5bd);
+  }
+
+  .hover-card {
+    position: relative;
+    transition:
+      transform 0.3s,
+      box-shadow 0.3s;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .trend-card {
+    position: relative;
+  }
+  .trend-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #66a355, #78c265);
+  }
+
+  .compliance-card {
+    position: relative;
+  }
+  .compliance-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f0c75c, #f5d78a);
+  }
+
+  .recommendation-card {
+    position: relative;
+  }
+  .recommendation-card:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3da5bd, #7cbfcc);
+  }
+
+  .api-status {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+
+  .api-status.active {
+    background-color: #66a355;
+  }
+
+  .api-status.inactive {
+    background-color: #dc3545;
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+
+  .district-info-item {
+    padding: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .district-info-item:last-child {
+    border-bottom: none;
+  }
+
+  .tax-code-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 30px;
+    background-color: rgba(61, 165, 189, 0.1);
+    color: #3da5bd;
+    margin: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .tax-code-badge:hover {
+    background-color: rgba(61, 165, 189, 0.2);
+    transform: translateY(-2px);
+  }
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <!-- Header Section with Gradient Background -->
 <div class="app-header-bg py-4 mb-4 rounded-4 mx-3">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-5 fw-bold text-white mb-3">District Analysis: {{ district.district_name }}</h1>
-                <p class="lead text-light opacity-90 mb-0">Comprehensive analysis and insights for this tax district</p>
-            </div>
-            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                <a href="{{ url_for('forecasting.ai_enhanced') }}" class="btn btn-light rounded-pill px-4">
-                    <i class="bi bi-arrow-left me-2"></i>Back to AI Analysis
-                </a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="display-5 fw-bold text-white mb-3">
+          District Analysis: {{ district.district_name }}
+        </h1>
+        <p class="lead text-light opacity-90 mb-0">
+          Comprehensive analysis and insights for this tax district
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <a
+          href="{{ url_for('forecasting.ai_enhanced') }}"
+          class="btn btn-light rounded-pill px-4"
+        >
+          <i class="bi bi-arrow-left me-2"></i>Back to AI Analysis
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="container">
-
-    <div class="row">
-        <div class="col-lg-3">
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden;">
-                <div class="position-absolute top-0 start-0 w-100" style="background: linear-gradient(90deg, #3DA5BD, #5da2b3); height: 4px;"></div>
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3" style="background-color: rgba(61, 165, 189, 0.1);">
-                            <i class="bi bi-geo-alt" style="color: #3DA5BD;"></i>
-                        </div>
-                        <h3 class="card-title h4 mb-0 fw-bold">District Information</h3>
-                    </div>
-                    <div class="p-0">
-                    <div class="district-info-item">
-                        <strong>Name:</strong> {{ district_details.name }}
-                    </div>
-                    <div class="district-info-item">
-                        <strong>Code:</strong> {{ district_details.code }}
-                    </div>
-                    <div class="district-info-item">
-                        <strong>Type:</strong> {{ district_details.type }}
-                    </div>
-                    <div class="district-info-item">
-                        <strong>County:</strong> {{ district_details.county }}
-                    </div>
-                    <div class="district-info-item">
-                        <strong>State:</strong> {{ district_details.state }}
-                    </div>
-                    <div class="district-info-item">
-                        <strong>Year:</strong> {{ district_details.year }}
-                    </div>
-                    {% if district_details.statutory_limit %}
-                    <div class="district-info-item">
-                        <strong>Statutory Limit:</strong> {{ district_details.statutory_limit|format_percent }}
-                    </div>
-                    {% endif %}
-                    {% if district_details.description %}
-                    <div class="district-info-item">
-                        <strong>Description:</strong> {{ district_details.description }}
-                    </div>
-                    {% endif %}
-                </div>
+  <div class="row">
+    <div class="col-lg-3">
+      <div
+        class="card border-0 shadow-sm mb-4"
+        style="border-radius: 16px; overflow: hidden"
+      >
+        <div
+          class="position-absolute top-0 start-0 w-100"
+          style="
+            background: linear-gradient(90deg, #3da5bd, #5da2b3);
+            height: 4px;
+          "
+        ></div>
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div
+              class="feature-icon me-3 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3"
+              style="background-color: rgba(61, 165, 189, 0.1)"
+            >
+              <i class="bi bi-geo-alt" style="color: #3da5bd"></i>
             </div>
+            <h3 class="card-title h4 mb-0 fw-bold">District Information</h3>
+          </div>
+          <div class="p-0">
+            <div class="district-info-item">
+              <strong>Name:</strong> {{ district_details.name }}
+            </div>
+            <div class="district-info-item">
+              <strong>Code:</strong> {{ district_details.code }}
+            </div>
+            <div class="district-info-item">
+              <strong>Type:</strong> {{ district_details.type }}
+            </div>
+            <div class="district-info-item">
+              <strong>County:</strong> {{ district_details.county }}
+            </div>
+            <div class="district-info-item">
+              <strong>State:</strong> {{ district_details.state }}
+            </div>
+            <div class="district-info-item">
+              <strong>Year:</strong> {{ district_details.year }}
+            </div>
+            {% if district_details.statutory_limit %}
+            <div class="district-info-item">
+              <strong>Statutory Limit:</strong> {{
+              district_details.statutory_limit|format_percent }}
+            </div>
+            {% endif %} {% if district_details.description %}
+            <div class="district-info-item">
+              <strong>Description:</strong> {{ district_details.description }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Related Tax Codes</h5>
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Related Tax Codes</h5>
+          </div>
+          <div class="card-body">
+            {% if tax_codes %}
+            <div class="d-flex flex-wrap">
+              {% for tax_code in tax_codes %}
+              <div class="tax-code-badge">{{ tax_code.tax_code }}</div>
+              {% endfor %}
+            </div>
+            <div class="mt-3 small text-muted">
+              {{ tax_codes|length }} tax code{{ 's' if tax_codes|length != 1 }}
+              associated with this district
+            </div>
+            {% else %}
+            <div class="alert alert-warning mb-0">
+              No tax codes found for this district
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Analysis Options</h5>
+          </div>
+          <div class="card-body">
+            <a href="#comprehensive" class="btn btn-primary mb-2 d-block"
+              >Comprehensive Analysis</a
+            >
+            <a href="#trends" class="btn btn-success mb-2 d-block"
+              >Trend Analysis</a
+            >
+            <a href="#compliance" class="btn btn-warning mb-2 d-block"
+              >Compliance Analysis</a
+            >
+
+            <hr />
+
+            <p class="small mb-0">
+              <span
+                class="api-status {{ 'active' if ai_available else 'inactive' }}"
+              ></span>
+              <span
+                >AI services are currently {{ 'available' if ai_available else
+                'unavailable' }}</span
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+        <!-- Comprehensive Analysis Section -->
+        <div id="comprehensive" class="card shadow-sm mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Comprehensive Analysis</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="card stats-card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Overview</h5>
+                    <div class="mb-3">
+                      <div class="d-flex justify-content-between">
+                        <span>Total Tax Codes:</span>
+                        <span class="fw-bold"
+                          >{{ comprehensive_stats.total_tax_codes }}</span
+                        >
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span>Average Levy Rate:</span>
+                        <span class="fw-bold"
+                          >{{
+                          comprehensive_stats.average_levy_rate|format_percent
+                          }}</span
+                        >
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span>Total Assessed Value:</span>
+                        <span class="fw-bold"
+                          >{{
+                          comprehensive_stats.total_assessed_value|format_currency
+                          }}</span
+                        >
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span>Average Assessed Value:</span>
+                        <span class="fw-bold"
+                          >{{
+                          comprehensive_stats.average_assessed_value|format_currency
+                          }}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="card-body">
-                    {% if tax_codes %}
-                        <div class="d-flex flex-wrap">
-                            {% for tax_code in tax_codes %}
-                                <div class="tax-code-badge">{{ tax_code.tax_code }}</div>
-                            {% endfor %}
-                        </div>
-                        <div class="mt-3 small text-muted">
-                            {{ tax_codes|length }} tax code{{ 's' if tax_codes|length != 1 }} associated with this district
-                        </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <div class="card stats-card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Statistical Metrics</h5>
+                    {% if comprehensive_stats.statistical_metrics %}
+                    <div class="mb-3">
+                      <div class="d-flex justify-content-between">
+                        <span>Mean Rate:</span>
+                        <span class="fw-bold"
+                          >{{
+                          comprehensive_stats.statistical_metrics.mean|format_percent
+                          }}</span
+                        >
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span>Median Rate:</span>
+                        <span class="fw-bold"
+                          >{{
+                          comprehensive_stats.statistical_metrics.median|format_percent
+                          }}</span
+                        >
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span>Standard Deviation:</span>
+                        <span class="fw-bold"
+                          >{{
+                          comprehensive_stats.statistical_metrics.std_dev|format_percent
+                          }}</span
+                        >
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span>Range:</span>
+                        <span class="fw-bold"
+                          >{{
+                          comprehensive_stats.statistical_metrics.range|format_percent
+                          }}</span
+                        >
+                      </div>
+                    </div>
                     {% else %}
-                        <div class="alert alert-warning mb-0">
-                            No tax codes found for this district
-                        </div>
+                    <div class="alert alert-warning">
+                      Statistical metrics not available
+                    </div>
                     {% endif %}
+                  </div>
                 </div>
+              </div>
             </div>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">Analysis Options</h5>
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <div class="card stats-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Historical Trend</h5>
+
+                    {% if comprehensive_stats.historical_trend %}
+                    <div class="chart-container">
+                      <canvas id="historicalTrendChart"></canvas>
+                    </div>
+
+                    <div class="mt-3">
+                      <h6>Year-over-Year Changes</h6>
+                      {% if comprehensive_stats.year_over_year_changes %}
+                      <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                          <thead>
+                            <tr>
+                              <th>Year</th>
+                              <th>Change</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for year, change in
+                            comprehensive_stats.year_over_year_changes.items()
+                            %}
+                            <tr>
+                              <td>{{ year }}</td>
+                              <td
+                                class="{{ 'text-success' if change < 0 else 'text-danger' }}"
+                              >
+                                {{ change|format_percent }}
+                              </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                      {% else %}
+                      <div class="alert alert-info">
+                        Year-over-year changes not available
+                      </div>
+                      {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                      Historical trend data not available
+                    </div>
+                    {% endif %}
+                  </div>
                 </div>
-                <div class="card-body">
-                    <a href="#comprehensive" class="btn btn-primary mb-2 d-block">Comprehensive Analysis</a>
-                    <a href="#trends" class="btn btn-success mb-2 d-block">Trend Analysis</a>
-                    <a href="#compliance" class="btn btn-warning mb-2 d-block">Compliance Analysis</a>
-                    
-                    <hr>
-                    
-                    <p class="small mb-0">
-                        <span class="api-status {{ 'active' if ai_available else 'inactive' }}"></span>
-                        <span>AI services are currently {{ 'available' if ai_available else 'unavailable' }}</span>
-                    </p>
-                </div>
+              </div>
             </div>
+          </div>
         </div>
 
-        <div class="col-lg-9">
-            <!-- Comprehensive Analysis Section -->
-            <div id="comprehensive" class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Comprehensive Analysis</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card stats-card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Overview</h5>
-                                    <div class="mb-3">
-                                        <div class="d-flex justify-content-between">
-                                            <span>Total Tax Codes:</span>
-                                            <span class="fw-bold">{{ comprehensive_stats.total_tax_codes }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>Average Levy Rate:</span>
-                                            <span class="fw-bold">{{ comprehensive_stats.average_levy_rate|format_percent }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>Total Assessed Value:</span>
-                                            <span class="fw-bold">{{ comprehensive_stats.total_assessed_value|format_currency }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>Average Assessed Value:</span>
-                                            <span class="fw-bold">{{ comprehensive_stats.average_assessed_value|format_currency }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 mb-4">
-                            <div class="card stats-card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Statistical Metrics</h5>
-                                    {% if comprehensive_stats.statistical_metrics %}
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between">
-                                                <span>Mean Rate:</span>
-                                                <span class="fw-bold">{{ comprehensive_stats.statistical_metrics.mean|format_percent }}</span>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <span>Median Rate:</span>
-                                                <span class="fw-bold">{{ comprehensive_stats.statistical_metrics.median|format_percent }}</span>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <span>Standard Deviation:</span>
-                                                <span class="fw-bold">{{ comprehensive_stats.statistical_metrics.std_dev|format_percent }}</span>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <span>Range:</span>
-                                                <span class="fw-bold">{{ comprehensive_stats.statistical_metrics.range|format_percent }}</span>
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-warning">
-                                            Statistical metrics not available
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+        <!-- Trend Analysis Section -->
+        <div id="trends" class="card shadow-sm mb-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Trend Analysis</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <div class="card trend-card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Yearly Trends</h5>
+
+                    {% if trend_stats.yearly_trends %}
+                    <div class="chart-container">
+                      <canvas id="yearlyTrendsChart"></canvas>
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-12 mb-4">
-                            <div class="card stats-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Historical Trend</h5>
-                                    
-                                    {% if comprehensive_stats.historical_trend %}
-                                        <div class="chart-container">
-                                            <canvas id="historicalTrendChart"></canvas>
-                                        </div>
-                                        
-                                        <div class="mt-3">
-                                            <h6>Year-over-Year Changes</h6>
-                                            {% if comprehensive_stats.year_over_year_changes %}
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Year</th>
-                                                                <th>Change</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for year, change in comprehensive_stats.year_over_year_changes.items() %}
-                                                                <tr>
-                                                                    <td>{{ year }}</td>
-                                                                    <td class="{{ 'text-success' if change < 0 else 'text-danger' }}">
-                                                                        {{ change|format_percent }}
-                                                                    </td>
-                                                                </tr>
-                                                            {% endfor %}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            {% else %}
-                                                <div class="alert alert-info">
-                                                    Year-over-year changes not available
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-warning">
-                                            Historical trend data not available
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                      Yearly trend data not available
                     </div>
+                    {% endif %}
+                  </div>
                 </div>
+              </div>
+
+              <div class="col-md-6 mb-4">
+                <div class="card trend-card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">Growth Rates</h5>
+
+                    {% if trend_stats.growth_rates %}
+                    <div class="chart-container">
+                      <canvas id="growthRatesChart"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                      Growth rate data not available
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <!-- Trend Analysis Section -->
-            <div id="trends" class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Trend Analysis</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card trend-card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Yearly Trends</h5>
-                                    
-                                    {% if trend_stats.yearly_trends %}
-                                        <div class="chart-container">
-                                            <canvas id="yearlyTrendsChart"></canvas>
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-warning">
-                                            Yearly trend data not available
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 mb-4">
-                            <div class="card trend-card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">Growth Rates</h5>
-                                    
-                                    {% if trend_stats.growth_rates %}
-                                        <div class="chart-container">
-                                            <canvas id="growthRatesChart"></canvas>
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-warning">
-                                            Growth rate data not available
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <div class="card trend-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Forecasting Indicators</h5>
+
+                    {% if trend_stats.forecasting_indicators %}
+                    <div class="mb-3">
+                      <div class="d-flex justify-content-between">
+                        <span>Rate Trend Slope:</span>
+                        <span class="fw-bold"
+                          >{{
+                          trend_stats.forecasting_indicators.rate_trend_slope
+                          }}</span
+                        >
+                      </div>
+
+                      {% if
+                      trend_stats.forecasting_indicators.predicted_next_year_rate
+                      %}
+                      <div class="d-flex justify-content-between">
+                        <span>Predicted Next Year Rate:</span>
+                        <span class="fw-bold"
+                          >{{
+                          trend_stats.forecasting_indicators.predicted_next_year_rate|format_percent
+                          }}</span
+                        >
+                      </div>
+                      {% endif %}
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-12 mb-4">
-                            <div class="card trend-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Forecasting Indicators</h5>
-                                    
-                                    {% if trend_stats.forecasting_indicators %}
-                                        <div class="mb-3">
-                                            <div class="d-flex justify-content-between">
-                                                <span>Rate Trend Slope:</span>
-                                                <span class="fw-bold">{{ trend_stats.forecasting_indicators.rate_trend_slope }}</span>
-                                            </div>
-                                            
-                                            {% if trend_stats.forecasting_indicators.predicted_next_year_rate %}
-                                                <div class="d-flex justify-content-between">
-                                                    <span>Predicted Next Year Rate:</span>
-                                                    <span class="fw-bold">{{ trend_stats.forecasting_indicators.predicted_next_year_rate|format_percent }}</span>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                        
-                                        {% if trend_stats.correlation_metrics %}
-                                            <h6>Correlation Metrics</h6>
-                                            <div class="d-flex justify-content-between">
-                                                <span>Rate-Value Correlation:</span>
-                                                <span class="fw-bold">{{ trend_stats.correlation_metrics.rate_value_correlation|round(2) }}</span>
-                                            </div>
-                                        {% endif %}
-                                    {% else %}
-                                        <div class="alert alert-warning">
-                                            Forecasting indicators not available
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+
+                    {% if trend_stats.correlation_metrics %}
+                    <h6>Correlation Metrics</h6>
+                    <div class="d-flex justify-content-between">
+                      <span>Rate-Value Correlation:</span>
+                      <span class="fw-bold"
+                        >{{
+                        trend_stats.correlation_metrics.rate_value_correlation|round(2)
+                        }}</span
+                      >
                     </div>
+                    {% endif %} {% else %}
+                    <div class="alert alert-warning">
+                      Forecasting indicators not available
+                    </div>
+                    {% endif %}
+                  </div>
                 </div>
+              </div>
             </div>
-            
-            <!-- Compliance Analysis Section -->
-            <div id="compliance" class="card shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">Compliance Analysis</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12 mb-4">
-                            <div class="card compliance-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Compliance Metrics</h5>
-                                    
-                                    {% if compliance_stats and compliance_stats.compliance_metrics %}
-                                        <div class="mb-3">
-                                            <div class="table-responsive">
-                                                <table class="table table-sm table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Metric</th>
-                                                            <th>Value</th>
-                                                            <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for metric, data in compliance_stats.compliance_metrics.items() %}
-                                                            <tr>
-                                                                <td>{{ metric|replace('_', ' ')|title }}</td>
-                                                                <td>{{ data.value }}</td>
-                                                                <td>
-                                                                    {% if data.compliant %}
-                                                                        <span class="badge bg-success">Compliant</span>
-                                                                    {% else %}
-                                                                        <span class="badge bg-danger">Non-Compliant</span>
-                                                                    {% endif %}
-                                                                </td>
-                                                            </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-warning">
-                                            Compliance metrics not available
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-12 mb-4">
-                            <div class="card compliance-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Issues & Recommendations</h5>
-                                    
-                                    {% if compliance_stats and compliance_stats.compliance_issues %}
-                                        <div class="list-group">
-                                            {% for issue in compliance_stats.compliance_issues %}
-                                                <div class="list-group-item">
-                                                    <div class="d-flex w-100 justify-content-between">
-                                                        <h6 class="mb-1">{{ issue.title }}</h6>
-                                                        <span class="badge bg-danger">Issue</span>
-                                                    </div>
-                                                    <p class="mb-1">{{ issue.description }}</p>
-                                                    {% if issue.recommendation %}
-                                                        <div class="alert alert-info mt-2 mb-0 py-2">
-                                                            <strong>Recommendation:</strong> {{ issue.recommendation }}
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    {% else %}
-                                        <div class="alert alert-success">
-                                            No compliance issues detected
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- AI Enhanced Analysis Section -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">AI-Enhanced Analysis</h5>
-                </div>
-                <div class="card-body text-center">
-                    <p class="mb-3">Run a comprehensive AI-enhanced analysis to get deeper insights into this district's data.</p>
-                    <a href="{{ url_for('forecasting.ai_enhanced') }}?district_id={{ district.id }}" class="btn btn-primary">
-                        <i class="bi bi-cpu me-2"></i>Run AI Analysis
-                    </a>
-                </div>
-            </div>
+          </div>
         </div>
+
+        <!-- Compliance Analysis Section -->
+        <div id="compliance" class="card shadow-sm mb-4">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Compliance Analysis</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <div class="card compliance-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Compliance Metrics</h5>
+
+                    {% if compliance_stats and
+                    compliance_stats.compliance_metrics %}
+                    <div class="mb-3">
+                      <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                          <thead>
+                            <tr>
+                              <th>Metric</th>
+                              <th>Value</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for metric, data in
+                            compliance_stats.compliance_metrics.items() %}
+                            <tr>
+                              <td>{{ metric|replace('_', ' ')|title }}</td>
+                              <td>{{ data.value }}</td>
+                              <td>
+                                {% if data.compliant %}
+                                <span class="badge bg-success">Compliant</span>
+                                {% else %}
+                                <span class="badge bg-danger"
+                                  >Non-Compliant</span
+                                >
+                                {% endif %}
+                              </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                      Compliance metrics not available
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 mb-4">
+                <div class="card compliance-card">
+                  <div class="card-body">
+                    <h5 class="card-title">Issues & Recommendations</h5>
+
+                    {% if compliance_stats and
+                    compliance_stats.compliance_issues %}
+                    <div class="list-group">
+                      {% for issue in compliance_stats.compliance_issues %}
+                      <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                          <h6 class="mb-1">{{ issue.title }}</h6>
+                          <span class="badge bg-danger">Issue</span>
+                        </div>
+                        <p class="mb-1">{{ issue.description }}</p>
+                        {% if issue.recommendation %}
+                        <div class="alert alert-info mt-2 mb-0 py-2">
+                          <strong>Recommendation:</strong> {{
+                          issue.recommendation }}
+                        </div>
+                        {% endif %}
+                      </div>
+                      {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">
+                      No compliance issues detected
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Enhanced Analysis Section -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">AI-Enhanced Analysis</h5>
+          </div>
+          <div class="card-body text-center">
+            <p class="mb-3">
+              Run a comprehensive AI-enhanced analysis to get deeper insights
+              into this district's data.
+            </p>
+            <a
+              href="{{ url_for('forecasting.ai_enhanced') }}?district_id={{ district.id }}"
+              class="btn btn-primary"
+            >
+              <i class="bi bi-cpu me-2"></i>Run AI Analysis
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1"></script>
-<script>
+  </div>
+  {% endblock %} {% block scripts %} {{ super() }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize charts if data is available
-        
+
         {% if comprehensive_stats.historical_trend %}
             // Historical Trend Chart
             const historicalYears = Object.keys({{ comprehensive_stats.historical_trend|tojson }});
             const historicalRates = Object.values({{ comprehensive_stats.historical_trend|tojson }});
-            
+
             new Chart(document.getElementById('historicalTrendChart'), {
                 type: 'line',
                 data: {
@@ -660,13 +742,13 @@
                 }
             });
         {% endif %}
-        
+
         {% if trend_stats.yearly_trends %}
             // Yearly Trends Chart
             const yearlyTrendsYears = Object.keys({{ trend_stats.yearly_trends.average_rates|tojson }});
             const yearlyTrendsRates = Object.values({{ trend_stats.yearly_trends.average_rates|tojson }});
             const yearlyTrendsValues = Object.values({{ trend_stats.yearly_trends.total_values|tojson }});
-            
+
             new Chart(document.getElementById('yearlyTrendsChart'), {
                 type: 'line',
                 data: {
@@ -732,13 +814,13 @@
                 }
             });
         {% endif %}
-        
+
         {% if trend_stats.growth_rates %}
             // Growth Rates Chart
             const growthYears = Object.keys({{ trend_stats.growth_rates.rates|tojson }});
             const growthRates = Object.values({{ trend_stats.growth_rates.rates|tojson }});
             const growthValues = Object.values({{ trend_stats.growth_rates.values|tojson }});
-            
+
             new Chart(document.getElementById('growthRatesChart'), {
                 type: 'bar',
                 data: {
@@ -781,5 +863,6 @@
             });
         {% endif %}
     });
-</script>
-{% endblock %}
+  </script>
+  {% endblock %}
+</div>

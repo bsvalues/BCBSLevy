@@ -1,59 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Intro.js Test</title>
-    <link href="../static/css/lib/introjs.min.css" rel="stylesheet">
-</head>
-<body>
+    <link href="../static/css/lib/introjs.min.css" rel="stylesheet" />
+  </head>
+  <body>
     <h1>Intro.js Test Page</h1>
     <button id="startTourBtn">Start Tour</button>
     <button id="checkIntroJsBtn">Check Intro.js</button>
     <div id="element1" data-step="1">Element 1</div>
     <div id="element2" data-step="2">Element 2</div>
-    
+
     <script src="../static/js/lib/intro.min.js"></script>
     <script>
-        // Simple test script
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Test page loaded");
-            
-            // Check if Intro.js is available
-            document.getElementById('checkIntroJsBtn').addEventListener('click', function() {
-                if (typeof introJs === 'function') {
-                    console.log("introJs is a function");
-                } else {
-                    console.log("introJs is NOT a function, it's: " + typeof introJs);
-                }
-                
-                console.log("window.introJs is: " + typeof window.introJs);
-            });
-            
-            // Try to start a tour
-            document.getElementById('startTourBtn').addEventListener('click', function() {
-                try {
-                    console.log("Attempting to start tour");
-                    var intro = introJs();
-                    intro.setOptions({
-                        steps: [
-                            {
-                                element: '#element1',
-                                intro: 'This is element 1'
-                            },
-                            {
-                                element: '#element2',
-                                intro: 'This is element 2'
-                            }
-                        ]
-                    });
-                    intro.start();
-                    console.log("Tour started successfully");
-                } catch (e) {
-                    console.error("Error starting tour:", e);
-                }
-            });
-        });
+      // Simple test script
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Test page loaded");
+
+        // Check if Intro.js is available
+        document
+          .getElementById("checkIntroJsBtn")
+          .addEventListener("click", function () {
+            if (typeof introJs === "function") {
+              console.log("introJs is a function");
+            } else {
+              console.log("introJs is NOT a function, it's: " + typeof introJs);
+            }
+
+            console.log("window.introJs is: " + typeof window.introJs);
+          });
+
+        // Try to start a tour
+        document
+          .getElementById("startTourBtn")
+          .addEventListener("click", function () {
+            try {
+              console.log("Attempting to start tour");
+              var intro = introJs();
+              intro.setOptions({
+                steps: [
+                  {
+                    element: "#element1",
+                    intro: "This is element 1",
+                  },
+                  {
+                    element: "#element2",
+                    intro: "This is element 2",
+                  },
+                ],
+              });
+              intro.start();
+              console.log("Tour started successfully");
+            } catch (e) {
+              console.error("Error starting tour:", e);
+            }
+          });
+      });
     </script>
-</body>
+  </body>
 </html>

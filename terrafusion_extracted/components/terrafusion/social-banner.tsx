@@ -1,10 +1,14 @@
 interface SocialBannerProps {
-  headline: string
-  supportText: string
-  url: string
+  headline: string;
+  supportText: string;
+  url: string;
 }
 
-export function SocialBanner({ headline, supportText, url }: SocialBannerProps) {
+export function SocialBanner({
+  headline,
+  supportText,
+  url,
+}: SocialBannerProps) {
   return (
     <div className="w-full aspect-[3/1] max-w-[1500px] bg-gradient-to-r from-[#3DBE82] via-[#5A9BD5] to-[#C080FF] flex overflow-hidden relative">
       {/* Left third - hero product photo faded into gradient */}
@@ -30,5 +34,5 @@ export function SocialBanner({ headline, supportText, url }: SocialBannerProps) 
         <p className="text-white font-medium">{url}</p>
       </div>
     </div>
-  )
+  );
 }

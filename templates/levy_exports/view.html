@@ -1,365 +1,439 @@
-{% extends 'base.html' %}
-
-{% block title %}Levy Data {{ year }} - Levy Calculation System{% endblock %}
-
-{% block page_title %}Levy Data for {{ year }}{% endblock %}
-{% block page_subtitle %}View and analyze levy data for the selected year{% endblock %}
-
-{% block header_actions %}
-<a href="{{ url_for('levy_exports.export_data', year=year) }}" class="btn btn-outline-secondary me-2">
-    <i class="bi bi-download me-1"></i>Export
+{% extends 'base.html' %} {% block title %}Levy Data {{ year }} - Levy
+Calculation System{% endblock %} {% block page_title %}Levy Data for {{ year
+}}{% endblock %} {% block page_subtitle %}View and analyze levy data for the
+selected year{% endblock %} {% block header_actions %}
+<a
+  href="{{ url_for('levy_exports.export_data', year=year) }}"
+  class="btn btn-outline-secondary me-2"
+>
+  <i class="bi bi-download me-1"></i>Export
 </a>
 <a href="{{ url_for('levy_exports.index') }}" class="btn btn-primary">
-    <i class="bi bi-arrow-left me-1"></i>Back to Levy Exports
+  <i class="bi bi-arrow-left me-1"></i>Back to Levy Exports
 </a>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="row mb-4">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="card-title mb-0">
-                        <i class="bi bi-calendar me-2 text-primary"></i>Levy Data for {{ year }}
-                    </h5>
-                    <div>
-                        <div class="btn-group">
-                            {% if tax_codes %}
-                                <button type="button" class="btn btn-sm btn-outline-primary" id="expandAll">
-                                    <i class="bi bi-chevron-expand me-1"></i>Expand All
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-primary" id="collapseAll">
-                                    <i class="bi bi-chevron-contract me-1"></i>Collapse All
-                                </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                
-                {% if districts %}
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th style="width: 3%">#</th>
-                                    <th style="width: 7%">District ID</th>
-                                    <th style="width: 15%">District Code</th>
-                                    <th style="width: 25%">District Name</th>
-                                    <th style="width: 40%">Tax Codes</th>
-                                    <th style="width: 10%">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for district in districts %}
-                                    <tr class="district-row" data-district-id="{{ district.id }}">
-                                        <td>{{ loop.index }}</td>
-                                        <td>{{ district.id }}</td>
-                                        <td>{{ district.district_code }}</td>
-                                        <td>{{ district.district_name }}</td>
-                                        <td>
-                                            {% set district_codes = district_tax_codes.get(district.id, []) %}
-                                            <div class="d-flex flex-wrap gap-1">
-                                                {% if district_codes %}
-                                                    <span class="badge bg-primary">{{ district_codes|length }} codes</span>
-                                                    {% for code in district_codes[:3] %}
-                                                        <span class="badge bg-secondary">{{ code.tax_code }}</span>
-                                                    {% endfor %}
-                                                    {% if district_codes|length > 3 %}
-                                                        <span class="badge bg-secondary">+{{ district_codes|length - 3 }} more</span>
-                                                    {% endif %}
-                                                {% else %}
-                                                    <span class="badge bg-light text-dark">No tax codes</span>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-sm btn-outline-primary toggle-details" data-district-id="{{ district.id }}">
-                                                <i class="bi bi-chevron-down"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <!-- Details row -->
-                                    <tr class="details-row bg-light" data-parent-id="{{ district.id }}" style="display: none;">
-                                        <td colspan="6" class="p-0">
-                                            <div class="p-3">
-                                                {% if district_codes %}
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm table-bordered">
-                                                            <thead class="table-secondary">
-                                                                <tr>
-                                                                    <th>Tax Code</th>
-                                                                    <th>Levy Rate</th>
-                                                                    <th>Levy Amount</th>
-                                                                    <th>Assessed Value</th>
-                                                                    <th>Linked Code</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {% for code in district_codes %}
-                                                                    <tr>
-                                                                        <td>{{ code.tax_code }}</td>
-                                                                        <td>
-                                                                            {% if code.historical_rate and code.historical_rate.levy_rate is not none %}
-                                                                                {{ "%.4f"|format(code.historical_rate.levy_rate) }}
-                                                                            {% else %}
-                                                                                <span class="text-muted">N/A</span>
-                                                                            {% endif %}
-                                                                        </td>
-                                                                        <td>
-                                                                            {% if code.historical_rate and code.historical_rate.levy_amount is not none %}
-                                                                                ${{ "{:,.2f}".format(code.historical_rate.levy_amount) }}
-                                                                            {% else %}
-                                                                                <span class="text-muted">N/A</span>
-                                                                            {% endif %}
-                                                                        </td>
-                                                                        <td>
-                                                                            {% if code.historical_rate and code.historical_rate.total_assessed_value is not none %}
-                                                                                ${{ "{:,.2f}".format(code.historical_rate.total_assessed_value) }}
-                                                                            {% else %}
-                                                                                <span class="text-muted">N/A</span>
-                                                                            {% endif %}
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="badge bg-info">Code information</span>
-                                                                        </td>
-                                                                    </tr>
-                                                                {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                {% else %}
-                                                    <div class="alert alert-info mb-0">
-                                                        <i class="bi bi-info-circle me-2"></i>No tax codes found for this district.
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle me-2"></i>No levy data available for {{ year }}. Please upload levy export files for this year.
-                    </div>
-                {% endif %}
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="card-title mb-0">
+            <i class="bi bi-calendar me-2 text-primary"></i>Levy Data for {{
+            year }}
+          </h5>
+          <div>
+            <div class="btn-group">
+              {% if tax_codes %}
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                id="expandAll"
+              >
+                <i class="bi bi-chevron-expand me-1"></i>Expand All
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-primary"
+                id="collapseAll"
+              >
+                <i class="bi bi-chevron-contract me-1"></i>Collapse All
+              </button>
+              {% endif %}
             </div>
+          </div>
         </div>
+
+        {% if districts %}
+        <div class="table-responsive">
+          <table class="table table-sm table-hover">
+            <thead class="table-dark">
+              <tr>
+                <th style="width: 3%">#</th>
+                <th style="width: 7%">District ID</th>
+                <th style="width: 15%">District Code</th>
+                <th style="width: 25%">District Name</th>
+                <th style="width: 40%">Tax Codes</th>
+                <th style="width: 10%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for district in districts %}
+              <tr class="district-row" data-district-id="{{ district.id }}">
+                <td>{{ loop.index }}</td>
+                <td>{{ district.id }}</td>
+                <td>{{ district.district_code }}</td>
+                <td>{{ district.district_name }}</td>
+                <td>
+                  {% set district_codes = district_tax_codes.get(district.id,
+                  []) %}
+                  <div class="d-flex flex-wrap gap-1">
+                    {% if district_codes %}
+                    <span class="badge bg-primary"
+                      >{{ district_codes|length }} codes</span
+                    >
+                    {% for code in district_codes[:3] %}
+                    <span class="badge bg-secondary">{{ code.tax_code }}</span>
+                    {% endfor %} {% if district_codes|length > 3 %}
+                    <span class="badge bg-secondary"
+                      >+{{ district_codes|length - 3 }} more</span
+                    >
+                    {% endif %} {% else %}
+                    <span class="badge bg-light text-dark">No tax codes</span>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary toggle-details"
+                    data-district-id="{{ district.id }}"
+                  >
+                    <i class="bi bi-chevron-down"></i>
+                  </button>
+                </td>
+              </tr>
+              <!-- Details row -->
+              <tr
+                class="details-row bg-light"
+                data-parent-id="{{ district.id }}"
+                style="display: none"
+              >
+                <td colspan="6" class="p-0">
+                  <div class="p-3">
+                    {% if district_codes %}
+                    <div class="table-responsive">
+                      <table class="table table-sm table-bordered">
+                        <thead class="table-secondary">
+                          <tr>
+                            <th>Tax Code</th>
+                            <th>Levy Rate</th>
+                            <th>Levy Amount</th>
+                            <th>Assessed Value</th>
+                            <th>Linked Code</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for code in district_codes %}
+                          <tr>
+                            <td>{{ code.tax_code }}</td>
+                            <td>
+                              {% if code.historical_rate and
+                              code.historical_rate.levy_rate is not none %} {{
+                              "%.4f"|format(code.historical_rate.levy_rate) }}
+                              {% else %}
+                              <span class="text-muted">N/A</span>
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if code.historical_rate and
+                              code.historical_rate.levy_amount is not none %}
+                              ${{
+                              "{:,.2f}".format(code.historical_rate.levy_amount)
+                              }} {% else %}
+                              <span class="text-muted">N/A</span>
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% if code.historical_rate and
+                              code.historical_rate.total_assessed_value is not
+                              none %} ${{
+                              "{:,.2f}".format(code.historical_rate.total_assessed_value)
+                              }} {% else %}
+                              <span class="text-muted">N/A</span>
+                              {% endif %}
+                            </td>
+                            <td>
+                              <span class="badge bg-info"
+                                >Code information</span
+                              >
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                      <i class="bi bi-info-circle me-2"></i>No tax codes found
+                      for this district.
+                    </div>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>No levy data available
+          for {{ year }}. Please upload levy export files for this year.
+        </div>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Filters and Stats Card -->
 <div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <h5 class="card-title mb-4">
-                    <i class="bi bi-funnel me-2 text-info"></i>Filters and Search
-                </h5>
-                <form id="filterForm" class="mb-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="searchDistrict" placeholder="Search districts">
-                                <label for="searchDistrict">Search Districts</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-floating">
-                                <input type="text" class="form-control" id="searchTaxCode" placeholder="Search tax codes">
-                                <label for="searchTaxCode">Search Tax Codes</label>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="d-grid">
-                                <button type="button" class="btn btn-outline-primary" id="applyFilters">
-                                    <i class="bi bi-search me-1"></i>Search and Filter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                
-                <h6 class="mb-3">Adjacent Years</h6>
-                <div class="list-group list-group-flush">
-                    <a href="{{ url_for('levy_exports.view_year', year=year-1) }}" class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-arrow-left me-2"></i>{{ year - 1 }} Data
-                        </div>
-                        <span class="badge bg-secondary">Previous Year</span>
-                    </a>
-                    <a href="{{ url_for('levy_exports.view_year', year=year+1) }}" class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="bi bi-arrow-right me-2"></i>{{ year + 1 }} Data
-                        </div>
-                        <span class="badge bg-secondary">Next Year</span>
-                    </a>
-                </div>
+  <div class="col-md-6 mb-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-4">
+          <i class="bi bi-funnel me-2 text-info"></i>Filters and Search
+        </h5>
+        <form id="filterForm" class="mb-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="searchDistrict"
+                  placeholder="Search districts"
+                />
+                <label for="searchDistrict">Search Districts</label>
+              </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6 mb-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-                <h5 class="card-title mb-4">
-                    <i class="bi bi-graph-up me-2 text-success"></i>Summary Statistics
-                </h5>
-                
-                {% if districts and tax_codes %}
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="card bg-primary bg-opacity-10 border-0">
-                                <div class="card-body">
-                                    <h6 class="card-title text-primary">Districts</h6>
-                                    <h3 class="display-6">{{ districts|length }}</h3>
-                                    <p class="card-text text-muted">Tax districts in {{ year }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card bg-success bg-opacity-10 border-0">
-                                <div class="card-body">
-                                    <h6 class="card-title text-success">Tax Codes</h6>
-                                    <h3 class="display-6">{{ tax_codes|length }}</h3>
-                                    <p class="card-text text-muted">Total tax codes in {{ year }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-12">
-                            <div class="card bg-light">
-                                <div class="card-body p-3">
-                                    <h6 class="card-title">Quick Actions</h6>
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <a href="{{ url_for('levy_exports.compare', start_year=year-5, end_year=year) }}" class="btn btn-sm btn-outline-primary w-100">
-                                                <i class="bi bi-bar-chart-line me-1"></i>5-Year Trend
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            <a href="{{ url_for('levy_exports.export_data', year=year, format='excel') }}" class="btn btn-sm btn-outline-success w-100">
-                                                <i class="bi bi-file-earmark-excel me-1"></i>Export to Excel
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            <a href="{{ url_for('forecasting.index') }}" class="btn btn-sm btn-outline-info w-100">
-                                                <i class="bi bi-graph-up-arrow me-1"></i>Forecasting
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            <a href="{{ url_for('reports.levy_summary') }}" class="btn btn-sm btn-outline-secondary w-100">
-                                                <i class="bi bi-file-earmark-text me-1"></i>Levy Summary
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>No data available to generate statistics.
-                    </div>
-                {% endif %}
+            <div class="col-md-6">
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="searchTaxCode"
+                  placeholder="Search tax codes"
+                />
+                <label for="searchTaxCode">Search Tax Codes</label>
+              </div>
             </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+            <div class="col-12">
+              <div class="d-grid">
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  id="applyFilters"
+                >
+                  <i class="bi bi-search me-1"></i>Search and Filter
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
 
-{% block extra_js %}
+        <h6 class="mb-3">Adjacent Years</h6>
+        <div class="list-group list-group-flush">
+          <a
+            href="{{ url_for('levy_exports.view_year', year=year-1) }}"
+            class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center"
+          >
+            <div><i class="bi bi-arrow-left me-2"></i>{{ year - 1 }} Data</div>
+            <span class="badge bg-secondary">Previous Year</span>
+          </a>
+          <a
+            href="{{ url_for('levy_exports.view_year', year=year+1) }}"
+            class="list-group-item list-group-item-action bg-transparent px-0 d-flex justify-content-between align-items-center"
+          >
+            <div><i class="bi bi-arrow-right me-2"></i>{{ year + 1 }} Data</div>
+            <span class="badge bg-secondary">Next Year</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 mb-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-4">
+          <i class="bi bi-graph-up me-2 text-success"></i>Summary Statistics
+        </h5>
+
+        {% if districts and tax_codes %}
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card bg-primary bg-opacity-10 border-0">
+              <div class="card-body">
+                <h6 class="card-title text-primary">Districts</h6>
+                <h3 class="display-6">{{ districts|length }}</h3>
+                <p class="card-text text-muted">Tax districts in {{ year }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card bg-success bg-opacity-10 border-0">
+              <div class="card-body">
+                <h6 class="card-title text-success">Tax Codes</h6>
+                <h3 class="display-6">{{ tax_codes|length }}</h3>
+                <p class="card-text text-muted">
+                  Total tax codes in {{ year }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card bg-light">
+              <div class="card-body p-3">
+                <h6 class="card-title">Quick Actions</h6>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <a
+                      href="{{ url_for('levy_exports.compare', start_year=year-5, end_year=year) }}"
+                      class="btn btn-sm btn-outline-primary w-100"
+                    >
+                      <i class="bi bi-bar-chart-line me-1"></i>5-Year Trend
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <a
+                      href="{{ url_for('levy_exports.export_data', year=year, format='excel') }}"
+                      class="btn btn-sm btn-outline-success w-100"
+                    >
+                      <i class="bi bi-file-earmark-excel me-1"></i>Export to
+                      Excel
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <a
+                      href="{{ url_for('forecasting.index') }}"
+                      class="btn btn-sm btn-outline-info w-100"
+                    >
+                      <i class="bi bi-graph-up-arrow me-1"></i>Forecasting
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <a
+                      href="{{ url_for('reports.levy_summary') }}"
+                      class="btn btn-sm btn-outline-secondary w-100"
+                    >
+                      <i class="bi bi-file-earmark-text me-1"></i>Levy Summary
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>No data available to generate
+          statistics.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle details rows
-        const toggleButtons = document.querySelectorAll('.toggle-details');
-        toggleButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const districtId = this.getAttribute('data-district-id');
-                const detailsRow = document.querySelector(`.details-row[data-parent-id="${districtId}"]`);
-                
-                if (detailsRow.style.display === 'none') {
-                    detailsRow.style.display = 'table-row';
-                    this.querySelector('i').classList.remove('bi-chevron-down');
-                    this.querySelector('i').classList.add('bi-chevron-up');
-                } else {
-                    detailsRow.style.display = 'none';
-                    this.querySelector('i').classList.remove('bi-chevron-up');
-                    this.querySelector('i').classList.add('bi-chevron-down');
-                }
-            });
-        });
-        
-        // Expand all button
-        document.getElementById('expandAll')?.addEventListener('click', function() {
-            document.querySelectorAll('.details-row').forEach(row => {
-                row.style.display = 'table-row';
-            });
-            document.querySelectorAll('.toggle-details i').forEach(icon => {
-                icon.classList.remove('bi-chevron-down');
-                icon.classList.add('bi-chevron-up');
-            });
-        });
-        
-        // Collapse all button
-        document.getElementById('collapseAll')?.addEventListener('click', function() {
-            document.querySelectorAll('.details-row').forEach(row => {
-                row.style.display = 'none';
-            });
-            document.querySelectorAll('.toggle-details i').forEach(icon => {
-                icon.classList.remove('bi-chevron-up');
-                icon.classList.add('bi-chevron-down');
-            });
-        });
-        
-        // Search/filter functionality
-        document.getElementById('applyFilters')?.addEventListener('click', function() {
-            const districtSearch = document.getElementById('searchDistrict').value.toLowerCase();
-            const taxCodeSearch = document.getElementById('searchTaxCode').value.toLowerCase();
-            
-            document.querySelectorAll('.district-row').forEach(row => {
-                const districtId = row.getAttribute('data-district-id');
-                const districtCode = row.cells[2].textContent.toLowerCase();
-                const districtName = row.cells[3].textContent.toLowerCase();
-                
-                // Get corresponding details row
-                const detailsRow = document.querySelector(`.details-row[data-parent-id="${districtId}"]`);
-                
-                // Check if district matches search
-                const districtMatches = 
-                    districtCode.includes(districtSearch) || 
-                    districtName.includes(districtSearch) ||
-                    districtSearch === '';
-                
-                // Check if any tax codes match search
-                let taxCodeMatches = taxCodeSearch === '';
-                if (detailsRow && !taxCodeMatches) {
-                    const taxCodes = detailsRow.querySelectorAll('td:first-child');
-                    taxCodes.forEach(cell => {
-                        if (cell.textContent.toLowerCase().includes(taxCodeSearch)) {
-                            taxCodeMatches = true;
-                        }
-                    });
-                }
-                
-                // Show/hide based on match
-                if (districtMatches && taxCodeMatches) {
-                    row.style.display = 'table-row';
-                    if (taxCodeSearch !== '' && !districtMatches) {
-                        detailsRow.style.display = 'table-row';
-                        row.querySelector('.toggle-details i').classList.remove('bi-chevron-down');
-                        row.querySelector('.toggle-details i').classList.add('bi-chevron-up');
-                    }
-                } else {
-                    row.style.display = 'none';
-                    if (detailsRow) {
-                        detailsRow.style.display = 'none';
-                    }
-                }
-            });
-        });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Toggle details rows
+    const toggleButtons = document.querySelectorAll(".toggle-details");
+    toggleButtons.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const districtId = this.getAttribute("data-district-id");
+        const detailsRow = document.querySelector(
+          `.details-row[data-parent-id="${districtId}"]`,
+        );
+
+        if (detailsRow.style.display === "none") {
+          detailsRow.style.display = "table-row";
+          this.querySelector("i").classList.remove("bi-chevron-down");
+          this.querySelector("i").classList.add("bi-chevron-up");
+        } else {
+          detailsRow.style.display = "none";
+          this.querySelector("i").classList.remove("bi-chevron-up");
+          this.querySelector("i").classList.add("bi-chevron-down");
+        }
+      });
     });
+
+    // Expand all button
+    document
+      .getElementById("expandAll")
+      ?.addEventListener("click", function () {
+        document.querySelectorAll(".details-row").forEach((row) => {
+          row.style.display = "table-row";
+        });
+        document.querySelectorAll(".toggle-details i").forEach((icon) => {
+          icon.classList.remove("bi-chevron-down");
+          icon.classList.add("bi-chevron-up");
+        });
+      });
+
+    // Collapse all button
+    document
+      .getElementById("collapseAll")
+      ?.addEventListener("click", function () {
+        document.querySelectorAll(".details-row").forEach((row) => {
+          row.style.display = "none";
+        });
+        document.querySelectorAll(".toggle-details i").forEach((icon) => {
+          icon.classList.remove("bi-chevron-up");
+          icon.classList.add("bi-chevron-down");
+        });
+      });
+
+    // Search/filter functionality
+    document
+      .getElementById("applyFilters")
+      ?.addEventListener("click", function () {
+        const districtSearch = document
+          .getElementById("searchDistrict")
+          .value.toLowerCase();
+        const taxCodeSearch = document
+          .getElementById("searchTaxCode")
+          .value.toLowerCase();
+
+        document.querySelectorAll(".district-row").forEach((row) => {
+          const districtId = row.getAttribute("data-district-id");
+          const districtCode = row.cells[2].textContent.toLowerCase();
+          const districtName = row.cells[3].textContent.toLowerCase();
+
+          // Get corresponding details row
+          const detailsRow = document.querySelector(
+            `.details-row[data-parent-id="${districtId}"]`,
+          );
+
+          // Check if district matches search
+          const districtMatches =
+            districtCode.includes(districtSearch) ||
+            districtName.includes(districtSearch) ||
+            districtSearch === "";
+
+          // Check if any tax codes match search
+          let taxCodeMatches = taxCodeSearch === "";
+          if (detailsRow && !taxCodeMatches) {
+            const taxCodes = detailsRow.querySelectorAll("td:first-child");
+            taxCodes.forEach((cell) => {
+              if (cell.textContent.toLowerCase().includes(taxCodeSearch)) {
+                taxCodeMatches = true;
+              }
+            });
+          }
+
+          // Show/hide based on match
+          if (districtMatches && taxCodeMatches) {
+            row.style.display = "table-row";
+            if (taxCodeSearch !== "" && !districtMatches) {
+              detailsRow.style.display = "table-row";
+              row
+                .querySelector(".toggle-details i")
+                .classList.remove("bi-chevron-down");
+              row
+                .querySelector(".toggle-details i")
+                .classList.add("bi-chevron-up");
+            }
+          } else {
+            row.style.display = "none";
+            if (detailsRow) {
+              detailsRow.style.display = "none";
+            }
+          }
+        });
+      });
+  });
 </script>
 {% endblock %}

@@ -26,42 +26,49 @@ PostgreSQL has specific considerations for production migrations:
 ### Pre-Migration Steps
 
 1. **Environment Setup**
+
    - Ensure PostgreSQL credentials are properly configured in environment variables
-   - Set `FLASK_ENV=production` 
+   - Set `FLASK_ENV=production`
 
 2. **Backup Current Database**
+
    ```bash
    ./production_migrate.py backup
    ```
-   
+
    This creates a compressed backup using the custom format in the `backups/` directory.
 
 3. **Generate Migration Report**
+
    ```bash
    ./production_migrate.py report
    ```
-   
+
    This creates a comprehensive report including database size, table information, and migration status.
 
 4. **Preview Migrations (Dry Run)**
+
    ```bash
    ./production_migrate.py migrate --dry-run
    ```
-   
+
    This generates the SQL that would be executed without actually running it.
 
 ### Performing the Migration
 
 1. **Schedule Migration Window**
+
    - For critical systems, schedule a maintenance window
    - Notify users if downtime is expected
 
 2. **Run Migration with Verification**
+
    ```bash
    ./production_migrate.py migrate
    ```
-   
+
    This will:
+
    - Backup the current database
    - Dump the pre-migration schema
    - Apply the migrations
@@ -70,24 +77,27 @@ PostgreSQL has specific considerations for production migrations:
    - Generate a migration report
 
 3. **Verify Database Integrity**
+
    ```bash
    ./production_migrate.py verify
    ```
-   
+
    This checks the database connection and current migration status.
 
 ### Post-Migration Steps
 
 1. **Verify Application Functionality**
+
    - Run automated tests if available
    - Manually test critical features
    - Monitor logs for errors
 
 2. **Generate Post-Migration Report**
+
    ```bash
    ./production_migrate.py report
    ```
-   
+
    This creates a comprehensive report of the current database state.
 
 3. **Archive Migration Reports**
@@ -101,19 +111,20 @@ PostgreSQL has specific considerations for production migrations:
 If issues are detected after migration:
 
 1. **Downgrade Database**
+
    ```bash
    python migrate.py downgrade
    ```
-   
+
    This rolls back to the previous migration version.
 
 2. **Restore from Backup**
    If downgrade fails or major issues occur:
-   
+
    ```bash
    ./production_migrate.py restore backups/pg_backup_YYYYMMDD_HHMMSS.sql
    ```
-   
+
    This completely restores the database from a backup file.
 
 ## Best Practices for PostgreSQL Migrations
@@ -121,10 +132,12 @@ If issues are detected after migration:
 ### Performance Optimization
 
 1. **Batched Migrations for Large Tables**
+
    - When modifying large tables, consider batching updates
    - For data migrations, use `COPY` instead of multiple `INSERT` statements
 
 2. **Indexing Considerations**
+
    - Create indexes using `CREATE INDEX CONCURRENTLY` for large tables
    - Drop indexes before bulk loading data, then recreate them
 
@@ -135,11 +148,13 @@ If issues are detected after migration:
 ### Schema Evolution Patterns
 
 1. **Adding Columns**
+
    - Add nullable columns without defaults first
    - Update data in batches
    - Then add constraints if needed
 
 2. **Changing Column Types**
+
    - Add a new column with the desired type
    - Migrate data in batches
    - Swap column names when complete
@@ -154,7 +169,8 @@ If issues are detected after migration:
 
 **Problem**: Migrations timeout or connections drop during long-running operations.
 
-**Solution**: 
+**Solution**:
+
 - Increase `statement_timeout` in PostgreSQL configuration
 - Use `keep-alive` connections
 - Split complex migrations into smaller steps
@@ -164,6 +180,7 @@ If issues are detected after migration:
 **Problem**: DDL operations lock tables, preventing application access.
 
 **Solution**:
+
 - Use `CONCURRENTLY` when possible
 - Schedule migrations during low-traffic periods
 - Consider zero-downtime migration techniques (temporary tables, views)
@@ -173,6 +190,7 @@ If issues are detected after migration:
 **Problem**: Migrations require temporary disk space that may not be available.
 
 **Solution**:
+
 - Check available disk space before migration
 - Clean up old backups or unused data
 - Monitor disk usage during migration
@@ -188,6 +206,7 @@ Create a full database backup:
 ```
 
 Options:
+
 - `--output-dir PATH`: Specify a custom directory for backups
 
 ### Database Restore
@@ -199,6 +218,7 @@ Restore a database from backup:
 ```
 
 This will:
+
 1. Prompt for confirmation (data loss warning)
 2. Create a backup of the current state
 3. Drop and recreate the database
@@ -213,6 +233,7 @@ Generate a comprehensive database report:
 ```
 
 This creates a report including:
+
 - Database version and size
 - Table sizes and row counts
 - Current migration status
@@ -232,11 +253,13 @@ The migration process automatically:
 ## Security Considerations
 
 1. **Backup Security**
+
    - Backup files contain all database data and should be secured
    - Consider encrypting backup files for sensitive data
    - Rotate or delete old backups according to data retention policies
 
 2. **Connection Security**
+
    - Use SSL for database connections
    - Avoid storing database credentials in scripts
    - Use environment variables or a secure credential store
@@ -250,6 +273,7 @@ The migration process automatically:
 For critical production migrations:
 
 1. Set up monitoring for:
+
    - Database locks and long-running queries
    - Table and index sizes
    - Connection counts

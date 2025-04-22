@@ -1,460 +1,542 @@
-{% extends 'base.html' %}
-
-{% block title %}Tax Terminology Glossary{% endblock %}
-
-{% block styles %}
+{% extends 'base.html' %} {% block title %}Tax Terminology Glossary{% endblock
+%} {% block styles %}
 <style>
-    /* Custom styles for glossary */
-    .glossary-term {
-        cursor: help;
-    }
-    
-    .glossary-card {
-        height: 100%;
-        transition: transform 0.2s ease-in-out;
-    }
-    
-    .glossary-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-    
-    .glossary-section {
-        margin-bottom: 2rem;
-    }
-    
-    .glossary-section h3 {
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid var(--bs-info);
-        margin-bottom: 1.5rem;
-    }
-    
-    .category-nav {
-        position: sticky;
-        top: 1rem;
-        padding: 1rem;
-        border-radius: 0.5rem;
-    }
-    
-    .search-container {
-        margin-bottom: 2rem;
-    }
-    
-    .term-count {
-        font-size: 0.9rem;
-        opacity: 0.7;
-    }
-    
-    .tooltip-term {
-        border-bottom: 1px dashed var(--bs-info);
-        color: var(--bs-info);
-        cursor: help;
-    }
-    
-    .term-letter {
-        font-size: 2.5rem;
-        color: var(--bs-info);
-        font-weight: bold;
-        display: inline-block;
-        width: 2rem;
-        text-align: center;
-        margin-right: 1rem;
-    }
-    
-    .glossary-help {
-        background-color: rgba(13, 202, 240, 0.1);
-        border-left: 4px solid var(--bs-info);
-        padding: 1rem;
-        margin-bottom: 2rem;
-        border-radius: 0 0.375rem 0.375rem 0;
-    }
-</style>
-{% endblock %}
+  /* Custom styles for glossary */
+  .glossary-term {
+    cursor: help;
+  }
 
-{% block content %}
+  .glossary-card {
+    height: 100%;
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .glossary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .glossary-section {
+    margin-bottom: 2rem;
+  }
+
+  .glossary-section h3 {
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--bs-info);
+    margin-bottom: 1.5rem;
+  }
+
+  .category-nav {
+    position: sticky;
+    top: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .search-container {
+    margin-bottom: 2rem;
+  }
+
+  .term-count {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+
+  .tooltip-term {
+    border-bottom: 1px dashed var(--bs-info);
+    color: var(--bs-info);
+    cursor: help;
+  }
+
+  .term-letter {
+    font-size: 2.5rem;
+    color: var(--bs-info);
+    font-weight: bold;
+    display: inline-block;
+    width: 2rem;
+    text-align: center;
+    margin-right: 1rem;
+  }
+
+  .glossary-help {
+    background-color: rgba(13, 202, 240, 0.1);
+    border-left: 4px solid var(--bs-info);
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 0 0.375rem 0.375rem 0;
+  }
+</style>
+{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-12">
-        <h2 class="mb-3">
-            <i class="bi bi-book"></i> Tax Terminology Glossary
-        </h2>
-        <p class="lead">Comprehensive reference for property tax terms and definitions.</p>
-        
-        <div class="glossary-help mb-4">
-            <h5><i class="bi bi-info-circle"></i> About the Glossary</h5>
-            <p>
-                This glossary provides definitions for terminology used throughout the Levy Calculation Application. 
-                Terms with tooltips appear throughout the application with blue underlines - hover over them for quick definitions.
-            </p>
-        </div>
+  <div class="col-12">
+    <h2 class="mb-3"><i class="bi bi-book"></i> Tax Terminology Glossary</h2>
+    <p class="lead">
+      Comprehensive reference for property tax terms and definitions.
+    </p>
+
+    <div class="glossary-help mb-4">
+      <h5><i class="bi bi-info-circle"></i> About the Glossary</h5>
+      <p>
+        This glossary provides definitions for terminology used throughout the
+        Levy Calculation Application. Terms with tooltips appear throughout the
+        application with blue underlines - hover over them for quick
+        definitions.
+      </p>
     </div>
+  </div>
 </div>
 
 <div class="row">
-    <!-- Search and filter -->
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-body">
-                <div class="search-container">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                        <input type="text" id="glossary-search" class="form-control" placeholder="Search for terms...">
-                        <button class="btn btn-outline-secondary" type="button" id="clear-search">Clear</button>
-                    </div>
-                </div>
-                
-                <!-- View options -->
-                <div class="btn-group" role="group" aria-label="View Options">
-                    <input type="radio" class="btn-check" name="viewOption" id="categoryView" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" for="categoryView">
-                        <i class="bi bi-grid"></i> Category View
-                    </label>
-                    
-                    <input type="radio" class="btn-check" name="viewOption" id="alphabeticalView" autocomplete="off">
-                    <label class="btn btn-outline-primary" for="alphabeticalView">
-                        <i class="bi bi-sort-alpha-down"></i> Alphabetical View
-                    </label>
-                </div>
-            </div>
+  <!-- Search and filter -->
+  <div class="col-12 mb-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="search-container">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input
+              type="text"
+              id="glossary-search"
+              class="form-control"
+              placeholder="Search for terms..."
+            />
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              id="clear-search"
+            >
+              Clear
+            </button>
+          </div>
         </div>
+
+        <!-- View options -->
+        <div class="btn-group" role="group" aria-label="View Options">
+          <input
+            type="radio"
+            class="btn-check"
+            name="viewOption"
+            id="categoryView"
+            autocomplete="off"
+            checked
+          />
+          <label class="btn btn-outline-primary" for="categoryView">
+            <i class="bi bi-grid"></i> Category View
+          </label>
+
+          <input
+            type="radio"
+            class="btn-check"
+            name="viewOption"
+            id="alphabeticalView"
+            autocomplete="off"
+          />
+          <label class="btn btn-outline-primary" for="alphabeticalView">
+            <i class="bi bi-sort-alpha-down"></i> Alphabetical View
+          </label>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Category View -->
 <div id="category-view">
-    <div class="row">
-        <!-- Sidebar with category links -->
-        <div class="col-md-3 mb-4">
-            <div class="card category-nav">
-                <div class="card-header">
-                    <h5 class="mb-0">Categories</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        <a href="#levy-terms" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            Levy Terms
-                            <span class="badge bg-primary rounded-pill">{{ levy_terms|length }}</span>
-                        </a>
-                        <a href="#assessment-terms" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            Assessment Terms
-                            <span class="badge bg-primary rounded-pill">{{ assessment_terms|length }}</span>
-                        </a>
-                        <a href="#special-terms" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            Special Levy Terms
-                            <span class="badge bg-primary rounded-pill">{{ special_terms|length }}</span>
-                        </a>
-                        <a href="#admin-terms" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            Administrative Terms
-                            <span class="badge bg-primary rounded-pill">{{ admin_terms|length }}</span>
-                        </a>
-                        <a href="#statistical-terms" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            Statistical Terms
-                            <span class="badge bg-primary rounded-pill">{{ statistical_terms|length }}</span>
-                        </a>
-                        <a href="#advanced-terms" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            Advanced Terms
-                            <span class="badge bg-primary rounded-pill">{{ advanced_terms|length }}</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+  <div class="row">
+    <!-- Sidebar with category links -->
+    <div class="col-md-3 mb-4">
+      <div class="card category-nav">
+        <div class="card-header">
+          <h5 class="mb-0">Categories</h5>
         </div>
-        
-        <!-- Main content area for categories -->
-        <div class="col-md-9">
-            <!-- Levy Terms Section -->
-            <div class="glossary-section" id="levy-terms">
-                <h3>
-                    <i class="bi bi-cash-stack"></i> Levy Terms
-                    <small class="term-count">({{ levy_terms|length }} terms)</small>
-                </h3>
-                <div class="row">
-                    {% for term, definition in levy_terms %}
-                    <div class="col-md-6 mb-4 glossary-term-item" data-term="{{ term|lower }}">
-                        <div class="card glossary-card">
-                            <div class="card-header">
-                                <h5 class="mb-0">{{ term }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ definition }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <!-- Assessment Terms Section -->
-            <div class="glossary-section" id="assessment-terms">
-                <h3>
-                    <i class="bi bi-house"></i> Assessment Terms
-                    <small class="term-count">({{ assessment_terms|length }} terms)</small>
-                </h3>
-                <div class="row">
-                    {% for term, definition in assessment_terms %}
-                    <div class="col-md-6 mb-4 glossary-term-item" data-term="{{ term|lower }}">
-                        <div class="card glossary-card">
-                            <div class="card-header">
-                                <h5 class="mb-0">{{ term }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ definition }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <!-- Special Levy Terms Section -->
-            <div class="glossary-section" id="special-terms">
-                <h3>
-                    <i class="bi bi-star"></i> Special Levy Terms
-                    <small class="term-count">({{ special_terms|length }} terms)</small>
-                </h3>
-                <div class="row">
-                    {% for term, definition in special_terms %}
-                    <div class="col-md-6 mb-4 glossary-term-item" data-term="{{ term|lower }}">
-                        <div class="card glossary-card">
-                            <div class="card-header">
-                                <h5 class="mb-0">{{ term }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ definition }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <!-- Administrative Terms Section -->
-            <div class="glossary-section" id="admin-terms">
-                <h3>
-                    <i class="bi bi-file-earmark-text"></i> Administrative Terms
-                    <small class="term-count">({{ admin_terms|length }} terms)</small>
-                </h3>
-                <div class="row">
-                    {% for term, definition in admin_terms %}
-                    <div class="col-md-6 mb-4 glossary-term-item" data-term="{{ term|lower }}">
-                        <div class="card glossary-card">
-                            <div class="card-header">
-                                <h5 class="mb-0">{{ term }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ definition }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <!-- Statistical Terms Section -->
-            <div class="glossary-section" id="statistical-terms">
-                <h3>
-                    <i class="bi bi-graph-up"></i> Statistical Terms
-                    <small class="term-count">({{ statistical_terms|length }} terms)</small>
-                </h3>
-                <div class="row">
-                    {% for term, definition in statistical_terms %}
-                    <div class="col-md-6 mb-4 glossary-term-item" data-term="{{ term|lower }}">
-                        <div class="card glossary-card">
-                            <div class="card-header">
-                                <h5 class="mb-0">{{ term }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ definition }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <!-- Advanced Terms Section -->
-            <div class="glossary-section" id="advanced-terms">
-                <h3>
-                    <i class="bi bi-lightning-charge"></i> Advanced Terms
-                    <small class="term-count">({{ advanced_terms|length }} terms)</small>
-                </h3>
-                <div class="row">
-                    {% for term, definition in advanced_terms %}
-                    <div class="col-md-6 mb-4 glossary-term-item" data-term="{{ term|lower }}">
-                        <div class="card glossary-card">
-                            <div class="card-header">
-                                <h5 class="mb-0">{{ term }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">{{ definition }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <a
+              href="#levy-terms"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              Levy Terms
+              <span class="badge bg-primary rounded-pill"
+                >{{ levy_terms|length }}</span
+              >
+            </a>
+            <a
+              href="#assessment-terms"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              Assessment Terms
+              <span class="badge bg-primary rounded-pill"
+                >{{ assessment_terms|length }}</span
+              >
+            </a>
+            <a
+              href="#special-terms"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              Special Levy Terms
+              <span class="badge bg-primary rounded-pill"
+                >{{ special_terms|length }}</span
+              >
+            </a>
+            <a
+              href="#admin-terms"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              Administrative Terms
+              <span class="badge bg-primary rounded-pill"
+                >{{ admin_terms|length }}</span
+              >
+            </a>
+            <a
+              href="#statistical-terms"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              Statistical Terms
+              <span class="badge bg-primary rounded-pill"
+                >{{ statistical_terms|length }}</span
+              >
+            </a>
+            <a
+              href="#advanced-terms"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              Advanced Terms
+              <span class="badge bg-primary rounded-pill"
+                >{{ advanced_terms|length }}</span
+              >
+            </a>
+          </div>
         </div>
+      </div>
     </div>
+
+    <!-- Main content area for categories -->
+    <div class="col-md-9">
+      <!-- Levy Terms Section -->
+      <div class="glossary-section" id="levy-terms">
+        <h3>
+          <i class="bi bi-cash-stack"></i> Levy Terms
+          <small class="term-count">({{ levy_terms|length }} terms)</small>
+        </h3>
+        <div class="row">
+          {% for term, definition in levy_terms %}
+          <div
+            class="col-md-6 mb-4 glossary-term-item"
+            data-term="{{ term|lower }}"
+          >
+            <div class="card glossary-card">
+              <div class="card-header">
+                <h5 class="mb-0">{{ term }}</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ definition }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Assessment Terms Section -->
+      <div class="glossary-section" id="assessment-terms">
+        <h3>
+          <i class="bi bi-house"></i> Assessment Terms
+          <small class="term-count"
+            >({{ assessment_terms|length }} terms)</small
+          >
+        </h3>
+        <div class="row">
+          {% for term, definition in assessment_terms %}
+          <div
+            class="col-md-6 mb-4 glossary-term-item"
+            data-term="{{ term|lower }}"
+          >
+            <div class="card glossary-card">
+              <div class="card-header">
+                <h5 class="mb-0">{{ term }}</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ definition }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Special Levy Terms Section -->
+      <div class="glossary-section" id="special-terms">
+        <h3>
+          <i class="bi bi-star"></i> Special Levy Terms
+          <small class="term-count">({{ special_terms|length }} terms)</small>
+        </h3>
+        <div class="row">
+          {% for term, definition in special_terms %}
+          <div
+            class="col-md-6 mb-4 glossary-term-item"
+            data-term="{{ term|lower }}"
+          >
+            <div class="card glossary-card">
+              <div class="card-header">
+                <h5 class="mb-0">{{ term }}</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ definition }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Administrative Terms Section -->
+      <div class="glossary-section" id="admin-terms">
+        <h3>
+          <i class="bi bi-file-earmark-text"></i> Administrative Terms
+          <small class="term-count">({{ admin_terms|length }} terms)</small>
+        </h3>
+        <div class="row">
+          {% for term, definition in admin_terms %}
+          <div
+            class="col-md-6 mb-4 glossary-term-item"
+            data-term="{{ term|lower }}"
+          >
+            <div class="card glossary-card">
+              <div class="card-header">
+                <h5 class="mb-0">{{ term }}</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ definition }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Statistical Terms Section -->
+      <div class="glossary-section" id="statistical-terms">
+        <h3>
+          <i class="bi bi-graph-up"></i> Statistical Terms
+          <small class="term-count"
+            >({{ statistical_terms|length }} terms)</small
+          >
+        </h3>
+        <div class="row">
+          {% for term, definition in statistical_terms %}
+          <div
+            class="col-md-6 mb-4 glossary-term-item"
+            data-term="{{ term|lower }}"
+          >
+            <div class="card glossary-card">
+              <div class="card-header">
+                <h5 class="mb-0">{{ term }}</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ definition }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Advanced Terms Section -->
+      <div class="glossary-section" id="advanced-terms">
+        <h3>
+          <i class="bi bi-lightning-charge"></i> Advanced Terms
+          <small class="term-count">({{ advanced_terms|length }} terms)</small>
+        </h3>
+        <div class="row">
+          {% for term, definition in advanced_terms %}
+          <div
+            class="col-md-6 mb-4 glossary-term-item"
+            data-term="{{ term|lower }}"
+          >
+            <div class="card glossary-card">
+              <div class="card-header">
+                <h5 class="mb-0">{{ term }}</h5>
+              </div>
+              <div class="card-body">
+                <p class="card-text">{{ definition }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Alphabetical View -->
-<div id="alphabetical-view" style="display: none;">
-    <div class="row">
-        <!-- Alphabetical Index -->
-        <div class="col-md-3 mb-4">
-            <div class="card category-nav">
-                <div class="card-header">
-                    <h5 class="mb-0">Index</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush" id="alpha-index">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
+<div id="alphabetical-view" style="display: none">
+  <div class="row">
+    <!-- Alphabetical Index -->
+    <div class="col-md-3 mb-4">
+      <div class="card category-nav">
+        <div class="card-header">
+          <h5 class="mb-0">Index</h5>
         </div>
-        
-        <!-- Main content area for alphabetical listing -->
-        <div class="col-md-9" id="alpha-content">
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush" id="alpha-index">
             <!-- Will be populated by JavaScript -->
+          </div>
         </div>
+      </div>
     </div>
-</div>
-{% endblock %}
 
-{% block scripts %}
+    <!-- Main content area for alphabetical listing -->
+    <div class="col-md-9" id="alpha-content">
+      <!-- Will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-        
-        // View switching
-        const categoryView = document.getElementById('category-view');
-        const alphabeticalView = document.getElementById('alphabetical-view');
-        const categoryViewBtn = document.getElementById('categoryView');
-        const alphabeticalViewBtn = document.getElementById('alphabeticalView');
-        
-        categoryViewBtn.addEventListener('change', function() {
-            categoryView.style.display = 'block';
-            alphabeticalView.style.display = 'none';
-        });
-        
-        alphabeticalViewBtn.addEventListener('change', function() {
-            categoryView.style.display = 'none';
-            alphabeticalView.style.display = 'block';
-            
-            // Build alphabetical view if it hasn't been built yet
-            if (!alphabeticalView.dataset.built) {
-                buildAlphabeticalView();
-                alphabeticalView.dataset.built = 'true';
-            }
-        });
-        
-        // Search functionality
-        const searchInput = document.getElementById('glossary-search');
-        const clearSearchBtn = document.getElementById('clear-search');
-        const glossaryTerms = document.querySelectorAll('.glossary-term-item');
-        
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.trim().toLowerCase();
-            
-            glossaryTerms.forEach(term => {
-                const termText = term.dataset.term;
-                const termCard = term.querySelector('.card-text').textContent.toLowerCase();
-                
-                if (termText.includes(searchTerm) || termCard.includes(searchTerm)) {
-                    term.style.display = '';
-                } else {
-                    term.style.display = 'none';
-                }
-            });
-            
-            // Handle empty sections after search
-            document.querySelectorAll('.glossary-section').forEach(section => {
-                const visibleTerms = section.querySelectorAll('.glossary-term-item[style=""]').length;
-                if (visibleTerms === 0) {
-                    section.style.display = 'none';
-                } else {
-                    section.style.display = '';
-                }
-            });
-        });
-        
-        clearSearchBtn.addEventListener('click', function() {
-            searchInput.value = '';
-            glossaryTerms.forEach(term => {
-                term.style.display = '';
-            });
-            document.querySelectorAll('.glossary-section').forEach(section => {
-                section.style.display = '';
-            });
-        });
-        
-        // Function to build alphabetical view
-        function buildAlphabeticalView() {
-            // Get all terms and sort them alphabetically
-            const terms = [];
-            glossaryTerms.forEach(term => {
-                const header = term.querySelector('.card-header h5').textContent;
-                const definition = term.querySelector('.card-body p').textContent;
-                terms.push({ term: header, definition: definition });
-            });
-            
-            terms.sort((a, b) => a.term.localeCompare(b.term));
-            
-            // Group terms by first letter
-            const groupedTerms = {};
-            terms.forEach(term => {
-                const firstLetter = term.term.charAt(0).toUpperCase();
-                if (!groupedTerms[firstLetter]) {
-                    groupedTerms[firstLetter] = [];
-                }
-                groupedTerms[firstLetter].push(term);
-            });
-            
-            // Build the alphabet index
-            const alphabetIndex = document.getElementById('alpha-index');
-            alphabetIndex.innerHTML = '';
-            
-            Object.keys(groupedTerms).sort().forEach(letter => {
-                const count = groupedTerms[letter].length;
-                const link = document.createElement('a');
-                link.href = `#letter-${letter}`;
-                link.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
-                link.innerHTML = `
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]'),
+    );
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // View switching
+    const categoryView = document.getElementById("category-view");
+    const alphabeticalView = document.getElementById("alphabetical-view");
+    const categoryViewBtn = document.getElementById("categoryView");
+    const alphabeticalViewBtn = document.getElementById("alphabeticalView");
+
+    categoryViewBtn.addEventListener("change", function () {
+      categoryView.style.display = "block";
+      alphabeticalView.style.display = "none";
+    });
+
+    alphabeticalViewBtn.addEventListener("change", function () {
+      categoryView.style.display = "none";
+      alphabeticalView.style.display = "block";
+
+      // Build alphabetical view if it hasn't been built yet
+      if (!alphabeticalView.dataset.built) {
+        buildAlphabeticalView();
+        alphabeticalView.dataset.built = "true";
+      }
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById("glossary-search");
+    const clearSearchBtn = document.getElementById("clear-search");
+    const glossaryTerms = document.querySelectorAll(".glossary-term-item");
+
+    searchInput.addEventListener("input", function () {
+      const searchTerm = this.value.trim().toLowerCase();
+
+      glossaryTerms.forEach((term) => {
+        const termText = term.dataset.term;
+        const termCard = term
+          .querySelector(".card-text")
+          .textContent.toLowerCase();
+
+        if (termText.includes(searchTerm) || termCard.includes(searchTerm)) {
+          term.style.display = "";
+        } else {
+          term.style.display = "none";
+        }
+      });
+
+      // Handle empty sections after search
+      document.querySelectorAll(".glossary-section").forEach((section) => {
+        const visibleTerms = section.querySelectorAll(
+          '.glossary-term-item[style=""]',
+        ).length;
+        if (visibleTerms === 0) {
+          section.style.display = "none";
+        } else {
+          section.style.display = "";
+        }
+      });
+    });
+
+    clearSearchBtn.addEventListener("click", function () {
+      searchInput.value = "";
+      glossaryTerms.forEach((term) => {
+        term.style.display = "";
+      });
+      document.querySelectorAll(".glossary-section").forEach((section) => {
+        section.style.display = "";
+      });
+    });
+
+    // Function to build alphabetical view
+    function buildAlphabeticalView() {
+      // Get all terms and sort them alphabetically
+      const terms = [];
+      glossaryTerms.forEach((term) => {
+        const header = term.querySelector(".card-header h5").textContent;
+        const definition = term.querySelector(".card-body p").textContent;
+        terms.push({ term: header, definition: definition });
+      });
+
+      terms.sort((a, b) => a.term.localeCompare(b.term));
+
+      // Group terms by first letter
+      const groupedTerms = {};
+      terms.forEach((term) => {
+        const firstLetter = term.term.charAt(0).toUpperCase();
+        if (!groupedTerms[firstLetter]) {
+          groupedTerms[firstLetter] = [];
+        }
+        groupedTerms[firstLetter].push(term);
+      });
+
+      // Build the alphabet index
+      const alphabetIndex = document.getElementById("alpha-index");
+      alphabetIndex.innerHTML = "";
+
+      Object.keys(groupedTerms)
+        .sort()
+        .forEach((letter) => {
+          const count = groupedTerms[letter].length;
+          const link = document.createElement("a");
+          link.href = `#letter-${letter}`;
+          link.className =
+            "list-group-item list-group-item-action d-flex justify-content-between align-items-center";
+          link.innerHTML = `
                     ${letter}
                     <span class="badge bg-primary rounded-pill">${count}</span>
                 `;
-                alphabetIndex.appendChild(link);
-            });
-            
-            // Build the content
-            const alphaContent = document.getElementById('alpha-content');
-            alphaContent.innerHTML = '';
-            
-            Object.keys(groupedTerms).sort().forEach(letter => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'glossary-section';
-                sectionDiv.id = `letter-${letter}`;
-                
-                const header = document.createElement('h3');
-                header.innerHTML = `
+          alphabetIndex.appendChild(link);
+        });
+
+      // Build the content
+      const alphaContent = document.getElementById("alpha-content");
+      alphaContent.innerHTML = "";
+
+      Object.keys(groupedTerms)
+        .sort()
+        .forEach((letter) => {
+          const sectionDiv = document.createElement("div");
+          sectionDiv.className = "glossary-section";
+          sectionDiv.id = `letter-${letter}`;
+
+          const header = document.createElement("h3");
+          header.innerHTML = `
                     <span class="term-letter">${letter}</span> Terms
                     <small class="term-count">(${groupedTerms[letter].length} terms)</small>
                 `;
-                sectionDiv.appendChild(header);
-                
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'row';
-                
-                groupedTerms[letter].forEach(term => {
-                    const termDiv = document.createElement('div');
-                    termDiv.className = 'col-md-6 mb-4 glossary-term-item';
-                    termDiv.dataset.term = term.term.toLowerCase();
-                    
-                    termDiv.innerHTML = `
+          sectionDiv.appendChild(header);
+
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "row";
+
+          groupedTerms[letter].forEach((term) => {
+            const termDiv = document.createElement("div");
+            termDiv.className = "col-md-6 mb-4 glossary-term-item";
+            termDiv.dataset.term = term.term.toLowerCase();
+
+            termDiv.innerHTML = `
                         <div class="card glossary-card">
                             <div class="card-header">
                                 <h5 class="mb-0">${term.term}</h5>
@@ -464,14 +546,14 @@
                             </div>
                         </div>
                     `;
-                    
-                    rowDiv.appendChild(termDiv);
-                });
-                
-                sectionDiv.appendChild(rowDiv);
-                alphaContent.appendChild(sectionDiv);
-            });
-        }
-    });
+
+            rowDiv.appendChild(termDiv);
+          });
+
+          sectionDiv.appendChild(rowDiv);
+          alphaContent.appendChild(sectionDiv);
+        });
+    }
+  });
 </script>
 {% endblock %}

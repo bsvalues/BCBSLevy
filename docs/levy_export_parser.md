@@ -95,6 +95,7 @@ The `LevyRecord` class represents a single levy record:
 - `get(key, default)`: Get a value with a default if not found
 
 Record fields include:
+
 - `tax_district_id`: Tax district identifier
 - `levy_cd`: Levy code
 - `levy_cd_linked`: Linked levy code (if applicable)
@@ -113,6 +114,7 @@ Text files are expected to be in a fixed-width or space-separated format with co
 ### Excel Files (XLS/XLSX)
 
 Excel files can have various structures. The parser tries to:
+
 1. Find a header row containing levy code, rate, amount, and value columns
 2. Extract the year from metadata rows
 3. Parse data rows according to the detected column structure
@@ -124,6 +126,7 @@ CSV files are parsed with automatic dialect detection. Headers are mapped to sta
 ### JSON Files
 
 JSON files can have various structures:
+
 1. An object with a `records` or `levies` array
 2. An array of levy records
 3. Metadata can be included in a `metadata` object

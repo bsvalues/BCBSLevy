@@ -1,425 +1,491 @@
-{% extends 'simple_base.html' %}
-
-{% block title %}Property {{ property.property_id }} - Benton County Property Tax Portal{% endblock %}
-
-{% block content %}
+{% extends 'simple_base.html' %} {% block title %}Property {{
+property.property_id }} - Benton County Property Tax Portal{% endblock %} {%
+block content %}
 <div class="container py-5">
-    <!-- Page Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('public.index') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('public.search') }}">Property Search</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Property {{ property.property_id }}</li>
-                </ol>
-            </nav>
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <h1 class="h2 mb-3">Property Detail</h1>
-                <div class="d-flex gap-2">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="yearDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            View {{ current_year }} <span class="d-none d-md-inline">Data</span>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="yearDropdown">
-                            {% for year in available_years %}
-                                <li><a class="dropdown-item {% if year == current_year %}active{% endif %}" href="{{ url_for('public.property_detail', property_id=property.property_id, year=year) }}">{{ year }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <a href="{{ url_for('public.compare_properties', property_ids=[property.property_id]) }}" class="btn btn-primary">
-                        <i class="bi bi-bar-chart me-2"></i><span class="d-none d-md-inline">Compare</span>
-                    </a>
-                </div>
-            </div>
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('public.index') }}">Home</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('public.search') }}">Property Search</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Property {{ property.property_id }}
+          </li>
+        </ol>
+      </nav>
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <h1 class="h2 mb-3">Property Detail</h1>
+        <div class="d-flex gap-2">
+          <div class="dropdown">
+            <button
+              class="btn btn-outline-secondary dropdown-toggle"
+              type="button"
+              id="yearDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              View {{ current_year }}
+              <span class="d-none d-md-inline">Data</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="yearDropdown">
+              {% for year in available_years %}
+              <li>
+                <a
+                  class="dropdown-item {% if year == current_year %}active{% endif %}"
+                  href="{{ url_for('public.property_detail', property_id=property.property_id, year=year) }}"
+                  >{{ year }}</a
+                >
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <a
+            href="{{ url_for('public.compare_properties', property_ids=[property.property_id]) }}"
+            class="btn btn-primary"
+          >
+            <i class="bi bi-bar-chart me-2"></i
+            ><span class="d-none d-md-inline">Compare</span>
+          </a>
         </div>
+      </div>
     </div>
-    
-    <!-- Property Overview -->
-    <div class="row mb-4">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Property Overview</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <h3 class="h6 text-muted mb-2">Parcel Information</h3>
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th style="width: 40%">Parcel ID:</th>
-                                        <td>{{ property.property_id }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Tax Year:</th>
-                                        <td>{{ property.year }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Tax Code:</th>
-                                        <td>
-                                            {% if tax_code %}
-                                                {{ tax_code.tax_code }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Property Type:</th>
-                                        <td>
-                                            {% if property.property_type %}
-                                                {{ property.property_type.name }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <h3 class="h6 text-muted mb-2">Location & Ownership</h3>
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th style="width: 40%">Address:</th>
-                                        <td>{{ property.address }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>City:</th>
-                                        <td>{{ property.city or 'N/A' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Owner:</th>
-                                        <td>{{ property.owner_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Legal Description:</th>
-                                        <td class="text-truncate" style="max-width: 200px" title="{{ property.legal_description }}">
-                                            {{ property.legal_description or 'N/A' }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Property Valuation -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Property Valuation</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4 mb-md-0">
-                            <h3 class="h6 text-muted mb-2">Assessed Values</h3>
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th style="width: 50%">Land Value:</th>
-                                        <td>${{ "{:,.2f}".format(property.land_value) if property.land_value else 'N/A' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Improvement Value:</th>
-                                        <td>${{ "{:,.2f}".format(property.improvement_value) if property.improvement_value else 'N/A' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Personal Property Value:</th>
-                                        <td>${{ "{:,.2f}".format(property.personal_property_value) if property.personal_property_value else 'N/A' }}</td>
-                                    </tr>
-                                    <tr class="table-active fw-bold">
-                                        <th>Total Assessed Value:</th>
-                                        <td>${{ "{:,.2f}".format(property.assessed_value) if property.assessed_value else 'N/A' }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h3 class="h6 text-muted mb-2">Exemptions & Adjustments</h3>
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th style="width: 50%">Exemption Amount:</th>
-                                        <td>${{ "{:,.2f}".format(property.exemption_amount) if property.exemption_amount else '0.00' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Exemption Type:</th>
-                                        <td>{{ property.exemption_type or 'None' }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Net Taxable Value:</th>
-                                        <td>
-                                            ${% if property.assessed_value and property.exemption_amount %}
-                                                {{ "{:,.2f}".format(property.assessed_value - property.exemption_amount) }}
-                                            {% elif property.assessed_value %}
-                                                {{ "{:,.2f}".format(property.assessed_value) }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Levy & Tax Information -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Tax Information</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-4 mb-md-0">
-                            <h3 class="h6 text-muted mb-2">Tax Summary</h3>
-                            <table class="table table-sm">
-                                <tbody>
-                                    <tr>
-                                        <th style="width: 50%">Tax Year:</th>
-                                        <td>{{ property.year }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Levy Code:</th>
-                                        <td>
-                                            {% if tax_code %}
-                                                {{ tax_code.tax_code }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Levy Rate:</th>
-                                        <td>
-                                            {% if historical_rate and historical_rate.levy_rate %}
-                                                {{ "{:.4f}".format(historical_rate.levy_rate) }} per $1,000
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    <tr class="table-active fw-bold">
-                                        <th>Estimated Taxes:</th>
-                                        <td>
-                                            {% if property.assessed_value and historical_rate and historical_rate.levy_rate %}
-                                                ${{ "{:,.2f}".format(property.assessed_value * historical_rate.levy_rate / 1000) }}
-                                            {% else %}
-                                                N/A
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h3 class="h6 text-muted mb-2">Taxing Districts</h3>
-                            {% if districts %}
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>District</th>
-                                                <th class="text-end">Type</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for district in districts %}
-                                                <tr>
-                                                    <td>
-                                                        <a href="{{ url_for('public.district_detail', district_id=district.id) }}">
-                                                            {{ district.district_name }}
-                                                        </a>
-                                                    </td>
-                                                    <td class="text-end">{{ district.district_type }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info mb-0">
-                                    <i class="bi bi-info-circle me-2"></i> No district information available for this property.
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4">
-            <!-- Tax History -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Tax History</h2>
-                </div>
-                <div class="card-body">
-                    {% if tax_history %}
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Year</th>
-                                        <th class="text-end">Assessed Value</th>
-                                        <th class="text-end">Tax Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in tax_history %}
-                                        <tr {% if item.year == current_year %}class="table-active"{% endif %}>
-                                            <td>
-                                                <a href="{{ url_for('public.property_detail', property_id=property.property_id, year=item.year) }}">
-                                                    {{ item.year }}
-                                                </a>
-                                            </td>
-                                            <td class="text-end">${{ "{:,.2f}".format(item.assessed_value) if item.assessed_value else 'N/A' }}</td>
-                                            <td class="text-end">${{ "{:,.2f}".format(item.tax_amount) if item.tax_amount else 'N/A' }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="{{ url_for('public.compare_properties', property_ids=[property.property_id]) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-bar-chart me-1"></i>View Detailed Tax History
-                            </a>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info mb-0">
-                            <i class="bi bi-info-circle me-2"></i> No tax history available for this property.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Property Value History -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Value History</h2>
-                </div>
-                <div class="card-body">
-                    {% if value_history|length > 1 %}
-                        <div id="valueChart" style="height: 250px;"></div>
-                    {% elif value_history|length == 1 %}
-                        <div class="alert alert-info mb-0">
-                            <i class="bi bi-info-circle me-2"></i> Only one year of value history available.
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info mb-0">
-                            <i class="bi bi-info-circle me-2"></i> No value history available for this property.
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Additional Information -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-transparent py-3">
-                    <h2 class="h5 mb-0">Property Details</h2>
-                </div>
-                <div class="card-body">
-                    <table class="table table-sm">
-                        <tbody>
-                            <tr>
-                                <th style="width: 40%">Land Area:</th>
-                                <td>{{ property.land_area if property.land_area else 'N/A' }} {% if property.land_area %}acres{% endif %}</td>
-                            </tr>
-                            <tr>
-                                <th>Building Area:</th>
-                                <td>{{ property.building_area if property.building_area else 'N/A' }} {% if property.building_area %}sq ft{% endif %}</td>
-                            </tr>
-                            <tr>
-                                <th>Year Built:</th>
-                                <td>{{ property.year_built if property.year_built else 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Bedrooms:</th>
-                                <td>{{ property.bedrooms if property.bedrooms else 'N/A' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Bathrooms:</th>
-                                <td>{{ property.bathrooms if property.bathrooms else 'N/A' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Actions -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('public.compare_properties', property_ids=[property.property_id]) }}" class="btn btn-outline-primary">
-                            <i class="bi bi-bar-chart me-2"></i>Compare Tax History
-                        </a>
-                        <a href="#" class="btn btn-outline-secondary">
-                            <i class="bi bi-printer me-2"></i>Print Property Card
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+  </div>
 
-{% block extra_js %}
+  <!-- Property Overview -->
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Property Overview</h2>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <h3 class="h6 text-muted mb-2">Parcel Information</h3>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <th style="width: 40%">Parcel ID:</th>
+                    <td>{{ property.property_id }}</td>
+                  </tr>
+                  <tr>
+                    <th>Tax Year:</th>
+                    <td>{{ property.year }}</td>
+                  </tr>
+                  <tr>
+                    <th>Tax Code:</th>
+                    <td>
+                      {% if tax_code %} {{ tax_code.tax_code }} {% else %} N/A
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Property Type:</th>
+                    <td>
+                      {% if property.property_type %} {{
+                      property.property_type.name }} {% else %} N/A {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6 mb-4">
+              <h3 class="h6 text-muted mb-2">Location & Ownership</h3>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <th style="width: 40%">Address:</th>
+                    <td>{{ property.address }}</td>
+                  </tr>
+                  <tr>
+                    <th>City:</th>
+                    <td>{{ property.city or 'N/A' }}</td>
+                  </tr>
+                  <tr>
+                    <th>Owner:</th>
+                    <td>{{ property.owner_name }}</td>
+                  </tr>
+                  <tr>
+                    <th>Legal Description:</th>
+                    <td
+                      class="text-truncate"
+                      style="max-width: 200px"
+                      title="{{ property.legal_description }}"
+                    >
+                      {{ property.legal_description or 'N/A' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property Valuation -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Property Valuation</h2>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+              <h3 class="h6 text-muted mb-2">Assessed Values</h3>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <th style="width: 50%">Land Value:</th>
+                    <td>
+                      ${{ "{:,.2f}".format(property.land_value) if
+                      property.land_value else 'N/A' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Improvement Value:</th>
+                    <td>
+                      ${{ "{:,.2f}".format(property.improvement_value) if
+                      property.improvement_value else 'N/A' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Personal Property Value:</th>
+                    <td>
+                      ${{ "{:,.2f}".format(property.personal_property_value) if
+                      property.personal_property_value else 'N/A' }}
+                    </td>
+                  </tr>
+                  <tr class="table-active fw-bold">
+                    <th>Total Assessed Value:</th>
+                    <td>
+                      ${{ "{:,.2f}".format(property.assessed_value) if
+                      property.assessed_value else 'N/A' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h3 class="h6 text-muted mb-2">Exemptions & Adjustments</h3>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <th style="width: 50%">Exemption Amount:</th>
+                    <td>
+                      ${{ "{:,.2f}".format(property.exemption_amount) if
+                      property.exemption_amount else '0.00' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Exemption Type:</th>
+                    <td>{{ property.exemption_type or 'None' }}</td>
+                  </tr>
+                  <tr>
+                    <th>Net Taxable Value:</th>
+                    <td>
+                      ${% if property.assessed_value and
+                      property.exemption_amount %} {{
+                      "{:,.2f}".format(property.assessed_value -
+                      property.exemption_amount) }} {% elif
+                      property.assessed_value %} {{
+                      "{:,.2f}".format(property.assessed_value) }} {% else %}
+                      N/A {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Levy & Tax Information -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Tax Information</h2>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-4 mb-md-0">
+              <h3 class="h6 text-muted mb-2">Tax Summary</h3>
+              <table class="table table-sm">
+                <tbody>
+                  <tr>
+                    <th style="width: 50%">Tax Year:</th>
+                    <td>{{ property.year }}</td>
+                  </tr>
+                  <tr>
+                    <th>Levy Code:</th>
+                    <td>
+                      {% if tax_code %} {{ tax_code.tax_code }} {% else %} N/A
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Levy Rate:</th>
+                    <td>
+                      {% if historical_rate and historical_rate.levy_rate %} {{
+                      "{:.4f}".format(historical_rate.levy_rate) }} per $1,000
+                      {% else %} N/A {% endif %}
+                    </td>
+                  </tr>
+                  <tr class="table-active fw-bold">
+                    <th>Estimated Taxes:</th>
+                    <td>
+                      {% if property.assessed_value and historical_rate and
+                      historical_rate.levy_rate %} ${{
+                      "{:,.2f}".format(property.assessed_value *
+                      historical_rate.levy_rate / 1000) }} {% else %} N/A {%
+                      endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h3 class="h6 text-muted mb-2">Taxing Districts</h3>
+              {% if districts %}
+              <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                  <thead>
+                    <tr>
+                      <th>District</th>
+                      <th class="text-end">Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for district in districts %}
+                    <tr>
+                      <td>
+                        <a
+                          href="{{ url_for('public.district_detail', district_id=district.id) }}"
+                        >
+                          {{ district.district_name }}
+                        </a>
+                      </td>
+                      <td class="text-end">{{ district.district_type }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-2"></i> No district information
+                available for this property.
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Tax History -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Tax History</h2>
+        </div>
+        <div class="card-body">
+          {% if tax_history %}
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th class="text-end">Assessed Value</th>
+                  <th class="text-end">Tax Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in tax_history %}
+                <tr
+                  {%
+                  if
+                  item.year=""
+                  ="current_year"
+                  %}class="table-active"
+                  {%
+                  endif
+                  %}
+                >
+                  <td>
+                    <a
+                      href="{{ url_for('public.property_detail', property_id=property.property_id, year=item.year) }}"
+                    >
+                      {{ item.year }}
+                    </a>
+                  </td>
+                  <td class="text-end">
+                    ${{ "{:,.2f}".format(item.assessed_value) if
+                    item.assessed_value else 'N/A' }}
+                  </td>
+                  <td class="text-end">
+                    ${{ "{:,.2f}".format(item.tax_amount) if item.tax_amount
+                    else 'N/A' }}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center mt-3">
+            <a
+              href="{{ url_for('public.compare_properties', property_ids=[property.property_id]) }}"
+              class="btn btn-sm btn-outline-primary"
+            >
+              <i class="bi bi-bar-chart me-1"></i>View Detailed Tax History
+            </a>
+          </div>
+          {% else %}
+          <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-2"></i> No tax history available for
+            this property.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Property Value History -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Value History</h2>
+        </div>
+        <div class="card-body">
+          {% if value_history|length > 1 %}
+          <div id="valueChart" style="height: 250px"></div>
+          {% elif value_history|length == 1 %}
+          <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-2"></i> Only one year of value
+            history available.
+          </div>
+          {% else %}
+          <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-2"></i> No value history available
+            for this property.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent py-3">
+          <h2 class="h5 mb-0">Property Details</h2>
+        </div>
+        <div class="card-body">
+          <table class="table table-sm">
+            <tbody>
+              <tr>
+                <th style="width: 40%">Land Area:</th>
+                <td>
+                  {{ property.land_area if property.land_area else 'N/A' }} {%
+                  if property.land_area %}acres{% endif %}
+                </td>
+              </tr>
+              <tr>
+                <th>Building Area:</th>
+                <td>
+                  {{ property.building_area if property.building_area else 'N/A'
+                  }} {% if property.building_area %}sq ft{% endif %}
+                </td>
+              </tr>
+              <tr>
+                <th>Year Built:</th>
+                <td>
+                  {{ property.year_built if property.year_built else 'N/A' }}
+                </td>
+              </tr>
+              <tr>
+                <th>Bedrooms:</th>
+                <td>{{ property.bedrooms if property.bedrooms else 'N/A' }}</td>
+              </tr>
+              <tr>
+                <th>Bathrooms:</th>
+                <td>
+                  {{ property.bathrooms if property.bathrooms else 'N/A' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a
+              href="{{ url_for('public.compare_properties', property_ids=[property.property_id]) }}"
+              class="btn btn-outline-primary"
+            >
+              <i class="bi bi-bar-chart me-2"></i>Compare Tax History
+            </a>
+            <a href="#" class="btn btn-outline-secondary">
+              <i class="bi bi-printer me-2"></i>Print Property Card
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        {% if value_history|length > 1 %}
-            const valueChartEl = document.getElementById('valueChart');
-            if (valueChartEl) {
-                // Prepare data for chart
-                const years = [{% for item in value_history %}{{ item.year }}{% if not loop.last %}, {% endif %}{% endfor %}];
-                const values = [{% for item in value_history %}{{ item.assessed_value or 0 }}{% if not loop.last %}, {% endif %}{% endfor %}];
-                
-                // Create the chart
-                new Chart(valueChartEl, {
-                    type: 'line',
-                    data: {
-                        labels: years,
-                        datasets: [{
-                            label: 'Assessed Value',
-                            data: values,
-                            borderColor: '#0d6efd',
-                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                            fill: true,
-                            tension: 0.1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return '$' + value.toLocaleString();
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return '$' + context.raw.toLocaleString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        {% endif %}
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      {% if value_history|length > 1 %}
+          const valueChartEl = document.getElementById('valueChart');
+          if (valueChartEl) {
+              // Prepare data for chart
+              const years = [{% for item in value_history %}{{ item.year }}{% if not loop.last %}, {% endif %}{% endfor %}];
+              const values = [{% for item in value_history %}{{ item.assessed_value or 0 }}{% if not loop.last %}, {% endif %}{% endfor %}];
+
+              // Create the chart
+              new Chart(valueChartEl, {
+                  type: 'line',
+                  data: {
+                      labels: years,
+                      datasets: [{
+                          label: 'Assessed Value',
+                          data: values,
+                          borderColor: '#0d6efd',
+                          backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                          fill: true,
+                          tension: 0.1
+                      }]
+                  },
+                  options: {
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      scales: {
+                          y: {
+                              beginAtZero: true,
+                              ticks: {
+                                  callback: function(value) {
+                                      return '$' + value.toLocaleString();
+                                  }
+                              }
+                          }
+                      },
+                      plugins: {
+                          tooltip: {
+                              callbacks: {
+                                  label: function(context) {
+                                      return '$' + context.raw.toLocaleString();
+                                  }
+                              }
+                          }
+                      }
+                  }
+              });
+          }
+      {% endif %}
+  });
 </script>
 {% endblock %}

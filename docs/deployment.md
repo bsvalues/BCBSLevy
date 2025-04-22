@@ -26,6 +26,7 @@ The following environment variables should be set for production:
 Update your Replit configuration to use the production WSGI entry point:
 
 1. In the `.replit` file, update the deployment run command:
+
    ```
    [deployment]
    deploymentTarget = "autoscale"
@@ -33,12 +34,14 @@ Update your Replit configuration to use the production WSGI entry point:
    ```
 
 2. Set the production environment variable:
+
    ```
    [env]
    FLASK_ENV = "production"
    ```
 
 3. Add database migration workflows:
+
    ```
    [[workflows.workflow]]
    name = "DB Migration Init"
@@ -132,6 +135,7 @@ Regularly check the application's performance metrics and optimize as needed.
 The application is designed to scale horizontally. When traffic increases:
 
 1. Increase the number of worker processes in Gunicorn:
+
    ```
    gunicorn --bind 0.0.0.0:5000 --workers=4 wsgi:app
    ```

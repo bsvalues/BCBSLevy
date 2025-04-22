@@ -4,111 +4,115 @@
  */
 
 // Wait for window to load before initializing
-window.addEventListener('load', function() {
-    console.log('Demo Guide initialized');
-    
-    // Add the demo mode toggle button to the page
-    addDemoModeToggle();
-    
-    // Set up page-specific demo content
-    setupPageSpecificDemo();
-    
-    // Force log to ensure code is running
-    console.log('Demo mode toggle button should now be visible');
+window.addEventListener("load", function () {
+  console.log("Demo Guide initialized");
+
+  // Add the demo mode toggle button to the page
+  addDemoModeToggle();
+
+  // Set up page-specific demo content
+  setupPageSpecificDemo();
+
+  // Force log to ensure code is running
+  console.log("Demo mode toggle button should now be visible");
 });
 
 /**
  * Adds the demo mode toggle button to the page
  */
 function addDemoModeToggle() {
-    // Create toggle button
-    const toggleButton = document.createElement('button');
-    toggleButton.className = 'demo-mode-toggle';
-    toggleButton.id = 'demoModeToggle';
-    toggleButton.innerHTML = '<i class="bi bi-play-fill"></i>';
-    toggleButton.setAttribute('title', 'Start Demo Mode');
-    
-    // Create demo mode indicator
-    const indicator = document.createElement('div');
-    indicator.className = 'demo-mode-indicator';
-    indicator.id = 'demoModeIndicator';
-    indicator.innerHTML = '<i class="bi bi-lightning-fill"></i> Demo Mode Active';
-    
-    // Add elements to page
-    document.body.appendChild(toggleButton);
-    document.body.appendChild(indicator);
-    
-    // Set up toggle event
-    toggleButton.addEventListener('click', toggleDemoMode);
+  // Create toggle button
+  const toggleButton = document.createElement("button");
+  toggleButton.className = "demo-mode-toggle";
+  toggleButton.id = "demoModeToggle";
+  toggleButton.innerHTML = '<i class="bi bi-play-fill"></i>';
+  toggleButton.setAttribute("title", "Start Demo Mode");
+
+  // Create demo mode indicator
+  const indicator = document.createElement("div");
+  indicator.className = "demo-mode-indicator";
+  indicator.id = "demoModeIndicator";
+  indicator.innerHTML = '<i class="bi bi-lightning-fill"></i> Demo Mode Active';
+
+  // Add elements to page
+  document.body.appendChild(toggleButton);
+  document.body.appendChild(indicator);
+
+  // Set up toggle event
+  toggleButton.addEventListener("click", toggleDemoMode);
 }
 
 /**
  * Toggles the demo mode on/off
  */
 function toggleDemoMode() {
-    const toggle = document.getElementById('demoModeToggle');
-    const indicator = document.getElementById('demoModeIndicator');
-    
-    // Check if demo mode is active
-    const isDemoActive = toggle.classList.contains('active');
-    
-    if (isDemoActive) {
-        // Deactivate demo mode
-        toggle.classList.remove('active');
-        indicator.classList.remove('active');
-        toggle.innerHTML = '<i class="bi bi-play-fill"></i>';
-        toggle.setAttribute('title', 'Start Demo Mode');
-        
-        // Clean up demo elements
-        cleanupDemoElements();
-    } else {
-        // Activate demo mode
-        toggle.classList.add('active');
-        indicator.classList.add('active');
-        toggle.innerHTML = '<i class="bi bi-stop-fill"></i>';
-        toggle.setAttribute('title', 'End Demo Mode');
-        
-        // Show intro card and start demo for current page
-        showDemoIntroCard();
-    }
+  const toggle = document.getElementById("demoModeToggle");
+  const indicator = document.getElementById("demoModeIndicator");
+
+  // Check if demo mode is active
+  const isDemoActive = toggle.classList.contains("active");
+
+  if (isDemoActive) {
+    // Deactivate demo mode
+    toggle.classList.remove("active");
+    indicator.classList.remove("active");
+    toggle.innerHTML = '<i class="bi bi-play-fill"></i>';
+    toggle.setAttribute("title", "Start Demo Mode");
+
+    // Clean up demo elements
+    cleanupDemoElements();
+  } else {
+    // Activate demo mode
+    toggle.classList.add("active");
+    indicator.classList.add("active");
+    toggle.innerHTML = '<i class="bi bi-stop-fill"></i>';
+    toggle.setAttribute("title", "End Demo Mode");
+
+    // Show intro card and start demo for current page
+    showDemoIntroCard();
+  }
 }
 
 /**
  * Creates and shows the initial demo introduction card
  */
 function showDemoIntroCard() {
-    // Identify current page
-    const currentPath = window.location.pathname;
-    let demoTitle, demoDescription, startDemoFunction;
-    
-    // Set content based on current page
-    if (currentPath.includes('workflow-designer')) {
-        demoTitle = 'Workflow Designer Demo';
-        demoDescription = 'This guided tour will introduce you to the key features of the Workflow Designer, including the advanced complexity metrics and optimization tools.';
-        startDemoFunction = startWorkflowDesignerDemo;
-    } else if (currentPath.includes('agent-registry')) {
-        demoTitle = 'Agent Registry Demo';
-        demoDescription = 'Explore the Agent Registry interface to learn how to monitor and manage AI agents in the LevyMaster system.';
-        startDemoFunction = startAgentRegistryDemo;
-    } else if (currentPath.includes('agent-playground')) {
-        demoTitle = 'Agent Playground Demo';
-        demoDescription = 'Discover how to interact directly with AI agents and create custom workflows in this interactive playground.';
-        startDemoFunction = startAgentPlaygroundDemo;
-    } else {
-        demoTitle = 'LevyMaster Demo';
-        demoDescription = 'This guided tour will introduce you to the key features of the LevyMaster platform. Please navigate to Workflow Designer, Agent Registry, or Agent Playground for a specialized demo.';
-        startDemoFunction = null;
-    }
-    
-    // Create and populate demo card
-    const demoCard = document.createElement('div');
-    demoCard.className = 'demo-card';
-    demoCard.id = 'demoIntroCard';
-    demoCard.style.top = '100px';
-    demoCard.style.left = '50%';
-    demoCard.style.transform = 'translateX(-50%)';
-    
-    demoCard.innerHTML = `
+  // Identify current page
+  const currentPath = window.location.pathname;
+  let demoTitle, demoDescription, startDemoFunction;
+
+  // Set content based on current page
+  if (currentPath.includes("workflow-designer")) {
+    demoTitle = "Workflow Designer Demo";
+    demoDescription =
+      "This guided tour will introduce you to the key features of the Workflow Designer, including the advanced complexity metrics and optimization tools.";
+    startDemoFunction = startWorkflowDesignerDemo;
+  } else if (currentPath.includes("agent-registry")) {
+    demoTitle = "Agent Registry Demo";
+    demoDescription =
+      "Explore the Agent Registry interface to learn how to monitor and manage AI agents in the LevyMaster system.";
+    startDemoFunction = startAgentRegistryDemo;
+  } else if (currentPath.includes("agent-playground")) {
+    demoTitle = "Agent Playground Demo";
+    demoDescription =
+      "Discover how to interact directly with AI agents and create custom workflows in this interactive playground.";
+    startDemoFunction = startAgentPlaygroundDemo;
+  } else {
+    demoTitle = "LevyMaster Demo";
+    demoDescription =
+      "This guided tour will introduce you to the key features of the LevyMaster platform. Please navigate to Workflow Designer, Agent Registry, or Agent Playground for a specialized demo.";
+    startDemoFunction = null;
+  }
+
+  // Create and populate demo card
+  const demoCard = document.createElement("div");
+  demoCard.className = "demo-card";
+  demoCard.id = "demoIntroCard";
+  demoCard.style.top = "100px";
+  demoCard.style.left = "50%";
+  demoCard.style.transform = "translateX(-50%)";
+
+  demoCard.innerHTML = `
         <div class="demo-card-header">
             <h5 class="demo-card-title">${demoTitle}</h5>
             <button type="button" class="btn-close" aria-label="Close"></button>
@@ -121,41 +125,47 @@ function showDemoIntroCard() {
             <button class="btn btn-primary btn-sm" id="startDemoBtn">Start Tour</button>
         </div>
     `;
-    
-    // Add to document
-    document.body.appendChild(demoCard);
-    
-    // Set up event listeners
-    document.querySelector('#demoIntroCard .btn-close').addEventListener('click', function() {
-        demoCard.remove();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(demoCard);
+
+  // Set up event listeners
+  document
+    .querySelector("#demoIntroCard .btn-close")
+    .addEventListener("click", function () {
+      demoCard.remove();
+      toggleDemoMode(); // Turn off demo mode
     });
-    
-    if (startDemoFunction) {
-        document.getElementById('startDemoBtn').addEventListener('click', function() {
-            demoCard.remove();
-            startDemoFunction();
-        });
-    } else {
-        document.getElementById('startDemoBtn').addEventListener('click', function() {
-            demoCard.remove();
-            showDemoNavigationPrompt();
-        });
-    }
+
+  if (startDemoFunction) {
+    document
+      .getElementById("startDemoBtn")
+      .addEventListener("click", function () {
+        demoCard.remove();
+        startDemoFunction();
+      });
+  } else {
+    document
+      .getElementById("startDemoBtn")
+      .addEventListener("click", function () {
+        demoCard.remove();
+        showDemoNavigationPrompt();
+      });
+  }
 }
 
 /**
  * Shows a prompt to navigate to a demo-enabled page
  */
 function showDemoNavigationPrompt() {
-    const demoPrompt = document.createElement('div');
-    demoPrompt.className = 'demo-card';
-    demoPrompt.id = 'demoNavPrompt';
-    demoPrompt.style.top = '100px';
-    demoPrompt.style.left = '50%';
-    demoPrompt.style.transform = 'translateX(-50%)';
-    
-    demoPrompt.innerHTML = `
+  const demoPrompt = document.createElement("div");
+  demoPrompt.className = "demo-card";
+  demoPrompt.id = "demoNavPrompt";
+  demoPrompt.style.top = "100px";
+  demoPrompt.style.left = "50%";
+  demoPrompt.style.transform = "translateX(-50%)";
+
+  demoPrompt.innerHTML = `
         <div class="demo-card-header">
             <h5 class="demo-card-title">Choose a Demo</h5>
             <button type="button" class="btn-close" aria-label="Close"></button>
@@ -187,14 +197,16 @@ function showDemoNavigationPrompt() {
             </div>
         </div>
     `;
-    
-    // Add to document
-    document.body.appendChild(demoPrompt);
-    
-    // Set up event listeners
-    document.querySelector('#demoNavPrompt .btn-close').addEventListener('click', function() {
-        demoPrompt.remove();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(demoPrompt);
+
+  // Set up event listeners
+  document
+    .querySelector("#demoNavPrompt .btn-close")
+    .addEventListener("click", function () {
+      demoPrompt.remove();
+      toggleDemoMode(); // Turn off demo mode
     });
 }
 
@@ -202,120 +214,120 @@ function showDemoNavigationPrompt() {
  * Sets up page-specific demo initialization based on current URL
  */
 function setupPageSpecificDemo() {
-    const currentPath = window.location.pathname;
-    
-    if (currentPath.includes('workflow-designer')) {
-        initWorkflowDesignerDemo();
-    } else if (currentPath.includes('agent-registry')) {
-        initAgentRegistryDemo();
-    } else if (currentPath.includes('agent-playground')) {
-        initAgentPlaygroundDemo();
-    }
+  const currentPath = window.location.pathname;
+
+  if (currentPath.includes("workflow-designer")) {
+    initWorkflowDesignerDemo();
+  } else if (currentPath.includes("agent-registry")) {
+    initAgentRegistryDemo();
+  } else if (currentPath.includes("agent-playground")) {
+    initAgentPlaygroundDemo();
+  }
 }
 
 /**
  * Initializes the Workflow Designer demo elements
  */
 function initWorkflowDesignerDemo() {
-    // Add any required elements or listeners for workflow designer demos
-    console.log('Workflow Designer demo initialized');
+  // Add any required elements or listeners for workflow designer demos
+  console.log("Workflow Designer demo initialized");
 }
 
 /**
  * Initializes the Agent Registry demo elements
  */
 function initAgentRegistryDemo() {
-    // Add any required elements or listeners for agent registry demos
-    console.log('Agent Registry demo initialized');
-    
-    // Add detail button functionality to show agent details modal
-    const detailButtons = document.querySelectorAll('.btn-outline-primary');
-    detailButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // This is now handled in the page's own JavaScript
-        });
+  // Add any required elements or listeners for agent registry demos
+  console.log("Agent Registry demo initialized");
+
+  // Add detail button functionality to show agent details modal
+  const detailButtons = document.querySelectorAll(".btn-outline-primary");
+  detailButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      // This is now handled in the page's own JavaScript
     });
+  });
 }
 
 /**
  * Initializes the Agent Playground demo elements
  */
 function initAgentPlaygroundDemo() {
-    // Add any required elements or listeners for agent playground demos
-    console.log('Agent Playground demo initialized');
+  // Add any required elements or listeners for agent playground demos
+  console.log("Agent Playground demo initialized");
 }
 
 /**
  * Starts the Workflow Designer demo sequence
  */
 function startWorkflowDesignerDemo() {
-    console.log('Starting Workflow Designer demo');
-    
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'demo-overlay active';
-    overlay.id = 'demoOverlay';
-    document.body.appendChild(overlay);
-    
-    // Begin the tour
-    workflowDesignerTourStep1();
+  console.log("Starting Workflow Designer demo");
+
+  // Create overlay
+  const overlay = document.createElement("div");
+  overlay.className = "demo-overlay active";
+  overlay.id = "demoOverlay";
+  document.body.appendChild(overlay);
+
+  // Begin the tour
+  workflowDesignerTourStep1();
 }
 
 /**
  * Starts the Agent Registry demo sequence
  */
 function startAgentRegistryDemo() {
-    console.log('Starting Agent Registry demo');
-    
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'demo-overlay active';
-    overlay.id = 'demoOverlay';
-    document.body.appendChild(overlay);
-    
-    // Begin the tour
-    agentRegistryTourStep1();
+  console.log("Starting Agent Registry demo");
+
+  // Create overlay
+  const overlay = document.createElement("div");
+  overlay.className = "demo-overlay active";
+  overlay.id = "demoOverlay";
+  document.body.appendChild(overlay);
+
+  // Begin the tour
+  agentRegistryTourStep1();
 }
 
 /**
  * Starts the Agent Playground demo sequence
  */
 function startAgentPlaygroundDemo() {
-    console.log('Starting Agent Playground demo');
-    
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'demo-overlay active';
-    overlay.id = 'demoOverlay';
-    document.body.appendChild(overlay);
-    
-    // Begin the tour
-    agentPlaygroundTourStep1();
+  console.log("Starting Agent Playground demo");
+
+  // Create overlay
+  const overlay = document.createElement("div");
+  overlay.className = "demo-overlay active";
+  overlay.id = "demoOverlay";
+  document.body.appendChild(overlay);
+
+  // Begin the tour
+  agentPlaygroundTourStep1();
 }
 
 /**
  * Removes all demo elements from the page
  */
 function cleanupDemoElements() {
-    // Remove overlay
-    const overlay = document.getElementById('demoOverlay');
-    if (overlay) overlay.remove();
-    
-    // Remove all tooltips
-    const tooltips = document.querySelectorAll('.demo-tooltip');
-    tooltips.forEach(tooltip => tooltip.remove());
-    
-    // Remove all cards
-    const cards = document.querySelectorAll('.demo-card');
-    cards.forEach(card => card.remove());
-    
-    // Remove highlights
-    const highlights = document.querySelectorAll('.demo-highlight');
-    highlights.forEach(element => element.classList.remove('demo-highlight'));
-    
-    // Remove completion message
-    const completion = document.getElementById('demoCompletion');
-    if (completion) completion.remove();
+  // Remove overlay
+  const overlay = document.getElementById("demoOverlay");
+  if (overlay) overlay.remove();
+
+  // Remove all tooltips
+  const tooltips = document.querySelectorAll(".demo-tooltip");
+  tooltips.forEach((tooltip) => tooltip.remove());
+
+  // Remove all cards
+  const cards = document.querySelectorAll(".demo-card");
+  cards.forEach((card) => card.remove());
+
+  // Remove highlights
+  const highlights = document.querySelectorAll(".demo-highlight");
+  highlights.forEach((element) => element.classList.remove("demo-highlight"));
+
+  // Remove completion message
+  const completion = document.getElementById("demoCompletion");
+  if (completion) completion.remove();
 }
 
 /**
@@ -324,48 +336,48 @@ function cleanupDemoElements() {
  * @param {string} text - Text for the tooltip
  * @param {string} position - Position (top, right, bottom, left)
  */
-function createElementTooltip(targetElementId, text, position = 'bottom') {
-    const targetElement = document.getElementById(targetElementId);
-    if (!targetElement) return null;
-    
-    // Get element position
-    const rect = targetElement.getBoundingClientRect();
-    
-    // Create tooltip
-    const tooltip = document.createElement('div');
-    tooltip.className = `demo-tooltip ${position}`;
-    tooltip.innerHTML = text;
-    document.body.appendChild(tooltip);
-    
-    // Add highlight to target
-    targetElement.classList.add('demo-highlight');
-    
-    // Position tooltip
-    let tooltipLeft, tooltipTop;
-    
-    switch(position) {
-        case 'top':
-            tooltipLeft = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
-            tooltipTop = rect.top - tooltip.offsetHeight - 12;
-            break;
-        case 'right':
-            tooltipLeft = rect.right + 12;
-            tooltipTop = rect.top + rect.height / 2 - tooltip.offsetHeight / 2;
-            break;
-        case 'bottom':
-            tooltipLeft = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
-            tooltipTop = rect.bottom + 12;
-            break;
-        case 'left':
-            tooltipLeft = rect.left - tooltip.offsetWidth - 12;
-            tooltipTop = rect.top + rect.height / 2 - tooltip.offsetHeight / 2;
-            break;
-    }
-    
-    tooltip.style.left = `${tooltipLeft}px`;
-    tooltip.style.top = `${tooltipTop}px`;
-    
-    return tooltip;
+function createElementTooltip(targetElementId, text, position = "bottom") {
+  const targetElement = document.getElementById(targetElementId);
+  if (!targetElement) return null;
+
+  // Get element position
+  const rect = targetElement.getBoundingClientRect();
+
+  // Create tooltip
+  const tooltip = document.createElement("div");
+  tooltip.className = `demo-tooltip ${position}`;
+  tooltip.innerHTML = text;
+  document.body.appendChild(tooltip);
+
+  // Add highlight to target
+  targetElement.classList.add("demo-highlight");
+
+  // Position tooltip
+  let tooltipLeft, tooltipTop;
+
+  switch (position) {
+    case "top":
+      tooltipLeft = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
+      tooltipTop = rect.top - tooltip.offsetHeight - 12;
+      break;
+    case "right":
+      tooltipLeft = rect.right + 12;
+      tooltipTop = rect.top + rect.height / 2 - tooltip.offsetHeight / 2;
+      break;
+    case "bottom":
+      tooltipLeft = rect.left + rect.width / 2 - tooltip.offsetWidth / 2;
+      tooltipTop = rect.bottom + 12;
+      break;
+    case "left":
+      tooltipLeft = rect.left - tooltip.offsetWidth - 12;
+      tooltipTop = rect.top + rect.height / 2 - tooltip.offsetHeight / 2;
+      break;
+  }
+
+  tooltip.style.left = `${tooltipLeft}px`;
+  tooltip.style.top = `${tooltipTop}px`;
+
+  return tooltip;
 }
 
 /**
@@ -373,24 +385,24 @@ function createElementTooltip(targetElementId, text, position = 'bottom') {
  * Introduces the complexity meter
  */
 function workflowDesignerTourStep1() {
-    // Find complexity meter element
-    const complexityMeterId = 'workflowComplexityMeter';
-    
-    // Create tooltip for complexity meter
-    const tooltip = createElementTooltip(
-        complexityMeterId,
-        'The Workflow Complexity Meter analyzes your workflow and provides a real-time assessment of its complexity across 5 key dimensions.',
-        'bottom'
-    );
-    
-    // Create step card
-    const stepCard = document.createElement('div');
-    stepCard.className = 'demo-card';
-    stepCard.id = 'demoStepCard1';
-    stepCard.style.top = '100px';
-    stepCard.style.right = '20px';
-    
-    stepCard.innerHTML = `
+  // Find complexity meter element
+  const complexityMeterId = "workflowComplexityMeter";
+
+  // Create tooltip for complexity meter
+  const tooltip = createElementTooltip(
+    complexityMeterId,
+    "The Workflow Complexity Meter analyzes your workflow and provides a real-time assessment of its complexity across 5 key dimensions.",
+    "bottom",
+  );
+
+  // Create step card
+  const stepCard = document.createElement("div");
+  stepCard.className = "demo-card";
+  stepCard.id = "demoStepCard1";
+  stepCard.style.top = "100px";
+  stepCard.style.right = "20px";
+
+  stepCard.innerHTML = `
         <div class="demo-card-header">
             <h5 class="demo-card-title">Workflow Complexity</h5>
             <button type="button" class="btn-close" aria-label="Close"></button>
@@ -404,22 +416,26 @@ function workflowDesignerTourStep1() {
             <button class="btn btn-primary btn-sm" id="nextStepBtn">Next Step</button>
         </div>
     `;
-    
-    // Add to document
-    document.body.appendChild(stepCard);
-    
-    // Set up event listeners
-    document.querySelector('#demoStepCard1 .btn-close').addEventListener('click', function() {
-        cleanupDemoElements();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(stepCard);
+
+  // Set up event listeners
+  document
+    .querySelector("#demoStepCard1 .btn-close")
+    .addEventListener("click", function () {
+      cleanupDemoElements();
+      toggleDemoMode(); // Turn off demo mode
     });
-    
-    document.getElementById('nextStepBtn').addEventListener('click', function() {
-        tooltip.remove();
-        document.getElementById(complexityMeterId).classList.remove('demo-highlight');
-        stepCard.remove();
-        workflowDesignerTourStep2();
-    });
+
+  document.getElementById("nextStepBtn").addEventListener("click", function () {
+    tooltip.remove();
+    document
+      .getElementById(complexityMeterId)
+      .classList.remove("demo-highlight");
+    stepCard.remove();
+    workflowDesignerTourStep2();
+  });
 }
 
 /**
@@ -427,24 +443,24 @@ function workflowDesignerTourStep1() {
  * Demonstrates the Analyze feature
  */
 function workflowDesignerTourStep2() {
-    // Find analyze button
-    const analyzeButtonId = 'analyzeWorkflowBtn';
-    
-    // Create tooltip for analyze button
-    const tooltip = createElementTooltip(
-        analyzeButtonId,
-        'The Analyze feature provides detailed insights into your workflow performance and identifies potential bottlenecks.',
-        'top'
-    );
-    
-    // Create step card
-    const stepCard = document.createElement('div');
-    stepCard.className = 'demo-card';
-    stepCard.id = 'demoStepCard2';
-    stepCard.style.top = '150px';
-    stepCard.style.left = '20px';
-    
-    stepCard.innerHTML = `
+  // Find analyze button
+  const analyzeButtonId = "analyzeWorkflowBtn";
+
+  // Create tooltip for analyze button
+  const tooltip = createElementTooltip(
+    analyzeButtonId,
+    "The Analyze feature provides detailed insights into your workflow performance and identifies potential bottlenecks.",
+    "top",
+  );
+
+  // Create step card
+  const stepCard = document.createElement("div");
+  stepCard.className = "demo-card";
+  stepCard.id = "demoStepCard2";
+  stepCard.style.top = "150px";
+  stepCard.style.left = "20px";
+
+  stepCard.innerHTML = `
         <div class="demo-card-header">
             <h5 class="demo-card-title">Workflow Analysis</h5>
             <button type="button" class="btn-close" aria-label="Close"></button>
@@ -464,22 +480,24 @@ function workflowDesignerTourStep2() {
             <button class="btn btn-primary btn-sm" id="nextStepBtn">Next Step</button>
         </div>
     `;
-    
-    // Add to document
-    document.body.appendChild(stepCard);
-    
-    // Set up event listeners
-    document.querySelector('#demoStepCard2 .btn-close').addEventListener('click', function() {
-        cleanupDemoElements();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(stepCard);
+
+  // Set up event listeners
+  document
+    .querySelector("#demoStepCard2 .btn-close")
+    .addEventListener("click", function () {
+      cleanupDemoElements();
+      toggleDemoMode(); // Turn off demo mode
     });
-    
-    document.getElementById('nextStepBtn').addEventListener('click', function() {
-        tooltip.remove();
-        document.getElementById(analyzeButtonId).classList.remove('demo-highlight');
-        stepCard.remove();
-        workflowDesignerTourStep3();
-    });
+
+  document.getElementById("nextStepBtn").addEventListener("click", function () {
+    tooltip.remove();
+    document.getElementById(analyzeButtonId).classList.remove("demo-highlight");
+    stepCard.remove();
+    workflowDesignerTourStep3();
+  });
 }
 
 /**
@@ -487,24 +505,24 @@ function workflowDesignerTourStep2() {
  * Shows the optimization feature
  */
 function workflowDesignerTourStep3() {
-    // Find optimize button
-    const optimizeButtonId = 'optimizeWorkflowBtn';
-    
-    // Create tooltip for optimize button
-    const tooltip = createElementTooltip(
-        optimizeButtonId,
-        'The Optimize feature automatically analyzes your workflow and suggests improvements to enhance performance.',
-        'right'
-    );
-    
-    // Create step card
-    const stepCard = document.createElement('div');
-    stepCard.className = 'demo-card';
-    stepCard.id = 'demoStepCard3';
-    stepCard.style.top = '200px';
-    stepCard.style.right = '20px';
-    
-    stepCard.innerHTML = `
+  // Find optimize button
+  const optimizeButtonId = "optimizeWorkflowBtn";
+
+  // Create tooltip for optimize button
+  const tooltip = createElementTooltip(
+    optimizeButtonId,
+    "The Optimize feature automatically analyzes your workflow and suggests improvements to enhance performance.",
+    "right",
+  );
+
+  // Create step card
+  const stepCard = document.createElement("div");
+  stepCard.className = "demo-card";
+  stepCard.id = "demoStepCard3";
+  stepCard.style.top = "200px";
+  stepCard.style.right = "20px";
+
+  stepCard.innerHTML = `
         <div class="demo-card-header">
             <h5 class="demo-card-title">Workflow Optimization</h5>
             <button type="button" class="btn-close" aria-label="Close"></button>
@@ -525,21 +543,27 @@ function workflowDesignerTourStep3() {
             <button class="btn btn-primary btn-sm" id="finishDemoBtn">Finish Tour</button>
         </div>
     `;
-    
-    // Add to document
-    document.body.appendChild(stepCard);
-    
-    // Set up event listeners
-    document.querySelector('#demoStepCard3 .btn-close').addEventListener('click', function() {
-        cleanupDemoElements();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(stepCard);
+
+  // Set up event listeners
+  document
+    .querySelector("#demoStepCard3 .btn-close")
+    .addEventListener("click", function () {
+      cleanupDemoElements();
+      toggleDemoMode(); // Turn off demo mode
     });
-    
-    document.getElementById('finishDemoBtn').addEventListener('click', function() {
-        tooltip.remove();
-        document.getElementById(optimizeButtonId).classList.remove('demo-highlight');
-        stepCard.remove();
-        showDemoCompletionMessage();
+
+  document
+    .getElementById("finishDemoBtn")
+    .addEventListener("click", function () {
+      tooltip.remove();
+      document
+        .getElementById(optimizeButtonId)
+        .classList.remove("demo-highlight");
+      stepCard.remove();
+      showDemoCompletionMessage();
     });
 }
 
@@ -547,17 +571,17 @@ function workflowDesignerTourStep3() {
  * Agent Registry tour - Step 1
  */
 function agentRegistryTourStep1() {
-    // Find agent table
-    const agentTableId = 'agentRegistryTable';
-    
-    // Create step card
-    const stepCard = document.createElement('div');
-    stepCard.className = 'demo-card';
-    stepCard.id = 'demoStepCard1';
-    stepCard.style.top = '100px';
-    stepCard.style.left = '20px';
-    
-    stepCard.innerHTML = `
+  // Find agent table
+  const agentTableId = "agentRegistryTable";
+
+  // Create step card
+  const stepCard = document.createElement("div");
+  stepCard.className = "demo-card";
+  stepCard.id = "demoStepCard1";
+  stepCard.style.top = "100px";
+  stepCard.style.left = "20px";
+
+  stepCard.innerHTML = `
         <div class="demo-card-header">
             <h5 class="demo-card-title">Agent Registry</h5>
             <button type="button" class="btn-close" aria-label="Close"></button>
@@ -578,40 +602,44 @@ function agentRegistryTourStep1() {
             <button class="btn btn-primary btn-sm" id="finishDemoBtn">Finish Tour</button>
         </div>
     `;
-    
-    // Add to document
-    document.body.appendChild(stepCard);
-    
-    // Set up event listeners
-    document.querySelector('#demoStepCard1 .btn-close').addEventListener('click', function() {
-        cleanupDemoElements();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(stepCard);
+
+  // Set up event listeners
+  document
+    .querySelector("#demoStepCard1 .btn-close")
+    .addEventListener("click", function () {
+      cleanupDemoElements();
+      toggleDemoMode(); // Turn off demo mode
     });
-    
-    document.getElementById('finishDemoBtn').addEventListener('click', function() {
-        stepCard.remove();
-        showDemoCompletionMessage();
+
+  document
+    .getElementById("finishDemoBtn")
+    .addEventListener("click", function () {
+      stepCard.remove();
+      showDemoCompletionMessage();
     });
-    
-    // Highlight the first detail button
-    const firstDetailBtn = document.querySelector('.btn-outline-primary');
-    if (firstDetailBtn) {
-        firstDetailBtn.classList.add('demo-highlight');
-    }
+
+  // Highlight the first detail button
+  const firstDetailBtn = document.querySelector(".btn-outline-primary");
+  if (firstDetailBtn) {
+    firstDetailBtn.classList.add("demo-highlight");
+  }
 }
 
 /**
  * Agent Playground tour - Step 1
  */
 function agentPlaygroundTourStep1() {
-    // Create step card
-    const stepCard = document.createElement('div');
-    stepCard.className = 'demo-card';
-    stepCard.id = 'demoStepCard1';
-    stepCard.style.top = '100px';
-    stepCard.style.right = '20px';
-    
-    stepCard.innerHTML = `
+  // Create step card
+  const stepCard = document.createElement("div");
+  stepCard.className = "demo-card";
+  stepCard.id = "demoStepCard1";
+  stepCard.style.top = "100px";
+  stepCard.style.right = "20px";
+
+  stepCard.innerHTML = `
         <div class="demo-card-header">
             <h5 class="demo-card-title">Agent Playground</h5>
             <button type="button" class="btn-close" aria-label="Close"></button>
@@ -632,19 +660,23 @@ function agentPlaygroundTourStep1() {
             <button class="btn btn-primary btn-sm" id="finishDemoBtn">Finish Tour</button>
         </div>
     `;
-    
-    // Add to document
-    document.body.appendChild(stepCard);
-    
-    // Set up event listeners
-    document.querySelector('#demoStepCard1 .btn-close').addEventListener('click', function() {
-        cleanupDemoElements();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(stepCard);
+
+  // Set up event listeners
+  document
+    .querySelector("#demoStepCard1 .btn-close")
+    .addEventListener("click", function () {
+      cleanupDemoElements();
+      toggleDemoMode(); // Turn off demo mode
     });
-    
-    document.getElementById('finishDemoBtn').addEventListener('click', function() {
-        stepCard.remove();
-        showDemoCompletionMessage();
+
+  document
+    .getElementById("finishDemoBtn")
+    .addEventListener("click", function () {
+      stepCard.remove();
+      showDemoCompletionMessage();
     });
 }
 
@@ -652,16 +684,16 @@ function agentPlaygroundTourStep1() {
  * Shows demo completion message
  */
 function showDemoCompletionMessage() {
-    // Remove overlay
-    const overlay = document.getElementById('demoOverlay');
-    if (overlay) overlay.remove();
-    
-    // Create completion message
-    const completion = document.createElement('div');
-    completion.className = 'demo-completion active';
-    completion.id = 'demoCompletion';
-    
-    completion.innerHTML = `
+  // Remove overlay
+  const overlay = document.getElementById("demoOverlay");
+  if (overlay) overlay.remove();
+
+  // Create completion message
+  const completion = document.createElement("div");
+  completion.className = "demo-completion active";
+  completion.id = "demoCompletion";
+
+  completion.innerHTML = `
         <div class="demo-completion-icon">
             <i class="bi bi-check-circle"></i>
         </div>
@@ -669,13 +701,15 @@ function showDemoCompletionMessage() {
         <p class="demo-completion-message">You've completed the guided tour of this feature. Feel free to explore and experiment with the interface.</p>
         <button class="btn btn-primary" id="closeDemoBtn">Close Demo</button>
     `;
-    
-    // Add to document
-    document.body.appendChild(completion);
-    
-    // Set up event listener
-    document.getElementById('closeDemoBtn').addEventListener('click', function() {
-        cleanupDemoElements();
-        toggleDemoMode(); // Turn off demo mode
+
+  // Add to document
+  document.body.appendChild(completion);
+
+  // Set up event listener
+  document
+    .getElementById("closeDemoBtn")
+    .addEventListener("click", function () {
+      cleanupDemoElements();
+      toggleDemoMode(); // Turn off demo mode
     });
 }

@@ -1,401 +1,518 @@
-{% extends "base.html" %}
-
-{% block title %}User Activity: {{ user.username }}{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}User Activity: {{ user.username }}{%
+endblock %} {% block content %}
 <div class="container-fluid px-4">
-    <h1 class="mt-4">User Activity: {{ user.username }}</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ url_for('user_audit.index') }}">User Audit</a></li>
-        <li class="breadcrumb-item active">User Detail</li>
-    </ol>
-    
-    <!-- User Info Card -->
-    <div class="row">
-        <div class="col-xl-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-user me-1"></i>
-                    User Information
-                </div>
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
-                            <i class="fas fa-user fa-3x text-primary"></i>
-                        </div>
-                        <h4 class="mt-3">{{ user.username }}</h4>
-                        <p class="text-muted">{{ user.email }}</p>
-                    </div>
-                    
-                    <dl class="row">
-                        <dt class="col-sm-4">User ID:</dt>
-                        <dd class="col-sm-8">{{ user.id }}</dd>
-                        
-                        <dt class="col-sm-4">Role:</dt>
-                        <dd class="col-sm-8">
-                            {% if user.is_admin %}
-                            <span class="badge bg-primary">Administrator</span>
-                            {% else %}
-                            <span class="badge bg-secondary">User</span>
-                            {% endif %}
-                        </dd>
-                        
-                        <dt class="col-sm-4">Status:</dt>
-                        <dd class="col-sm-8">
-                            {% if user.is_active %}
-                            <span class="badge bg-success">Active</span>
-                            {% else %}
-                            <span class="badge bg-danger">Inactive</span>
-                            {% endif %}
-                        </dd>
-                        
-                        <dt class="col-sm-4">Last Login:</dt>
-                        <dd class="col-sm-8">
-                            {% if user.last_login %}
-                            {{ user.last_login.strftime('%Y-%m-%d %H:%M') }}
-                            {% else %}
-                            Never
-                            {% endif %}
-                        </dd>
-                    </dl>
-                </div>
-            </div>
+  <h1 class="mt-4">User Activity: {{ user.username }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('dashboard.index') }}">Dashboard</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('user_audit.index') }}">User Audit</a>
+    </li>
+    <li class="breadcrumb-item active">User Detail</li>
+  </ol>
+
+  <!-- User Info Card -->
+  <div class="row">
+    <div class="col-xl-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-user me-1"></i>
+          User Information
         </div>
-        
-        <div class="col-xl-8">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fas fa-chart-bar me-1"></i>
-                            Activity Summary
-                        </div>
-                        <div>
-                            <select class="form-select form-select-sm" id="timeRange" style="width: auto;">
-                                <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 Days</option>
-                                <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 Days</option>
-                                <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 Days</option>
-                                <option value="365" {% if days == 365 %}selected{% endif %}>Last Year</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Activity by Module -->
-                        <div class="col-md-6">
-                            <h5 class="text-center mb-3">Activity by Module</h5>
-                            <canvas id="moduleChart" width="100%" height="200"></canvas>
-                        </div>
-                        
-                        <!-- Activity by Day -->
-                        <div class="col-md-6">
-                            <h5 class="text-center mb-3">Activity Timeline</h5>
-                            <canvas id="timelineChart" width="100%" height="200"></canvas>
-                        </div>
-                    </div>
-                </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <div
+              class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+              style="width: 100px; height: 100px"
+            >
+              <i class="fas fa-user fa-3x text-primary"></i>
             </div>
+            <h4 class="mt-3">{{ user.username }}</h4>
+            <p class="text-muted">{{ user.email }}</p>
+          </div>
+
+          <dl class="row">
+            <dt class="col-sm-4">User ID:</dt>
+            <dd class="col-sm-8">{{ user.id }}</dd>
+
+            <dt class="col-sm-4">Role:</dt>
+            <dd class="col-sm-8">
+              {% if user.is_admin %}
+              <span class="badge bg-primary">Administrator</span>
+              {% else %}
+              <span class="badge bg-secondary">User</span>
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-4">Status:</dt>
+            <dd class="col-sm-8">
+              {% if user.is_active %}
+              <span class="badge bg-success">Active</span>
+              {% else %}
+              <span class="badge bg-danger">Inactive</span>
+              {% endif %}
+            </dd>
+
+            <dt class="col-sm-4">Last Login:</dt>
+            <dd class="col-sm-8">
+              {% if user.last_login %} {{ user.last_login.strftime('%Y-%m-%d
+              %H:%M') }} {% else %} Never {% endif %}
+            </dd>
+          </dl>
         </div>
+      </div>
     </div>
-    
-    <div class="row">
-        <!-- Recent Activity Tab Card -->
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <ul class="nav nav-tabs card-header-tabs" id="activityTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="actions-tab" data-bs-toggle="tab" data-bs-target="#actions" type="button" role="tab" aria-controls="actions" aria-selected="true">
-                                <i class="fas fa-history me-1"></i> Recent Activity
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="overrides-tab" data-bs-toggle="tab" data-bs-target="#overrides" type="button" role="tab" aria-controls="overrides" aria-selected="false">
-                                <i class="fas fa-clipboard-check me-1"></i> Levy Overrides
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-                <div class="card-body">
-                    <div class="tab-content" id="activityTabContent">
-                        <!-- Recent Activity Tab -->
-                        <div class="tab-pane fade show active" id="actions" role="tabpanel" aria-labelledby="actions-tab">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Action Type</th>
-                                            <th>Module</th>
-                                            <th>Submodule</th>
-                                            <th>Timestamp</th>
-                                            <th>Status</th>
-                                            <th>Details</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for action in actions %}
-                                        <tr>
-                                            <td>{{ action.action_type }}</td>
-                                            <td>{{ action.module }}</td>
-                                            <td>{{ action.submodule or '-' }}</td>
-                                            <td>{{ action.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                                            <td>
-                                                {% if action.success %}
-                                                <span class="badge bg-success">Success</span>
-                                                {% else %}
-                                                <span class="badge bg-danger" data-bs-toggle="tooltip" title="{{ action.error_message }}">Failed</span>
-                                                {% endif %}
-                                            </td>
-                                            <td>
-                                                {% if action.action_details %}
-                                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ action.id }}">
-                                                    <i class="fas fa-info-circle"></i>
-                                                </button>
-                                                
-                                                <!-- Details Modal -->
-                                                <div class="modal fade" id="detailsModal{{ action.id }}" tabindex="-1" aria-labelledby="detailsModalLabel{{ action.id }}" aria-hidden="true">
-                                                    <div class="modal-dialog modal-lg">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="detailsModalLabel{{ action.id }}">Action Details #{{ action.id }}</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <div class="mb-3">
-                                                                    <h6>Action Information</h6>
-                                                                    <dl class="row">
-                                                                        <dt class="col-sm-3">Action Type:</dt>
-                                                                        <dd class="col-sm-9">{{ action.action_type }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">Module:</dt>
-                                                                        <dd class="col-sm-9">{{ action.module }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">Submodule:</dt>
-                                                                        <dd class="col-sm-9">{{ action.submodule or '-' }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">Timestamp:</dt>
-                                                                        <dd class="col-sm-9">{{ action.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">IP Address:</dt>
-                                                                        <dd class="col-sm-9">{{ action.ip_address or '-' }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">User Agent:</dt>
-                                                                        <dd class="col-sm-9">{{ action.user_agent or '-' }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">Session ID:</dt>
-                                                                        <dd class="col-sm-9">{{ action.session_id or '-' }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">Duration:</dt>
-                                                                        <dd class="col-sm-9">{{ "%.2f"|format(action.duration_ms) + ' ms' if action.duration_ms else '-' }}</dd>
-                                                                        
-                                                                        <dt class="col-sm-3">Status:</dt>
-                                                                        <dd class="col-sm-9">
-                                                                            {% if action.success %}
-                                                                            <span class="badge bg-success">Success</span>
-                                                                            {% else %}
-                                                                            <span class="badge bg-danger">Failed</span>
-                                                                            {% endif %}
-                                                                        </dd>
-                                                                        
-                                                                        {% if not action.success and action.error_message %}
-                                                                        <dt class="col-sm-3">Error Message:</dt>
-                                                                        <dd class="col-sm-9">{{ action.error_message }}</dd>
-                                                                        {% endif %}
-                                                                    </dl>
-                                                                </div>
-                                                                
-                                                                <div class="mb-3">
-                                                                    <h6>Action Details</h6>
-                                                                    <pre class="bg-light p-3 rounded"><code>{{ action.action_details | tojson(indent=2) }}</code></pre>
-                                                                </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {% else %}
-                                                -
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% else %}
-                                        <tr>
-                                            <td colspan="6" class="text-center">No recent activity found</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="text-end mt-3">
-                                <a href="{{ url_for('user_audit.user_activity', user_id=user.id) }}" class="btn btn-primary btn-sm">View All Activity</a>
-                            </div>
-                        </div>
-                        
-                        <!-- Levy Overrides Tab -->
-                        <div class="tab-pane fade" id="overrides" role="tabpanel" aria-labelledby="overrides-tab">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>District/Code</th>
-                                            <th>Year</th>
-                                            <th>Field</th>
-                                            <th>Original</th>
-                                            <th>Override</th>
-                                            <th>Change</th>
-                                            <th>Timestamp</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for override in overrides %}
-                                        <tr>
-                                            <td>
-                                                {% if override.tax_district %}
-                                                {{ override.tax_district.district_name }}
-                                                {% elif override.tax_code %}
-                                                {{ override.tax_code.code_name }}
-                                                {% else %}
-                                                Unknown
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ override.year }}</td>
-                                            <td>{{ override.field_name }}</td>
-                                            <td>${{ "%.2f"|format(override.original_value) }}</td>
-                                            <td>${{ "%.2f"|format(override.override_value) }}</td>
-                                            <td>
-                                                {% if override.percent_change %}
-                                                <span class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}">
-                                                    {{ "%.2f"|format(override.percent_change) }}%
-                                                </span>
-                                                {% else %}
-                                                N/A
-                                                {% endif %}
-                                            </td>
-                                            <td>{{ override.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
-                                            <td>
-                                                {% if override.requires_approval and override.approved is none %}
-                                                <span class="badge bg-warning">Pending</span>
-                                                {% elif override.approved == true %}
-                                                <span class="badge bg-success">Approved</span>
-                                                {% elif override.approved == false %}
-                                                <span class="badge bg-danger">Rejected</span>
-                                                {% else %}
-                                                <span class="badge bg-secondary">No Approval Required</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% else %}
-                                        <tr>
-                                            <td colspan="8" class="text-center">No levy overrides found</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="text-end mt-3">
-                                <a href="{{ url_for('user_audit.levy_overrides', user_id=user.id) }}" class="btn btn-primary btn-sm">View All Overrides</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+    <div class="col-xl-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-chart-bar me-1"></i>
+              Activity Summary
             </div>
+            <div>
+              <select
+                class="form-select form-select-sm"
+                id="timeRange"
+                style="width: auto"
+              >
+                <option value="7" {% if days="" ="7" %}selected{% endif %}>
+                  Last 7 Days
+                </option>
+                <option value="30" {% if days="" ="30" %}selected{% endif %}>
+                  Last 30 Days
+                </option>
+                <option value="90" {% if days="" ="90" %}selected{% endif %}>
+                  Last 90 Days
+                </option>
+                <option value="365" {% if days="" ="365" %}selected{% endif %}>
+                  Last Year
+                </option>
+              </select>
+            </div>
+          </div>
         </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Activity by Module -->
+            <div class="col-md-6">
+              <h5 class="text-center mb-3">Activity by Module</h5>
+              <canvas id="moduleChart" width="100%" height="200"></canvas>
+            </div>
+
+            <!-- Activity by Day -->
+            <div class="col-md-6">
+              <h5 class="text-center mb-3">Activity Timeline</h5>
+              <canvas id="timelineChart" width="100%" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="row">
+    <!-- Recent Activity Tab Card -->
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <ul
+            class="nav nav-tabs card-header-tabs"
+            id="activityTabs"
+            role="tablist"
+          >
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="actions-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#actions"
+                type="button"
+                role="tab"
+                aria-controls="actions"
+                aria-selected="true"
+              >
+                <i class="fas fa-history me-1"></i> Recent Activity
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="overrides-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#overrides"
+                type="button"
+                role="tab"
+                aria-controls="overrides"
+                aria-selected="false"
+              >
+                <i class="fas fa-clipboard-check me-1"></i> Levy Overrides
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content" id="activityTabContent">
+            <!-- Recent Activity Tab -->
+            <div
+              class="tab-pane fade show active"
+              id="actions"
+              role="tabpanel"
+              aria-labelledby="actions-tab"
+            >
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th>Action Type</th>
+                      <th>Module</th>
+                      <th>Submodule</th>
+                      <th>Timestamp</th>
+                      <th>Status</th>
+                      <th>Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for action in actions %}
+                    <tr>
+                      <td>{{ action.action_type }}</td>
+                      <td>{{ action.module }}</td>
+                      <td>{{ action.submodule or '-' }}</td>
+                      <td>
+                        {{ action.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                      </td>
+                      <td>
+                        {% if action.success %}
+                        <span class="badge bg-success">Success</span>
+                        {% else %}
+                        <span
+                          class="badge bg-danger"
+                          data-bs-toggle="tooltip"
+                          title="{{ action.error_message }}"
+                          >Failed</span
+                        >
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if action.action_details %}
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-info"
+                          data-bs-toggle="modal"
+                          data-bs-target="#detailsModal{{ action.id }}"
+                        >
+                          <i class="fas fa-info-circle"></i>
+                        </button>
+
+                        <!-- Details Modal -->
+                        <div
+                          class="modal fade"
+                          id="detailsModal{{ action.id }}"
+                          tabindex="-1"
+                          aria-labelledby="detailsModalLabel{{ action.id }}"
+                          aria-hidden="true"
+                        >
+                          <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5
+                                  class="modal-title"
+                                  id="detailsModalLabel{{ action.id }}"
+                                >
+                                  Action Details #{{ action.id }}
+                                </h5>
+                                <button
+                                  type="button"
+                                  class="btn-close"
+                                  data-bs-dismiss="modal"
+                                  aria-label="Close"
+                                ></button>
+                              </div>
+                              <div class="modal-body">
+                                <div class="mb-3">
+                                  <h6>Action Information</h6>
+                                  <dl class="row">
+                                    <dt class="col-sm-3">Action Type:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.action_type }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">Module:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.module }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">Submodule:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.submodule or '-' }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">Timestamp:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.timestamp.strftime('%Y-%m-%d
+                                      %H:%M:%S') }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">IP Address:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.ip_address or '-' }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">User Agent:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.user_agent or '-' }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">Session ID:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.session_id or '-' }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">Duration:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ "%.2f"|format(action.duration_ms) + '
+                                      ms' if action.duration_ms else '-' }}
+                                    </dd>
+
+                                    <dt class="col-sm-3">Status:</dt>
+                                    <dd class="col-sm-9">
+                                      {% if action.success %}
+                                      <span class="badge bg-success"
+                                        >Success</span
+                                      >
+                                      {% else %}
+                                      <span class="badge bg-danger"
+                                        >Failed</span
+                                      >
+                                      {% endif %}
+                                    </dd>
+
+                                    {% if not action.success and
+                                    action.error_message %}
+                                    <dt class="col-sm-3">Error Message:</dt>
+                                    <dd class="col-sm-9">
+                                      {{ action.error_message }}
+                                    </dd>
+                                    {% endif %}
+                                  </dl>
+                                </div>
+
+                                <div class="mb-3">
+                                  <h6>Action Details</h6>
+                                  <pre
+                                    class="bg-light p-3 rounded"
+                                  ><code>{{ action.action_details | tojson(indent=2) }}</code></pre>
+                                </div>
+                              </div>
+                              <div class="modal-footer">
+                                <button
+                                  type="button"
+                                  class="btn btn-secondary"
+                                  data-bs-dismiss="modal"
+                                >
+                                  Close
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        {% else %} - {% endif %}
+                      </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                      <td colspan="6" class="text-center">
+                        No recent activity found
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-end mt-3">
+                <a
+                  href="{{ url_for('user_audit.user_activity', user_id=user.id) }}"
+                  class="btn btn-primary btn-sm"
+                  >View All Activity</a
+                >
+              </div>
+            </div>
+
+            <!-- Levy Overrides Tab -->
+            <div
+              class="tab-pane fade"
+              id="overrides"
+              role="tabpanel"
+              aria-labelledby="overrides-tab"
+            >
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th>District/Code</th>
+                      <th>Year</th>
+                      <th>Field</th>
+                      <th>Original</th>
+                      <th>Override</th>
+                      <th>Change</th>
+                      <th>Timestamp</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for override in overrides %}
+                    <tr>
+                      <td>
+                        {% if override.tax_district %} {{
+                        override.tax_district.district_name }} {% elif
+                        override.tax_code %} {{ override.tax_code.code_name }}
+                        {% else %} Unknown {% endif %}
+                      </td>
+                      <td>{{ override.year }}</td>
+                      <td>{{ override.field_name }}</td>
+                      <td>${{ "%.2f"|format(override.original_value) }}</td>
+                      <td>${{ "%.2f"|format(override.override_value) }}</td>
+                      <td>
+                        {% if override.percent_change %}
+                        <span
+                          class="{% if override.percent_change > 0 %}text-success{% else %}text-danger{% endif %}"
+                        >
+                          {{ "%.2f"|format(override.percent_change) }}%
+                        </span>
+                        {% else %} N/A {% endif %}
+                      </td>
+                      <td>
+                        {{ override.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                      </td>
+                      <td>
+                        {% if override.requires_approval and override.approved
+                        is none %}
+                        <span class="badge bg-warning">Pending</span>
+                        {% elif override.approved == true %}
+                        <span class="badge bg-success">Approved</span>
+                        {% elif override.approved == false %}
+                        <span class="badge bg-danger">Rejected</span>
+                        {% else %}
+                        <span class="badge bg-secondary"
+                          >No Approval Required</span
+                        >
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                      <td colspan="8" class="text-center">
+                        No levy overrides found
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-end mt-3">
+                <a
+                  href="{{ url_for('user_audit.levy_overrides', user_id=user.id) }}"
+                  class="btn btn-primary btn-sm"
+                  >View All Overrides</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-        
-        // Module chart
-        var moduleCtx = document.getElementById('moduleChart').getContext('2d');
-        var moduleChart = new Chart(moduleCtx, {
-            type: 'doughnut',
-            data: {
-                labels: {{ module_chart_data.labels | tojson }},
-                datasets: [{
-                    data: {{ module_chart_data.values | tojson }},
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(153, 102, 255, 0.7)',
-                        'rgba(255, 159, 64, 0.7)',
-                        'rgba(199, 199, 199, 0.7)',
-                        'rgba(83, 102, 255, 0.7)',
-                        'rgba(40, 159, 64, 0.7)',
-                        'rgba(210, 60, 180, 0.7)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            boxWidth: 12
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Timeline chart
-        var timelineCtx = document.getElementById('timelineChart').getContext('2d');
-        var timelineChart = new Chart(timelineCtx, {
-            type: 'line',
-            data: {
-                labels: {{ daily_chart_data.labels | tojson }},
-                datasets: [{
-                    label: 'Activity',
-                    data: {{ daily_chart_data.values | tojson }},
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-        
-        // Time range selector
-        document.getElementById('timeRange').addEventListener('change', function() {
-            var days = this.value;
-            window.location.href = "{{ url_for('user_audit.user_detail', user_id=user.id) }}?days=" + days;
-        });
-    });
+  document.addEventListener('DOMContentLoaded', function() {
+      // Initialize tooltips
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+
+      // Module chart
+      var moduleCtx = document.getElementById('moduleChart').getContext('2d');
+      var moduleChart = new Chart(moduleCtx, {
+          type: 'doughnut',
+          data: {
+              labels: {{ module_chart_data.labels | tojson }},
+              datasets: [{
+                  data: {{ module_chart_data.values | tojson }},
+                  backgroundColor: [
+                      'rgba(54, 162, 235, 0.7)',
+                      'rgba(255, 99, 132, 0.7)',
+                      'rgba(255, 206, 86, 0.7)',
+                      'rgba(75, 192, 192, 0.7)',
+                      'rgba(153, 102, 255, 0.7)',
+                      'rgba(255, 159, 64, 0.7)',
+                      'rgba(199, 199, 199, 0.7)',
+                      'rgba(83, 102, 255, 0.7)',
+                      'rgba(40, 159, 64, 0.7)',
+                      'rgba(210, 60, 180, 0.7)'
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                  legend: {
+                      position: 'bottom',
+                      labels: {
+                          boxWidth: 12
+                      }
+                  }
+              }
+          }
+      });
+
+      // Timeline chart
+      var timelineCtx = document.getElementById('timelineChart').getContext('2d');
+      var timelineChart = new Chart(timelineCtx, {
+          type: 'line',
+          data: {
+              labels: {{ daily_chart_data.labels | tojson }},
+              datasets: [{
+                  label: 'Activity',
+                  data: {{ daily_chart_data.values | tojson }},
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 2,
+                  tension: 0.4,
+                  fill: true
+              }]
+          },
+          options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: {
+                          precision: 0
+                      }
+                  }
+              },
+              plugins: {
+                  legend: {
+                      display: false
+                  }
+              }
+          }
+      });
+
+      // Time range selector
+      document.getElementById('timeRange').addEventListener('change', function() {
+          var days = this.value;
+          window.location.href = "{{ url_for('user_audit.user_detail', user_id=user.id) }}?days=" + days;
+      });
+  });
 </script>
-{% endblock %}
-{% endblock %}
+{% endblock %} {% endblock %}

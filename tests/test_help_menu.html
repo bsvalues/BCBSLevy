@@ -1,90 +1,96 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Help Menu and Guided Tour Test</title>
-    <link href="../static/css/lib/introjs.min.css" rel="stylesheet">
-    <link href="../static/css/help_menu.css" rel="stylesheet">
-</head>
-<body>
+    <link href="../static/css/lib/introjs.min.css" rel="stylesheet" />
+    <link href="../static/css/help_menu.css" rel="stylesheet" />
+  </head>
+  <body>
     <h1>Help Menu and Guided Tour Test</h1>
     <button id="help-button">Help</button>
     <div id="main-header">Main Header</div>
     <div data-tour="public-lookup">Public Lookup</div>
     <div data-tour="admin-dashboard">Admin Dashboard</div>
-    
+
     <script src="../static/js/lib/intro.min.js"></script>
     <script>
-        // First check if Intro.js is properly loaded
-        console.log("Intro.js test - checking if window.introJs exists:", typeof window.introJs);
-        
-        // Add some tours for testing
-        const TOURS = {
-            dashboard: [
-                {
-                    element: '#main-header',
-                    title: 'Test Tour',
-                    intro: 'This is a test tour step',
-                    position: 'bottom'
-                },
-                {
-                    element: '[data-tour="public-lookup"]',
-                    title: 'Public Lookup',
-                    intro: 'This is the public lookup',
-                    position: 'bottom'
-                }
-            ]
+      // First check if Intro.js is properly loaded
+      console.log(
+        "Intro.js test - checking if window.introJs exists:",
+        typeof window.introJs,
+      );
+
+      // Add some tours for testing
+      const TOURS = {
+        dashboard: [
+          {
+            element: "#main-header",
+            title: "Test Tour",
+            intro: "This is a test tour step",
+            position: "bottom",
+          },
+          {
+            element: '[data-tour="public-lookup"]',
+            title: "Public Lookup",
+            intro: "This is the public lookup",
+            position: "bottom",
+          },
+        ],
+      };
+
+      // Create a simplified startTour function
+      function startTour(tourName) {
+        console.log("Starting tour:", tourName);
+        try {
+          if (typeof window.introJs === "function") {
+            const intro = window.introJs();
+            intro.setOptions({
+              steps: TOURS[tourName],
+              showBullets: true,
+              showProgress: true,
+            });
+            intro.start();
+            console.log("Tour started successfully");
+          } else {
+            console.error("Intro.js is not available");
+          }
+        } catch (e) {
+          console.error("Error starting tour:", e);
+        }
+      }
+
+      // Create a simplified toggleHelpMenu function
+      function toggleHelpMenu() {
+        console.log("Toggle help menu called");
+      }
+
+      // Initialize on DOMContentLoaded
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("Help Menu Test initialized");
+
+        // Set up global access to toggleHelpMenu (simulating help_menu.js)
+        window.helpMenuSystem = {
+          toggleHelpMenu: toggleHelpMenu,
         };
-        
-        // Create a simplified startTour function
-        function startTour(tourName) {
-            console.log("Starting tour:", tourName);
-            try {
-                if (typeof window.introJs === 'function') {
-                    const intro = window.introJs();
-                    intro.setOptions({
-                        steps: TOURS[tourName],
-                        showBullets: true,
-                        showProgress: true
-                    });
-                    intro.start();
-                    console.log("Tour started successfully");
-                } else {
-                    console.error("Intro.js is not available");
-                }
-            } catch (e) {
-                console.error("Error starting tour:", e);
+
+        // Set up click handler for help button (simulating guided_tour.js)
+        const helpButton = document.getElementById("help-button");
+        if (helpButton) {
+          helpButton.addEventListener("click", function (e) {
+            e.preventDefault();
+            if (
+              window.helpMenuSystem &&
+              typeof window.helpMenuSystem.toggleHelpMenu === "function"
+            ) {
+              window.helpMenuSystem.toggleHelpMenu();
+            } else {
+              startTour("dashboard");
             }
+          });
         }
-        
-        // Create a simplified toggleHelpMenu function
-        function toggleHelpMenu() {
-            console.log("Toggle help menu called");
-        }
-        
-        // Initialize on DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Help Menu Test initialized");
-            
-            // Set up global access to toggleHelpMenu (simulating help_menu.js)
-            window.helpMenuSystem = {
-                toggleHelpMenu: toggleHelpMenu
-            };
-            
-            // Set up click handler for help button (simulating guided_tour.js)
-            const helpButton = document.getElementById('help-button');
-            if (helpButton) {
-                helpButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (window.helpMenuSystem && typeof window.helpMenuSystem.toggleHelpMenu === 'function') {
-                        window.helpMenuSystem.toggleHelpMenu();
-                    } else {
-                        startTour('dashboard');
-                    }
-                });
-            }
-        });
+      });
     </script>
-</body>
+  </body>
 </html>
