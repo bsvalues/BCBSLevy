@@ -33,12 +33,20 @@ def index():
 def dashboard():
     """Render the main dashboard."""
     # Summary statistics
-    tax_code_count = TaxCode.query.distinct(TaxCode.code).count()
+    tax_code_count = TaxCode.query.distinct(TaxCode.tax_code).count()
     property_count = Property.query.count()
-    district_count = TaxDistrict.query.distinct(TaxDistrict.tax_district_id).count()
+    district_count = TaxDistrict.query.count()
     
     # Recent tax codes
     recent_tax_codes = TaxCode.query.order_by(TaxCode.updated_at.desc()).limit(5).all()
+    
+    # Calculate aggregates for the template
+    total_assessed_value = 0
+    total_levy_amount = 0
+    avg_levy_rate = 0
+    
+    # Create default recent imports (empty list)
+    recent_imports = []
     
     return render_template(
         'dashboard.html',
@@ -46,7 +54,12 @@ def dashboard():
         tax_code_count=tax_code_count,
         property_count=property_count,
         district_count=district_count,
-        recent_tax_codes=recent_tax_codes
+        recent_tax_codes=recent_tax_codes,
+        total_assessed_value=total_assessed_value,
+        total_levy_amount=total_levy_amount,
+        avg_levy_rate=avg_levy_rate,
+        recent_imports=recent_imports,
+        current_year=2025
     )
 
 @home_bp.route('/about')
