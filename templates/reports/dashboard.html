@@ -175,7 +175,7 @@ block content %}
                 <div class="card-body text-center">
                   <h6 class="card-title">Properties</h6>
                   <p class="card-text fs-3">
-                    {{ property_count|default('0')|number_format }}
+                    {{ property_count|default('0')|format_number }}
                   </p>
                 </div>
               </div>
@@ -185,7 +185,7 @@ block content %}
                 <div class="card-body text-center">
                   <h6 class="card-title">Tax Codes</h6>
                   <p class="card-text fs-3">
-                    {{ tax_code_count|default('0')|number_format }}
+                    {{ tax_code_count|default('0')|format_number }}
                   </p>
                 </div>
               </div>

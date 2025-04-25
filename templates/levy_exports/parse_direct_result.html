@@ -38,7 +38,7 @@ endblock %} {% block header_actions %}
             <div class="col-md-4">
               <div class="mb-3">
                 <h6 class="text-muted">Total Records</h6>
-                <p class="mb-0">{{ total_records | number_format }}</p>
+                <p class="mb-0">{{ total_records | format_number }}</p>
               </div>
             </div>
             <div class="col-md-4">

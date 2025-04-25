@@ -25,6 +25,16 @@ reports_bp = Blueprint('reports', __name__, url_prefix='/reports')
 logger = logging.getLogger(__name__)
 
 
+@reports_bp.route('/', methods=['GET'])
+def reports_index():
+    """
+    Root route for reports section.
+    
+    Redirects to the reports dashboard.
+    """
+    return redirect(url_for('reports.reports_dashboard'))
+
+
 @reports_bp.route('/dashboard', methods=['GET'])
 def reports_dashboard():
     """
