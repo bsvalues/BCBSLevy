@@ -39,7 +39,7 @@ def login():
     # Just redirect to home page - we're already auto-authenticated
     logger.info("Login page accessed - redirecting to home (auto-authentication enabled)")
     flash('Welcome to Benton County Levy Calculator!', 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('home.index'))
 
 
 @auth_bp.route('/logout')
@@ -51,7 +51,7 @@ def logout():
     """
     logger.info("Logout accessed - redirecting to home (auto-authentication enabled)")
     flash('You are now back at the home page', 'info')
-    return redirect(url_for('index'))
+    return redirect(url_for('home.index'))
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -64,7 +64,7 @@ def register():
     # Just redirect to home page - we're already auto-authenticated
     logger.info("Registration page accessed - redirecting to home (auto-authentication enabled)")
     flash('Welcome to Benton County Levy Calculator!', 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('home.index'))
 
 
 @auth_bp.route('/profile', methods=['GET', 'POST'])
@@ -77,7 +77,7 @@ def profile():
     # Just redirect to home page with appropriate message
     logger.info("Profile page accessed - redirecting to home (auto-authentication enabled)")
     flash('Benton County Staff Profile - No changes needed', 'info')
-    return redirect(url_for('index'))
+    return redirect(url_for('home.index'))
 
 
 @auth_bp.route('/change-password', methods=['GET', 'POST'])
@@ -90,7 +90,7 @@ def change_password():
     # Just redirect to home page with appropriate message
     logger.info("Change password page accessed - redirecting to home (auto-authentication enabled)")
     flash('No password change needed for Benton County shared access.', 'info')
-    return redirect(url_for('index'))
+    return redirect(url_for('home.index'))
 
 
 # Note: We'll handle this in the init_auth_routes function instead

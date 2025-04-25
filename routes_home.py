@@ -77,6 +77,16 @@ def help_page():
     """Render the help page."""
     return render_template('help.html', page_title="Help & Documentation")
 
+@home_bp.route('/login')
+def login_redirect():
+    """Redirect /login to /auth/login for better compatibility."""
+    return redirect(url_for('auth.login'))
+
+@home_bp.route('/reports')
+def reports_redirect():
+    """Redirect /reports to /reports/dashboard for better compatibility."""
+    return redirect(url_for('reports.reports_dashboard'))
+
 @home_bp.route('/demo-dashboard')
 def demo_dashboard():
     """Render the enhanced demo dashboard for Benton County."""
