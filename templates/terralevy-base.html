@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TerraLevy - Comprehensive levy management and property tax calculation solution for assessors and tax districts.">
+    <title>{% block title %}TerraLevy{% endblock %} | TerraFusion Platform</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/terralevy-favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/terralevy-favicon.svg') }}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- TerraLevy Theme CSS -->
+    <link href="{{ url_for('static', filename='css/terralevy-theme.css') }}" rel="stylesheet">
+    
+    <!-- Chart.js (for data visualization) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Intro.js (for guided tours) -->
+    <link href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
+    
+    <!-- Custom styles for this template -->
+    {% block extra_css %}{% endblock %}
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="d-flex flex-column h-100">
+    <!-- Header and navigation -->
+    {% include 'includes/terralevy-header.html' %}
+    
+    <!-- Main content -->
+    <main class="flex-shrink-0">
+        <div class="container py-4">
+            <!-- Page header section -->
+            {% if show_page_header|default(true) %}
+            <div class="row mb-4">
+                <div class="col">
+                    <h1 class="display-5 fw-bold tl-text-dark">{% block page_title %}Welcome to TerraLevy{% endblock %}</h1>
+                    {% if page_subtitle|default(false) %}
+                    <p class="lead text-muted">{{ page_subtitle }}</p>
+                    {% endif %}
+                    
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Flash messages/alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert tl-alert-{{ category|default('info') }} alert-dismissible fade show" role="alert">
+                        <i class="bi {% if category == 'success' %}bi-check-circle{% elif category == 'danger' %}bi-exclamation-triangle{% elif category == 'warning' %}bi-exclamation-circle{% else %}bi-info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Main content block -->
+            {% block content %}
+            <div class="row">
+                <div class="col">
+                    <div class="tl-card">
+                        <div class="tl-card-header">
+                            <h2 class="tl-card-title">Welcome to TerraLevy</h2>
+                        </div>
+                        <div class="card-body">
+                            <p>Welcome to the new TerraLevy platform, part of the TerraFusion ecosystem.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    {% include 'includes/terralevy-footer.html' %}
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Intro.js (for guided tours) -->
+    <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+    
+    <!-- Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/utilities.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/terralevy-core.js') }}"></script>
+    
+    <!-- Page specific JavaScript -->
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            
+            // Initialize popovers
+            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+            const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+            
+            // Initialize guided tour if available
+            const startTourButton = document.getElementById('startTour');
+            if (startTourButton) {
+                startTourButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    initGuidedTour();
+                });
+            }
+            
+            // Check for automatic tour trigger
+            if (window.location.search.includes('tour=true')) {
+                setTimeout(initGuidedTour, 1000);
+            }
+            
+            function initGuidedTour() {
+                // Define steps based on current page
+                const tourSteps = window.tourSteps || [
+                    {
+                        element: '.navbar-brand',
+                        intro: 'Welcome to TerraLevy, a comprehensive levy management platform.'
+                    },
+                    {
+                        element: '#navbarMain',
+                        intro: 'Use the navigation menu to access different tools and features.'
+                    },
+                    {
+                        element: '.breadcrumb',
+                        intro: 'Breadcrumb navigation helps you track your location within the application.'
+                    }
+                ];
+                
+                const tour = introJs();
+                tour.setOptions({
+                    steps: tourSteps,
+                    showProgress: true,
+                    showBullets: true,
+                    showStepNumbers: false,
+                    disableInteraction: false,
+                    exitOnOverlayClick: true,
+                    doneLabel: 'Finish',
+                    nextLabel: 'Next',
+                    prevLabel: 'Back'
+                });
+                
+                tour.start();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 """
-PRODUCTION ENTRY POINT for the LevyMaster application.
+PRODUCTION ENTRY POINT for the TerraLevy application.
 
 This module serves as the primary entry point for running the Flask
 application in production with Gunicorn, as well as for direct execution
@@ -9,6 +9,8 @@ This file provides:
 1. The 'app' object that Gunicorn looks for when starting the server
 2. Basic logging configuration
 3. Proper host/port binding for development server execution
+
+Part of the TerraFusion Platform ecosystem.
 
 NOTE: This file imports from app.py, which is the authoritative source
 for all application configuration, blueprints, and route registration.
@@ -25,7 +27,7 @@ from app import app
 logging.basicConfig(level=logging.DEBUG)
 
 # Log that application is being served
-app.logger.info("Starting LevyMaster application")
+app.logger.info("Starting TerraLevy application")
 
 # Signal handling for graceful shutdown
 def handle_signal(sig, frame):
@@ -40,7 +42,7 @@ signal.signal(signal.SIGINT, handle_signal)
 @app.route('/health')
 def health_check():
     """Health check endpoint for monitoring."""
-    return {'status': 'healthy', 'service': 'levymaster'}, 200
+    return {'status': 'healthy', 'service': 'terralevy', 'platform': 'terrafusion'}, 200
 
 # This makes the app discoverable by Gunicorn
 # Do not modify this section - Gunicorn looks for app in this location

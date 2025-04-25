@@ -1,0 +1,526 @@
+/**
+ * TerraLevy Theme CSS
+ * Part of the TerraFusion Platform Design System
+ * 
+ * This file defines the TerraLevy brand-specific styling,
+ * built on top of the TerraFusion design system.
+ */
+
+:root {
+  /* TerraFusion Primary Colors */
+  --tf-primary-100: #e0f7fa;
+  --tf-primary-200: #b2ebf2;
+  --tf-primary-300: #80deea;
+  --tf-primary-400: #4dd0e1;
+  --tf-primary-500: #26c6da;
+  --tf-primary-600: #00bcd4;
+  --tf-primary-700: #00acc1;
+  --tf-primary-800: #00838f;
+  --tf-primary-900: #006064;
+  
+  /* TerraFusion Secondary Colors */
+  --tf-secondary-100: #e0f2f1;
+  --tf-secondary-200: #b2dfdb;
+  --tf-secondary-300: #80cbc4;
+  --tf-secondary-400: #4db6ac;
+  --tf-secondary-500: #26a69a;
+  --tf-secondary-600: #009688;
+  --tf-secondary-700: #00897b;
+  --tf-secondary-800: #00796b;
+  --tf-secondary-900: #00695c;
+  
+  /* TerraFusion Accent Colors */
+  --tf-accent-100: #e1f5fe;
+  --tf-accent-200: #b3e5fc;
+  --tf-accent-300: #81d4fa;
+  --tf-accent-400: #4fc3f7;
+  --tf-accent-500: #29b6f6;
+  --tf-accent-600: #03a9f4;
+  --tf-accent-700: #039be5;
+  --tf-accent-800: #0288d1;
+  --tf-accent-900: #01579b;
+  
+  /* TerraFusion Neutral Colors */
+  --tf-neutral-50: #fafbfc;
+  --tf-neutral-100: #f3f4f6;
+  --tf-neutral-200: #e5e7eb;
+  --tf-neutral-300: #d2d6dc;
+  --tf-neutral-400: #9fa6b2;
+  --tf-neutral-500: #6b7280;
+  --tf-neutral-600: #4b5563;
+  --tf-neutral-700: #374151;
+  --tf-neutral-800: #252f3f;
+  --tf-neutral-900: #161e2e;
+  
+  /* TerraFusion Semantic Colors */
+  --tf-success: #10b981;
+  --tf-success-light: #d1fae5;
+  --tf-warning: #f59e0b;
+  --tf-warning-light: #fef3c7;
+  --tf-error: #ef4444;
+  --tf-error-light: #fee2e2;
+  --tf-info: #3b82f6;
+  --tf-info-light: #dbeafe;
+  
+  /* TerraLevy Specific Colors */
+  --tl-primary: #00e5ff;
+  --tl-primary-dark: #00b8d4;
+  --tl-primary-light: #6effff;
+  --tl-secondary: #004d7a;
+  --tl-secondary-dark: #002a4a;
+  --tl-secondary-light: #0078ad;
+  --tl-accent: #27b0c9;
+  --tl-dark: #001529;
+  --tl-light: #f5f8fa;
+  
+  /* Typography */
+  --tl-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --tl-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  
+  /* Spacing System */
+  --tl-spacing-1: 0.25rem;   /* 4px */
+  --tl-spacing-2: 0.5rem;    /* 8px */
+  --tl-spacing-3: 0.75rem;   /* 12px */
+  --tl-spacing-4: 1rem;      /* 16px */
+  --tl-spacing-5: 1.25rem;   /* 20px */
+  --tl-spacing-6: 1.5rem;    /* 24px */
+  --tl-spacing-8: 2rem;      /* 32px */
+  --tl-spacing-10: 2.5rem;   /* 40px */
+  --tl-spacing-12: 3rem;     /* 48px */
+  --tl-spacing-16: 4rem;     /* 64px */
+  --tl-spacing-20: 5rem;     /* 80px */
+  
+  /* Border Radius */
+  --tl-radius-sm: 0.125rem;  /* 2px */
+  --tl-radius: 0.25rem;      /* 4px */
+  --tl-radius-md: 0.375rem;  /* 6px */
+  --tl-radius-lg: 0.5rem;    /* 8px */
+  --tl-radius-xl: 0.75rem;   /* 12px */
+  --tl-radius-2xl: 1rem;     /* 16px */
+  --tl-radius-3xl: 1.5rem;   /* 24px */
+  --tl-radius-full: 9999px;  /* Full round */
+  
+  /* Shadows */
+  --tl-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --tl-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --tl-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --tl-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --tl-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --tl-transition-fast: 150ms;
+  --tl-transition: 200ms;
+  --tl-transition-slow: 300ms;
+  
+  /* Z-index scale */
+  --tl-z-0: 0;
+  --tl-z-10: 10;
+  --tl-z-20: 20;
+  --tl-z-30: 30;
+  --tl-z-40: 40;
+  --tl-z-50: 50;
+  --tl-z-dropdown: 1000;
+  --tl-z-sticky: 1100;
+  --tl-z-fixed: 1200;
+  --tl-z-modal: 1300;
+  --tl-z-popover: 1400;
+  --tl-z-tooltip: 1500;
+}
+
+/* Base Elements */
+body {
+  font-family: var(--tl-font-sans);
+  color: var(--tf-neutral-800);
+  background-color: var(--tf-neutral-100);
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--tf-neutral-900);
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 0;
+}
+
+a {
+  color: var(--tl-primary-dark);
+  transition: color var(--tl-transition);
+}
+
+a:hover {
+  color: var(--tl-primary);
+}
+
+code, pre {
+  font-family: var(--tl-font-mono);
+}
+
+/* TerraLevy Specific Layout */
+.tl-navbar {
+  background-color: var(--tl-dark);
+  padding: var(--tl-spacing-3) 0;
+  box-shadow: var(--tl-shadow);
+}
+
+.tl-navbar-brand {
+  padding: var(--tl-spacing-2) 0;
+}
+
+.tl-navbar-item {
+  color: var(--tf-neutral-300) !important;
+  font-weight: 500;
+  padding: var(--tl-spacing-2) var(--tl-spacing-3);
+  transition: color var(--tl-transition);
+}
+
+.tl-navbar-item:hover,
+.tl-navbar-item.active {
+  color: var(--tl-primary) !important;
+}
+
+.tl-bg-dark {
+  background-color: var(--tl-dark);
+}
+
+.tl-bg-primary {
+  background-color: var(--tl-primary) !important;
+}
+
+.tl-bg-secondary {
+  background-color: var(--tl-secondary) !important;
+}
+
+.tl-text-primary {
+  color: var(--tl-primary) !important;
+}
+
+.tl-text-secondary {
+  color: var(--tl-secondary) !important;
+}
+
+.tl-text-dark {
+  color: var(--tl-dark) !important;
+}
+
+/* TerraLevy Cards */
+.tl-card {
+  background-color: #fff;
+  border-radius: var(--tl-radius-lg);
+  box-shadow: var(--tl-shadow);
+  border: none;
+  transition: all var(--tl-transition);
+  height: 100%;
+}
+
+.tl-card:hover {
+  box-shadow: var(--tl-shadow-md);
+}
+
+.tl-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--tl-spacing-4) var(--tl-spacing-4) var(--tl-spacing-2);
+  border-bottom: 1px solid var(--tf-neutral-200);
+}
+
+.tl-card-title {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--tl-secondary-dark);
+}
+
+.tl-dashboard-card {
+  padding: var(--tl-spacing-4);
+  transition: transform var(--tl-transition);
+}
+
+.tl-dashboard-card:hover {
+  transform: translateY(-2px);
+}
+
+.tl-dashboard-stat {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--tl-secondary-dark);
+}
+
+/* TerraLevy Buttons */
+.tl-btn-primary {
+  background-color: var(--tl-primary) !important;
+  border-color: var(--tl-primary) !important;
+  color: var(--tl-dark) !important;
+  font-weight: 500;
+  box-shadow: var(--tl-shadow-sm);
+}
+
+.tl-btn-primary:hover {
+  background-color: var(--tl-primary-dark) !important;
+  border-color: var(--tl-primary-dark) !important;
+}
+
+.tl-btn-secondary {
+  background-color: var(--tl-secondary) !important;
+  border-color: var(--tl-secondary) !important;
+  color: #fff !important;
+  font-weight: 500;
+  box-shadow: var(--tl-shadow-sm);
+}
+
+.tl-btn-secondary:hover {
+  background-color: var(--tl-secondary-dark) !important;
+  border-color: var(--tl-secondary-dark) !important;
+}
+
+.tl-btn-outline {
+  background-color: transparent !important;
+  border-color: var(--tf-neutral-300) !important;
+  color: var(--tf-neutral-700) !important;
+  font-weight: 500;
+}
+
+.tl-btn-outline:hover {
+  background-color: var(--tf-neutral-100) !important;
+  border-color: var(--tf-neutral-400) !important;
+  color: var(--tf-neutral-800) !important;
+}
+
+/* TerraLevy Alerts */
+.tl-alert-success {
+  background-color: var(--tf-success-light);
+  color: var(--tf-success);
+  border-left: 4px solid var(--tf-success);
+}
+
+.tl-alert-warning {
+  background-color: var(--tf-warning-light);
+  color: var(--tf-warning);
+  border-left: 4px solid var(--tf-warning);
+}
+
+.tl-alert-error {
+  background-color: var(--tf-error-light);
+  color: var(--tf-error);
+  border-left: 4px solid var(--tf-error);
+}
+
+.tl-alert-info {
+  background-color: var(--tf-info-light);
+  color: var(--tf-info);
+  border-left: 4px solid var(--tf-info);
+}
+
+/* TerraLevy Badges */
+.tl-badge {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: var(--tl-radius-full);
+  background-color: var(--tf-neutral-200);
+  color: var(--tf-neutral-700);
+}
+
+.tl-badge-primary {
+  background-color: var(--tl-primary-light);
+  color: var(--tl-secondary-dark);
+}
+
+.tl-badge-secondary {
+  background-color: var(--tl-secondary-light);
+  color: white;
+}
+
+/* TerraLevy Table */
+.tl-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.tl-table th {
+  background-color: var(--tf-neutral-100);
+  color: var(--tf-neutral-700);
+  font-weight: 600;
+  text-align: left;
+  padding: var(--tl-spacing-3) var(--tl-spacing-4);
+  border-bottom: 2px solid var(--tf-neutral-200);
+}
+
+.tl-table td {
+  padding: var(--tl-spacing-3) var(--tl-spacing-4);
+  border-bottom: 1px solid var(--tf-neutral-200);
+  color: var(--tf-neutral-800);
+}
+
+.tl-table tbody tr:hover {
+  background-color: var(--tf-neutral-50);
+}
+
+/* TerraLevy Form Elements */
+.tl-form-control {
+  display: block;
+  width: 100%;
+  padding: var(--tl-spacing-2) var(--tl-spacing-3);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--tf-neutral-800);
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--tf-neutral-300);
+  border-radius: var(--tl-radius);
+  transition: border-color var(--tl-transition), box-shadow var(--tl-transition);
+}
+
+.tl-form-control:focus {
+  color: var(--tf-neutral-900);
+  background-color: #fff;
+  border-color: var(--tl-primary);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 229, 255, 0.25);
+}
+
+.tl-form-label {
+  margin-bottom: var(--tl-spacing-2);
+  font-weight: 500;
+  color: var(--tf-neutral-700);
+}
+
+.tl-form-text {
+  color: var(--tf-neutral-600);
+  font-size: 0.875rem;
+  margin-top: var(--tl-spacing-1);
+}
+
+/* TerraLevy Notifications */
+.tl-notifications-container {
+  position: fixed;
+  top: var(--tl-spacing-4);
+  right: var(--tl-spacing-4);
+  z-index: var(--tl-z-tooltip);
+  max-width: 350px;
+}
+
+.tl-notification {
+  display: flex;
+  align-items: center;
+  padding: var(--tl-spacing-3) var(--tl-spacing-4);
+  margin-bottom: var(--tl-spacing-3);
+  background-color: white;
+  border-radius: var(--tl-radius-lg);
+  box-shadow: var(--tl-shadow-lg);
+  transform: translateX(120%);
+  opacity: 0;
+  transition: transform var(--tl-transition), opacity var(--tl-transition);
+}
+
+.tl-notification-visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.tl-notification-hiding {
+  transform: translateX(120%);
+  opacity: 0;
+}
+
+.tl-notification-icon {
+  margin-right: var(--tl-spacing-3);
+  font-size: 1.25rem;
+}
+
+.tl-notification-content {
+  flex: 1;
+}
+
+.tl-notification-close {
+  background: transparent;
+  border: none;
+  color: var(--tf-neutral-500);
+  cursor: pointer;
+  margin-left: var(--tl-spacing-2);
+}
+
+.tl-notification-success .tl-notification-icon {
+  color: var(--tf-success);
+}
+
+.tl-notification-error .tl-notification-icon {
+  color: var(--tf-error);
+}
+
+.tl-notification-warning .tl-notification-icon {
+  color: var(--tf-warning);
+}
+
+.tl-notification-info .tl-notification-icon {
+  color: var(--tf-info);
+}
+
+/* Accessibility */
+.keyboard-navigation :focus {
+  outline: 2px solid var(--tl-primary);
+  outline-offset: 2px;
+}
+
+/* Skip to content link for accessibility */
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--tl-primary);
+  color: var(--tl-dark);
+  padding: var(--tl-spacing-2) var(--tl-spacing-4);
+  z-index: var(--tl-z-tooltip);
+  transition: top var(--tl-transition);
+}
+
+.skip-to-content:focus {
+  top: 0;
+}
+
+/* Responsive Utilities */
+@media (max-width: 767.98px) {
+  .tl-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .tl-card-header > :not(:first-child) {
+    margin-top: var(--tl-spacing-3);
+    align-self: flex-end;
+  }
+  
+  .tl-dashboard-stat {
+    font-size: 1.5rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .tl-card {
+    box-shadow: none !important;
+    border: 1px solid var(--tf-neutral-300);
+  }
+  
+  .tl-navbar, 
+  .tl-sidebar,
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background-color: white;
+  }
+  
+  .container,
+  .container-fluid {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+}

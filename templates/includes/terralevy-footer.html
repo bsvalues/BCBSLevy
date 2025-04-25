@@ -1,0 +1,82 @@
+<!-- TerraLevy Footer Template -->
+<footer class="tl-bg-dark text-white py-5 mt-auto">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4 mb-md-0">
+        <img src="{{ url_for('static', filename='images/terralevy-logo.svg') }}" alt="TerraLevy" height="50" class="mb-3">
+        <p class="text-light mb-2">Part of the TerraFusion Platform</p>
+        <p class="mb-3 text-muted">Comprehensive levy management and property tax calculation solution for assessors and tax districts.</p>
+        <div class="d-flex gap-2">
+          <a href="#" class="btn btn-sm btn-outline-light rounded-circle">
+            <i class="bi bi-linkedin"></i>
+          </a>
+          <a href="#" class="btn btn-sm btn-outline-light rounded-circle">
+            <i class="bi bi-twitter-x"></i>
+          </a>
+          <a href="#" class="btn btn-sm btn-outline-light rounded-circle">
+            <i class="bi bi-facebook"></i>
+          </a>
+          <a href="#" class="btn btn-sm btn-outline-light rounded-circle">
+            <i class="bi bi-youtube"></i>
+          </a>
+        </div>
+      </div>
+      
+      <div class="col-md-2 mb-4 mb-md-0">
+        <h5 class="text-light tl-text-primary mb-3">Quick Links</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/" class="text-light text-decoration-none">Dashboard</a></li>
+          <li class="mb-2"><a href="/levy-calculator" class="text-light text-decoration-none">Levy Calculator</a></li>
+          <li class="mb-2"><a href="/historical" class="text-light text-decoration-none">Historical Data</a></li>
+          <li class="mb-2"><a href="/reports" class="text-light text-decoration-none">Reports</a></li>
+          <li class="mb-2"><a href="/data-management" class="text-light text-decoration-none">Data Management</a></li>
+        </ul>
+      </div>
+      
+      <div class="col-md-2 mb-4 mb-md-0">
+        <h5 class="text-light tl-text-primary mb-3">Resources</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/help/guide" class="text-light text-decoration-none">User Guide</a></li>
+          <li class="mb-2"><a href="/help/videos" class="text-light text-decoration-none">Tutorial Videos</a></li>
+          <li class="mb-2"><a href="/help/api" class="text-light text-decoration-none">API Documentation</a></li>
+          <li class="mb-2"><a href="/help/glossary" class="text-light text-decoration-none">Glossary</a></li>
+          <li class="mb-2"><a href="/help/faqs" class="text-light text-decoration-none">FAQs</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-4">
+        <h5 class="text-light tl-text-primary mb-3">Contact Us</h5>
+        <p class="mb-3">Questions or feedback? We're here to help you with any inquiries about TerraLevy.</p>
+        <div class="d-grid gap-2">
+          <a href="/contact" class="btn btn-outline-light">
+            <i class="bi bi-envelope me-1"></i> Contact Support
+          </a>
+          <a href="/schedule-demo" class="btn tl-btn-primary">
+            <i class="bi bi-calendar-check me-1"></i> Schedule a Demo
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <hr class="mt-4 mb-4 border-secondary">
+    
+    <div class="row align-items-center">
+      <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+        <p class="mb-0 text-muted">&copy; {{ current_year|default('2025') }} TerraFusion. All rights reserved.</p>
+      </div>
+      <div class="col-md-6 text-center text-md-end">
+        <ul class="list-inline mb-0">
+          <li class="list-inline-item">
+            <a href="/privacy" class="text-muted text-decoration-none">Privacy Policy</a>
+          </li>
+          <li class="list-inline-item ms-3">
+            <a href="/terms" class="text-muted text-decoration-none">Terms of Service</a>
+          </li>
+          <li class="list-inline-item ms-3">
+            <a href="/legal" class="text-muted text-decoration-none">Legal</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>

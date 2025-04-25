@@ -1,528 +1,424 @@
-{% extends "base.html" %} {% block title %}Dashboard - Levy Calculation System{%
-endblock %} {% block page_title %}Dashboard{% endblock %} {% block page_subtitle
-%}Overview of your levy calculation system{% endblock %} {% block header_actions
-%}
-<div class="d-flex gap-2">
-  <a href="#" class="btn btn-primary">
-    <i class="bi bi-calculator me-1"></i>New Calculation
-  </a>
-  <button type="button" class="btn btn-outline-secondary" data-tour="dashboard">
-    <i class="bi bi-info-circle me-1"></i>Tour
+{% extends "terralevy-base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}TerraLevy Dashboard{% endblock %}
+
+{% block page_subtitle %}Welcome to your comprehensive levy management hub{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex justify-content-end gap-2 mt-3">
+  <button type="button" class="btn tl-btn-outline" id="refreshDashboard">
+    <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+  </button>
+  <button type="button" class="btn tl-btn-primary" data-bs-toggle="modal" data-bs-target="#quickActionModal">
+    <i class="bi bi-lightning-charge me-1"></i> Quick Actions
   </button>
 </div>
-{% endblock %} {% block content %}
-<div class="dashboard-container">
-  <!-- Dashboard Statistics with TerraFusion Design -->
-  <div class="tf-dashboard-layout">
-    <!-- Tax Districts Stat Card -->
-    <div class="tf-stat-card tf-animate-in">
-      <div class="tf-stat-card-header">
-        <div class="tf-stat-card-title">Tax Districts</div>
-        <div class="tf-stat-card-icon">
-          <i class="bi bi-geo-alt"></i>
+{% endblock %}
+
+{% block content %}
+<!-- Quick Stats Row -->
+<div class="row mb-4">
+  <div class="col-md-3 mb-3 mb-md-0">
+    <div class="tl-card tl-dashboard-card">
+      <div class="d-flex align-items-center mb-3">
+        <div class="rounded-circle p-3 tl-bg-primary me-3">
+          <i class="bi bi-calculator text-dark fs-4"></i>
+        </div>
+        <div>
+          <span class="text-muted fs-6">Active Tax Districts</span>
+          <h3 class="tl-dashboard-stat mb-0">{{ stats.districts|default(42) }}</h3>
         </div>
       </div>
-      <div class="tf-stat-card-value">{{ district_count }}</div>
-      <div class="tf-stat-card-trend">
-        <span class="tf-stat-card-trend-up">
-          <i class="bi bi-arrow-up-short"></i>
-          <span class="tf-stat-card-trend-value">4.2%</span>
-        </span>
-        <span class="ms-1 text-secondary">since last year</span>
+      <div class="progress" style="height: 5px;">
+        <div class="progress-bar tl-bg-primary" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <p class="text-end mt-2 mb-0"><small class="text-muted">Updated today</small></p>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-3 mb-md-0">
+    <div class="tl-card tl-dashboard-card">
+      <div class="d-flex align-items-center mb-3">
+        <div class="rounded-circle p-3 bg-success me-3">
+          <i class="bi bi-check-circle text-white fs-4"></i>
+        </div>
+        <div>
+          <span class="text-muted fs-6">Compliance Rate</span>
+          <h3 class="tl-dashboard-stat mb-0">{{ stats.compliance_rate|default('92.8%') }}</h3>
+        </div>
+      </div>
+      <div class="progress" style="height: 5px;">
+        <div class="progress-bar bg-success" role="progressbar" style="width: 92.8%;" aria-valuenow="92.8" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <p class="text-end mt-2 mb-0"><small class="text-muted">5% increase since last month</small></p>
+    </div>
+  </div>
+  
+  <div class="col-md-3 mb-3 mb-md-0">
+    <div class="tl-card tl-dashboard-card">
+      <div class="d-flex align-items-center mb-3">
+        <div class="rounded-circle p-3 bg-info me-3">
+          <i class="bi bi-graph-up text-white fs-4"></i>
+        </div>
+        <div>
+          <span class="text-muted fs-6">Total AV (billions)</span>
+          <h3 class="tl-dashboard-stat mb-0">{{ stats.total_av|default('$5.3B') }}</h3>
+        </div>
+      </div>
+      <div class="progress" style="height: 5px;">
+        <div class="progress-bar bg-info" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <p class="text-end mt-2 mb-0"><small class="text-muted">7.2% YoY growth</small></p>
+    </div>
+  </div>
+  
+  <div class="col-md-3">
+    <div class="tl-card tl-dashboard-card">
+      <div class="d-flex align-items-center mb-3">
+        <div class="rounded-circle p-3 bg-warning me-3">
+          <i class="bi bi-exclamation-triangle text-dark fs-4"></i>
+        </div>
+        <div>
+          <span class="text-muted fs-6">Pending Actions</span>
+          <h3 class="tl-dashboard-stat mb-0">{{ stats.pending_actions|default(7) }}</h3>
+        </div>
+      </div>
+      <div class="progress" style="height: 5px;">
+        <div class="progress-bar bg-warning" role="progressbar" style="width: 35%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <p class="text-end mt-2 mb-0"><small class="text-muted">Review required</small></p>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row">
+  <!-- Tax Districts Performance -->
+  <div class="col-lg-8 mb-4">
+    <div class="tl-card h-100">
+      <div class="tl-card-header">
+        <h2 class="tl-card-title">Tax District Performance</h2>
+        <div class="dropdown">
+          <button class="btn btn-sm tl-btn-outline dropdown-toggle" type="button" id="districtPerformanceOptions" data-bs-toggle="dropdown" aria-expanded="false">
+            Last 30 Days
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="districtPerformanceOptions">
+            <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
+            <li><a class="dropdown-item active" href="#">Last 30 Days</a></li>
+            <li><a class="dropdown-item" href="#">Last Quarter</a></li>
+            <li><a class="dropdown-item" href="#">Year to Date</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Custom Range...</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-container" style="position: relative; height: 300px;">
+          <canvas id="districtPerformanceChart"></canvas>
+        </div>
       </div>
     </div>
-
-    <!-- Tax Codes Stat Card -->
-    <div class="tf-stat-card tf-animate-in">
-      <div class="tf-stat-card-header">
-        <div class="tf-stat-card-title">Tax Codes</div>
-        <div class="tf-stat-card-icon">
-          <i class="bi bi-upc"></i>
+  </div>
+  
+  <!-- Recent Activity -->
+  <div class="col-lg-4 mb-4">
+    <div class="tl-card h-100">
+      <div class="tl-card-header">
+        <h2 class="tl-card-title">Recent Activity</h2>
+        <a href="/activity-log" class="btn btn-sm tl-btn-outline">View All</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          <a href="#" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">Levy Calculation Updated</h6>
+              <small class="text-muted">3 mins ago</small>
+            </div>
+            <p class="mb-1 text-muted">School District #123 levy rate updated to 2.5498.</p>
+            <small><i class="bi bi-person-circle me-1"></i> By: John Smith</small>
+          </a>
+          <a href="#" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">New Scenario Created</h6>
+              <small class="text-muted">2 hours ago</small>
+            </div>
+            <p class="mb-1 text-muted">City of Springfield 2025 Forecast created.</p>
+            <small><i class="bi bi-person-circle me-1"></i> By: Jane Doe</small>
+          </a>
+          <a href="#" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">Compliance Alert Resolved</h6>
+              <small class="text-muted">Yesterday</small>
+            </div>
+            <p class="mb-1 text-muted">Fire District #7 compliance issue resolved.</p>
+            <small><i class="bi bi-person-circle me-1"></i> By: Robert Johnson</small>
+          </a>
+          <a href="#" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">Data Import Completed</h6>
+              <small class="text-muted">2 days ago</small>
+            </div>
+            <p class="mb-1 text-muted">2025 assessment values imported successfully.</p>
+            <small><i class="bi bi-person-circle me-1"></i> By: System</small>
+          </a>
         </div>
-      </div>
-      <div class="tf-stat-card-value">{{ tax_code_count }}</div>
-      <div class="tf-stat-card-trend">
-        <span class="tf-stat-card-trend-up">
-          <i class="bi bi-arrow-up-short"></i>
-          <span class="tf-stat-card-trend-value">2.8%</span>
-        </span>
-        <span class="ms-1 text-secondary">since last year</span>
-      </div>
-    </div>
-
-    <!-- Properties Stat Card -->
-    <div class="tf-stat-card tf-animate-in">
-      <div class="tf-stat-card-header">
-        <div class="tf-stat-card-title">Properties</div>
-        <div class="tf-stat-card-icon">
-          <i class="bi bi-houses"></i>
-        </div>
-      </div>
-      <div class="tf-stat-card-value">{{ property_count }}</div>
-      <div class="tf-stat-card-trend">
-        <span class="tf-stat-card-trend-up">
-          <i class="bi bi-arrow-up-short"></i>
-          <span class="tf-stat-card-trend-value">5.7%</span>
-        </span>
-        <span class="ms-1 text-secondary">since last year</span>
-      </div>
-    </div>
-
-    <!-- Avg Levy Rate Stat Card -->
-    <div class="tf-stat-card tf-animate-in">
-      <div class="tf-stat-card-header">
-        <div class="tf-stat-card-title">Avg Levy Rate</div>
-        <div class="tf-stat-card-icon">
-          <i class="bi bi-percent"></i>
-        </div>
-      </div>
-      <div class="tf-stat-card-value">{{ avg_levy_rate|format_currency }}</div>
-      <div class="tf-stat-card-trend">
-        <span class="tf-stat-card-trend-down">
-          <i class="bi bi-arrow-down-short"></i>
-          <span class="tf-stat-card-trend-value">1.2%</span>
-        </span>
-        <span class="ms-1 text-secondary">since last year</span>
       </div>
     </div>
   </div>
 
-  <!-- Quick Actions and Metrics -->
-  <div class="row mb-4">
-    <div class="col-lg-8">
-      <div class="tf-card tf-animate-in mb-4">
-        <div class="tf-table-header">
-          <div class="tf-table-title">System Overview</div>
-          <div class="dropdown">
-            <button
-              class="tf-button tf-button-outline dropdown-toggle"
-              type="button"
-              id="overviewDropdown"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              {{ current_year }}
-            </button>
-            <ul
-              class="dropdown-menu dropdown-menu-end"
-              aria-labelledby="overviewDropdown"
-            >
-              <li><a class="dropdown-item" href="#">{{ current_year }}</a></li>
-              <li>
-                <a class="dropdown-item" href="#">{{ current_year - 1 }}</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">{{ current_year - 2 }}</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        
-        <div class="row text-center mb-4 mt-3">
-          <div class="col-md-4 mb-3">
-            <div class="tf-stat-card-title">Total Assessed Value</div>
-            <div class="tf-stat-card-value">{{ total_assessed_value|format_currency }}</div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="tf-stat-card-title">Total Levy Amount</div>
-            <div class="tf-stat-card-value">{{ total_levy_amount|format_currency }}</div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="tf-stat-card-title">Tax Year</div>
-            <div class="tf-stat-card-value">{{ current_year }}</div>
-          </div>
-        </div>
-
-        <div class="chart-container">
-          <canvas id="levyOverviewChart" height="250"></canvas>
-        </div>
+  <!-- Compliance Issues -->
+  <div class="col-lg-4 mb-4">
+    <div class="tl-card h-100">
+      <div class="tl-card-header">
+        <h2 class="tl-card-title">Compliance Issues</h2>
+        <a href="/compliance-dashboard" class="btn btn-sm tl-btn-outline">View All</a>
       </div>
-
-      <div class="tf-card tf-animate-in">
-        <div class="tf-table-header">
-          <div class="tf-table-title">Compliance Check</div>
-          <a href="#" class="tf-button tf-button-outline">Run All Checks</a>
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle p-2 bg-danger me-2">
+              <i class="bi bi-exclamation-circle text-white"></i>
+            </div>
+            <span>Critical Issues</span>
+          </div>
+          <span class="badge bg-danger">2</span>
         </div>
         
-        <div class="mt-3 p-3" style="background-color: rgba(0, 229, 255, 0.1); border-radius: 8px; border-left: 4px solid var(--tf-primary);">
-          <div class="d-flex">
-            <div class="me-3">
-              <i class="bi bi-check-circle-fill fs-4" style="color: var(--tf-primary);"></i>
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle p-2 bg-warning me-2">
+              <i class="bi bi-exclamation-triangle text-dark"></i>
             </div>
-            <div>
-              <h5 style="color: var(--tf-text-light); font-weight: 600;">All compliance checks pass!</h5>
-              <p class="mb-0" style="color: rgba(255, 255, 255, 0.8);">
-                Your levy calculations for the current tax year comply with
-                all statutory requirements.
-              </p>
-            </div>
+            <span>Warning Issues</span>
           </div>
+          <span class="badge bg-warning text-dark">5</span>
+        </div>
+        
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle p-2 bg-success me-2">
+              <i class="bi bi-check-circle text-white"></i>
+            </div>
+            <span>Resolved This Month</span>
+          </div>
+          <span class="badge bg-success">12</span>
+        </div>
+        
+        <div class="alert tl-alert-warning mt-3">
+          <i class="bi bi-info-circle me-2"></i>
+          <strong>Attention Required:</strong> 2 districts have levy rates exceeding statutory limits.
+          <a href="/compliance-dashboard" class="alert-link">Review now</a>
         </div>
       </div>
     </div>
-
-    <div class="col-lg-4">
-      <div class="tf-card tf-animate-in mb-4">
-        <div class="tf-table-title mb-3">Quick Actions</div>
-        
-        <a href="#" class="d-flex align-items-center p-3 mb-2 tf-glassmorphic" style="text-decoration: none; border-radius: 8px; transition: all 0.2s ease;">
-          <div class="tf-stat-card-icon me-3">
-            <i class="bi bi-calculator"></i>
-          </div>
-          <div>
-            <div style="color: var(--tf-primary); font-weight: 600;">Calculate Levy</div>
-            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">New levy calculation</div>
-          </div>
-        </a>
-        
-        <a href="#" class="d-flex align-items-center p-3 mb-2 tf-glassmorphic" style="text-decoration: none; border-radius: 8px; transition: all 0.2s ease;">
-          <div class="tf-stat-card-icon me-3">
-            <i class="bi bi-cloud-upload"></i>
-          </div>
-          <div>
-            <div style="color: var(--tf-primary); font-weight: 600;">Import Data</div>
-            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">Import tax districts or properties</div>
-          </div>
-        </a>
-        
-        <a href="#" class="d-flex align-items-center p-3 mb-2 tf-glassmorphic" style="text-decoration: none; border-radius: 8px; transition: all 0.2s ease;">
-          <div class="tf-stat-card-icon me-3">
-            <i class="bi bi-file-earmark-text"></i>
-          </div>
-          <div>
-            <div style="color: var(--tf-primary); font-weight: 600;">Generate Report</div>
-            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">Create summary reports</div>
-          </div>
-        </a>
-        
-        <a href="#" class="d-flex align-items-center p-3 mb-2 tf-glassmorphic" style="text-decoration: none; border-radius: 8px; transition: all 0.2s ease;">
-          <div class="tf-stat-card-icon me-3">
-            <i class="bi bi-graph-up-arrow"></i>
-          </div>
-          <div>
-            <div style="color: var(--tf-primary); font-weight: 600;">Run Forecast</div>
-            <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.875rem;">Project future levy rates</div>
-          </div>
-        </a>
+  </div>
+  
+  <!-- Quick Tasks -->
+  <div class="col-lg-4 mb-4">
+    <div class="tl-card h-100">
+      <div class="tl-card-header">
+        <h2 class="tl-card-title">Quick Tasks</h2>
       </div>
-
-      <div class="tf-card tf-animate-in">
-        <div class="tf-table-header">
-          <div class="tf-table-title">Recent Activity</div>
-          <a href="#" class="tf-button tf-button-outline">View All</a>
+      <div class="card-body">
+        <div class="list-group">
+          <a href="/levy-calculator" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+            <i class="bi bi-calculator fs-4 me-3 tl-text-primary"></i>
+            <div>
+              <h6 class="mb-0">Calculate Levy Rate</h6>
+              <small class="text-muted">Determine levy rates based on assessed values</small>
+            </div>
+          </a>
+          <a href="/data-management/import" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+            <i class="bi bi-cloud-upload fs-4 me-3 tl-text-primary"></i>
+            <div>
+              <h6 class="mb-0">Import Data</h6>
+              <small class="text-muted">Upload new assessment data or tax codes</small>
+            </div>
+          </a>
+          <a href="/reports/generate" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+            <i class="bi bi-file-earmark-text fs-4 me-3 tl-text-primary"></i>
+            <div>
+              <h6 class="mb-0">Generate Reports</h6>
+              <small class="text-muted">Create customized levy reports</small>
+            </div>
+          </a>
+          <a href="/forecasting" class="list-group-item list-group-item-action d-flex align-items-center py-3">
+            <i class="bi bi-graph-up-arrow fs-4 me-3 tl-text-primary"></i>
+            <div>
+              <h6 class="mb-0">Run Forecasts</h6>
+              <small class="text-muted">Project future levy scenarios</small>
+            </div>
+          </a>
         </div>
-        
-        <div class="mt-3">
-          {% for import in recent_imports %}
-          <div class="p-3 mb-2 tf-glassmorphic" style="border-radius: 8px;">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <div style="color: var(--tf-primary); font-weight: 600;">
-                <i class="bi bi-file-earmark me-2" style="color: {% if import.status == 'SUCCESS' %}#4caf50{% elif import.status == 'ERROR' %}#f44336{% else %}#ff9800{% endif %};"></i>
-                {{ import.filename }}
-              </div>
-              <small style="color: rgba(255, 255, 255, 0.7);">{{ import.created_at|datetime }}</small>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Recent Scenarios -->
+  <div class="col-lg-4 mb-4">
+    <div class="tl-card h-100">
+      <div class="tl-card-header">
+        <h2 class="tl-card-title">Recent Scenarios</h2>
+        <a href="/levy-calculator/scenarios" class="btn btn-sm tl-btn-outline">View All</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+          {% for scenario in recent_scenarios|default([
+            {'name': 'School District #123 - 2025', 'date': '04/20/2025', 'district': 'School District #123', 'levy_rate': 2.5498},
+            {'name': 'City of Springfield - Forecast', 'date': '04/18/2025', 'district': 'City of Springfield', 'levy_rate': 1.8735},
+            {'name': 'Fire District #7 - Final', 'date': '04/15/2025', 'district': 'Fire District #7', 'levy_rate': 0.9432}
+          ]) %}
+          <a href="/levy-calculator/scenarios/{{ loop.index }}" class="list-group-item list-group-item-action py-3">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">{{ scenario.name }}</h6>
+              <small class="tl-badge tl-badge-primary">{{ scenario.levy_rate }}</small>
             </div>
-            <div class="d-flex justify-content-between align-items-center">
-              <small style="color: rgba(255, 255, 255, 0.7);">
-                {{ import.record_count }} records, {{ import.success_count }} successful
-              </small>
-              <span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; background-color: {% if import.status == 'SUCCESS' %}rgba(76, 175, 80, 0.2){% elif import.status == 'ERROR' %}rgba(244, 67, 54, 0.2){% else %}rgba(255, 152, 0, 0.2){% endif %}; color: {% if import.status == 'SUCCESS' %}#4caf50{% elif import.status == 'ERROR' %}#f44336{% else %}#ff9800{% endif %};">
-                {{ import.status }}
-              </span>
-            </div>
-          </div>
-          {% else %}
-          <div class="p-4 tf-glassmorphic text-center" style="border-radius: 8px;">
-            <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 0;">No recent activity</p>
-          </div>
+            <p class="mb-1"><small class="text-muted">{{ scenario.district }}</small></p>
+            <small class="text-muted"><i class="bi bi-calendar3 me-1"></i> Created: {{ scenario.date }}</small>
+          </a>
           {% endfor %}
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endblock %} {% block extra_js %}
+
+<!-- Quick Action Modal -->
+<div class="modal fade" id="quickActionModal" tabindex="-1" aria-labelledby="quickActionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="quickActionModalLabel">Quick Actions</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-grid gap-3">
+          <a href="/levy-calculator" class="btn tl-btn-primary d-flex align-items-center p-3">
+            <i class="bi bi-calculator fs-3 me-3"></i>
+            <div class="text-start">
+              <h5 class="mb-0">New Levy Calculation</h5>
+              <p class="mb-0 text-muted">Calculate levy rates for a district</p>
+            </div>
+          </a>
+          
+          <a href="/data-management/import" class="btn tl-btn-outline d-flex align-items-center p-3">
+            <i class="bi bi-cloud-upload fs-3 me-3"></i>
+            <div class="text-start">
+              <h5 class="mb-0">Import New Data</h5>
+              <p class="mb-0 text-muted">Upload assessment values or tax codes</p>
+            </div>
+          </a>
+          
+          <a href="/reports/compliance" class="btn tl-btn-outline d-flex align-items-center p-3">
+            <i class="bi bi-clipboard-check fs-3 me-3"></i>
+            <div class="text-start">
+              <h5 class="mb-0">Compliance Check</h5>
+              <p class="mb-0 text-muted">Verify district compliance with regulations</p>
+            </div>
+          </a>
+          
+          <a href="/reports/export" class="btn tl-btn-outline d-flex align-items-center p-3">
+            <i class="bi bi-file-earmark-arrow-down fs-3 me-3"></i>
+            <div class="text-start">
+              <h5 class="mb-0">Export Reports</h5>
+              <p class="mb-0 text-muted">Generate and download reports</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-      // Chart colors palette
-      const colorPalette = [
-          'rgba(52, 152, 219, 0.8)',  // Blue
-          'rgba(46, 204, 113, 0.8)',  // Green
-          'rgba(155, 89, 182, 0.8)',  // Purple
-          'rgba(231, 76, 60, 0.8)',   // Red
-          'rgba(241, 196, 15, 0.8)',  // Yellow
-          'rgba(149, 165, 166, 0.8)'  // Gray
-      ];
-
-      const borderColorPalette = [
-          'rgba(52, 152, 219, 1)',   // Blue
-          'rgba(46, 204, 113, 1)',   // Green
-          'rgba(155, 89, 182, 1)',   // Purple
-          'rgba(231, 76, 60, 1)',    // Red
-          'rgba(241, 196, 15, 1)',   // Yellow
-          'rgba(149, 165, 166, 1)'   // Gray
-      ];
-
-      // Fetch dashboard metrics
-      fetch('/dashboard/metrics?year={{ current_year }}')
-          .then(response => response.json())
-          .then(data => {
-              if (data.status === 'success') {
-                  createDistrictChart(data.district_data);
-                  createHistoricalRateChart(data.historical_data);
-              } else {
-                  console.error('Error fetching dashboard metrics:', data.message);
-              }
-          })
-          .catch(error => {
-              console.error('Error fetching dashboard metrics:', error);
-          });
-
-      // Also fetch system stats
-      fetch('/dashboard/stats')
-          .then(response => response.json())
-          .then(data => {
-              if (data.status === 'success') {
-                  updateSystemStats(data.stats);
-              } else {
-                  console.error('Error fetching dashboard stats:', data.message);
-              }
-          })
-          .catch(error => {
-              console.error('Error fetching dashboard stats:', error);
-          });
-
-      // Create the district breakdown chart
-      function createDistrictChart(districtData) {
-          const chartCanvas = document.getElementById('levyOverviewChart');
-          if (!chartCanvas) return;
-
-          const ctx = chartCanvas.getContext('2d');
-
-          // If we have real district data, use it
-          const labels = districtData.labels.length > 0 ?
-                          districtData.labels :
-                          ['School', 'County', 'City', 'Fire', 'Hospital', 'Other'];
-
-          const chartData = districtData.values.length > 0 ?
-                          districtData.values :
-                          [
-                              {{ (total_levy_amount * 0.55)|round(2) }},
-                              {{ (total_levy_amount * 0.15)|round(2) }},
-                              {{ (total_levy_amount * 0.12)|round(2) }},
-                              {{ (total_levy_amount * 0.08)|round(2) }},
-                              {{ (total_levy_amount * 0.05)|round(2) }},
-                              {{ (total_levy_amount * 0.05)|round(2) }}
-                          ];
-
-          // Create dynamic colors based on number of districts
-          const backgroundColor = [];
-          const borderColor = [];
-
-          for (let i = 0; i < labels.length; i++) {
-              backgroundColor.push(colorPalette[i % colorPalette.length]);
-              borderColor.push(borderColorPalette[i % borderColorPalette.length]);
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize performance chart
+  const ctx = document.getElementById('districtPerformanceChart').getContext('2d');
+  
+  const districtPerformanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [
+        {
+          label: 'Actual Levy',
+          data: [98, 85, 90, 81, 87, 95, 91, 84, 89, 92, 88, 93],
+          borderColor: '#00e5ff',
+          backgroundColor: 'rgba(0, 229, 255, 0.1)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true
+        },
+        {
+          label: 'Projected Levy',
+          data: [95, 88, 84, 85, 90, 93, 88, 87, 90, 93, 95, 97],
+          borderColor: '#004d7a',
+          backgroundColor: 'rgba(0, 77, 122, 0.05)',
+          borderWidth: 2,
+          borderDash: [5, 5],
+          tension: 0.4,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'end'
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          min: 80,
+          grid: {
+            drawBorder: false
           }
-
-          const chart = new Chart(ctx, {
-              type: 'bar',
-              data: {
-                  labels: labels,
-                  datasets: [{
-                      label: 'Levy Amount',
-                      data: chartData,
-                      backgroundColor: backgroundColor,
-                      borderColor: borderColor,
-                      borderWidth: 1
-                  }]
-              },
-              options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                      y: {
-                          beginAtZero: true,
-                          ticks: {
-                              callback: function(value) {
-                                  return '$' + value.toLocaleString();
-                              }
-                          }
-                      }
-                  },
-                  plugins: {
-                      legend: {
-                          display: false
-                      },
-                      title: {
-                          display: true,
-                          text: 'Levy Distribution by District Type',
-                          font: {
-                              size: 16
-                          }
-                      },
-                      tooltip: {
-                          callbacks: {
-                              label: function(context) {
-                                  let label = context.dataset.label || '';
-                                  if (label) {
-                                      label += ': ';
-                                  }
-                                  label += '$' + context.raw.toLocaleString();
-                                  return label;
-                              }
-                          }
-                      }
-                  }
-              }
-          });
-      }
-
-      // Create historical rate trend chart
-      function createHistoricalRateChart(historicalData) {
-          // Create a new canvas for the historical chart
-          const containerDiv = document.createElement('div');
-          containerDiv.className = 'mt-4';
-          containerDiv.innerHTML = `
-              <h5 class="text-muted mb-3">Historical Rate Trends</h5>
-              <div class="chart-container">
-                  <canvas id="historicalRateChart" height="250"></canvas>
-              </div>
-          `;
-
-          // Insert after the existing chart
-          const existingChart = document.getElementById('levyOverviewChart');
-          if (existingChart && existingChart.parentNode) {
-              existingChart.parentNode.appendChild(containerDiv);
-
-              const histChartCanvas = document.getElementById('historicalRateChart');
-              const ctx = histChartCanvas.getContext('2d');
-
-              // If we have real historical data, use it
-              const labels = historicalData.labels.length > 0 ?
-                             historicalData.labels :
-                             [{{ current_year - 4 }}, {{ current_year - 3 }}, {{ current_year - 2 }}, {{ current_year - 1 }}, {{ current_year }}];
-
-              const chartData = historicalData.values.length > 0 ?
-                             historicalData.values :
-                             [{{ avg_levy_rate * 0.85 }}, {{ avg_levy_rate * 0.9 }}, {{ avg_levy_rate * 0.95 }}, {{ avg_levy_rate * 0.98 }}, {{ avg_levy_rate }}];
-
-              const chart = new Chart(ctx, {
-                  type: 'line',
-                  data: {
-                      labels: labels,
-                      datasets: [{
-                          label: 'Average Levy Rate',
-                          data: chartData,
-                          backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                          borderColor: 'rgba(52, 152, 219, 1)',
-                          borderWidth: 2,
-                          tension: 0.3,
-                          fill: true,
-                          pointBackgroundColor: 'rgba(52, 152, 219, 1)',
-                          pointBorderColor: '#fff',
-                          pointBorderWidth: 2,
-                          pointRadius: 5,
-                          pointHoverRadius: 7
-                      }]
-                  },
-                  options: {
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      scales: {
-                          y: {
-                              beginAtZero: false,
-                              ticks: {
-                                  callback: function(value) {
-                                      return value.toFixed(3);
-                                  }
-                              }
-                          }
-                      },
-                      plugins: {
-                          legend: {
-                              display: true,
-                              position: 'top'
-                          },
-                          tooltip: {
-                              callbacks: {
-                                  label: function(context) {
-                                      let label = context.dataset.label || '';
-                                      if (label) {
-                                          label += ': ';
-                                      }
-                                      label += context.parsed.y.toFixed(4);
-                                      return label;
-                                  }
-                              }
-                          }
-                      }
-                  }
-              });
+        },
+        x: {
+          grid: {
+            display: false
           }
+        }
       }
-
-      // Update system stats from API data
-      function updateSystemStats(stats) {
-          // Create a new stats row under the existing metrics
-          const containerDiv = document.createElement('div');
-          containerDiv.className = 'row mt-4 mb-4 text-center';
-          containerDiv.innerHTML = `
-              <div class="col-md-2">
-                  <div class="card border-0 bg-light h-100">
-                      <div class="card-body">
-                          <h6 class="text-muted">Users</h6>
-                          <h4>${stats.user_count}</h4>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-md-2">
-                  <div class="card border-0 bg-light h-100">
-                      <div class="card-body">
-                          <h6 class="text-muted">Admins</h6>
-                          <h4>${stats.admin_count}</h4>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-md-2">
-                  <div class="card border-0 bg-light h-100">
-                      <div class="card-body">
-                          <h6 class="text-muted">Imports</h6>
-                          <h4>${stats.import_count}</h4>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-md-2">
-                  <div class="card border-0 bg-light h-100">
-                      <div class="card-body">
-                          <h6 class="text-muted">Exports</h6>
-                          <h4>${stats.export_count}</h4>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-md-2">
-                  <div class="card border-0 bg-light h-100">
-                      <div class="card-body">
-                          <h6 class="text-muted">Import Success</h6>
-                          <h4>${stats.import_success_rate.toFixed(1)}%</h4>
-                      </div>
-                  </div>
-              </div>
-              <div class="col-md-2">
-                  <div class="card border-0 bg-light h-100">
-                      <div class="card-body">
-                          <h6 class="text-muted">Export Success</h6>
-                          <h4>${stats.export_success_rate.toFixed(1)}%</h4>
-                      </div>
-                  </div>
-              </div>
-          `;
-
-          // Insert after the existing row
-          const systemOverviewCard = document.querySelector('.card-body .row.text-center.mb-4');
-          if (systemOverviewCard && systemOverviewCard.parentNode) {
-              systemOverviewCard.parentNode.appendChild(containerDiv);
-          }
-      }
+    }
   });
+  
+  // Refresh button functionality
+  const refreshButton = document.getElementById('refreshDashboard');
+  if (refreshButton) {
+    refreshButton.addEventListener('click', function() {
+      refreshButton.disabled = true;
+      refreshButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Refreshing...';
+      
+      // Simulate refresh (would be an actual API call in production)
+      setTimeout(() => {
+        // Update chart with new random data
+        districtPerformanceChart.data.datasets.forEach((dataset) => {
+          dataset.data = dataset.data.map(() => Math.floor(Math.random() * 20) + 80);
+        });
+        districtPerformanceChart.update();
+        
+        // Re-enable button
+        refreshButton.disabled = false;
+        refreshButton.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Refresh';
+        
+        // Show notification
+        TerraLevy.showNotification('Dashboard refreshed successfully!', 'success');
+      }, 1500);
+    });
+  }
+});
 </script>
 {% endblock %}
