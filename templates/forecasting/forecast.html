@@ -73,13 +73,7 @@ block content %}
                 {% for code in tax_codes %}
                 <option
                   value="{{ code.id }}"
-                  {%
-                  if
-                  tax_code_id=""
-                  ="code.id"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if tax_code_id == code.id %}selected{% endif %}
                 >
                   {{ code.code }} ({{ code.history_count }} years of data)
                 </option>
@@ -117,40 +111,19 @@ block content %}
               >
                 <option
                   value="0.90"
-                  {%
-                  if
-                  confidence_level=""
-                  ="0.90"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if confidence_level == "0.90" %}selected{% endif %}
                 >
                   90%
                 </option>
                 <option
                   value="0.95"
-                  {%
-                  if
-                  confidence_level=""
-                  ="0.95"
-                  or
-                  not
-                  confidence_level
-                  %}selected{%
-                  endif
-                  %}
+                  {% if confidence_level == "0.95" or not confidence_level %}selected{% endif %}
                 >
                   95%
                 </option>
                 <option
                   value="0.99"
-                  {%
-                  if
-                  confidence_level=""
-                  ="0.99"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if confidence_level == "0.99" %}selected{% endif %}
                 >
                   99%
                 </option>
@@ -171,49 +144,25 @@ block content %}
               >
                 <option
                   value=""
-                  {%
-                  if
-                  not
-                  preferred_model
-                  %}selected{%
-                  endif
-                  %}
+                  {% if not preferred_model %}selected{% endif %}
                 >
                   Auto (Best Fit)
                 </option>
                 <option
                   value="linear"
-                  {%
-                  if
-                  preferred_model=""
-                  ="linear"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if preferred_model == "linear" %}selected{% endif %}
                 >
                   Linear Trend
                 </option>
                 <option
                   value="exponential"
-                  {%
-                  if
-                  preferred_model=""
-                  ="exponential"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if preferred_model == "exponential" %}selected{% endif %}
                 >
                   Exponential Smoothing
                 </option>
                 <option
                   value="arima"
-                  {%
-                  if
-                  preferred_model=""
-                  ="arima"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if preferred_model == "arima" %}selected{% endif %}
                 >
                   ARIMA
                 </option>
@@ -230,12 +179,7 @@ block content %}
                 class="form-check-input"
                 id="include_explanation"
                 name="include_explanation"
-                {%
-                if
-                include_explanation
-                %}checked{%
-                endif
-                %}
+                {% if include_explanation %}checked{% endif %}
                 value="true"
               />
               <label

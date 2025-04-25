@@ -108,13 +108,7 @@
                 {% for tax_code in tax_codes %}
                 <option
                   value="{{ tax_code.tax_code }}"
-                  {%
-                  if
-                  tax_code.tax_code=""
-                  ="selected_tax_code"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if tax_code.tax_code == selected_tax_code %}selected{% endif %}
                 >
                   {{ tax_code.tax_code }}
                 </option>
@@ -129,13 +123,7 @@
                 {% for year in available_years %}
                 <option
                   value="{{ year }}"
-                  {%
-                  if
-                  year|string=""
-                  ="selected_year|string"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if year|string == selected_year|string %}selected{% endif %}
                 >
                   {{ year }}
                 </option>
