@@ -253,12 +253,35 @@ def configure_logging(app):
     if not os.path.exists('logs'):
         os.makedirs('logs')
     
+    # Create a file handler for performance logging
+    perf_handler = logging.FileHandler('logs/performance.log')
+    perf_handler.setLevel(logging.INFO)
+    perf_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s',
+        '%Y-%m-%d %H:%M:%S'
+    ))
+    
+    # Add performance logger
+    perf_logger = logging.getLogger('performance')
+    perf_logger.setLevel(logging.INFO)
+    perf_logger.addHandler(perf_handler)
+    
     app.logger.setLevel(log_level)
     app.logger.info('LevyMaster application startup')
 
 
 # Create the Flask application instance
 app = create_app()
+
+# Set up database performance monitoring
+try:
+    from utils.database_performance import setup_query_monitoring
+    monitor = setup_query_monitoring(app, db)
+    app.logger.info("Database performance monitoring enabled")
+except ImportError as e:
+    app.logger.warning(f"Could not set up database performance monitoring: {str(e)}")
+except Exception as e:
+    app.logger.error(f"Error setting up database performance monitoring: {str(e)}")
 
 # Root route is now handled by home_bp
 

@@ -16,6 +16,8 @@ for all application configuration, blueprints, and route registration.
 
 import os
 import logging
+import signal
+import sys
 
 from app import app
 
@@ -24,6 +26,21 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Log that application is being served
 app.logger.info("Starting LevyMaster application")
+
+# Signal handling for graceful shutdown
+def handle_signal(sig, frame):
+    """Handle shutdown signals gracefully."""
+    app.logger.info(f"Received signal {sig}, shutting down...")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, handle_signal)
+signal.signal(signal.SIGINT, handle_signal)
+
+# Health check route for container orchestration
+@app.route('/health')
+def health_check():
+    """Health check endpoint for monitoring."""
+    return {'status': 'healthy', 'service': 'levymaster'}, 200
 
 # This makes the app discoverable by Gunicorn
 # Do not modify this section - Gunicorn looks for app in this location
