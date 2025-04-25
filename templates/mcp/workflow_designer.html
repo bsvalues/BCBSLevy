@@ -1057,24 +1057,31 @@ parameters: { threshold: 0.95, check_statutory: true }</textarea
 
   // Initialize the demo button
   document.addEventListener("DOMContentLoaded", function () {
-    const demoButton = document.getElementById("demoModeButton");
+    // Try both possible button IDs to handle either system
+    const demoButton = document.getElementById("demoModeButton") || document.getElementById("autoDemoButton");
     if (demoButton) {
       console.log("Demo button found in Workflow Designer page");
-      demoButton.addEventListener("click", function (event) {
-        event.preventDefault();
-        console.log("Demo button clicked - starting Workflow Designer tour");
-        if (typeof startTour === "function") {
-          startTour("workflow-designer");
-        } else {
-          console.error("startTour function not found");
-          alert(
-            "Demo tour system is initializing. Please try again in a moment.",
-          );
-        }
-        return false;
-      });
+      
+      // Only add event listener if it doesn't already have one
+      if (!demoButton._hasWorkflowDesignerHandler) {
+        demoButton._hasWorkflowDesignerHandler = true;
+        
+        demoButton.addEventListener("click", function (event) {
+          event.preventDefault();
+          console.log("Demo button clicked - starting Workflow Designer tour");
+          if (typeof startTour === "function") {
+            startTour("workflow-designer");
+          } else {
+            console.error("startTour function not found");
+            alert(
+              "Demo tour system is initializing. Please try again in a moment.",
+            );
+          }
+          return false;
+        });
+      }
     } else {
-      console.error("Demo button not found in the Workflow Designer page DOM");
+      console.warn("Demo button not yet found in the Workflow Designer page DOM - it may be injected later");
     }
   });
 </script>

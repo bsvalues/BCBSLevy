@@ -382,14 +382,24 @@ const demoScenarios = {
 function initializeAutoDemo() {
   console.log("Initializing Auto Demo System");
 
-  // Find auto demo button
+  // Check for both button types - either the auto demo button or the original guided tour button
   const autoDemoButton = document.getElementById("autoDemoButton");
-  if (!autoDemoButton) {
+  const guidedTourButton = document.getElementById("demoModeButton");
+  
+  // If neither button exists, inject the auto demo button
+  if (!autoDemoButton && !guidedTourButton) {
     console.log("Auto Demo Button not found, injecting it");
     injectAutoDemoButton();
-  } else {
+  } 
+  // If auto demo button exists, use it
+  else if (autoDemoButton) {
     console.log("Auto Demo Button found, setting up handler");
     setupAutoDemoButton(autoDemoButton);
+  }
+  // If only guided tour button exists, adapt to use it
+  else if (guidedTourButton) {
+    console.log("Using guided tour button for auto demo");
+    setupAutoDemoButton(guidedTourButton);
   }
 
   // Initialize Chart.js if not already loaded
