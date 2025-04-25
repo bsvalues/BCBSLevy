@@ -557,31 +557,7 @@ function initLevyCalculator() {
       });
   }
 
-  /**
-   * Format a number as currency
-   * @param {number} value - The value to format
-   * @returns {string} Formatted currency string
-   */
-  function formatCurrency(value) {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  }
-
-  /**
-   * Format a number as a rate
-   * @param {number} value - The value to format
-   * @returns {string} Formatted rate string
-   */
-  function formatRate(value) {
-    return new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 4,
-      maximumFractionDigits: 4,
-    }).format(value);
-  }
+  // Using global utility functions from utilities.js for formatting
 }
 
 /**
@@ -763,28 +739,4 @@ function loadSavedScenarios() {
   }
 }
 
-/**
- * Format a decimal number as a currency string (outside of any function scope)
- * @param {number} value - The number to format
- * @returns {string} The formatted currency string
- */
-function formatCurrency(value) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-/**
- * Format a decimal number as a rate with 3 decimal places (outside of any function scope)
- * @param {number} value - The number to format
- * @returns {string} The formatted rate string
- */
-function formatRate(value) {
-  return new Intl.NumberFormat("en-US", {
-    minimumFractionDigits: 3,
-    maximumFractionDigits: 3,
-  }).format(value);
-}
+// Global utility functions moved to main.js or elsewhere in the application

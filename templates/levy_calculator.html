@@ -734,6 +734,7 @@ block page_subtitle %}Calculate property tax levy rates and amounts{% endblock
   </div>
 </div>
 {% endblock %} {% block extra_js %}
+<script src="{{ url_for('static', filename='js/utilities.js') }}"></script>
 <script src="{{ url_for('static', filename='js/levy_calculator_updated.js') }}"></script>
 <script>
   // Additional page-specific JavaScript
@@ -1275,22 +1276,7 @@ block page_subtitle %}Calculate property tax levy rates and amounts{% endblock
         });
     }
 
-    // Formatting functions
-    function formatCurrency(value) {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(value);
-    }
-
-    function formatNumber(value) {
-      return new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 4,
-        maximumFractionDigits: 4,
-      }).format(value);
-    }
+    // Use global formatting functions from utilities.js
 
     // Load scenarios on page load
     loadSavedScenarios();
