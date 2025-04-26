@@ -143,6 +143,17 @@ def create_app(config_name=None):
         """Add current_year to all templates."""
         return {'current_year': datetime.now().year}
     
+    # Set up database performance monitoring inside app context
+    with app.app_context():
+        try:
+            from utils.database_performance import setup_query_monitoring
+            monitor = setup_query_monitoring(app, db)
+            app.logger.info("Database performance monitoring enabled")
+        except ImportError as e:
+            app.logger.warning(f"Could not set up database performance monitoring: {str(e)}")
+        except Exception as e:
+            app.logger.error(f"Error setting up database performance monitoring: {str(e)}")
+    
     # Configure logging
     configure_logging(app)
     
@@ -273,15 +284,9 @@ def configure_logging(app):
 # Create the Flask application instance
 app = create_app()
 
-# Set up database performance monitoring
-try:
-    from utils.database_performance import setup_query_monitoring
-    monitor = setup_query_monitoring(app, db)
-    app.logger.info("Database performance monitoring enabled")
-except ImportError as e:
-    app.logger.warning(f"Could not set up database performance monitoring: {str(e)}")
-except Exception as e:
-    app.logger.error(f"Error setting up database performance monitoring: {str(e)}")
+# Move database performance monitoring setup inside create_app function
+# We'll add this to the create_app function later
+# For now, skip database performance monitoring to fix the 500 error
 
 # Root route is now handled by home_bp
 

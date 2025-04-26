@@ -38,23 +38,27 @@ class QueryPerformanceMonitor:
     
     def _after_cursor_execute(self, conn, cursor, statement, parameters, context, executemany):
         """Record query end time and log if slow."""
+        from flask import has_request_context, request, g
+        
         if not self.enabled or not conn.info.get('query_start_time'):
             return
         
         query_start_time = conn.info['query_start_time'].pop(-1)
         query_time = time.time() - query_start_time
         
-        # Get additional context
-        endpoint = request.endpoint if request and hasattr(request, 'endpoint') else 'unknown'
-        
-        # Store query in global context for request stats
-        if hasattr(g, 'database_queries'):
-            g.database_queries.append({
-                'query': statement,
-                'parameters': parameters,
-                'duration': query_time,
-                'endpoint': endpoint
-            })
+        # Get additional context if we're in a request context
+        endpoint = 'unknown'
+        if has_request_context():
+            endpoint = request.endpoint if hasattr(request, 'endpoint') else 'unknown'
+            
+            # Store query in global context for request stats
+            if hasattr(g, 'database_queries'):
+                g.database_queries.append({
+                    'query': statement,
+                    'parameters': parameters,
+                    'duration': query_time,
+                    'endpoint': endpoint
+                })
         
         # Log slow queries
         if query_time > self.slow_query_threshold:
@@ -128,14 +132,24 @@ def query_performance_log(f):
     """
     @functools.wraps(f)
     def decorated(*args, **kwargs):
+        from flask import has_request_context, g
+        
         start_time = time.time()
-        queries_before = len(getattr(g, 'database_queries', []))
+        
+        # Only track queries if we're in a request context
+        queries_before = 0
+        if has_request_context():
+            queries_before = len(getattr(g, 'database_queries', []))
         
         result = f(*args, **kwargs)
         
-        queries_after = len(getattr(g, 'database_queries', []))
         duration = time.time() - start_time
-        query_count = queries_after - queries_before
+        
+        # Only calculate query count if we're in a request context
+        query_count = 0
+        if has_request_context():
+            queries_after = len(getattr(g, 'database_queries', []))
+            query_count = queries_after - queries_before
         
         logger.info(
             f"Function {f.__name__} took {duration:.4f}s and executed "

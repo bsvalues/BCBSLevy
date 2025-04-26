@@ -25,22 +25,22 @@
       <div class="col-md-2 mb-4 mb-md-0">
         <h5 class="text-light tl-text-primary mb-3">Quick Links</h5>
         <ul class="list-unstyled">
-          <li class="mb-2"><a href="/" class="text-light text-decoration-none">Dashboard</a></li>
-          <li class="mb-2"><a href="/levy-calculator" class="text-light text-decoration-none">Levy Calculator</a></li>
-          <li class="mb-2"><a href="/historical" class="text-light text-decoration-none">Historical Data</a></li>
-          <li class="mb-2"><a href="/reports" class="text-light text-decoration-none">Reports</a></li>
-          <li class="mb-2"><a href="/data-management" class="text-light text-decoration-none">Data Management</a></li>
+          <li class="mb-2"><a href="{{ url_for('main.index') }}" class="text-light text-decoration-none">Dashboard</a></li>
+          <li class="mb-2"><a href="{{ url_for('levy_calculator.calculator') }}" class="text-light text-decoration-none">Levy Calculator</a></li>
+          <li class="mb-2"><a href="{{ url_for('historical_analysis.index') }}" class="text-light text-decoration-none">Historical Data</a></li>
+          <li class="mb-2"><a href="{{ url_for('reports.index') }}" class="text-light text-decoration-none">Reports</a></li>
+          <li class="mb-2"><a href="{{ url_for('data_management.index') }}" class="text-light text-decoration-none">Data Management</a></li>
         </ul>
       </div>
       
       <div class="col-md-2 mb-4 mb-md-0">
         <h5 class="text-light tl-text-primary mb-3">Resources</h5>
         <ul class="list-unstyled">
-          <li class="mb-2"><a href="/help/guide" class="text-light text-decoration-none">User Guide</a></li>
-          <li class="mb-2"><a href="/help/videos" class="text-light text-decoration-none">Tutorial Videos</a></li>
-          <li class="mb-2"><a href="/help/api" class="text-light text-decoration-none">API Documentation</a></li>
-          <li class="mb-2"><a href="/help/glossary" class="text-light text-decoration-none">Glossary</a></li>
-          <li class="mb-2"><a href="/help/faqs" class="text-light text-decoration-none">FAQs</a></li>
+          <li class="mb-2"><a href="{{ url_for('home.help_page') }}" class="text-light text-decoration-none">User Guide</a></li>
+          <li class="mb-2"><a href="{{ url_for('glossary.index') }}" class="text-light text-decoration-none">Glossary</a></li>
+          <li class="mb-2"><a href="{{ url_for('home.about') }}" class="text-light text-decoration-none">About</a></li>
+          <li class="mb-2"><a href="{{ url_for('mcp.documentation') }}" class="text-light text-decoration-none">API Documentation</a></li>
+          <li class="mb-2"><a href="{{ url_for('home.help_page') }}?section=faq" class="text-light text-decoration-none">FAQs</a></li>
         </ul>
       </div>
 
@@ -48,10 +48,10 @@
         <h5 class="text-light tl-text-primary mb-3">Contact Us</h5>
         <p class="mb-3">Questions or feedback? We're here to help you with any inquiries about TerraLevy.</p>
         <div class="d-grid gap-2">
-          <a href="/contact" class="btn btn-outline-light">
+          <a href="{{ url_for('home.help_page') }}?section=contact" class="btn btn-outline-light">
             <i class="bi bi-envelope me-1"></i> Contact Support
           </a>
-          <a href="/schedule-demo" class="btn tl-btn-primary">
+          <a href="{{ url_for('home.help_page') }}?section=demo" class="btn tl-btn-primary">
             <i class="bi bi-calendar-check me-1"></i> Schedule a Demo
           </a>
         </div>
@@ -67,13 +67,13 @@
       <div class="col-md-6 text-center text-md-end">
         <ul class="list-inline mb-0">
           <li class="list-inline-item">
-            <a href="/privacy" class="text-muted text-decoration-none">Privacy Policy</a>
+            <a href="{{ url_for('home.about') }}?section=privacy" class="text-muted text-decoration-none">Privacy Policy</a>
           </li>
           <li class="list-inline-item ms-3">
-            <a href="/terms" class="text-muted text-decoration-none">Terms of Service</a>
+            <a href="{{ url_for('home.about') }}?section=terms" class="text-muted text-decoration-none">Terms of Service</a>
           </li>
           <li class="list-inline-item ms-3">
-            <a href="/legal" class="text-muted text-decoration-none">Legal</a>
+            <a href="{{ url_for('home.about') }}?section=legal" class="text-muted text-decoration-none">Legal</a>
           </li>
         </ul>
       </div>
