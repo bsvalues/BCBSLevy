@@ -1,0 +1,74 @@
+## Summary
+
+Below is a ready-to-use **Replit AI Agent** prompt plus a step-by-step bootstrap to migrate **BCBSLevy** into the **TerraFusionPlayground** monorepo. The prompt first defines the overall goal (porting Flask/SQLAlchemy models to a Turborepo + Drizzle ORM backend, recreating routes in Express, converting Jinja templates to React/Tailwind components, and translating CLI scripts), then breaks the work into discrete tasks. Finally, a concrete bootstrap snippet shows exactly what you’d paste into your new Replit project’s Agent pane.  
+
+---
+
+## Prompt Structure for Replit AI Agent
+
+Replit Agent prompts work best when you:
+
+1. **Describe your app & environment** in everyday language.  ([Replit Agent](https://docs.replit.com/replitai/agent?utm_source=chatgpt.com))  
+2. **List clear, ordered tasks** (“Step 1: …”, “Step 2: …”).  ([Create with AI - Replit Docs](https://docs.replit.com/getting-started/quickstarts/ask-ai?utm_source=chatgpt.com))  
+3. **Specify deliverables** (e.g., file paths, config files).  ([Building LLMs for Code Repair - Replit Blog](https://blog.replit.com/code-repair?utm_source=chatgpt.com))  
+4. **Include examples or snippets** where helpful (e.g., sample `pnpm-workspace.yaml`).  ([Build No-Code AI Agents on Your Phone with Replit Mobile App!](https://www.analyticsvidhya.com/blog/2025/02/replit-ai-agent/?utm_source=chatgpt.com))  
+
+---
+
+## Step-by-Step Guidance
+
+1. **Initialize a new Replit AI Agent project**  
+   - Create a Replit App using the “Agent” template.  ([Replit Agent](https://docs.replit.com/replitai/agent?utm_source=chatgpt.com))  
+   - Ensure workspace uses **pnpm** and **Turborepo**.  ([Building a Monorepo with pnpm and Turborepo - Vinayak Hegde](https://vinayak-hegde.medium.com/building-a-monorepo-with-pnpm-and-turborepo-a-journey-to-efficiency-cfeec5d182f5?utm_source=chatgpt.com))  
+
+2. **Add a `packages/levy` workspace**  
+   - In `pnpm-workspace.yaml`, include `packages/levy/**`.  ([React Monorepo Setup Tutorial with pnpm and Vite - DEV Community](https://dev.to/lico/react-monorepo-setup-tutorial-with-pnpm-and-vite-react-project-ui-utils-5705?utm_source=chatgpt.com))  
+   - Run `pnpm install` to bootstrap.  ([riipandi/fuelstack: Monorepo starter pre-configured with Turborepo ...](https://github.com/riipandi/fuelstack?utm_source=chatgpt.com))  
+
+3. **Port Flask/SQLAlchemy models to Drizzle ORM**  
+   - Copy table definitions from `models.py` into `shared/schema.ts` using `pgTable` definitions.  ([Shared database schema with DrizzleORM and Turborepo](https://pliszko.com/blog/post/2023-08-31-shared-database-schema-with-drizzleorm-and-turborepo?utm_source=chatgpt.com))  
+   - Add `drizzle-kit` scripts for migrations under `packages/levy`.  ([retconned/pnpm-turborepo-boilerplate - GitHub](https://github.com/retconned/pnpm-turborepo-boilerplate?utm_source=chatgpt.com))  
+
+4. **Scaffold Express routes in `server/routes/levy.ts`**  
+   - Mirror each Flask blueprint (`levy_calculator`, `forecasting`, etc.) with REST endpoints.  ([How to Create a Monorepo With Vite, Cloudflare, Remix, PNPM and ...](https://hackernoon.com/how-to-create-a-monorepo-with-vite-cloudflare-remix-pnpm-and-turborepo-no-build-step?utm_source=chatgpt.com))  
+
+5. **Migrate Jinja templates to React/Tailwind**  
+   - Under `client/src/levy`, create a **LevyWizard** component with multi-step form and progress bar.  ([retconned/pnpm-turborepo-boilerplate - GitHub](https://github.com/retconned/pnpm-turborepo-boilerplate?utm_source=chatgpt.com))  
+   - Use **shadcn/ui** primitives and Tailwind CSS for styling.  ([retconned/pnpm-turborepo-boilerplate - GitHub](https://github.com/retconned/pnpm-turborepo-boilerplate?utm_source=chatgpt.com))  
+
+6. **Translate Python CLI to Node**  
+   - Build a `levy-cli.js` in `packages/levy/bin` that runs backups and migrations via `drizzle-kit` or `node-postgres`.  ([Shared database schema with DrizzleORM and Turborepo](https://pliszko.com/blog/post/2023-08-31-shared-database-schema-with-drizzleorm-and-turborepo?utm_source=chatgpt.com))  
+
+7. **Set up CI/CD**  
+   - Add `.github/workflows/levy.yml` to run `pnpm --filter levy test` and deploy both server and client artifacts.  ([How to Create a Monorepo With Vite, Cloudflare, Remix, PNPM and ...](https://hackernoon.com/how-to-create-a-monorepo-with-vite-cloudflare-remix-pnpm-and-turborepo-no-build-step?utm_source=chatgpt.com))  
+   - Leverage existing CI templates for caching and parallel jobs.  ([riipandi/fuelstack: Monorepo starter pre-configured with Turborepo ...](https://github.com/riipandi/fuelstack?utm_source=chatgpt.com))  
+
+8. **Run tests & validate end-to-end**  
+   - Write Jest unit tests for schema and Express routes.  ([retconned/pnpm-turborepo-boilerplate - GitHub](https://github.com/retconned/pnpm-turborepo-boilerplate?utm_source=chatgpt.com))  
+   - Use Playwright to cover critical UI flows.  ([React Monorepo Setup Tutorial with pnpm and Vite - DEV Community](https://dev.to/lico/react-monorepo-setup-tutorial-with-pnpm-and-vite-react-project-ui-utils-5705?utm_source=chatgpt.com))  
+
+---
+
+## Bootstrap Snippet for Replit AI Agent
+
+Paste this into your new Replit App’s Agent prompt area:
+
+```text
+I have an existing Flask/SQLAlchemy levy application (BCBSLevy) that I need to migrate into our TerraFusionPlayground monorepo (Turborepo + pnpm workspaces). 
+Please:
+
+1. Add a new workspace at packages/levy and update pnpm-workspace.yaml.
+2. Port all SQLAlchemy models from BCBSLevy/models.py into shared/schema.ts using Drizzle ORM pgTable definitions.
+3. Create Drizzle migration scripts under migrations/levy matching the existing Flask-Migrate history.
+4. Scaffold Express routes in server/routes/levy.ts mirroring BCBSLevy blueprints (levy_calculator, forecasting, data_management).
+5. Migrate Jinja templates into React component files under client/src/levy, building a LevyWizard with Tailwind and shadcn/ui.
+6. Convert Python CLI commands (backup, verify, info) into a Node CLI at packages/levy/bin/levy-cli.js using drizzle-kit.
+7. Configure CI by adding .github/workflows/levy.yml to run tests, builds, and deploy server + client on merges to main.
+8. Add Jest unit tests for schema and Express routes, plus Playwright tests for LevyWizard end-to-end.
+9. Ensure imports and dependencies are wired correctly (shared schema, utilities).
+10. Generate a summary of all changes with file paths and commands to run (pnpm dev, pnpm build, pnpm migrate).
+
+Deliver each step as discrete commits with clear commit messages.
+```
+
+This structured, example-driven prompt follows best practices for **Replit AI Agent** and will bootstrap the migration end-to-end.
