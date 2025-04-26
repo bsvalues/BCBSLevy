@@ -25,11 +25,11 @@
       <div class="col-md-2 mb-4 mb-md-0">
         <h5 class="text-light tl-text-primary mb-3">Quick Links</h5>
         <ul class="list-unstyled">
-          <li class="mb-2"><a href="{{ url_for('main.index') }}" class="text-light text-decoration-none">Dashboard</a></li>
+          <li class="mb-2"><a href="{{ url_for('home.index') }}" class="text-light text-decoration-none">Dashboard</a></li>
           <li class="mb-2"><a href="{{ url_for('levy_calculator.calculator') }}" class="text-light text-decoration-none">Levy Calculator</a></li>
-          <li class="mb-2"><a href="{{ url_for('historical_analysis.index') }}" class="text-light text-decoration-none">Historical Data</a></li>
-          <li class="mb-2"><a href="{{ url_for('reports.index') }}" class="text-light text-decoration-none">Reports</a></li>
-          <li class="mb-2"><a href="{{ url_for('data_management.index') }}" class="text-light text-decoration-none">Data Management</a></li>
+          <li class="mb-2"><a href="{{ url_for('historical_analysis.historical_rates') }}" class="text-light text-decoration-none">Historical Data</a></li>
+          <li class="mb-2"><a href="{{ url_for('reports.reports_index') }}" class="text-light text-decoration-none">Reports</a></li>
+          <li class="mb-2"><a href="{{ url_for('data_management.data_management_index') }}" class="text-light text-decoration-none">Data Management</a></li>
         </ul>
       </div>
       
@@ -37,7 +37,7 @@
         <h5 class="text-light tl-text-primary mb-3">Resources</h5>
         <ul class="list-unstyled">
           <li class="mb-2"><a href="{{ url_for('home.help_page') }}" class="text-light text-decoration-none">User Guide</a></li>
-          <li class="mb-2"><a href="{{ url_for('glossary.index') }}" class="text-light text-decoration-none">Glossary</a></li>
+          <li class="mb-2"><a href="{{ url_for('glossary.glossary') }}" class="text-light text-decoration-none">Glossary</a></li>
           <li class="mb-2"><a href="{{ url_for('home.about') }}" class="text-light text-decoration-none">About</a></li>
           <li class="mb-2"><a href="{{ url_for('mcp.documentation') }}" class="text-light text-decoration-none">API Documentation</a></li>
           <li class="mb-2"><a href="{{ url_for('home.help_page') }}?section=faq" class="text-light text-decoration-none">FAQs</a></li>
