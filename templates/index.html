@@ -1,5 +1,7 @@
-{% extends "simple_base.html" %} {% block title %}LevyMaster - Tax Calculation
-and Levy Management System{% endblock %} {% block page_header %}
+{% extends "terralevy-base.html" %} 
+{% block title %}TerraLevy - Tax Calculation and Levy Management System{% endblock %} 
+
+{% block content %}
 <!-- Hero Section with Animated Background -->
 <div class="hero-section text-center py-5">
   <div class="container position-relative" style="z-index: 2">
@@ -7,15 +9,15 @@ and Levy Management System{% endblock %} {% block page_header %}
       <div class="col-lg-10">
         <div class="mt-5 mb-5" id="main-header">
           <!-- Platform Logo Badge -->
-          <div class="mx-auto mb-4" style="max-width: 120px">
-            <i class="bi bi-cpu display-1 text-light"></i>
+          <div class="mx-auto mb-4">
+            <img src="{{ url_for('static', filename='images/terralevy-logo.svg') }}" alt="TerraLevy" class="img-fluid" style="max-width: 180px;">
           </div>
 
-          <h1 class="display-2 fw-bold mb-3 gradient-text">LevyMaster</h1>
-          <p class="lead mb-4 fs-4 text-light">
+          <h1 class="display-2 fw-bold mb-3 gradient-text">TerraLevy</h1>
+          <p class="lead mb-4 fs-4 text-dark">
             Advanced Tax Calculation System
           </p>
-          <p class="lead mb-5 text-light">
+          <p class="lead mb-5 text-dark">
             Comprehensive levy management with intelligent AI-powered analysis
             and forecasting
           </p>
@@ -157,7 +159,8 @@ and Levy Management System{% endblock %} {% block page_header %}
     style="z-index: 1"
   ></div>
 </div>
-{% endblock %} {% block content %}
+
+<!-- Tools Showcase Carousel Section -->
 <div data-auto-tour="dashboard">
   <!-- Tools Showcase Carousel Section -->
   <section
