@@ -356,7 +356,7 @@ def api_historical_comparison():
         return jsonify({'error': str(e)}), 500
 
 @historical_analysis_bp.route('/historical-rates', methods=['GET'])
-def historical_analysis():
+def historical_rates():
     """
     Display historical tax rates page with visualization options.
     
