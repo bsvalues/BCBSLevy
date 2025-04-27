@@ -1,0 +1,640 @@
+{% extends "terrafusion-base.html" %}
+
+{% from "components/workflow-container.html" import workflow_container, data_flow_visualization, task_suggestions, help_context %}
+
+{% block title %}Workflow Example{% endblock %}
+
+{% block page_title %}Multi-Step Workflow Example{% endblock %}
+
+{% block page_subtitle %}This example demonstrates the unified workflow system with clear data flow and contextual help.{% endblock %}
+
+{% block page_actions %}
+<div class="d-flex gap-2">
+  <button type="button" class="tf-btn tf-btn-outline" id="resetWorkflow">
+    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+  </button>
+  <button type="button" class="tf-btn tf-btn-primary" id="viewDataFlow">
+    <i class="bi bi-diagram-3 me-1"></i> View Data Flow
+  </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <!-- Main Workflow Container -->
+    {{ workflow_container(
+      title="Property Assessment Workflow",
+      description="This workflow guides you through the process of assessing property values and calculating tax implications.",
+      id="assessmentWorkflow"
+    ) }}
+  </div>
+  
+  <div class="col-lg-4">
+    <!-- Contextual Sidebar -->
+    <div class="tf-card h-100">
+      <div class="tf-card-header">
+        <h3 class="tf-card-title">Workflow Information</h3>
+      </div>
+      <div class="tf-card-body">
+        <h5 class="d-flex align-items-center">
+          About This Process
+          {{ help_context(
+            id="helpAboutWorkflow",
+            content="This workflow provides a standardized process for assessing property values according to statutory requirements.",
+            icon="bi-info-circle"
+          ) }}
+        </h5>
+        <p>This workflow will guide you through the property assessment process, ensuring compliance with all regulatory requirements.</p>
+        
+        <hr class="my-4">
+        
+        <h5>Benefits</h5>
+        <ul class="tf-feature-list">
+          <li class="tf-feature-item">
+            <div class="tf-feature-icon">
+              <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="tf-feature-content">
+              <h6>Compliance Assurance</h6>
+              <p>Ensures all assessments follow regulatory guidelines</p>
+            </div>
+          </li>
+          <li class="tf-feature-item">
+            <div class="tf-feature-icon">
+              <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="tf-feature-content">
+              <h6>Time Saving</h6>
+              <p>Streamlines the assessment process for faster completion</p>
+            </div>
+          </li>
+          <li class="tf-feature-item">
+            <div class="tf-feature-icon">
+              <i class="bi bi-bar-chart"></i>
+            </div>
+            <div class="tf-feature-content">
+              <h6>Data-Driven Decisions</h6>
+              <p>Uses historical trends to improve accuracy</p>
+            </div>
+          </li>
+        </ul>
+        
+        <hr class="my-4">
+        
+        <h5>Need Help?</h5>
+        <p>Contact the assessment team for assistance with this workflow:</p>
+        <a href="mailto:assessment@terrafusion.example" class="tf-btn tf-btn-outline w-100">
+          <i class="bi bi-envelope me-2"></i> Contact Support
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Flow Section (initially hidden) -->
+<div class="row mt-4" id="dataFlowSection" style="display: none;">
+  <div class="col-12">
+    <div class="tf-card">
+      <div class="tf-card-header">
+        <h3 class="tf-card-title">Data Flow Visualization</h3>
+        <button type="button" class="tf-btn tf-btn-sm tf-btn-outline" id="hideDataFlow">
+          <i class="bi bi-x-lg"></i> Close
+        </button>
+      </div>
+      <div class="tf-card-body">
+        {{ data_flow_visualization(
+          title="Property Assessment Data Flow",
+          id="assessmentDataFlow"
+        ) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Related Tasks Section -->
+<div class="row mt-4">
+  <div class="col-12">
+    {{ task_suggestions(
+      title="Related Tasks & Processes",
+      description="Based on your current workflow, these related tasks might be helpful to complete.",
+      id="relatedTasks"
+    ) }}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize workflow
+    const workflow = new TerraFusionWorkflow({
+      containerId: 'assessmentWorkflow',
+      persistState: true,
+      steps: [
+        {
+          title: 'Select Properties',
+          content: `
+            <h4>Select Properties to Assess</h4>
+            <p>Choose the properties you want to include in this assessment batch.</p>
+            <div class="form-group mb-3">
+              <label for="district" class="form-label">Tax District</label>
+              <select id="district" class="form-select">
+                <option value="">Select a district</option>
+                <option value="1">Benton County</option>
+                <option value="2">Franklin County</option>
+                <option value="3">Yakima County</option>
+              </select>
+            </div>
+            <div class="form-group mb-3">
+              <label for="propertyType" class="form-label">Property Type</label>
+              <select id="propertyType" class="form-select">
+                <option value="">All property types</option>
+                <option value="residential">Residential</option>
+                <option value="commercial">Commercial</option>
+                <option value="agricultural">Agricultural</option>
+              </select>
+            </div>
+            <div class="form-group mb-3">
+              <label for="assessmentYear" class="form-label">Assessment Year</label>
+              <select id="assessmentYear" class="form-select">
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+              </select>
+            </div>
+            <div class="form-group mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="includeExempt">
+                <label class="form-check-label" for="includeExempt">
+                  Include exempt properties
+                </label>
+              </div>
+            </div>
+          `,
+          validate: function(data) {
+            if (!data.district) {
+              alert('Please select a tax district');
+              return false;
+            }
+            return true;
+          }
+        },
+        {
+          title: 'Configure Parameters',
+          content: `
+            <h4>Assessment Parameters</h4>
+            <p>Configure the parameters that will be used for this assessment batch.</p>
+            <div class="form-group mb-3">
+              <label for="assessmentMethod" class="form-label">Assessment Method</label>
+              <select id="assessmentMethod" class="form-select">
+                <option value="market">Market Value</option>
+                <option value="income">Income Approach</option>
+                <option value="cost">Cost Approach</option>
+              </select>
+            </div>
+            <div class="form-group mb-3">
+              <label for="adjustmentFactor" class="form-label">Adjustment Factor</label>
+              <input type="number" id="adjustmentFactor" class="form-control" value="1.0" step="0.01" min="0.5" max="1.5">
+              <div class="form-text">Factor to adjust values based on local market conditions (0.5-1.5)</div>
+            </div>
+            <div class="form-group mb-3">
+              <label for="complianceLevel" class="form-label">Compliance Level</label>
+              <select id="complianceLevel" class="form-select">
+                <option value="strict">Strict (Recommended)</option>
+                <option value="standard">Standard</option>
+                <option value="relaxed">Relaxed</option>
+              </select>
+            </div>
+          `,
+          validate: function(data) {
+            if (!data.assessmentMethod) {
+              alert('Please select an assessment method');
+              return false;
+            }
+            return true;
+          }
+        },
+        {
+          title: 'Review & Validate',
+          content: `
+            <h4>Review Assessment Configuration</h4>
+            <p>Review the assessment configuration before processing.</p>
+            <div class="tf-card mb-3">
+              <div class="tf-card-body">
+                <h5 class="tf-card-title">Assessment Details</h5>
+                <table class="table">
+                  <tbody>
+                    <tr>
+                      <th>Tax District</th>
+                      <td id="summary-district">Loading...</td>
+                    </tr>
+                    <tr>
+                      <th>Property Type</th>
+                      <td id="summary-propertyType">Loading...</td>
+                    </tr>
+                    <tr>
+                      <th>Assessment Year</th>
+                      <td id="summary-assessmentYear">Loading...</td>
+                    </tr>
+                    <tr>
+                      <th>Include Exempt</th>
+                      <td id="summary-includeExempt">Loading...</td>
+                    </tr>
+                    <tr>
+                      <th>Assessment Method</th>
+                      <td id="summary-assessmentMethod">Loading...</td>
+                    </tr>
+                    <tr>
+                      <th>Adjustment Factor</th>
+                      <td id="summary-adjustmentFactor">Loading...</td>
+                    </tr>
+                    <tr>
+                      <th>Compliance Level</th>
+                      <td id="summary-complianceLevel">Loading...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="confirmAccuracy">
+              <label class="form-check-label" for="confirmAccuracy">
+                I confirm that this information is accurate
+              </label>
+            </div>
+          `,
+          init: function(container, data) {
+            // Populate the summary with collected data
+            document.getElementById('summary-district').textContent = getDistrictName(data.district);
+            document.getElementById('summary-propertyType').textContent = data.propertyType || 'All';
+            document.getElementById('summary-assessmentYear').textContent = data.assessmentYear;
+            document.getElementById('summary-includeExempt').textContent = data.includeExempt ? 'Yes' : 'No';
+            document.getElementById('summary-assessmentMethod').textContent = data.assessmentMethod;
+            document.getElementById('summary-adjustmentFactor').textContent = data.adjustmentFactor;
+            document.getElementById('summary-complianceLevel').textContent = data.complianceLevel;
+          },
+          validate: function(data) {
+            if (!data.confirmAccuracy) {
+              alert('Please confirm that the information is accurate');
+              return false;
+            }
+            return true;
+          }
+        },
+        {
+          title: 'Process & Complete',
+          content: `
+            <h4>Processing Assessment</h4>
+            <p>Your assessment is being processed. This may take a few moments.</p>
+            <div class="progress mb-4">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" id="processingProgress"></div>
+            </div>
+            <div id="processingStatus" class="alert alert-info">
+              <i class="bi bi-hourglass-split me-2"></i> Initializing assessment process...
+            </div>
+            <div id="completionSection" style="display: none;">
+              <div class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i> Assessment process completed successfully!
+              </div>
+              <h5>Assessment Results</h5>
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <th>Properties Processed</th>
+                    <td>247</td>
+                  </tr>
+                  <tr>
+                    <th>Total Assessed Value</th>
+                    <td>$183,256,900</td>
+                  </tr>
+                  <tr>
+                    <th>Average Assessment Change</th>
+                    <td>+4.2%</td>
+                  </tr>
+                  <tr>
+                    <th>Compliance Score</th>
+                    <td>98.3%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          `,
+          init: function(container, data) {
+            // Simulate processing
+            const progressBar = document.getElementById('processingProgress');
+            const statusDisplay = document.getElementById('processingStatus');
+            const completionSection = document.getElementById('completionSection');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+              progress += 5;
+              progressBar.style.width = `${progress}%`;
+              
+              // Update status text
+              if (progress === 20) {
+                statusDisplay.innerHTML = '<i class="bi bi-database me-2"></i> Retrieving property data...';
+              } else if (progress === 40) {
+                statusDisplay.innerHTML = '<i class="bi bi-calculator me-2"></i> Calculating assessment values...';
+              } else if (progress === 60) {
+                statusDisplay.innerHTML = '<i class="bi bi-clipboard-check me-2"></i> Validating compliance...';
+              } else if (progress === 80) {
+                statusDisplay.innerHTML = '<i class="bi bi-file-earmark-text me-2"></i> Generating assessment reports...';
+              }
+              
+              // Complete the process
+              if (progress >= 100) {
+                clearInterval(interval);
+                progressBar.classList.remove('progress-bar-animated');
+                statusDisplay.style.display = 'none';
+                completionSection.style.display = 'block';
+                
+                // Update workflow completion status
+                document.querySelector('.tf-workflow-completion').textContent = '100%';
+                document.querySelector('.tf-workflow-step').textContent = 'Completed';
+                document.querySelector('.tf-workflow-processing').textContent = 'Processed successfully';
+                
+                // Show notification
+                if (typeof showNotification === 'function') {
+                  showNotification('Assessment Complete', 'Your property assessment has been completed successfully!', 'success');
+                }
+              }
+            }, 500);
+          }
+        }
+      ],
+      onStepChange: function(stepIndex, data) {
+        // Update workflow metrics
+        updateWorkflowMetrics(stepIndex);
+        
+        // Update page title based on current step
+        document.title = `Step ${stepIndex + 1}: ${this.steps[stepIndex].title} | Workflow Example`;
+      },
+      onComplete: function(data) {
+        console.log('Workflow completed with data:', data);
+        
+        // You could send the data to the server here
+        // submitAssessmentData(data);
+        
+        // Show a success notification
+        if (typeof showNotification === 'function') {
+          showNotification('Workflow Complete', 'Your assessment workflow has been completed and saved.', 'success');
+        }
+        
+        // Update related tasks
+        updateRelatedTasks('completed');
+      }
+    });
+    
+    // Initialize data flow visualization
+    const dataFlow = new TerraFusionDataFlow({
+      containerId: 'assessmentDataFlow',
+      steps: [
+        {
+          title: 'Property Selection',
+          description: 'Properties are selected based on district, type, and year',
+          icon: '<i class="bi bi-house"></i>'
+        },
+        {
+          title: 'Data Retrieval',
+          description: 'Historical property data is retrieved from the database',
+          icon: '<i class="bi bi-database"></i>'
+        },
+        {
+          title: 'Market Analysis',
+          description: 'Local market conditions and trends are analyzed',
+          icon: '<i class="bi bi-graph-up"></i>'
+        },
+        {
+          title: 'Value Calculation',
+          description: 'Property values are calculated using the selected method',
+          icon: '<i class="bi bi-calculator"></i>'
+        },
+        {
+          title: 'Compliance Check',
+          description: 'Assessments are verified against regulatory requirements',
+          icon: '<i class="bi bi-clipboard-check"></i>'
+        },
+        {
+          title: 'Report Generation',
+          description: 'Final assessment reports are generated for each property',
+          icon: '<i class="bi bi-file-earmark-text"></i>'
+        }
+      ],
+      activeStep: 0
+    });
+    
+    // Initialize task suggestions
+    const tasks = new TerraFusionTaskSuggestions({
+      containerId: 'relatedTasks',
+      tasks: [
+        {
+          id: 'tax-impact',
+          title: 'Tax Impact Analysis',
+          description: 'Analyze the tax impact of these assessment changes',
+          icon: '<i class="bi bi-calculator"></i>',
+          url: '#'
+        },
+        {
+          id: 'export-data',
+          title: 'Export Assessment Data',
+          description: 'Export the completed assessment data',
+          icon: '<i class="bi bi-download"></i>',
+          url: '#'
+        },
+        {
+          id: 'create-report',
+          title: 'Generate Summary Report',
+          description: 'Create a summary report of all assessed properties',
+          icon: '<i class="bi bi-file-earmark-text"></i>',
+          url: '#'
+        },
+        {
+          id: 'schedule-review',
+          title: 'Schedule Review Meeting',
+          description: 'Set up a review meeting with the assessment team',
+          icon: '<i class="bi bi-calendar-event"></i>',
+          url: '#'
+        }
+      ],
+      onSelect: function(task) {
+        console.log('Selected task:', task);
+        alert(`You selected: ${task.title}`);
+      }
+    });
+    
+    // Setup UI event handlers
+    document.getElementById('resetWorkflow').addEventListener('click', function() {
+      if (confirm('Are you sure you want to reset the workflow? All progress will be lost.')) {
+        workflow.reset();
+        dataFlow.setActiveStep(0);
+        updateWorkflowMetrics(0);
+      }
+    });
+    
+    document.getElementById('viewDataFlow').addEventListener('click', function() {
+      document.getElementById('dataFlowSection').style.display = 'block';
+      
+      // Scroll to data flow section
+      document.getElementById('dataFlowSection').scrollIntoView({ behavior: 'smooth' });
+    });
+    
+    document.getElementById('hideDataFlow').addEventListener('click', function() {
+      document.getElementById('dataFlowSection').style.display = 'none';
+    });
+    
+    // Helper function to update workflow metrics
+    function updateWorkflowMetrics(stepIndex) {
+      const totalSteps = workflow.steps.length;
+      const completion = Math.round((stepIndex / (totalSteps - 1)) * 100);
+      
+      document.querySelector('.tf-workflow-completion').textContent = `${completion}%`;
+      document.querySelector('.tf-workflow-step').textContent = workflow.steps[stepIndex].title;
+      
+      let processingStatus = 'Not started';
+      if (stepIndex === 0) {
+        processingStatus = 'Initializing';
+      } else if (stepIndex === totalSteps - 1) {
+        processingStatus = 'Processing data';
+      } else {
+        processingStatus = 'In progress';
+      }
+      document.querySelector('.tf-workflow-processing').textContent = processingStatus;
+      
+      // Also update the data flow visualization to match
+      dataFlow.setActiveStep(stepIndex);
+    }
+    
+    // Helper function to get district name
+    function getDistrictName(districtId) {
+      const districts = {
+        '1': 'Benton County',
+        '2': 'Franklin County',
+        '3': 'Yakima County'
+      };
+      return districts[districtId] || 'Unknown District';
+    }
+    
+    // Helper function to update related tasks based on workflow state
+    function updateRelatedTasks(state) {
+      let context = { workflowState: state };
+      
+      // Add tasks specific to completed workflow
+      if (state === 'completed') {
+        const completedTasks = [
+          {
+            id: 'notice-generation',
+            title: 'Generate Assessment Notices',
+            description: 'Create and send notices to property owners',
+            icon: '<i class="bi bi-envelope"></i>',
+            priority: 10
+          },
+          {
+            id: 'compliance-report',
+            title: 'Compliance Report',
+            description: 'Generate a detailed compliance report',
+            icon: '<i class="bi bi-shield-check"></i>',
+            priority: 8
+          }
+        ];
+        
+        tasks.tasks = tasks.tasks.concat(completedTasks);
+        tasks.render();
+      }
+    }
+    
+    // Define the tour steps for this page
+    window.tourSteps = [
+      {
+        element: '.tf-workflow-container',
+        intro: 'This is the main workflow container that guides you through a step-by-step process.',
+        position: 'bottom'
+      },
+      {
+        element: '.tf-workflow-stepper-container',
+        intro: 'The workflow stepper shows your progress and allows you to navigate between steps.',
+        position: 'top'
+      },
+      {
+        element: '.tf-workflow-context',
+        intro: 'This information panel shows you the current status and progress of your workflow.',
+        position: 'bottom'
+      },
+      {
+        element: '#viewDataFlow',
+        intro: 'Click here to see a visualization of how data flows through this process.',
+        position: 'left'
+      },
+      {
+        element: '.tf-task-suggestions-container',
+        intro: 'Related tasks are suggested based on your current workflow context.',
+        position: 'top'
+      }
+    ];
+  });
+</script>
+
+<style>
+  /* Feature list styling */
+  .tf-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .tf-feature-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .tf-feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(0, 229, 255, 0.1);
+    color: var(--tf-primary);
+    border-radius: 50%;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+  
+  .tf-feature-content h6 {
+    margin: 0 0 0.25rem;
+    font-weight: 600;
+  }
+  
+  .tf-feature-content p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--tf-neutral-600);
+  }
+  
+  /* Help context styling */
+  .tf-help-context {
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .tf-help-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 229, 255, 0.1);
+    color: var(--tf-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .tf-help-trigger:hover {
+    background-color: var(--tf-primary);
+    color: var(--tf-dark);
+  }
+</style>
+{% endblock %}

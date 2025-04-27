@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TerraFusion Platform - Comprehensive analytics and management platform for property tax assessment and levy calculations.">
+    <title>{% block title %}TerraFusion Platform{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/terralevy-favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/terralevy-favicon.svg') }}">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- jQuery (for Bootstrap components and legacy support) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    
+    <!-- Chart.js (for data visualization) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <!-- Intro.js (for guided tours) -->
+    <link href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+    
+    <!-- TerraFusion Unified Design System -->
+    <link href="{{ url_for('static', filename='css/terrafusion-unified.css') }}" rel="stylesheet">
+    
+    <!-- Legacy CSS support (will be phased out) -->
+    <link href="{{ url_for('static', filename='css/terralevy-theme.css') }}" rel="stylesheet">
+    
+    <!-- Custom styles for this template -->
+    {% block extra_css %}{% endblock %}
+    
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body class="d-flex flex-column h-100">
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    
+    <!-- Header and navigation -->
+    {% include 'includes/terrafusion-header.html' %}
+    
+    <!-- Main content with container -->
+    <main class="flex-shrink-0 py-4" id="main-content">
+        <div class="container">
+            <!-- Page header section -->
+            {% if show_page_header|default(true) %}
+            <div class="row mb-4">
+                <div class="col">
+                    <h1 class="tf-page-title">{% block page_title %}Welcome to TerraFusion Platform{% endblock %}</h1>
+                    {% if page_subtitle|default(false) %}
+                    <p class="tf-page-subtitle text-muted">{{ page_subtitle }}</p>
+                    {% endif %}
+                    
+                    <div class="tf-page-actions mt-3">
+                        {% block page_actions %}{% endblock %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Flash messages/alerts -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="tf-alert tf-alert-{{ category|default('info') }} alert-dismissible fade show mb-4" role="alert">
+                        <div class="tf-alert-icon">
+                            <i class="bi {% if category == 'success' %}bi-check-circle{% elif category == 'danger' %}bi-exclamation-triangle{% elif category == 'warning' %}bi-exclamation-circle{% else %}bi-info-circle{% endif %}"></i>
+                        </div>
+                        <div class="tf-alert-content">
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Main content block -->
+            {% block content %}
+            <div class="tf-card">
+                <div class="tf-card-header">
+                    <h2 class="tf-card-title">Welcome to TerraFusion Platform</h2>
+                </div>
+                <div class="tf-card-body">
+                    <p>Welcome to the new TerraFusion Platform, a comprehensive solution for tax levy and property assessment analytics.</p>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    {% include 'includes/terrafusion-footer.html' %}
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- TerraFusion Workflow System -->
+    <script src="{{ url_for('static', filename='js/terrafusion-workflow.js') }}"></script>
+    
+    <!-- Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/terralevy-core.js') }}"></script>
+    
+    <!-- Page specific JavaScript -->
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            
+            // Initialize popovers
+            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+            const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+            
+            // Initialize keyboard navigation detection
+            window.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    document.body.classList.add('keyboard-navigation');
+                }
+            });
+            
+            window.addEventListener('mousedown', function() {
+                document.body.classList.remove('keyboard-navigation');
+            });
+            
+            // Detect high contrast mode for accessibility
+            const highContrastMq = window.matchMedia('(forced-colors: active)');
+            if (highContrastMq.matches) {
+                document.body.classList.add('high-contrast-mode');
+            }
+            
+            // Initialize guided tour if available
+            const startTourButton = document.getElementById('startTour');
+            if (startTourButton) {
+                startTourButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    initGuidedTour();
+                });
+            }
+            
+            // Check for automatic tour trigger
+            if (window.location.search.includes('tour=true')) {
+                setTimeout(initGuidedTour, 1000);
+            }
+            
+            // Initialize guided tour function
+            window.initGuidedTour = function() {
+                // Define steps based on current page
+                const tourSteps = window.tourSteps || [
+                    {
+                        element: '.tf-navbar-brand',
+                        intro: 'Welcome to TerraFusion Platform, a comprehensive solution for tax levy and property assessment analytics.'
+                    },
+                    {
+                        element: '.tf-navbar-nav',
+                        intro: 'Use the navigation menu to access different tools and features across the platform.'
+                    },
+                    {
+                        element: '.tf-breadcrumb',
+                        intro: 'Breadcrumb navigation helps you track your location within the application and quickly navigate back.'
+                    },
+                    {
+                        element: '.tf-page-title',
+                        intro: 'Each page clearly indicates what you\'re currently working on.'
+                    }
+                ];
+                
+                const tour = introJs();
+                tour.setOptions({
+                    steps: tourSteps,
+                    showProgress: true,
+                    showBullets: true,
+                    showStepNumbers: false,
+                    disableInteraction: false,
+                    exitOnOverlayClick: true,
+                    doneLabel: 'Finish',
+                    nextLabel: 'Next',
+                    prevLabel: 'Back',
+                    tooltipClass: 'tf-tour-tooltip'
+                });
+                
+                tour.start();
+            };
+            
+            // Send page load analytics
+            if (typeof sendAnalytics === 'function') {
+                sendAnalytics('page_view', {
+                    page_title: document.title,
+                    page_location: window.location.href,
+                    page_path: window.location.pathname
+                });
+            }
+        });
+    </script>
+</body>
+</html>
