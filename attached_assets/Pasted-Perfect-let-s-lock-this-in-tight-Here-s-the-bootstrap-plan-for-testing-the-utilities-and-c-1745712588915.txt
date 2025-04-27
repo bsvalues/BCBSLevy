@@ -1,0 +1,137 @@
+Perfect — let's lock this in tight.  
+Here’s the **bootstrap plan** for testing the utilities and controllers you just built:
+
+---
+
+### 🏗 Bootstrap Testing Setup
+
+**1. Install Vitest + Testing Libs**
+
+If not already installed:
+
+```bash
+pnpm add -D vitest @vitest/coverage c8
+```
+
+(or `npm` / `yarn` depending on your project)
+
+---
+
+**2. Create Test Directory Structure**
+
+We'll mirror your source structure under `/packages/levy/src`, but in `/packages/levy/test`.
+
+```plaintext
+packages/
+└── levy/
+    ├── src/
+    │    ├── controllers/
+    │    │    └── LevyController.ts
+    │    ├── utils/
+    │    │    └── schemaHelper.ts
+    │    └── middleware/
+    │         └── errorHandler.ts
+    └── test/
+         ├── controllers/
+         │    └── LevyController.test.ts
+         ├── utils/
+         │    └── schemaHelper.test.ts
+         └── middleware/
+              └── errorHandler.test.ts
+```
+
+---
+
+**3. Example Test Files**
+
+### `schemaHelper.test.ts`
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { validateSchema } from '../../src/utils/schemaHelper';
+import { z } from 'zod';
+
+const TestSchema = z.object({
+  name: z.string(),
+  age: z.number().min(0),
+});
+
+describe('schemaHelper', () => {
+  it('validates correct schema input', () => {
+    const result = validateSchema(TestSchema, { name: 'John', age: 30 });
+    expect(result.success).toBe(true);
+  });
+
+  it('fails validation on incorrect input', () => {
+    const result = validateSchema(TestSchema, { name: 'John', age: -5 });
+    expect(result.success).toBe(false);
+  });
+});
+```
+
+---
+
+### `LevyController.test.ts`
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { LevyController } from '../../src/controllers/LevyController';
+
+describe('LevyController', () => {
+  it('should have basic CRUD methods defined', () => {
+    expect(typeof LevyController.create).toBe('function');
+    expect(typeof LevyController.update).toBe('function');
+    expect(typeof LevyController.delete).toBe('function');
+    expect(typeof LevyController.get).toBe('function');
+  });
+});
+```
+
+---
+
+### `errorHandler.test.ts`
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { createError } from '../../src/middleware/errorHandler';
+
+describe('errorHandler', () => {
+  it('should create a standardized error object', () => {
+    const error = createError(400, 'Invalid Request');
+    expect(error).toHaveProperty('status', 400);
+    expect(error).toHaveProperty('message', 'Invalid Request');
+  });
+});
+```
+
+---
+
+**4. Update `package.json` scripts**
+
+```json
+"scripts": {
+  "test": "vitest run",
+  "test:watch": "vitest"
+}
+```
+
+---
+
+### 🧹 Clean Testing Philosophy
+- **Unit tests only:** We focus *only* on each file's responsibility.
+- **Don't mock the world yet:** Only if a utility needs mocking, add it later.
+- **Fail Fast:** Better to have ugly test failures early than silent wrong behavior later.
+
+---
+
+**✅ Immediate Next Step:**  
+I'll create those test files in `/packages/levy/test` based on the examples above and run a first `pnpm test` to verify everything passes cleanly.
+
+---
+
+**Would you like me to also**:  
+- Add a **coverage report** setup too (showing % tested)? 📈  
+- Add a **pre-push git hook** to **auto-run tests** before every push? 🛡️
+
+(Highly recommend both — will take <5 minutes to bootstrap!)  
+**→ Want me to add those too?** 🔥
