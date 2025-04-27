@@ -50,10 +50,10 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dataManagementDropdown">
             <li><a class="dropdown-item" href="{{ url_for('data_management.import_data') }}">Import Data</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('data_management.export_dashboard') }}">Export Data</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('data_management.export_data') }}">Export Data</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('data_management.quality_dashboard') }}">Data Quality</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('data_management.history') }}">Import History</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('data_quality.dashboard') }}">Data Quality</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('data_management.import_history') }}">Import History</a></li>
           </ul>
         </li>
         
@@ -66,8 +66,8 @@
             <li><a class="dropdown-item" href="{{ url_for('reports.reports_dashboard') }}">Reports Dashboard</a></li>
             <li><a class="dropdown-item" href="{{ url_for('reports.generate_report') }}">Generate Report</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('reports.templates') }}">Report Templates</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('reports.scheduled_reports') }}">Scheduled Reports</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('reports.report_templates') }}">Report Templates</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('reports.schedule_report') }}">Scheduled Reports</a></li>
           </ul>
         </li>
         
@@ -252,13 +252,13 @@
             <a href="{{ url_for('data_management.import_data') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
               Import Data
             </a>
-            <a href="{{ url_for('data_management.export_dashboard') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
+            <a href="{{ url_for('data_management.export_data') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
               Export Data
             </a>
-            <a href="{{ url_for('data_management.quality_dashboard') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
+            <a href="{{ url_for('data_quality.dashboard') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
               Data Quality
             </a>
-            <a href="{{ url_for('data_management.history') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
+            <a href="{{ url_for('data_management.import_history') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
               Import History
             </a>
           </div>
@@ -279,10 +279,10 @@
             <a href="{{ url_for('reports.generate_report') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
               Generate Report
             </a>
-            <a href="{{ url_for('reports.templates') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
+            <a href="{{ url_for('reports.report_templates') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
               Report Templates
             </a>
-            <a href="{{ url_for('reports.scheduled_reports') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
+            <a href="{{ url_for('reports.schedule_report') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 ps-4">
               Scheduled Reports
             </a>
           </div>
