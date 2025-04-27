@@ -72,7 +72,7 @@
         </li>
         
         <li>
-          <a href="{{ url_for('mcp.mcp_dashboard') }}" class="tf-navbar-item {% if request.path.startswith('/mcp') %}active{% endif %}">
+          <a href="{{ url_for('mcp_army_dashboard') }}" class="tf-navbar-item {% if request.path.startswith('/mcp') %}active{% endif %}">
             <i class="bi bi-lightning me-1"></i> Advanced Analysis
           </a>
         </li>
@@ -121,7 +121,7 @@
             <li><span class="dropdown-item-text">No new notifications</span></li>
           {% endif %}
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item text-center" href="{{ url_for('notifications.view_all') }}">View all</a></li>
+          <li><a class="dropdown-item text-center" href="#" id="viewAllNotifications">View all</a></li>
         </ul>
       </div>
       
@@ -160,7 +160,7 @@
             </div>
           </li>
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="{{ url_for('user.profile') }}"><i class="bi bi-person me-2"></i> My Profile</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}"><i class="bi bi-person me-2"></i> My Profile</a></li>
           <li><a class="dropdown-item" href="{{ url_for('home.settings') }}"><i class="bi bi-gear me-2"></i> Settings</a></li>
           {% if current_user.is_admin %}
           <li><a class="dropdown-item" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-shield-lock me-2"></i> Admin</a></li>
@@ -289,7 +289,7 @@
         </div>
       </div>
       
-      <a href="{{ url_for('mcp.mcp_dashboard') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 {% if request.path.startswith('/mcp') %}active{% endif %}">
+      <a href="{{ url_for('mcp_army_dashboard') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10 {% if request.path.startswith('/mcp') %}active{% endif %}">
         <i class="bi bi-lightning me-2"></i> Advanced Analysis
       </a>
       
@@ -318,7 +318,7 @@
       
       <hr class="text-light opacity-10 my-2">
       
-      <a href="{{ url_for('user.profile') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10">
+      <a href="{{ url_for('auth.profile') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10">
         <i class="bi bi-person me-2"></i> My Profile
       </a>
       <a href="{{ url_for('home.settings') }}" class="list-group-item list-group-item-action bg-dark text-light border-light border-opacity-10">
@@ -401,6 +401,18 @@ document.addEventListener('DOMContentLoaded', function() {
           initGuidedTour();
         }
       }, 300);
+    });
+  }
+  
+  // View all notifications button
+  const viewAllNotificationsBtn = document.getElementById('viewAllNotifications');
+  if (viewAllNotificationsBtn) {
+    viewAllNotificationsBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      // Show toast notification
+      if (typeof showNotification === 'function') {
+        showNotification('Notifications', 'All notifications will be displayed here.', 'info');
+      }
     });
   }
   
