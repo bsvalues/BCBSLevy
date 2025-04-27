@@ -1,0 +1,602 @@
+{% extends "terrafusion-base.html" %}
+
+{% from "components/workflow-container.html" import workflow_container, workflow_stepper, data_flow_visualization, task_suggestions, help_context, process_status %}
+
+{% block title %}UI Components Gallery - TerraFusion Platform{% endblock %}
+
+{% block page_title %}UI Components Gallery{% endblock %}
+
+{% block page_subtitle %}Reference guide for TerraFusion UI components and styles{% endblock %}
+
+{% block page_actions %}
+<button type="button" class="tf-btn tf-btn-outline me-2" id="toggleTheme">
+  <i class="bi bi-palette me-1"></i> Toggle Theme
+</button>
+<button type="button" class="tf-btn tf-btn-primary">
+  <i class="bi bi-download me-1"></i> Download Components
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    {% call workflow_container(
+      title="TerraFusion UI Components Gallery",
+      description="This gallery showcases all available UI components in the TerraFusion design system."
+    ) %}
+      <div class="tf-alert tf-alert-info mb-4">
+        <div class="tf-alert-icon">
+          <i class="bi bi-info-circle"></i>
+        </div>
+        <div class="tf-alert-content">
+          <div class="tf-alert-title">Introduction</div>
+          <p>The TerraFusion design system provides a comprehensive set of UI components for building consistent, accessible, and user-friendly interfaces.</p>
+          <p>This gallery demonstrates each component with usage examples and code snippets to help developers implement the design system correctly.</p>
+        </div>
+      </div>
+      
+      <div class="row mb-4">
+        <div class="col-lg-3">
+          <div class="nav flex-column nav-pills" id="components-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="buttons-tab" data-bs-toggle="pill" data-bs-target="#buttons" type="button" role="tab">Buttons</button>
+            <button class="nav-link" id="cards-tab" data-bs-toggle="pill" data-bs-target="#cards" type="button" role="tab">Cards</button>
+            <button class="nav-link" id="alerts-tab" data-bs-toggle="pill" data-bs-target="#alerts" type="button" role="tab">Alerts</button>
+            <button class="nav-link" id="badges-tab" data-bs-toggle="pill" data-bs-target="#badges" type="button" role="tab">Badges</button>
+            <button class="nav-link" id="forms-tab" data-bs-toggle="pill" data-bs-target="#forms" type="button" role="tab">Form Controls</button>
+            <button class="nav-link" id="workflow-tab" data-bs-toggle="pill" data-bs-target="#workflow" type="button" role="tab">Workflow Components</button>
+            <button class="nav-link" id="tables-tab" data-bs-toggle="pill" data-bs-target="#tables" type="button" role="tab">Tables</button>
+            <button class="nav-link" id="notifications-tab" data-bs-toggle="pill" data-bs-target="#notifications" type="button" role="tab">Notifications</button>
+          </div>
+        </div>
+        <div class="col-lg-9">
+          <div class="tab-content" id="components-tabContent">
+            <!-- Buttons Tab -->
+            <div class="tab-pane fade show active" id="buttons" role="tabpanel" aria-labelledby="buttons-tab">
+              <h3 class="mb-3">Buttons</h3>
+              <p>Buttons are used to trigger actions and events throughout the interface.</p>
+              
+              <h5 class="mt-4 mb-3">Button Variants</h5>
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                <button class="tf-btn tf-btn-primary">Primary</button>
+                <button class="tf-btn tf-btn-secondary">Secondary</button>
+                <button class="tf-btn tf-btn-outline">Outline</button>
+                <button class="tf-btn tf-btn-link">Link</button>
+              </div>
+              
+              <h5 class="mt-4 mb-3">Button Sizes</h5>
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                <button class="tf-btn tf-btn-primary tf-btn-sm">Small</button>
+                <button class="tf-btn tf-btn-primary">Default</button>
+                <button class="tf-btn tf-btn-primary tf-btn-lg">Large</button>
+              </div>
+              
+              <h5 class="mt-4 mb-3">Buttons with Icons</h5>
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                <button class="tf-btn tf-btn-primary">
+                  <i class="bi bi-search me-1"></i> Search
+                </button>
+                <button class="tf-btn tf-btn-outline">
+                  <i class="bi bi-filter me-1"></i> Filter
+                </button>
+                <button class="tf-btn tf-btn-secondary">
+                  <i class="bi bi-download me-1"></i> Download
+                </button>
+              </div>
+            </div>
+            
+            <!-- Cards Tab -->
+            <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
+              <h3 class="mb-3">Cards</h3>
+              <p>Cards are containers that provide a way to organize and present content in a flexible and extensible container.</p>
+              
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <div class="tf-card">
+                    <div class="tf-card-header">
+                      <h5 class="tf-card-title">Basic Card</h5>
+                    </div>
+                    <div class="tf-card-body">
+                      <p>This is a basic card with a header and body. Use this for simple content containers.</p>
+                      <div class="tf-card-actions">
+                        <button class="tf-btn tf-btn-primary">Action</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="tf-card">
+                    <div class="tf-card-header">
+                      <h5 class="tf-card-title">Card with Footer</h5>
+                    </div>
+                    <div class="tf-card-body">
+                      <p>This card includes a footer section for additional actions or metadata.</p>
+                    </div>
+                    <div class="tf-card-footer">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                        <button class="tf-btn tf-btn-outline tf-btn-sm">View Details</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <h5 class="mt-4 mb-3">Stat Cards</h5>
+              <div class="row mb-4">
+                <div class="col-md-3">
+                  <div class="tf-card tf-stat-card">
+                    <div class="tf-stat-value">2,534</div>
+                    <div class="text-muted">Total Properties</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="tf-card tf-stat-card">
+                    <div class="tf-stat-value">$3.2M</div>
+                    <div class="text-muted">Total Revenue</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="tf-card tf-stat-card">
+                    <div class="tf-stat-value">48</div>
+                    <div class="text-muted">Active Districts</div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="tf-card tf-stat-card">
+                    <div class="tf-stat-value">92%</div>
+                    <div class="text-muted">Completion Rate</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Alerts Tab -->
+            <div class="tab-pane fade" id="alerts" role="tabpanel" aria-labelledby="alerts-tab">
+              <h3 class="mb-3">Alerts</h3>
+              <p>Alerts provide contextual feedback messages for typical user actions.</p>
+              
+              <div class="tf-alert tf-alert-info mb-3">
+                <div class="tf-alert-icon">
+                  <i class="bi bi-info-circle"></i>
+                </div>
+                <div class="tf-alert-content">
+                  <div class="tf-alert-title">Information Alert</div>
+                  <p>This is an informational message for the user. Use it for general guidance and tips.</p>
+                </div>
+              </div>
+              
+              <div class="tf-alert tf-alert-success mb-3">
+                <div class="tf-alert-icon">
+                  <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="tf-alert-content">
+                  <div class="tf-alert-title">Success Alert</div>
+                  <p>This is a success message for the user. Use it to confirm that an action was completed successfully.</p>
+                </div>
+              </div>
+              
+              <div class="tf-alert tf-alert-warning mb-3">
+                <div class="tf-alert-icon">
+                  <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="tf-alert-content">
+                  <div class="tf-alert-title">Warning Alert</div>
+                  <p>This is a warning message for the user. Use it to alert the user about potential issues.</p>
+                </div>
+              </div>
+              
+              <div class="tf-alert tf-alert-error mb-3">
+                <div class="tf-alert-icon">
+                  <i class="bi bi-exclamation-circle"></i>
+                </div>
+                <div class="tf-alert-content">
+                  <div class="tf-alert-title">Error Alert</div>
+                  <p>This is an error message for the user. Use it to inform the user about errors or failures.</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Badges Tab -->
+            <div class="tab-pane fade" id="badges" role="tabpanel" aria-labelledby="badges-tab">
+              <h3 class="mb-3">Badges</h3>
+              <p>Badges are small components used to display status or highlight key information.</p>
+              
+              <h5 class="mt-4 mb-3">Badge Variants</h5>
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="tf-badge tf-badge-primary">Primary</span>
+                <span class="tf-badge tf-badge-secondary">Secondary</span>
+                <span class="tf-badge tf-badge-success">Success</span>
+                <span class="tf-badge tf-badge-warning">Warning</span>
+                <span class="tf-badge tf-badge-error">Error</span>
+                <span class="tf-badge tf-badge-info">Info</span>
+              </div>
+              
+              <h5 class="mt-4 mb-3">Badge in Context</h5>
+              <div class="mb-4">
+                <div class="tf-card">
+                  <div class="tf-card-header">
+                    <h5 class="tf-card-title">Tax District Status</h5>
+                  </div>
+                  <div class="tf-card-body">
+                    <ul class="list-group">
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Benton County School District
+                        <span class="tf-badge tf-badge-success">Active</span>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Kennewick City
+                        <span class="tf-badge tf-badge-warning">Pending Review</span>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Franklin County Fire District
+                        <span class="tf-badge tf-badge-primary">New</span>
+                      </li>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Richland Hospital District
+                        <span class="tf-badge tf-badge-error">Inactive</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Forms Tab -->
+            <div class="tab-pane fade" id="forms" role="tabpanel" aria-labelledby="forms-tab">
+              <h3 class="mb-3">Form Controls</h3>
+              <p>Form controls provide interactive elements for gathering user input.</p>
+              
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <div class="tf-form-group">
+                    <label class="tf-form-label">Text Input</label>
+                    <input type="text" class="tf-form-control" placeholder="Enter text">
+                    <div class="tf-form-text">Helper text for the input field</div>
+                  </div>
+                  
+                  <div class="tf-form-group">
+                    <label class="tf-form-label">Select Input</label>
+                    <select class="tf-form-control">
+                      <option selected>Choose an option</option>
+                      <option>Option 1</option>
+                      <option>Option 2</option>
+                      <option>Option 3</option>
+                    </select>
+                  </div>
+                  
+                  <div class="tf-form-group">
+                    <label class="tf-form-label">Textarea</label>
+                    <textarea class="tf-form-control" rows="3" placeholder="Enter multiple lines of text"></textarea>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="tf-form-group">
+                    <label class="tf-form-label">Validation States</label>
+                    <input type="text" class="tf-form-control is-valid" placeholder="Valid input">
+                    <div class="tf-form-text text-success">This input is valid</div>
+                  </div>
+                  
+                  <div class="tf-form-group">
+                    <label class="tf-form-label">Error State</label>
+                    <input type="text" class="tf-form-control is-invalid" placeholder="Invalid input">
+                    <div class="tf-feedback-invalid">This field is required</div>
+                  </div>
+                  
+                  <div class="tf-form-group">
+                    <label class="tf-form-label">Checkboxes</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="checkbox1">
+                      <label class="form-check-label" for="checkbox1">Option 1</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="checkbox2" checked>
+                      <label class="form-check-label" for="checkbox2">Option 2</label>
+                    </div>
+                  </div>
+                  
+                  <div class="tf-form-group">
+                    <label class="tf-form-label">Radio Buttons</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="radioGroup" id="radio1" checked>
+                      <label class="form-check-label" for="radio1">Option 1</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" name="radioGroup" id="radio2">
+                      <label class="form-check-label" for="radio2">Option 2</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <h5 class="mt-4 mb-3">Form Actions</h5>
+              <div class="tf-form-actions">
+                <button class="tf-btn tf-btn-primary">Submit</button>
+                <button class="tf-btn tf-btn-outline">Cancel</button>
+              </div>
+            </div>
+            
+            <!-- Workflow Components Tab -->
+            <div class="tab-pane fade" id="workflow" role="tabpanel" aria-labelledby="workflow-tab">
+              <h3 class="mb-3">Workflow Components</h3>
+              <p>Workflow components help users navigate through complex multi-step processes.</p>
+              
+              <h5 class="mt-4 mb-3">Workflow Stepper</h5>
+              <div class="mb-4">
+                {{ workflow_stepper([
+                  {"title": "Step 1", "description": "Configure options"},
+                  {"title": "Step 2", "description": "Enter data"},
+                  {"title": "Step 3", "description": "Review & Submit"},
+                  {"title": "Step 4", "description": "Confirmation"}
+                ], 2) }}
+              </div>
+              
+              <h5 class="mt-4 mb-3">Data Flow Visualization</h5>
+              <div class="mb-4">
+                {{ data_flow_visualization([
+                  {"title": "Data Input", "description": "Enter or upload raw data", "icon": "bi-upload"},
+                  {"title": "Data Processing", "description": "Clean and transform data", "icon": "bi-gear"},
+                  {"title": "Analysis", "description": "Perform calculations and analysis", "icon": "bi-graph-up"},
+                  {"title": "Reporting", "description": "Generate insights and reports", "icon": "bi-file-earmark-text"}
+                ], 1) }}
+              </div>
+              
+              <h5 class="mt-4 mb-3">Process Status</h5>
+              <div class="tf-card mb-4">
+                <div class="tf-card-header">
+                  <h5 class="tf-card-title">Process Status</h5>
+                </div>
+                <div class="tf-card-body">
+                  {{ process_status("Data Import", "completed", "Completed at 10:15 AM") }}
+                  {{ process_status("Data Validation", "processing", "Running validation checks...") }}
+                  {{ process_status("Analysis", "pending", "Waiting for validation to complete") }}
+                  {{ process_status("Report Generation", "error", "Failed: Missing required fields") }}
+                </div>
+              </div>
+              
+              <h5 class="mt-4 mb-3">Task Suggestions</h5>
+              <div class="mb-4">
+                {{ task_suggestions([
+                  {
+                    "title": "Complete Profile",
+                    "description": "Add your contact details and preferences",
+                    "icon": "bi-person",
+                    "url": "#"
+                  },
+                  {
+                    "title": "Import Data",
+                    "description": "Import tax district data from files",
+                    "icon": "bi-upload",
+                    "url": "#"
+                  },
+                  {
+                    "title": "Run Reports",
+                    "description": "Generate financial reports for your districts",
+                    "icon": "bi-file-earmark-bar-graph",
+                    "url": "#"
+                  }
+                ]) }}
+              </div>
+              
+              <h5 class="mt-4 mb-3">Help Context</h5>
+              <div class="mb-4">
+                <div class="tf-card">
+                  <div class="tf-card-header">
+                    <h5 class="tf-card-title">
+                      Tax Rate Calculator
+                      {{ help_context(
+                        id="helpCalculator",
+                        title="Tax Rate Calculator",
+                        content="This calculator helps you determine the appropriate tax rate based on district assessed values and levy amounts."
+                      ) }}
+                    </h5>
+                  </div>
+                  <div class="tf-card-body">
+                    <p>Form fields with contextual help:</p>
+                    <div class="tf-form-group">
+                      <label class="d-flex align-items-center">
+                        Assessed Value
+                        {{ help_context(
+                          id="helpAssessedValue",
+                          content="The total assessed value of all properties in the district."
+                        ) }}
+                      </label>
+                      <input type="text" class="tf-form-control" value="$10,000,000">
+                    </div>
+                    <div class="tf-form-group">
+                      <label class="d-flex align-items-center">
+                        Levy Amount
+                        {{ help_context(
+                          id="helpLevyAmount",
+                          content="The total amount to be collected through property taxes."
+                        ) }}
+                      </label>
+                      <input type="text" class="tf-form-control" value="$150,000">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tables Tab -->
+            <div class="tab-pane fade" id="tables" role="tabpanel" aria-labelledby="tables-tab">
+              <h3 class="mb-3">Tables</h3>
+              <p>Tables are used to display structured data in a grid format.</p>
+              
+              <div class="tf-table-container mb-4">
+                <table class="tf-table">
+                  <thead>
+                    <tr>
+                      <th>District Name</th>
+                      <th>Tax Code</th>
+                      <th>Total Assessed Value</th>
+                      <th>Levy Rate</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Benton County School District</td>
+                      <td>BC-SCH-001</td>
+                      <td>$456,789,000</td>
+                      <td>1.75%</td>
+                      <td><span class="tf-badge tf-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td>Kennewick City</td>
+                      <td>KC-CITY-032</td>
+                      <td>$234,567,000</td>
+                      <td>1.25%</td>
+                      <td><span class="tf-badge tf-badge-warning">Pending</span></td>
+                    </tr>
+                    <tr>
+                      <td>Franklin County Fire District</td>
+                      <td>FC-FIRE-015</td>
+                      <td>$123,456,000</td>
+                      <td>0.95%</td>
+                      <td><span class="tf-badge tf-badge-primary">New</span></td>
+                    </tr>
+                    <tr>
+                      <td>Richland Hospital District</td>
+                      <td>RHD-022</td>
+                      <td>$345,678,000</td>
+                      <td>0.45%</td>
+                      <td><span class="tf-badge tf-badge-info">Updated</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <h5 class="mt-4 mb-3">Table with Actions</h5>
+              <div class="tf-table-container mb-4">
+                <table class="tf-table">
+                  <thead>
+                    <tr>
+                      <th>Property ID</th>
+                      <th>Address</th>
+                      <th>Assessed Value</th>
+                      <th>Tax Amount</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>P-12345</td>
+                      <td>123 Main St, Kennewick</td>
+                      <td>$350,000</td>
+                      <td>$5,250</td>
+                      <td>
+                        <div class="d-flex gap-2">
+                          <button class="tf-btn tf-btn-outline tf-btn-sm">View</button>
+                          <button class="tf-btn tf-btn-primary tf-btn-sm">Edit</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>P-23456</td>
+                      <td>456 Oak Ave, Richland</td>
+                      <td>$425,000</td>
+                      <td>$6,375</td>
+                      <td>
+                        <div class="d-flex gap-2">
+                          <button class="tf-btn tf-btn-outline tf-btn-sm">View</button>
+                          <button class="tf-btn tf-btn-primary tf-btn-sm">Edit</button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>P-34567</td>
+                      <td>789 Pine Ln, Pasco</td>
+                      <td>$275,000</td>
+                      <td>$4,125</td>
+                      <td>
+                        <div class="d-flex gap-2">
+                          <button class="tf-btn tf-btn-outline tf-btn-sm">View</button>
+                          <button class="tf-btn tf-btn-primary tf-btn-sm">Edit</button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Notifications Tab -->
+            <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+              <h3 class="mb-3">Notifications</h3>
+              <p>Notifications provide feedback to users about system events and actions.</p>
+              
+              <h5 class="mt-4 mb-3">Notification Examples</h5>
+              <div class="mb-4">
+                <p>Click the buttons below to trigger different types of notifications:</p>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                  <button class="tf-btn tf-btn-primary" id="showInfoNotification">
+                    <i class="bi bi-info-circle me-1"></i> Info Notification
+                  </button>
+                  <button class="tf-btn tf-btn-success" id="showSuccessNotification">
+                    <i class="bi bi-check-circle me-1"></i> Success Notification
+                  </button>
+                  <button class="tf-btn tf-btn-warning" id="showWarningNotification">
+                    <i class="bi bi-exclamation-triangle me-1"></i> Warning Notification
+                  </button>
+                  <button class="tf-btn tf-btn-danger" id="showErrorNotification">
+                    <i class="bi bi-exclamation-circle me-1"></i> Error Notification
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endcall %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Notification examples
+    document.getElementById('showInfoNotification').addEventListener('click', function() {
+      showNotification('Information', 'This is an informational message for the user.', 'info');
+    });
+    
+    document.getElementById('showSuccessNotification').addEventListener('click', function() {
+      showNotification('Success', 'Your changes have been saved successfully!', 'success');
+    });
+    
+    document.getElementById('showWarningNotification').addEventListener('click', function() {
+      showNotification('Warning', 'Please review your input before proceeding.', 'warning');
+    });
+    
+    document.getElementById('showErrorNotification').addEventListener('click', function() {
+      showNotification('Error', 'An error occurred while saving your changes.', 'error');
+    });
+    
+    // Toggle theme (placeholder functionality)
+    document.getElementById('toggleTheme').addEventListener('click', function() {
+      document.body.classList.toggle('tf-dark-theme');
+      showNotification('Theme Changed', 'UI theme has been updated.', 'info');
+    });
+    
+    // Register help topics
+    if (window.terraFusionHelp) {
+      window.terraFusionHelp.registerTopics({
+        'calculator': {
+          title: 'Tax Rate Calculator',
+          content: 'This calculator helps you determine the appropriate tax rate based on district assessed values and levy amounts.'
+        },
+        'assessedvalue': {
+          title: 'Assessed Value',
+          content: 'The total assessed value is the sum of all property values in a tax district as determined by the county assessor.'
+        },
+        'levyamount': {
+          title: 'Levy Amount',
+          content: 'The total amount of money to be collected from property owners within a tax district.'
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,204 +1,254 @@
 <!DOCTYPE html>
-<html lang="en" class="h-100">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TerraFusion Platform - Comprehensive analytics and management platform for property tax assessment and levy calculations.">
-    <title>{% block title %}TerraFusion Platform{% endblock %}</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" href="{{ url_for('static', filename='images/terralevy-favicon.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/terralevy-favicon.svg') }}">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- jQuery (for Bootstrap components and legacy support) -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    
-    <!-- Chart.js (for data visualization) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    
-    <!-- Intro.js (for guided tours) -->
-    <link href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
-    
-    <!-- TerraFusion Unified Design System -->
-    <link href="{{ url_for('static', filename='css/terrafusion-unified.css') }}" rel="stylesheet">
-    
-    <!-- Legacy CSS support (will be phased out) -->
-    <link href="{{ url_for('static', filename='css/terralevy-theme.css') }}" rel="stylesheet">
-    
-    <!-- Custom styles for this template -->
-    {% block extra_css %}{% endblock %}
-    
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block title %}TerraFusion Platform{% endblock %}</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <!-- IntroJS for guided tours -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@7.0.1/minified/introjs.min.css">
+  
+  <!-- Chart.js for data visualization -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/Chart.min.css">
+  
+  <!-- TerraFusion Unified CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/terrafusion-unified.css') }}">
+  
+  <!-- Page-specific CSS -->
+  {% block additional_css %}{% endblock %}
+  
+  <!-- Favicon -->
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
-<body class="d-flex flex-column h-100">
-    <!-- Skip to content link for accessibility -->
-    <a href="#main-content" class="skip-to-content">Skip to main content</a>
-    
-    <!-- Header and navigation -->
-    {% include 'includes/terrafusion-header.html' %}
-    
-    <!-- Main content with container -->
-    <main class="flex-shrink-0 py-4" id="main-content">
-        <div class="container">
-            <!-- Page header section -->
-            {% if show_page_header|default(true) %}
-            <div class="row mb-4">
-                <div class="col">
-                    <h1 class="tf-page-title">{% block page_title %}Welcome to TerraFusion Platform{% endblock %}</h1>
-                    {% if page_subtitle|default(false) %}
-                    <p class="tf-page-subtitle text-muted">{{ page_subtitle }}</p>
-                    {% endif %}
-                    
-                    <div class="tf-page-actions mt-3">
-                        {% block page_actions %}{% endblock %}
-                    </div>
-                </div>
-            </div>
+
+<body class="tf-body">
+  <!-- Notifications Container -->
+  <div class="tf-notifications-container" id="notificationsContainer"></div>
+  
+  <!-- Header -->
+  {% include 'includes/terrafusion-header.html' %}
+  
+  <!-- Main Content Area -->
+  <main class="tf-main-content">
+    <!-- Page Header -->
+    <div class="tf-page-header">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h1 class="tf-page-title">{% block page_title %}{% endblock %}</h1>
+            {% if self.page_subtitle() %}
+            <p class="tf-page-subtitle">{% block page_subtitle %}{% endblock %}</p>
             {% endif %}
-            
-            <!-- Flash messages/alerts -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                    <div class="tf-alert tf-alert-{{ category|default('info') }} alert-dismissible fade show mb-4" role="alert">
-                        <div class="tf-alert-icon">
-                            <i class="bi {% if category == 'success' %}bi-check-circle{% elif category == 'danger' %}bi-exclamation-triangle{% elif category == 'warning' %}bi-exclamation-circle{% else %}bi-info-circle{% endif %}"></i>
-                        </div>
-                        <div class="tf-alert-content">
-                            {{ message }}
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            
-            <!-- Main content block -->
-            {% block content %}
-            <div class="tf-card">
-                <div class="tf-card-header">
-                    <h2 class="tf-card-title">Welcome to TerraFusion Platform</h2>
-                </div>
-                <div class="tf-card-body">
-                    <p>Welcome to the new TerraFusion Platform, a comprehensive solution for tax levy and property assessment analytics.</p>
-                </div>
-            </div>
-            {% endblock %}
+          </div>
+          <div class="col-md-4 text-md-end">
+            {% block page_actions %}{% endblock %}
+          </div>
         </div>
-    </main>
+      </div>
+    </div>
     
-    <!-- Footer -->
-    {% include 'includes/terrafusion-footer.html' %}
+    <!-- Page Content -->
+    <div class="container tf-page-container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  {% include 'includes/terrafusion-footer.html' %}
+  
+  <!-- Bootstrap JS and Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- IntroJS for guided tours -->
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@7.0.1/intro.min.js"></script>
+  
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+  
+  <!-- Unified TerraFusion JS -->
+  <script src="{{ url_for('static', filename='js/terrafusion-workflow.js') }}"></script>
+  
+  <!-- Notifications System -->
+  <script>
+    // Unified notification system
+    function showNotification(title, message, type = 'info', duration = 5000) {
+      const container = document.getElementById('notificationsContainer');
+      
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `tf-notification tf-notification-${type}`;
+      
+      // Add notification content
+      notification.innerHTML = `
+        <div class="tf-notification-icon">
+          <i class="bi ${type === 'success' ? 'bi-check-circle' : 
+                      type === 'warning' ? 'bi-exclamation-triangle' : 
+                      type === 'error' ? 'bi-exclamation-circle' : 'bi-info-circle'}"></i>
+        </div>
+        <div class="tf-notification-content">
+          <div class="tf-notification-title">${title}</div>
+          <div class="tf-notification-message">${message}</div>
+        </div>
+        <button class="tf-notification-close">
+          <i class="bi bi-x"></i>
+        </button>
+      `;
+      
+      // Append notification to container
+      container.appendChild(notification);
+      
+      // Add event listener for close button
+      const closeButton = notification.querySelector('.tf-notification-close');
+      closeButton.addEventListener('click', function() {
+        container.removeChild(notification);
+      });
+      
+      // Show notification with animation
+      setTimeout(() => {
+        notification.classList.add('tf-notification-visible');
+      }, 10);
+      
+      // Auto-dismiss after duration
+      if (duration > 0) {
+        setTimeout(() => {
+          notification.classList.remove('tf-notification-visible');
+          setTimeout(() => {
+            if (container.contains(notification)) {
+              container.removeChild(notification);
+            }
+          }, 300);
+        }, duration);
+      }
+      
+      return notification;
+    }
     
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- TerraFusion Workflow System -->
-    <script src="{{ url_for('static', filename='js/terrafusion-workflow.js') }}"></script>
-    
-    <!-- Core JavaScript -->
-    <script src="{{ url_for('static', filename='js/terralevy-core.js') }}"></script>
-    
-    <!-- Page specific JavaScript -->
-    {% block extra_js %}{% endblock %}
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize tooltips
-            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-            
-            // Initialize popovers
-            const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-            const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
-            
-            // Initialize keyboard navigation detection
-            window.addEventListener('keydown', function(e) {
-                if (e.key === 'Tab') {
-                    document.body.classList.add('keyboard-navigation');
-                }
-            });
-            
-            window.addEventListener('mousedown', function() {
-                document.body.classList.remove('keyboard-navigation');
-            });
-            
-            // Detect high contrast mode for accessibility
-            const highContrastMq = window.matchMedia('(forced-colors: active)');
-            if (highContrastMq.matches) {
-                document.body.classList.add('high-contrast-mode');
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+      const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      [...tooltips].map(tooltip => new bootstrap.Tooltip(tooltip));
+      
+      // Initialize context help system
+      if (typeof terraFusionHelp === 'undefined') {
+        window.terraFusionHelp = {
+          topics: {},
+          registerTopic: function(id, title, content) {
+            this.topics[id] = { title, content };
+          },
+          registerTopics: function(topicsObj) {
+            for (const [id, data] of Object.entries(topicsObj)) {
+              this.registerTopic(id, data.title, data.content);
+            }
+          },
+          showHelpModal: function(id) {
+            if (!this.topics[id]) {
+              console.error(`Help topic '${id}' not found`);
+              return;
             }
             
-            // Initialize guided tour if available
-            const startTourButton = document.getElementById('startTour');
-            if (startTourButton) {
-                startTourButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    initGuidedTour();
-                });
+            const topic = this.topics[id];
+            const modalId = `helpModal_${id}`;
+            
+            // Create modal if it doesn't exist
+            let modal = document.getElementById(modalId);
+            if (!modal) {
+              modal = document.createElement('div');
+              modal.className = 'modal fade';
+              modal.id = modalId;
+              modal.setAttribute('tabindex', '-1');
+              modal.setAttribute('aria-hidden', 'true');
+              
+              modal.innerHTML = `
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">${topic.title}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      ${topic.content}
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              `;
+              
+              document.body.appendChild(modal);
             }
             
-            // Check for automatic tour trigger
-            if (window.location.search.includes('tour=true')) {
-                setTimeout(initGuidedTour, 1000);
-            }
-            
-            // Initialize guided tour function
-            window.initGuidedTour = function() {
-                // Define steps based on current page
-                const tourSteps = window.tourSteps || [
-                    {
-                        element: '.tf-navbar-brand',
-                        intro: 'Welcome to TerraFusion Platform, a comprehensive solution for tax levy and property assessment analytics.'
-                    },
-                    {
-                        element: '.tf-navbar-nav',
-                        intro: 'Use the navigation menu to access different tools and features across the platform.'
-                    },
-                    {
-                        element: '.tf-breadcrumb',
-                        intro: 'Breadcrumb navigation helps you track your location within the application and quickly navigate back.'
-                    },
-                    {
-                        element: '.tf-page-title',
-                        intro: 'Each page clearly indicates what you\'re currently working on.'
-                    }
-                ];
-                
-                const tour = introJs();
-                tour.setOptions({
-                    steps: tourSteps,
-                    showProgress: true,
-                    showBullets: true,
-                    showStepNumbers: false,
-                    disableInteraction: false,
-                    exitOnOverlayClick: true,
-                    doneLabel: 'Finish',
-                    nextLabel: 'Next',
-                    prevLabel: 'Back',
-                    tooltipClass: 'tf-tour-tooltip'
-                });
-                
-                tour.start();
-            };
-            
-            // Send page load analytics
-            if (typeof sendAnalytics === 'function') {
-                sendAnalytics('page_view', {
-                    page_title: document.title,
-                    page_location: window.location.href,
-                    page_path: window.location.pathname
-                });
-            }
-        });
-    </script>
+            // Show the modal
+            const modalInstance = new bootstrap.Modal(modal);
+            modalInstance.show();
+          }
+        };
+      }
+    });
+    
+    // Function to initialize a guided tour
+    function initGuidedTour() {
+      // Define tour steps based on current page
+      let steps = [];
+      
+      // Try to get page-specific tour steps
+      if (typeof pageTourSteps !== 'undefined' && Array.isArray(pageTourSteps)) {
+        steps = pageTourSteps;
+      } else {
+        // Default tour for standard pages
+        steps = [
+          {
+            element: '.tf-navbar',
+            intro: 'This is the primary navigation bar where you can access all key features.',
+            position: 'bottom'
+          },
+          {
+            element: '.tf-page-header',
+            intro: 'The page header shows your current location and provides context for the current screen.',
+            position: 'bottom'
+          },
+          {
+            element: '.tf-page-container',
+            intro: 'This is the main content area where you\'ll work with data and complete workflows.',
+            position: 'top'
+          },
+          {
+            element: '.tf-notifications-container',
+            intro: 'Notifications appear here to provide updates and alerts without interrupting your work.',
+            position: 'left'
+          }
+        ];
+      }
+      
+      // Initialize IntroJS with steps
+      const tour = introJs();
+      tour.setOptions({
+        steps: steps,
+        showProgress: true,
+        showBullets: true,
+        showStepNumbers: false,
+        disableInteraction: false,
+        exitOnOverlayClick: true,
+        doneLabel: 'Finish',
+        nextLabel: 'Next',
+        prevLabel: 'Back',
+        tooltipClass: 'tf-tour-tooltip'
+      });
+      
+      tour.start();
+      
+      return tour;
+    }
+  </script>
+  
+  <!-- Page-specific JavaScript -->
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

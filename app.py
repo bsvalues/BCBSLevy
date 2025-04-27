@@ -304,7 +304,7 @@ from routes_levy_calculator import levy_calculator_bp, register_levy_calculator_
 from routes_historical_analysis import historical_analysis_bp, init_historical_analysis_routes
 from routes_mcp import mcp_bp, init_mcp_routes
 from routes_advanced_mcp import advanced_mcp_bp
-from routes_examples import examples_bp
+from routes_examples import examples_bp, init_example_routes
 from routes_budget_impact import budget_impact_bp
 from routes_reports_new import init_report_routes
 from routes_home import home_bp, init_home_routes
@@ -329,7 +329,8 @@ app.register_blueprint(db_fix_bp)
 # Note: historical_analysis_bp is registered via init_historical_analysis_routes
 # Note: mcp_bp is registered via init_mcp_routes
 app.register_blueprint(advanced_mcp_bp)
-app.register_blueprint(examples_bp)
+# examples_bp is now registered via init_example_routes
+# app.register_blueprint(examples_bp)
 app.register_blueprint(budget_impact_bp)
 
 # Register direct MCP Army dashboard route
@@ -387,6 +388,16 @@ try:
     app.logger.info("MCP UI routes registered")
 except Exception as e:
     app.logger.error(f"Error registering MCP UI routes: {str(e)}")
+
+# Register examples routes with unified UI components
+try:
+    # Already imported at the top of the file
+    init_example_routes(app)
+    app.logger.info("Example routes registered with unified UI components")
+except ImportError as e:
+    app.logger.warning(f"Could not import example routes: {str(e)}")
+except Exception as e:
+    app.logger.error(f"Error initializing example routes: {str(e)}")
 
 # Import models after db is defined to avoid circular imports
 with app.app_context():

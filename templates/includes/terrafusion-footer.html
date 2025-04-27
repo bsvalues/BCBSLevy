@@ -1,294 +1,68 @@
-<!-- TerraFusion Unified Footer -->
-<footer class="footer mt-auto py-4 bg-dark text-light">
+<footer class="tf-footer">
   <div class="container">
     <div class="row">
       <div class="col-md-4 mb-4 mb-md-0">
-        <div class="d-flex align-items-center mb-3">
-          <img src="{{ url_for('static', filename='images/terralevy-logo.svg') }}" alt="TerraFusion Platform" height="30">
-          <span class="ms-2 h5 mb-0">TerraFusion Platform</span>
-        </div>
-        <p class="small text-light-50">
-          Comprehensive multi-component process (MCP) management platform for tax levy and property assessment analytics.
+        <h5 class="tf-footer-heading">TerraFusion Platform</h5>
+        <p class="tf-footer-description">
+          Comprehensive tax levy and property assessment management with integrated AI-powered analysis and decision support.
         </p>
-        <div class="d-flex gap-2">
-          <a href="{{ url_for('home.about') }}" class="text-light text-decoration-none small">About</a>
-          <span class="text-muted mx-1">|</span>
-          <a href="{{ url_for('home.help_page') }}" class="text-light text-decoration-none small">Help</a>
-          <span class="text-muted mx-1">|</span>
-          <a href="#" class="text-light text-decoration-none small">Contact</a>
+        <div class="mt-3">
+          <a href="{{ url_for('home.about') }}" class="tf-footer-link">About</a>
+          <span class="tf-footer-divider">|</span>
+          <a href="{{ url_for('home.privacy') }}" class="tf-footer-link">Privacy</a>
+          <span class="tf-footer-divider">|</span>
+          <a href="{{ url_for('home.terms') }}" class="tf-footer-link">Terms</a>
         </div>
       </div>
       
       <div class="col-md-2 mb-4 mb-md-0">
-        <h6 class="text-primary mb-3">Tax Calculation</h6>
-        <ul class="list-unstyled small">
-          <li class="mb-2"><a href="{{ url_for('levy_calculator.calculator') }}" class="text-light text-decoration-none">Levy Calculator</a></li>
-          <li class="mb-2"><a href="{{ url_for('levy_calculator.get_scenarios') }}" class="text-light text-decoration-none">Levy Scenarios</a></li>
-          <li class="mb-2"><a href="{{ url_for('levy_calculator.impact_calculator') }}" class="text-light text-decoration-none">Tax Impact Analysis</a></li>
-          <li class="mb-2"><a href="{{ url_for('forecasting.forecasting_dashboard') }}" class="text-light text-decoration-none">Forecasting</a></li>
+        <h5 class="tf-footer-heading">Quick Links</h5>
+        <ul class="tf-footer-list">
+          <li><a href="{{ url_for('home.dashboard') }}" class="tf-footer-link">Dashboard</a></li>
+          <li><a href="{{ url_for('levy_calculator.calculator') }}" class="tf-footer-link">Levy Calculator</a></li>
+          <li><a href="{{ url_for('property_assessment.assessment_dashboard') }}" class="tf-footer-link">Property Assessment</a></li>
+          <li><a href="{{ url_for('reports.reports_dashboard') }}" class="tf-footer-link">Reports</a></li>
         </ul>
       </div>
       
       <div class="col-md-2 mb-4 mb-md-0">
-        <h6 class="text-primary mb-3">Assessment</h6>
-        <ul class="list-unstyled small">
-          <li class="mb-2"><a href="{{ url_for('property_assessment.assessment_dashboard') }}" class="text-light text-decoration-none">Assessment Dashboard</a></li>
-          <li class="mb-2"><a href="{{ url_for('property_assessment.property_search') }}" class="text-light text-decoration-none">Property Search</a></li>
-          <li class="mb-2"><a href="{{ url_for('property_assessment.assessment_workflow') }}" class="text-light text-decoration-none">Assessment Workflow</a></li>
-          <li class="mb-2"><a href="{{ url_for('property_assessment.compliance_dashboard') }}" class="text-light text-decoration-none">Compliance Review</a></li>
+        <h5 class="tf-footer-heading">Resources</h5>
+        <ul class="tf-footer-list">
+          <li><a href="{{ url_for('home.help_page') }}" class="tf-footer-link">User Guide</a></li>
+          <li><a href="{{ url_for('glossary.glossary') }}" class="tf-footer-link">Glossary</a></li>
+          <li><a href="{{ url_for('home.faq') }}" class="tf-footer-link">FAQ</a></li>
+          <li><a href="{{ url_for('home.support') }}" class="tf-footer-link">Support</a></li>
         </ul>
       </div>
       
-      <div class="col-md-2 mb-4 mb-md-0">
-        <h6 class="text-primary mb-3">Data & Reports</h6>
-        <ul class="list-unstyled small">
-          <li class="mb-2"><a href="{{ url_for('data_management.import_dashboard') }}" class="text-light text-decoration-none">Import Data</a></li>
-          <li class="mb-2"><a href="{{ url_for('data_management.export_dashboard') }}" class="text-light text-decoration-none">Export Data</a></li>
-          <li class="mb-2"><a href="{{ url_for('reports.reports_dashboard') }}" class="text-light text-decoration-none">Reports Dashboard</a></li>
-          <li class="mb-2"><a href="{{ url_for('reports.templates') }}" class="text-light text-decoration-none">Report Templates</a></li>
-        </ul>
-      </div>
-      
-      <div class="col-md-2">
-        <h6 class="text-primary mb-3">Advanced</h6>
-        <ul class="list-unstyled small">
-          <li class="mb-2"><a href="{{ url_for('mcp.mcp_dashboard') }}" class="text-light text-decoration-none">Advanced Analysis</a></li>
-          <li class="mb-2"><a href="{{ url_for('mcp.mcp_army_dashboard') }}" class="text-light text-decoration-none">MCP Army Dashboard</a></li>
-          <li class="mb-2"><a href="{{ url_for('data_management.quality_dashboard') }}" class="text-light text-decoration-none">Data Quality</a></li>
-          <li class="mb-2"><a href="{{ url_for('admin.dashboard') }}" class="text-light text-decoration-none">Admin Dashboard</a></li>
-        </ul>
+      <div class="col-md-4">
+        <h5 class="tf-footer-heading">Contact Us</h5>
+        <p class="tf-footer-contact">
+          <i class="bi bi-envelope me-2"></i> support@terrafusion.gov
+        </p>
+        <p class="tf-footer-contact">
+          <i class="bi bi-telephone me-2"></i> (555) 123-4567
+        </p>
+        <p class="tf-footer-contact">
+          <i class="bi bi-geo-alt me-2"></i> 123 Government Ave, Suite 300<br>
+          <span class="ms-4">Capital City, ST 12345</span>
+        </p>
       </div>
     </div>
     
-    <hr class="border-secondary my-4">
+    <hr class="tf-footer-divider-hr">
     
-    <div class="row align-items-center">
-      <div class="col-md-6 text-center text-md-start">
-        <p class="small mb-0 text-muted">
-          &copy; {{ current_year|default(2025) }} TerraFusion Platform. All rights reserved.
-        </p>
-      </div>
-      <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
-        <div class="d-flex justify-content-center justify-content-md-end">
-          <a href="#" class="text-light me-3" title="Terms of Service">
-            <small>Terms</small>
-          </a>
-          <a href="#" class="text-light me-3" title="Privacy Policy">
-            <small>Privacy</small>
-          </a>
-          <a href="#" class="text-light" title="Cookies Policy">
-            <small>Cookies</small>
-          </a>
+    <div class="tf-footer-bottom">
+      <div class="row align-items-center">
+        <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+          <p class="tf-footer-copyright">&copy; {{ current_year|default('2025') }} TerraFusion Platform. All rights reserved.</p>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          {% if app_version %}
+          <p class="tf-footer-version">Version {{ app_version }}</p>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
 </footer>
-
-<!-- Workflow Status Toast Container -->
-<div class="tf-toast-container position-fixed top-0 end-0 p-3" style="z-index: 1080;">
-  <!-- Toasts will be injected here by JavaScript -->
-</div>
-
-<!-- Context Help Mode Indicator -->
-<div class="tf-context-help-indicator">
-  <div class="tf-context-help-badge">
-    <i class="bi bi-lightbulb"></i> Context Help Mode
-  </div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the toast container
-    if (typeof bootstrap !== 'undefined') {
-      const toastElements = document.querySelectorAll('.toast');
-      toastElements.forEach(toastEl => {
-        new bootstrap.Toast(toastEl);
-      });
-    }
-    
-    // Helper function to show notifications
-    window.showNotification = function(title, message, type = 'info', duration = 5000) {
-      const container = document.querySelector('.tf-toast-container');
-      if (!container) return;
-      
-      // Create toast element
-      const toast = document.createElement('div');
-      toast.className = `toast tf-toast tf-toast-${type}`;
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      
-      // Set duration
-      if (duration) {
-        toast.setAttribute('data-bs-delay', duration);
-      }
-      
-      // Create toast content
-      let iconClass = 'bi-info-circle';
-      switch (type) {
-        case 'success':
-          iconClass = 'bi-check-circle';
-          break;
-        case 'warning':
-          iconClass = 'bi-exclamation-triangle';
-          break;
-        case 'danger':
-        case 'error':
-          iconClass = 'bi-exclamation-circle';
-          break;
-      }
-      
-      toast.innerHTML = `
-        <div class="toast-header">
-          <i class="bi ${iconClass} me-2"></i>
-          <strong class="me-auto">${title}</strong>
-          <small>${new Date().toLocaleTimeString()}</small>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-          ${message}
-        </div>
-      `;
-      
-      // Add to container
-      container.appendChild(toast);
-      
-      // Show toast
-      if (typeof bootstrap !== 'undefined') {
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-        
-        // Remove from DOM after hiding
-        toast.addEventListener('hidden.bs.toast', function() {
-          toast.remove();
-        });
-      }
-    };
-    
-    // Workflow status update function
-    window.updateWorkflowStatus = function(status, step, message, type = 'info') {
-      // Update status in the header (if present)
-      const statusElement = document.querySelector('.tf-workflow-status');
-      if (statusElement) {
-        const badgeElement = statusElement.querySelector('.tf-badge');
-        const stepElement = statusElement.querySelector('small');
-        
-        if (badgeElement) {
-          badgeElement.textContent = status;
-          
-          // Update badge class based on type
-          badgeElement.className = 'tf-badge';
-          switch (type) {
-            case 'success':
-              badgeElement.classList.add('tf-badge-success');
-              break;
-            case 'warning':
-              badgeElement.classList.add('tf-badge-warning');
-              break;
-            case 'danger':
-            case 'error':
-              badgeElement.classList.add('tf-badge-danger');
-              break;
-            default:
-              badgeElement.classList.add('tf-badge-primary');
-          }
-        }
-        
-        if (stepElement && step) {
-          stepElement.textContent = step;
-        }
-      }
-      
-      // Show notification if message is provided
-      if (message) {
-        showNotification(status, message, type);
-      }
-    };
-  });
-</script>
-
-<style>
-  /* Context help mode styles */
-  body.show-context-help .tf-help-trigger {
-    animation: pulse 1.5s infinite;
-  }
-  
-  @keyframes pulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7);
-    }
-    70% {
-      box-shadow: 0 0 0 6px rgba(0, 229, 255, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(0, 229, 255, 0);
-    }
-  }
-  
-  .tf-context-help-indicator {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1070;
-    display: none;
-  }
-  
-  body.show-context-help .tf-context-help-indicator {
-    display: block;
-  }
-  
-  .tf-context-help-badge {
-    background-color: var(--tf-primary);
-    color: var(--tf-dark);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-  }
-  
-  .tf-context-help-badge i {
-    margin-right: 8px;
-  }
-  
-  /* Toast styling */
-  .tf-toast {
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    margin-bottom: 10px;
-    min-width: 280px;
-  }
-  
-  .tf-toast .toast-header {
-    border-bottom: none;
-    background-color: transparent;
-    padding-bottom: 0;
-  }
-  
-  .tf-toast .toast-body {
-    padding-top: 8px;
-  }
-  
-  .tf-toast-info .toast-header {
-    color: var(--tf-info);
-  }
-  
-  .tf-toast-success .toast-header {
-    color: var(--tf-success);
-  }
-  
-  .tf-toast-warning .toast-header {
-    color: var(--tf-warning);
-  }
-  
-  .tf-toast-error .toast-header,
-  .tf-toast-danger .toast-header {
-    color: var(--tf-error);
-  }
-</style>
