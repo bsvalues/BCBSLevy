@@ -1,12 +1,13 @@
-import { Router, Request, Response } from 'express';
-import { eq, and, gte, lte, desc } from 'drizzle-orm';
+import express, { Request, Response, Router } from 'express';
+import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
 import { db } from '../index';
 import { 
-  taxDistricts, 
-  taxCodes, 
-  taxCodeHistoricalRates 
+  taxCodes,
+  taxCodeHistoricalRates,
+  properties
 } from '@terrafusion/shared';
 
+// Create router
 const router = Router();
 
 /**
@@ -14,305 +15,234 @@ const router = Router();
  */
 router.get('/historical-rates', async (req: Request, res: Response) => {
   try {
-    const taxDistrictId = parseInt(req.query.taxDistrictId as string);
-    const startYear = parseInt(req.query.startYear as string) || (new Date().getFullYear() - 5);
-    const endYear = parseInt(req.query.endYear as string) || new Date().getFullYear();
+    const { taxCodeId, years } = req.query;
     
-    if (!taxDistrictId) {
-      return res.status(400).json({ error: 'Missing required parameter: taxDistrictId' });
-    }
-    
-    // Get tax codes for the district
-    const codes = await db.query.taxCodes.findMany({
-      where: eq(taxCodes.taxDistrictId, taxDistrictId),
-      orderBy: taxCodes.code
-    });
-    
-    const codeIds = codes.map(code => code.id);
-    
-    // Get historical rates for these tax codes
-    const historicalRates = await db.query.taxCodeHistoricalRates.findMany({
-      where: and(
-        taxCodeHistoricalRates.taxCodeId in codeIds,
-        gte(taxCodeHistoricalRates.year, startYear),
-        lte(taxCodeHistoricalRates.year, endYear)
-      ),
-      orderBy: [
-        taxCodeHistoricalRates.taxCodeId,
-        taxCodeHistoricalRates.year
-      ]
-    });
-    
-    // Group by tax code and year for easier processing
-    const ratesByCodeAndYear = historicalRates.reduce((acc, rate) => {
-      if (!acc[rate.taxCodeId]) {
-        acc[rate.taxCodeId] = {};
+    // If a specific tax code is requested
+    if (taxCodeId) {
+      // Get the tax code first to verify it exists
+      const code = await db.select()
+        .from(taxCodes)
+        .where(eq(taxCodes.id, parseInt(taxCodeId as string)))
+        .limit(1);
+      
+      if (!code.length) {
+        return res.status(404).json({
+          success: false,
+          message: 'Tax code not found'
+        });
       }
-      acc[rate.taxCodeId][rate.year] = rate;
-      return acc;
-    }, {} as Record<number, Record<number, typeof historicalRates[0]>>);
-    
-    return res.status(200).json({
-      taxCodes: codes,
-      historicalRates: ratesByCodeAndYear,
-      startYear,
-      endYear
-    });
+      
+      // Get historical rates for this tax code
+      const rates = await db.select()
+        .from(taxCodeHistoricalRates)
+        .where(eq(taxCodeHistoricalRates.taxCodeId, parseInt(taxCodeId as string)))
+        .orderBy(desc(taxCodeHistoricalRates.year));
+      
+      // Calculate year-over-year changes for trend analysis
+      const ratesWithChanges = rates.map((rate, index) => {
+        if (index === rates.length - 1) {
+          return { ...rate, changePercent: 0 };
+        }
+        
+        const prevRate = rates[index + 1];
+        const changePercent = ((rate.levyRate - prevRate.levyRate) / prevRate.levyRate) * 100;
+        
+        return {
+          ...rate,
+          changePercent: parseFloat(changePercent.toFixed(2))
+        };
+      });
+      
+      // Calculate average rate change
+      const avgRateChange = ratesWithChanges
+        .filter(r => r.changePercent !== 0)
+        .reduce((acc, rate) => acc + rate.changePercent, 0) / 
+        (ratesWithChanges.length - 1 || 1);
+      
+      return res.json({
+        success: true,
+        taxCodeId: parseInt(taxCodeId as string),
+        rates: ratesWithChanges,
+        trends: {
+          avgYearlyRateChangePercent: parseFloat(avgRateChange.toFixed(2)),
+          minRate: Math.min(...rates.map(r => r.levyRate)),
+          maxRate: Math.max(...rates.map(r => r.levyRate)),
+          volatility: calculateVolatility(rates.map(r => r.levyRate))
+        }
+      });
+    } 
+    // Get rates for all tax codes if no specific one is requested
+    else {
+      const allCodes = await db.select()
+        .from(taxCodes)
+        .limit(100);  // Limit to prevent excessive data
+        
+      // For each tax code, get the most recent historical rate
+      const codePromises = allCodes.map(async code => {
+        const rates = await db.select()
+          .from(taxCodeHistoricalRates)
+          .where(eq(taxCodeHistoricalRates.taxCodeId, code.id))
+          .orderBy(desc(taxCodeHistoricalRates.year))
+          .limit(1);
+          
+        return {
+          ...code,
+          currentRate: rates.length > 0 ? rates[0].levyRate : null,
+          currentYear: rates.length > 0 ? rates[0].year : null
+        };
+      });
+      
+      const codesWithRates = await Promise.all(codePromises);
+      
+      return res.json({
+        success: true,
+        taxCodes: codesWithRates
+      });
+    }
   } catch (error) {
     console.error('Error fetching historical rates:', error);
-    return res.status(500).json({ error: 'Failed to fetch historical rates' });
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch historical rates'
+    });
   }
 });
 
 /**
- * Generate forecast based on historical data
+ * Generate levy forecast
  */
 router.post('/generate', async (req: Request, res: Response) => {
   try {
-    const {
-      taxDistrictId,
-      forecastYears = 3,
-      method = 'linear', // 'linear', 'average', 'weighted', 'custom'
-      customWeights,
-      baseYear = new Date().getFullYear(),
-      parameters = {}
+    const { 
+      taxCodeId, 
+      years = 5,
+      baseYear,
+      inflationRate = 0.02,
+      populationGrowthRate = 0.01,
+      assessedValueGrowthRate = 0.03,
+      newConstructionRate = 0.02
     } = req.body;
     
-    if (!taxDistrictId) {
-      return res.status(400).json({ error: 'Missing required parameter: taxDistrictId' });
+    // Input validation
+    if (!taxCodeId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tax code ID is required'
+      });
     }
     
-    // Get historical data for the district
-    const startYear = baseYear - 5;
-    const endYear = baseYear;
+    // Get the tax code and its most recent data
+    const code = await db.select()
+      .from(taxCodes)
+      .where(eq(taxCodes.id, taxCodeId))
+      .limit(1);
+      
+    if (!code.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tax code not found'
+      });
+    }
     
-    // Get tax codes for the district
-    const codes = await db.query.taxCodes.findMany({
-      where: eq(taxCodes.taxDistrictId, taxDistrictId)
+    const taxCode = code[0];
+    
+    // Get historical rates to establish baseline and trends
+    const rates = await db.select()
+      .from(taxCodeHistoricalRates)
+      .where(eq(taxCodeHistoricalRates.taxCodeId, taxCodeId))
+      .orderBy(desc(taxCodeHistoricalRates.year));
+    
+    if (!rates.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'No historical data available for forecasting'
+      });
+    }
+    
+    // Determine starting point for forecast
+    const mostRecentRate = rates[0];
+    const startYear = baseYear || mostRecentRate.year;
+    const startLevyRate = mostRecentRate.levyRate;
+    const startAssessedValue = mostRecentRate.totalAssessedValue || taxCode.totalAssessedValue;
+    
+    // Calculate historical trends for more accurate forecasting
+    const yearlyRateChanges = rates.slice(0, -1).map((rate, i) => {
+      return (rate.levyRate - rates[i + 1].levyRate) / rates[i + 1].levyRate;
     });
     
-    const codeIds = codes.map(code => code.id);
+    const avgHistoricalRateChange = yearlyRateChanges.length > 0 ? 
+      yearlyRateChanges.reduce((a, b) => a + b, 0) / yearlyRateChanges.length : 
+      inflationRate;
     
-    // Get historical rates
-    const historicalRates = await db.query.taxCodeHistoricalRates.findMany({
-      where: and(
-        taxCodeHistoricalRates.taxCodeId in codeIds,
-        gte(taxCodeHistoricalRates.year, startYear),
-        lte(taxCodeHistoricalRates.year, endYear)
-      ),
-      orderBy: [
-        taxCodeHistoricalRates.taxCodeId,
-        taxCodeHistoricalRates.year
-      ]
-    });
+    // Generate forecast for each year
+    const forecast = [];
+    let currentYear = startYear;
+    let currentLevyRate = startLevyRate;
+    let currentAssessedValue = startAssessedValue;
+    let currentLevyAmount = currentLevyRate * currentAssessedValue / 100;
     
-    // Calculate forecasts based on method
-    const forecasts = generateForecasts(
-      codes,
-      historicalRates,
-      forecastYears,
-      method,
-      customWeights,
-      baseYear,
-      parameters
-    );
+    for (let i = 0; i < years; i++) {
+      currentYear++;
+      
+      // Apply growth factors
+      const assessedValueGrowth = currentAssessedValue * assessedValueGrowthRate;
+      const newConstruction = currentAssessedValue * newConstructionRate;
+      currentAssessedValue += assessedValueGrowth + newConstruction;
+      
+      // Apply inflation and historical trends to levy rate
+      const rateChange = (inflationRate + avgHistoricalRateChange) / 2;
+      currentLevyRate *= (1 + rateChange);
+      
+      // Calculate new levy amount
+      currentLevyAmount = currentLevyRate * currentAssessedValue / 100;
+      
+      // Add to forecast
+      forecast.push({
+        year: currentYear,
+        levyRate: parseFloat(currentLevyRate.toFixed(4)),
+        assessedValue: Math.round(currentAssessedValue),
+        levyAmount: Math.round(currentLevyAmount),
+        assessedValueGrowth: Math.round(assessedValueGrowth),
+        newConstruction: Math.round(newConstruction)
+      });
+    }
     
-    return res.status(200).json({
-      forecasts,
-      method,
-      baseYear,
-      forecastYears,
-      parameters
+    return res.json({
+      success: true,
+      taxCodeId,
+      forecast,
+      parameters: {
+        baseYear: startYear,
+        years,
+        inflationRate,
+        assessedValueGrowthRate,
+        newConstructionRate,
+        historicalRateChange: parseFloat(avgHistoricalRateChange.toFixed(4))
+      },
+      confidence: {
+        high: 0.95,
+        medium: 0.9,
+        low: 0.8
+      }
     });
   } catch (error) {
-    console.error('Error generating forecasts:', error);
-    return res.status(500).json({ error: 'Failed to generate forecasts' });
+    console.error('Error generating forecast:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to generate forecast'
+    });
   }
 });
 
 /**
- * Helper function to generate forecasts based on historical data
+ * Calculate volatility from a series of values
  */
-function generateForecasts(
-  taxCodes: any[],
-  historicalRates: any[],
-  forecastYears: number,
-  method: string,
-  customWeights: any,
-  baseYear: number,
-  parameters: any
-) {
-  // Group historical rates by tax code
-  const ratesByCode = historicalRates.reduce((acc, rate) => {
-    if (!acc[rate.taxCodeId]) {
-      acc[rate.taxCodeId] = [];
-    }
-    acc[rate.taxCodeId].push(rate);
-    return acc;
-  }, {} as Record<number, any[]>);
-  
-  const forecasts: any = {};
-  
-  // Generate forecasts for each tax code
-  taxCodes.forEach(code => {
-    const codeRates = ratesByCode[code.id] || [];
-    const codeForecast = [];
-    
-    // Sort rates by year
-    codeRates.sort((a, b) => a.year - b.year);
-    
-    // Generate forecast for future years
-    for (let i = 1; i <= forecastYears; i++) {
-      const forecastYear = baseYear + i;
-      let forecastRate;
-      
-      switch (method) {
-        case 'linear':
-          forecastRate = calculateLinearForecast(codeRates, forecastYear);
-          break;
-        case 'average':
-          forecastRate = calculateAverageForecast(codeRates);
-          break;
-        case 'weighted':
-          forecastRate = calculateWeightedForecast(codeRates, customWeights);
-          break;
-        case 'custom':
-          forecastRate = calculateCustomForecast(codeRates, parameters);
-          break;
-        default:
-          forecastRate = calculateLinearForecast(codeRates, forecastYear);
-      }
-      
-      codeForecast.push({
-        year: forecastYear,
-        levyRate: forecastRate,
-        confidence: calculateConfidence(codeRates, method, forecastYear)
-      });
-    }
-    
-    forecasts[code.id] = codeForecast;
-  });
-  
-  return forecasts;
-}
-
-/**
- * Calculate linear regression forecast
- */
-function calculateLinearForecast(rates: any[], targetYear: number): number {
-  if (rates.length < 2) {
-    return rates.length === 1 ? rates[0].levyRate : 0;
-  }
-  
-  // Simple linear regression
-  const n = rates.length;
-  const xValues = rates.map(r => r.year);
-  const yValues = rates.map(r => r.levyRate);
-  
-  const xMean = xValues.reduce((sum, x) => sum + x, 0) / n;
-  const yMean = yValues.reduce((sum, y) => sum + y, 0) / n;
-  
-  let numerator = 0;
-  let denominator = 0;
-  
-  for (let i = 0; i < n; i++) {
-    numerator += (xValues[i] - xMean) * (yValues[i] - yMean);
-    denominator += (xValues[i] - xMean) * (xValues[i] - xMean);
-  }
-  
-  const slope = denominator !== 0 ? numerator / denominator : 0;
-  const intercept = yMean - (slope * xMean);
-  
-  // Calculate forecast using y = mx + b
-  const forecast = slope * targetYear + intercept;
-  
-  // Ensure forecast is not negative
-  return Math.max(0, forecast);
-}
-
-/**
- * Calculate average forecast
- */
-function calculateAverageForecast(rates: any[]): number {
-  if (rates.length === 0) return 0;
-  
-  const sum = rates.reduce((total, rate) => total + rate.levyRate, 0);
-  return sum / rates.length;
-}
-
-/**
- * Calculate weighted average forecast
- */
-function calculateWeightedForecast(rates: any[], weights: any): number {
-  if (rates.length === 0) return 0;
-  
-  // Default weights give more importance to recent years
-  const defaultWeights = rates.map((_, index) => index + 1);
-  const actualWeights = weights || defaultWeights;
-  
-  let weightedSum = 0;
-  let totalWeight = 0;
-  
-  // Calculate weighted sum
-  rates.forEach((rate, index) => {
-    const weight = index < actualWeights.length ? actualWeights[index] : 1;
-    weightedSum += rate.levyRate * weight;
-    totalWeight += weight;
-  });
-  
-  return totalWeight > 0 ? weightedSum / totalWeight : 0;
-}
-
-/**
- * Calculate custom forecast based on parameters
- */
-function calculateCustomForecast(rates: any[], parameters: any): number {
-  // Implement custom forecast logic based on parameters
-  // This is a placeholder implementation
-  const baseRate = calculateAverageForecast(rates);
-  const growthFactor = parameters.growthFactor || 1.02;
-  
-  return baseRate * growthFactor;
-}
-
-/**
- * Calculate confidence score for the forecast
- */
-function calculateConfidence(rates: any[], method: string, forecastYear: number): number {
-  if (rates.length < 2) return 0.5; // Low confidence with little data
-  
-  // Base confidence on data consistency and forecast distance
-  const yearRange = Math.max(...rates.map(r => r.year)) - Math.min(...rates.map(r => r.year));
-  const rateVariability = calculateVariability(rates.map(r => r.levyRate));
-  const forecastDistance = forecastYear - Math.max(...rates.map(r => r.year));
-  
-  // More data points, longer history, and less variability increase confidence
-  let confidence = 0.8 - (rateVariability * 0.5) - (forecastDistance * 0.05);
-  
-  // Adjust based on method
-  if (method === 'linear' && yearRange > 3) {
-    confidence += 0.1; // Linear regression works better with more years
-  } else if (method === 'weighted') {
-    confidence += 0.05; // Weighted tends to be more reliable
-  }
-  
-  // Ensure confidence is between 0 and 1
-  return Math.max(0, Math.min(1, confidence));
-}
-
-/**
- * Calculate variability (coefficient of variation)
- */
-function calculateVariability(values: number[]): number {
+function calculateVolatility(values: number[]): number {
   if (values.length < 2) return 0;
   
-  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-  if (mean === 0) return 1; // Avoid division by zero
-  
-  const sumSquaredDiff = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0);
-  const stdDev = Math.sqrt(sumSquaredDiff / values.length);
-  
-  return stdDev / mean; // Coefficient of variation
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;
+  const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+  return parseFloat(Math.sqrt(variance).toFixed(4));
 }
 
 export default router;

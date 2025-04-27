@@ -1,50 +1,50 @@
-import { pgTable, serial, varchar, text, integer, numeric, boolean, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, text, timestamp, boolean, jsonb, varchar, doublePrecision } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { users } from './users';
 
 /**
- * Tax District schema - represents tax districts
- * Corresponds to the TaxDistrict model in SQLAlchemy
+ * Tax Districts schema
+ * 
+ * Stores information about tax districts including their geographical and administrative details
  */
 export const taxDistricts = pgTable('tax_district', {
   id: serial('id').primaryKey(),
-  name: varchar('name', { length: 100 }).notNull(),
-  districtType: varchar('district_type', { length: 50 }).notNull(),
-  county: varchar('county', { length: 50 }).notNull(),
-  state: varchar('state', { length: 2 }).notNull(),
-  taxDistrictId: varchar('tax_district_id', { length: 20 }),
-  levyCode: varchar('levy_code', { length: 20 }),
-  linkedLevyCode: varchar('linked_levy_code', { length: 20 }),
+  name: varchar('name', { length: 128 }).notNull(),
+  description: text('description'),
+  countyName: varchar('county_name', { length: 64 }).notNull(),
+  stateName: varchar('state_name', { length: 64 }).notNull(),
+  taxDistrictId: varchar('tax_district_id', { length: 32 }),
+  levyCode: varchar('levy_code', { length: 32 }),
+  linkedLevyCode: varchar('linked_levy_code', { length: 32 }),
+  districtType: varchar('district_type', { length: 32 }).notNull(),
+  creationYear: integer('creation_year'),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  createdById: integer('created_by_id').references(() => users.id),
+  updatedById: integer('updated_by_id').references(() => users.id),
+  metadata: jsonb('metadata'),
+});
+
+/**
+ * District Configuration schema
+ * 
+ * Stores district-specific configuration and settings
+ */
+export const districtConfigurations = pgTable('district_configuration', {
+  id: serial('id').primaryKey(),
+  taxDistrictId: integer('tax_district_id').references(() => taxDistricts.id).notNull(),
+  configKey: varchar('config_key', { length: 64 }).notNull(),
+  configValue: jsonb('config_value').notNull(),
   description: text('description'),
   active: boolean('active').default(true),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-  createdById: integer('created_by_id').references(() => users.id),
-  updatedById: integer('updated_by_id').references(() => users.id)
+  updatedById: integer('updated_by_id').references(() => users.id),
 });
 
-/**
- * Levy Rate schema - represents levy rates for districts
- * Corresponds to the TaxDistrictRate model in SQLAlchemy
- */
-export const taxDistrictRates = pgTable('tax_district_rate', {
-  id: serial('id').primaryKey(),
-  taxDistrictId: integer('tax_district_id').notNull().references(() => taxDistricts.id),
-  year: integer('year').notNull(),
-  baseRate: numeric('base_rate').notNull(),
-  specialRate: numeric('special_rate'),
-  totalRate: numeric('total_rate').notNull(),
-  assessedValue: numeric('assessed_value'),
-  newConstructionValue: numeric('new_construction_value'),
-  totalLevyAmount: numeric('total_levy_amount'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-});
-
-// Define relationships
-export const taxDistrictsRelations = relations(taxDistricts, ({ many, one }) => ({
-  taxCodes: many(taxCodes),
-  rates: many(taxDistrictRates),
+// Define tax district relations
+export const taxDistrictsRelations = relations(taxDistricts, ({ one, many }) => ({
   createdBy: one(users, {
     fields: [taxDistricts.createdById],
     references: [users.id]
@@ -52,19 +52,18 @@ export const taxDistrictsRelations = relations(taxDistricts, ({ many, one }) => 
   updatedBy: one(users, {
     fields: [taxDistricts.updatedById],
     references: [users.id]
-  })
+  }),
+  configuration: many(districtConfigurations)
 }));
 
-export const taxDistrictRatesRelations = relations(taxDistrictRates, ({ one }) => ({
-  district: one(taxDistricts, {
-    fields: [taxDistrictRates.taxDistrictId],
+// Define district configuration relations
+export const districtConfigurationsRelations = relations(districtConfigurations, ({ one }) => ({
+  taxDistrict: one(taxDistricts, {
+    fields: [districtConfigurations.taxDistrictId],
     references: [taxDistricts.id]
+  }),
+  updatedBy: one(users, {
+    fields: [districtConfigurations.updatedById],
+    references: [users.id]
   })
 }));
-
-// Placeholder declarations to resolve relation references
-// These will be fully defined in their respective files
-export const taxCodes = pgTable('tax_code', {
-  id: serial('id').primaryKey(),
-  taxDistrictId: integer('tax_district_id').references(() => taxDistricts.id)
-});

@@ -1,14 +1,15 @@
-import { Router, Request, Response } from 'express';
-import { eq, and } from 'drizzle-orm';
+import express, { Request, Response, Router } from 'express';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { db } from '../index';
 import { 
-  taxDistricts, 
-  levyRates, 
+  taxDistricts,
   taxCodes,
-  taxCodeHistoricalRates,
-  levyScenarios
+  levyRates,
+  levyScenarios,
+  properties
 } from '@terrafusion/shared';
 
+// Create router
 const router = Router();
 
 /**
@@ -16,195 +17,224 @@ const router = Router();
  */
 router.get('/districts', async (req: Request, res: Response) => {
   try {
-    const year = parseInt(req.query.year as string) || new Date().getFullYear();
+    const districts = await db.select().from(taxDistricts);
     
-    const districts = await db.query.taxDistricts.findMany({
-      where: eq(taxDistricts.year, year),
-      orderBy: taxDistricts.districtName
+    return res.json({
+      success: true,
+      districts
     });
-    
-    return res.status(200).json({ districts });
   } catch (error) {
-    console.error('Error fetching districts:', error);
-    return res.status(500).json({ error: 'Failed to fetch tax districts' });
+    console.error('Error fetching tax districts:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch tax districts'
+    });
   }
 });
 
 /**
- * Get district by ID
+ * Get tax district by ID
  */
 router.get('/districts/:id', async (req: Request, res: Response) => {
   try {
-    const districtId = parseInt(req.params.id);
-    const year = parseInt(req.query.year as string) || new Date().getFullYear();
+    const { id } = req.params;
+    const district = await db.select()
+      .from(taxDistricts)
+      .where(eq(taxDistricts.id, parseInt(id)))
+      .limit(1);
     
-    const district = await db.query.taxDistricts.findFirst({
-      where: and(
-        eq(taxDistricts.id, districtId),
-        eq(taxDistricts.year, year)
-      )
-    });
-    
-    if (!district) {
-      return res.status(404).json({ error: 'Tax district not found' });
+    if (!district.length) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tax district not found'
+      });
     }
     
-    return res.status(200).json({ district });
+    return res.json({
+      success: true,
+      district: district[0]
+    });
   } catch (error) {
-    console.error('Error fetching district:', error);
-    return res.status(500).json({ error: 'Failed to fetch tax district' });
+    console.error(`Error fetching tax district ${req.params.id}:`, error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch tax district'
+    });
   }
 });
 
 /**
- * Get levy rates for a district
+ * Get levy rates for a tax district
  */
 router.get('/districts/:id/rates', async (req: Request, res: Response) => {
   try {
-    const districtId = parseInt(req.params.id);
-    const year = parseInt(req.query.year as string) || new Date().getFullYear();
+    const { id } = req.params;
+    const rates = await db.select()
+      .from(levyRates)
+      .where(eq(levyRates.taxDistrictId, parseInt(id)));
     
-    const rates = await db.query.levyRates.findMany({
-      where: and(
-        eq(levyRates.taxDistrictId, districtId),
-        eq(levyRates.year, year)
-      )
+    return res.json({
+      success: true,
+      rates
     });
-    
-    return res.status(200).json({ rates });
   } catch (error) {
-    console.error('Error fetching rates:', error);
-    return res.status(500).json({ error: 'Failed to fetch levy rates' });
+    console.error(`Error fetching levy rates for district ${req.params.id}:`, error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch levy rates'
+    });
   }
 });
 
 /**
- * Get tax codes for a district
+ * Get tax codes for a tax district
  */
 router.get('/districts/:id/tax-codes', async (req: Request, res: Response) => {
   try {
-    const districtId = parseInt(req.params.id);
-    const year = parseInt(req.query.year as string) || new Date().getFullYear();
+    const { id } = req.params;
+    const codes = await db.select()
+      .from(taxCodes)
+      .where(eq(taxCodes.taxDistrictId, parseInt(id)));
     
-    const codes = await db.query.taxCodes.findMany({
-      where: and(
-        eq(taxCodes.taxDistrictId, districtId),
-        eq(taxCodes.year, year)
-      )
+    return res.json({
+      success: true,
+      codes
     });
-    
-    return res.status(200).json({ taxCodes: codes });
   } catch (error) {
-    console.error('Error fetching tax codes:', error);
-    return res.status(500).json({ error: 'Failed to fetch tax codes' });
+    console.error(`Error fetching tax codes for district ${req.params.id}:`, error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch tax codes'
+    });
   }
 });
 
 /**
- * Calculate levy rate
+ * Calculate levy for a tax district
  */
 router.post('/calculate', async (req: Request, res: Response) => {
   try {
     const { 
       taxDistrictId, 
-      levyAmount, 
-      assessedValue,
-      year = new Date().getFullYear()
+      year, 
+      priorYearLevyAmount,
+      assessedValueChange,
+      newConstructionValue,
+      annexationValue,
+      inflationRate
     } = req.body;
     
-    if (!taxDistrictId || !levyAmount || !assessedValue) {
-      return res.status(400).json({ 
-        error: 'Missing required parameters: taxDistrictId, levyAmount, assessedValue' 
+    // Input validation
+    if (!taxDistrictId || !year || priorYearLevyAmount === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required parameters'
       });
     }
     
-    // Calculate levy rate based on amount and assessed value
-    const levyRate = (parseFloat(levyAmount) / parseFloat(assessedValue)) * 1000;
+    // Get district properties for calculation
+    const properties = await db.select({
+      totalAssessedValue: sql<number>`SUM(${taxCodes.totalAssessedValue})`
+    })
+    .from(taxCodes)
+    .where(eq(taxCodes.taxDistrictId, taxDistrictId));
     
-    return res.status(200).json({
-      taxDistrictId,
-      levyAmount: parseFloat(levyAmount),
-      assessedValue: parseFloat(assessedValue),
-      levyRate,
-      year
+    const totalAssessedValue = properties[0]?.totalAssessedValue || 0;
+    
+    // Perform levy calculation
+    const limitFactor = 1 + (inflationRate || 0.01); // Default 1% inflation
+    const statutoryMaximum = priorYearLevyAmount * limitFactor;
+    
+    // Apply assessed value changes
+    const adjustedAssessedValue = totalAssessedValue + 
+      (newConstructionValue || 0) + 
+      (annexationValue || 0);
+    
+    // Calculate effective rate
+    const effectiveRate = (priorYearLevyAmount / totalAssessedValue) * 100;
+    
+    // Calculate new levy amount
+    const calculatedLevyAmount = Math.min(
+      statutoryMaximum,
+      adjustedAssessedValue * (effectiveRate / 100)
+    );
+    
+    return res.json({
+      success: true,
+      result: {
+        taxDistrictId,
+        year,
+        priorYearLevyAmount,
+        totalAssessedValue,
+        adjustedAssessedValue,
+        statutoryMaximum,
+        calculatedLevyAmount,
+        effectiveRate
+      }
     });
   } catch (error) {
-    console.error('Error calculating levy rate:', error);
-    return res.status(500).json({ error: 'Failed to calculate levy rate' });
+    console.error('Error calculating levy:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to calculate levy'
+    });
   }
 });
 
 /**
- * Create a new levy scenario
+ * Save a levy scenario
  */
 router.post('/scenarios', async (req: Request, res: Response) => {
   try {
     const { 
-      userId,
       name,
       description,
       taxDistrictId,
-      baseYear,
-      targetYear,
-      levyAmount,
+      year,
+      priorYearLevyAmount,
+      targetLevyAmount,
       assessedValueChange,
       newConstructionValue,
       annexationValue,
-      isPublic = false
+      inflationRate,
+      userId
     } = req.body;
     
-    if (!userId || !name || !taxDistrictId || !baseYear || !targetYear) {
-      return res.status(400).json({ 
-        error: 'Missing required parameters' 
+    // Input validation
+    if (!name || !taxDistrictId || !year || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required parameters'
       });
     }
     
-    // Insert the scenario into the database
-    const [scenario] = await db.insert(levyScenarios).values({
-      userId,
+    // Create scenario
+    const result = await db.insert(levyScenarios).values({
       name,
       description,
       taxDistrictId,
-      baseYear,
-      targetYear,
-      levyAmount,
-      assessedValueChange: assessedValueChange || 0,
-      newConstructionValue: newConstructionValue || 0,
-      annexationValue: annexationValue || 0,
-      isPublic,
-      status: 'DRAFT',
-      year: targetYear,
-      createdById: userId,
-      updatedById: userId
+      year,
+      priorYearLevyAmount,
+      targetLevyAmount,
+      assessedValueChange,
+      newConstructionValue,
+      annexationValue,
+      inflationRate,
+      userId,
+      createdAt: new Date(),
+      updatedAt: new Date()
     }).returning();
     
-    return res.status(201).json({ scenario });
-  } catch (error) {
-    console.error('Error creating scenario:', error);
-    return res.status(500).json({ error: 'Failed to create levy scenario' });
-  }
-});
-
-/**
- * Get levy scenarios for a user
- */
-router.get('/scenarios', async (req: Request, res: Response) => {
-  try {
-    const userId = parseInt(req.query.userId as string);
-    
-    if (!userId) {
-      return res.status(400).json({ error: 'Missing required parameter: userId' });
-    }
-    
-    const scenarios = await db.query.levyScenarios.findMany({
-      where: eq(levyScenarios.userId, userId),
-      orderBy: [levyScenarios.targetYear, levyScenarios.name]
+    return res.json({
+      success: true,
+      scenario: result[0]
     });
-    
-    return res.status(200).json({ scenarios });
   } catch (error) {
-    console.error('Error fetching scenarios:', error);
-    return res.status(500).json({ error: 'Failed to fetch levy scenarios' });
+    console.error('Error saving levy scenario:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to save levy scenario'
+    });
   }
 });
 

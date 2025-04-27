@@ -1,78 +1,77 @@
-import { pgTable, serial, varchar, text, integer, numeric, boolean, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, serial, integer, text, timestamp, boolean, jsonb, varchar, doublePrecision } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { taxDistricts } from './taxDistricts';
 import { users } from './users';
+import { taxDistricts } from './taxDistricts';
 
 /**
- * Tax Code schema - represents tax codes
- * Corresponds to the TaxCode model in SQLAlchemy
+ * Tax Codes schema
+ * 
+ * Stores tax code information including rates and associated districts
  */
 export const taxCodes = pgTable('tax_code', {
   id: serial('id').primaryKey(),
-  code: varchar('code', { length: 20 }).notNull().unique(),
-  name: varchar('name', { length: 100 }),
-  taxDistrictId: integer('tax_district_id').references(() => taxDistricts.id),
+  code: varchar('code', { length: 32 }).notNull().unique(),
   description: text('description'),
-  levyRate: numeric('levy_rate'),
-  totalLevyAmount: numeric('total_levy_amount'),
-  totalAssessedValue: numeric('total_assessed_value'),
-  effectiveTaxRate: numeric('effective_tax_rate'),
-  active: boolean('active').default(true),
+  countyName: varchar('county_name', { length: 64 }),
+  stateName: varchar('state_name', { length: 64 }),
+  taxYear: integer('tax_year').notNull(),
+  levyRate: doublePrecision('levy_rate').notNull(),
+  totalAssessedValue: doublePrecision('total_assessed_value'),
+  totalLevyAmount: doublePrecision('total_levy_amount'),
+  effectiveTaxRate: doublePrecision('effective_tax_rate'),
+  isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
+  updatedAt: timestamp('updated_at').defaultNow(),
+  createdById: integer('created_by_id').references(() => users.id),
+  updatedById: integer('updated_by_id').references(() => users.id),
+  metadata: jsonb('metadata'),
 });
 
 /**
- * Historical Rate schema - represents historical tax rates
- * Corresponds to the TaxCodeHistoricalRate model in SQLAlchemy
+ * Tax Code Historical Rate schema
+ * 
+ * Stores historical tax rates for each tax code over multiple years
  */
 export const taxCodeHistoricalRates = pgTable('tax_code_historical_rate', {
   id: serial('id').primaryKey(),
-  taxCodeId: integer('tax_code_id').notNull().references(() => taxCodes.id),
+  taxCodeId: integer('tax_code_id').references(() => taxCodes.id).notNull(),
   year: integer('year').notNull(),
-  levyRate: numeric('levy_rate').notNull(),
-  levyAmount: numeric('levy_amount'),
-  totalAssessedValue: numeric('total_assessed_value'),
+  levyRate: doublePrecision('levy_rate').notNull(),
+  levyAmount: doublePrecision('levy_amount'),
+  totalAssessedValue: doublePrecision('total_assessed_value'),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 /**
- * Levy Scenario schema - represents levy calculation scenarios
- * Corresponds to the LevyScenario model in SQLAlchemy
+ * Tax Code to Tax District junction table
+ * 
+ * Connects tax codes to tax districts with relationship metadata
  */
-export const levyScenarios = pgTable('levy_scenario', {
+export const taxCodeToTaxDistrict = pgTable('tax_code_to_tax_district', {
   id: serial('id').primaryKey(),
-  name: varchar('name', { length: 100 }).notNull(),
-  description: text('description'),
-  taxCodeId: integer('tax_code_id').references(() => taxCodes.id),
-  taxDistrictId: integer('tax_district_id').references(() => taxDistricts.id),
-  year: integer('year').notNull(),
-  baseRate: numeric('base_rate'),
-  targetYear: integer('target_year'),
-  levyAmount: numeric('levy_amount'),
-  assessedValueChange: numeric('assessed_value_change'),
-  newConstructionValue: numeric('new_construction_value'),
-  annexationValue: numeric('annexation_value'),
-  resultLevyRate: numeric('result_levy_rate'),
-  resultLevyAmount: numeric('result_levy_amount'),
+  taxCodeId: integer('tax_code_id').references(() => taxCodes.id).notNull(),
+  taxDistrictId: integer('tax_district_id').references(() => taxDistricts.id).notNull(),
+  percentage: doublePrecision('percentage').default(100.0),
+  isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-  userId: integer('user_id').references(() => users.id),
-  createdById: integer('created_by_id').references(() => users.id),
-  updatedById: integer('updated_by_id').references(() => users.id)
 });
 
-// Define relationships
+// Define tax code relations
 export const taxCodesRelations = relations(taxCodes, ({ one, many }) => ({
-  district: one(taxDistricts, {
-    fields: [taxCodes.taxDistrictId],
-    references: [taxDistricts.id]
+  createdBy: one(users, {
+    fields: [taxCodes.createdById],
+    references: [users.id]
+  }),
+  updatedBy: one(users, {
+    fields: [taxCodes.updatedById],
+    references: [users.id]
   }),
   historicalRates: many(taxCodeHistoricalRates),
-  scenarios: many(levyScenarios)
+  districts: many(taxCodeToTaxDistrict)
 }));
 
+// Define tax code historical rates relations
 export const taxCodeHistoricalRatesRelations = relations(taxCodeHistoricalRates, ({ one }) => ({
   taxCode: one(taxCodes, {
     fields: [taxCodeHistoricalRates.taxCodeId],
@@ -80,25 +79,14 @@ export const taxCodeHistoricalRatesRelations = relations(taxCodeHistoricalRates,
   })
 }));
 
-export const levyScenariosRelations = relations(levyScenarios, ({ one }) => ({
+// Define tax code to tax district relations
+export const taxCodeToTaxDistrictRelations = relations(taxCodeToTaxDistrict, ({ one }) => ({
   taxCode: one(taxCodes, {
-    fields: [levyScenarios.taxCodeId],
+    fields: [taxCodeToTaxDistrict.taxCodeId],
     references: [taxCodes.id]
   }),
   taxDistrict: one(taxDistricts, {
-    fields: [levyScenarios.taxDistrictId],
+    fields: [taxCodeToTaxDistrict.taxDistrictId],
     references: [taxDistricts.id]
-  }),
-  user: one(users, {
-    fields: [levyScenarios.userId],
-    references: [users.id]
-  }),
-  createdBy: one(users, {
-    fields: [levyScenarios.createdById],
-    references: [users.id]
-  }),
-  updatedBy: one(users, {
-    fields: [levyScenarios.updatedById],
-    references: [users.id]
   })
 }));

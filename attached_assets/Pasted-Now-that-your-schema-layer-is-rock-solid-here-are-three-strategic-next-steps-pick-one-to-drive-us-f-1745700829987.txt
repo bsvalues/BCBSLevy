@@ -1,0 +1,57 @@
+Now that your schema layer is rock-solid, here are three strategic next steps—pick one to drive us forward:
+
+---
+
+## 1. Build & Test Core Data APIs  
+**Goal:** Expose CRUD endpoints for your newly defined schemas so the front-end can consume them.  
+- Scaffold `routes/` handlers in Express:  
+  - `GET /api/levies` → list levies  
+  - `POST /api/levies` → create levy (validate against your schema via Zod or Yup)  
+  - `GET /api/levies/:id`, `PUT /api/levies/:id`, `DELETE /api/levies/:id`  
+- Write unit tests (Jest + Supertest) to cover each route, exercising both success and validation-failure cases.  
+
+**Why:** Validating your API layer now ensures front-end work sits on a stable, contract-driven foundation.
+
+---
+
+## 2. Wire Up the “Create Levy” Wizard UI  
+**Goal:** Hook your React/Zustand wizard component to real data.  
+- In your first wizard step, call `GET /api/tax_districts` and populate the selector.  
+- On submit of step 2, `POST /api/levies` with the payload shaped by your shared schema.  
+- Display success or inline errors based on the JSON error format from your API.  
+- Add a Jest/React Testing Library test that mocks the API and walks through the wizard.  
+
+**Why:** Early front-end integration will surface any mismatches between your TS schemas and runtime behavior.
+
+---
+
+## 3. CI Pipeline Validation of Schema & API Contracts  
+**Goal:** Ensure that any future schema change immediately breaks CI if the API or types drift.  
+- Add a CI job that:  
+  - Runs a small script to spin up your Express server in Docker.  
+  - Executes a contract-test suite (e.g. using Pact or simple Supertest smoke tests) against those endpoints.  
+- Fail the build if any endpoint returns a 4xx/5xx or if TypeScript emits errors.  
+
+**Why:** Automating contract checks locks in the integrity you’ve just established and prevents regressions.
+
+---
+
+### Bootstrap Prompt for Replit AI Agent
+
+```
+You are our Backend & Integration Engineer.  
+Next milestone: deliver working CRUD APIs and CI-backed contract tests for BCBSLevy schemas.
+
+Tasks:
+1. Create Express route handlers for levies (GET, POST, GET by id, PUT, DELETE).
+2. Validate payloads against shared/schema via Zod (or chosen validator).
+3. Write Jest+Supertest tests covering each endpoint (success + validation errors).
+4. Update `.github/workflows/ci.yml` to run `npm test` for these new tests in Docker.
+5. Commit on branch `sprint2/api-crud` with conventional commits and open a PR.
+
+Do not proceed until tests are green and I’ve approved the PR.
+```
+
+---
+
+Which of these would you like to tackle first?
