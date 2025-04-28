@@ -94,7 +94,7 @@ block head %} {{ super() }}
         <div class="card-body">
           <form
             method="GET"
-            action="{{ url_for('historical_analysis.historical_analysis') }}"
+            action="{{ url_for('historical_analysis.historical_rates') }}"
           >
             <div class="mb-3">
               <label for="tax_code" class="form-label">Tax Code</label>
@@ -108,13 +108,7 @@ block head %} {{ super() }}
                 {% for tax_code in tax_codes %}
                 <option
                   value="{{ tax_code.tax_code }}"
-                  {%
-                  if
-                  tax_code.tax_code=""
-                  ="selected_tax_code"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if tax_code.tax_code == selected_tax_code %}selected{% endif %}
                 >
                   {{ tax_code.tax_code }}
                 </option>
@@ -150,7 +144,7 @@ block head %} {{ super() }}
           <div class="list-group">
             {% for year in available_years %}
             <a
-              href="{{ url_for('historical_analysis.historical_analysis', tax_code=selected_tax_code, year=year) }}"
+              href="{{ url_for('historical_analysis.historical_rates', tax_code=selected_tax_code, year=year) }}"
               class="list-group-item list-group-item-action"
             >
               {{ year }}
