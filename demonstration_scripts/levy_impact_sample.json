@@ -1,0 +1,9 @@
+{
+  "mill_rate": 1.5,
+  "property_value": 250000,
+  "levy_limit": 5000000,
+  "prior_year_levy": 4800000,
+  "district_type": "school",
+  "year": 2025,
+  "new_construction_value": 10000000
+}

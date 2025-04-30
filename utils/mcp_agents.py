@@ -618,6 +618,10 @@ class WorkflowCoordinatorAgent(MCPAgent):
         # Create agent instances
         self.levy_analysis_agent = LevyAnalysisAgent()
         self.levy_prediction_agent = LevyPredictionAgent()
+        
+        # Import here to avoid circular imports
+        from utils.ml_levy_impact_agent import MLLevyImpactAgent
+        self.levy_impact_agent = MLLevyImpactAgent()
     
     def execute_comprehensive_analysis(self, tax_code: str) -> Dict[str, Any]:
         """
@@ -683,6 +687,92 @@ class WorkflowCoordinatorAgent(MCPAgent):
             logger.error(f"Error in comprehensive analysis: {str(e)}")
             return {
                 "error": str(e),
+                "partial_results": results
+            }
+            
+    def analyze_levy_impact(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Analyze the impact of levy changes using the ML Levy Impact Agent.
+        
+        This workflow orchestrates a levy impact analysis by:
+        1. Getting basic levy information
+        2. Using ML to predict the impact on taxpayers and jurisdictions
+        3. Generating human-readable explanations of the results
+        
+        Args:
+            params: Dictionary containing parameters needed for analysis
+                - district_id: Taxing district identifier
+                - mill_rate: Current mill rate (tax rate per $1,000 of assessed value)
+                - property_value: Assessed property value (optional, uses average if not provided)
+                - levy_limit: Maximum levy amount allowed by law
+                - prior_year_levy: Previous year's levy amount
+                - new_construction_value: Value of new construction in the district (optional)
+                - district_type: Type of taxing district (e.g., "school", "fire", "city")
+                - year: Target year for the prediction
+                
+        Returns:
+            Dictionary containing the detailed impact analysis results
+        """
+        results = {}
+        
+        try:
+            # Validate required parameters
+            required_params = ["district_id", "mill_rate", "levy_limit", "prior_year_levy", "district_type", "year"]
+            missing_params = [param for param in required_params if param not in params]
+            
+            if missing_params:
+                return {
+                    "error": f"Missing required parameters: {', '.join(missing_params)}",
+                    "status": "failed"
+                }
+            
+            # Extract parameters for impact prediction
+            impact_params = {
+                "mill_rate": params["mill_rate"],
+                "property_value": params.get("property_value", 250000),  # Default to average property value
+                "levy_limit": params["levy_limit"],
+                "prior_year_levy": params["prior_year_levy"],
+                "district_type": params["district_type"],
+                "year": params["year"]
+            }
+            
+            # Add optional parameters if provided
+            if "new_construction_value" in params:
+                impact_params["new_construction_value"] = params["new_construction_value"]
+            
+            # Step 1: Predict levy impact using ML
+            impact_result = self.levy_impact_agent.handle_request(
+                "predict_levy_impact",
+                impact_params
+            )
+            
+            results["impact_prediction"] = impact_result
+            
+            # Step 2: Get detailed explanation if prediction was successful
+            if impact_result.get("status") == "success" and not params.get("skip_explanation", False):
+                explanation = self.levy_impact_agent.explain_prediction(impact_result)
+                results["detailed_explanation"] = explanation.get("detailed_explanation", "")
+            
+            # Step 3: Add district information
+            results["district_info"] = {
+                "id": params["district_id"],
+                "type": params["district_type"],
+                "year": params["year"]
+            }
+            
+            # Step 4: Include any extra context provided by the user
+            if "context" in params:
+                results["context"] = params["context"]
+            
+            # Final result status
+            results["status"] = "success"
+            return results
+            
+        except Exception as e:
+            logger.error(f"Error in levy impact analysis: {str(e)}")
+            return {
+                "error": str(e),
+                "status": "failed",
                 "partial_results": results
             }
 
@@ -809,5 +899,59 @@ registry.register_function(
                 "description": "Tax code to analyze"
             }
         }
+    }
+)
+
+# Register levy impact analysis workflow
+registry.register_function(
+    func=workflow_coordinator_agent.analyze_levy_impact,
+    name="analyze_levy_impact",
+    description="Analyze the impact of levy changes using machine learning",
+    parameter_schema={
+        "type": "object",
+        "properties": {
+            "district_id": {
+                "type": "string",
+                "description": "Taxing district identifier"
+            },
+            "mill_rate": {
+                "type": "number",
+                "description": "Current mill rate (tax rate per $1,000 of assessed value)"
+            },
+            "property_value": {
+                "type": "number",
+                "description": "Assessed property value (optional, uses average if not provided)"
+            },
+            "levy_limit": {
+                "type": "number",
+                "description": "Maximum levy amount allowed by law"
+            },
+            "prior_year_levy": {
+                "type": "number",
+                "description": "Previous year's levy amount"
+            },
+            "new_construction_value": {
+                "type": "number",
+                "description": "Value of new construction in the district (optional)"
+            },
+            "district_type": {
+                "type": "string",
+                "description": "Type of taxing district (e.g., 'school', 'fire', 'city')"
+            },
+            "year": {
+                "type": "integer",
+                "description": "Target year for the prediction"
+            },
+            "skip_explanation": {
+                "type": "boolean",
+                "description": "Whether to skip the detailed explanation (optional)",
+                "default": False
+            },
+            "context": {
+                "type": "object",
+                "description": "Additional context information (optional)"
+            }
+        },
+        "required": ["district_id", "mill_rate", "levy_limit", "prior_year_levy", "district_type", "year"]
     }
 )

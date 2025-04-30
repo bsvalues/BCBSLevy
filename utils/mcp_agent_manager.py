@@ -106,6 +106,9 @@ class AgentManager:
                 elif agent_type == 'LevyPredictionAgent':
                     from utils.mcp_agents import LevyPredictionAgent
                     self.agents[agent_id] = LevyPredictionAgent()
+                elif agent_type == 'MLLevyImpactAgent':
+                    from utils.ml_levy_impact_agent import MLLevyImpactAgent
+                    self.agents[agent_id] = MLLevyImpactAgent()
                 elif agent_type == 'WorkflowCoordinatorAgent':
                     from utils.mcp_agents import WorkflowCoordinatorAgent
                     self.agents[agent_id] = WorkflowCoordinatorAgent()
@@ -193,6 +196,15 @@ class AgentManager:
                         'role': 'specialist_agent',
                         'component': 'levy',
                         'domain': 'prediction',
+                        'reports_to': 'levy_analysis',
+                        'config': {}
+                    },
+                    {
+                        'id': 'levy_impact',
+                        'type': 'MLLevyImpactAgent',
+                        'role': 'specialist_agent',
+                        'component': 'levy',
+                        'domain': 'impact',
                         'reports_to': 'levy_analysis',
                         'config': {}
                     }
