@@ -37,19 +37,19 @@ login_manager = LoginManager()
 def create_app(config_name=None):
     """
     Application factory function to create and configure the Flask app.
-    
+
     Args:
         config_name: The configuration to use (development, testing, production)
-        
+
     Returns:
         The configured Flask application
     """
     app = Flask(__name__)
-    
+
     # Load configuration
     if config_name is None:
         config_name = os.environ.get('FLASK_CONFIG', 'development')
-    
+
     # Configure the application
     if config_name == 'production':
         app.config.from_object('config.ProductionConfig')
@@ -57,92 +57,92 @@ def create_app(config_name=None):
         app.config.from_object('config.TestingConfig')
     else:
         app.config.from_object('config.DevelopmentConfig')
-    
+
     # Override config from environment variables
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', 'dev-secret-key')
-    
+
     # Configure database connection pooling
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'pool_recycle': 300,
         'pool_pre_ping': True,
     }
-    
+
     # Initialize extensions with the app
     db.init_app(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
-    
+
     # Set up mock authentication for all users (no login required)
     # This gives all users automatic admin access without login
     from flask_login import AnonymousUserMixin
-    
+
     class AutoAuthUser(AnonymousUserMixin):
         """User class that automatically grants admin privileges to everyone."""
         @property
         def is_authenticated(self):
             return True
-            
+
         @property
         def is_active(self):
             return True
-            
+
         @property
         def is_admin(self):
             return True
-            
+
         @property
         def id(self):
             return 1
-            
+
         @property
         def username(self):
             return "BentonStaff"
-            
+
         @property
         def first_name(self):
             return "Benton County"
-            
+
         @property
         def last_name(self):
             return "Staff"
-    
+
     # Initialize login manager with auto auth
     login_manager.init_app(app)
     login_manager.anonymous_user = AutoAuthUser
-    
+
     # Override login_required decorator to do nothing - this bypasses all @login_required decorators
     def no_login_required(func):
         return func
-        
+
     # Replace the actual login_required with our no-op version
     import flask_login
     flask_login.login_required = no_login_required
-    
+
     @login_manager.user_loader
     def load_user(user_id):
         # Always return our auto-authenticated user
         return AutoAuthUser()
-    
+
     # Register CLI commands
     try:
         from cli import register_commands
         register_commands(app)
     except ImportError:
         app.logger.warning("CLI commands not registered, cli.py not found")
-    
+
     # Register error handlers
     register_error_handlers(app)
-    
+
     # Register template filters
     register_template_filters(app)
-    
+
     # Register template context processors
     @app.context_processor
     def inject_current_year():
         """Add current_year to all templates."""
         return {'current_year': datetime.now().year}
-    
+
     # Set up database performance monitoring inside app context
     with app.app_context():
         try:
@@ -153,17 +153,17 @@ def create_app(config_name=None):
             app.logger.warning(f"Could not set up database performance monitoring: {str(e)}")
         except Exception as e:
             app.logger.error(f"Error setting up database performance monitoring: {str(e)}")
-    
+
     # Configure logging
     configure_logging(app)
-    
+
     return app
 
 
 def register_error_handlers(app):
     """
     Register custom error handlers for the application.
-    
+
     Args:
         app: The Flask application instance
     """
@@ -172,7 +172,7 @@ def register_error_handlers(app):
         if request.path.startswith('/api/'):
             return jsonify(error="Not found"), 404
         return render_template('simple_404.html'), 404
-    
+
     @app.errorhandler(500)
     def internal_server_error(error):
         if request.path.startswith('/api/'):
@@ -186,7 +186,7 @@ def register_error_handlers(app):
 def register_template_filters(app):
     """
     Register custom template filters for Jinja templates.
-    
+
     Args:
         app: The Flask application instance
     """
@@ -196,14 +196,14 @@ def register_template_filters(app):
         if value is None:
             return "$0.00"
         return "${:,.2f}".format(value)
-    
+
     @app.template_filter('format_percent')
     def format_percent(value):
         """Format a value as a percentage."""
         if value is None:
             return "0.00%"
         return "{:.2f}%".format(value * 100)
-    
+
     @app.template_filter('format_date')
     def format_date(value):
         """Format a date value."""
@@ -222,12 +222,12 @@ def register_template_filters(app):
         if value is None:
             return "0"
         return "{:,}".format(int(value))
-        
+
     @app.template_filter('add_tooltips')
     def add_tooltips(value):
         """Add tooltip highlighting to text."""
         return f'<span class="tooltip-text" data-toggle="tooltip" title="{value}">{value}</span>'
-        
+
     @app.template_filter('datetime')
     def format_datetime(value):
         """Format a datetime value."""
@@ -247,23 +247,23 @@ def register_template_filters(app):
 def configure_logging(app):
     """
     Configure logging for the application.
-    
+
     Args:
         app: The Flask application instance
     """
     log_level = app.config.get('LOG_LEVEL', logging.INFO)
-    
+
     # Configure basic logging
     logging.basicConfig(
         level=log_level,
         format='%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
-    
+
     # Create logs directory if it doesn't exist
     if not os.path.exists('logs'):
         os.makedirs('logs')
-    
+
     # Create a file handler for performance logging
     perf_handler = logging.FileHandler('logs/performance.log')
     perf_handler.setLevel(logging.INFO)
@@ -271,22 +271,18 @@ def configure_logging(app):
         '%(asctime)s %(levelname)s: %(message)s',
         '%Y-%m-%d %H:%M:%S'
     ))
-    
+
     # Add performance logger
     perf_logger = logging.getLogger('performance')
     perf_logger.setLevel(logging.INFO)
     perf_logger.addHandler(perf_handler)
-    
+
     app.logger.setLevel(log_level)
     app.logger.info('LevyMaster application startup')
 
 
 # Create the Flask application instance
 app = create_app()
-
-# Move database performance monitoring setup inside create_app function
-# We'll add this to the create_app function later
-# For now, skip database performance monitoring to fix the 500 error
 
 # Root route is now handled by home_bp
 
@@ -315,6 +311,8 @@ from routes_search import init_search_routes
 from routes_db_fix import db_fix_bp
 from routes_property_assessment import property_assessment_bp
 from routes_mcp_ui import register_mcp_ui_routes
+from routes_monitoring import monitoring_bp # Added import
+
 
 app.register_blueprint(data_management_bp)
 app.register_blueprint(property_assessment_bp)
@@ -406,13 +404,13 @@ with app.app_context():
     from utils.advanced_ai_agent import init_advanced_agent
     from utils.mcp_army_init import init_mcp_army
     from utils.anthropic_utils import check_api_key_status
-    
+
     # Check Anthropic API key status before attempting to initialize AI components
     api_status = check_api_key_status()
     if api_status['status'] != 'valid':
         app.logger.warning(f"Anthropic API key issue: {api_status['message']}")
         app.logger.warning("AI-powered features will be limited or unavailable")
-    
+
     # Initialize MCP framework with improved error handling
     try:
         init_mcp()
@@ -423,26 +421,26 @@ with app.app_context():
     except Exception as e:
         app.logger.error(f"Error initializing MCP framework: {str(e)}")
         app.logger.error("MCP framework initialization failed - basic features will still be available")
-    
+
     # Register MCP API routes even if initialization failed (endpoints will handle errors)
     try:
         init_mcp_api_routes(app)
     except Exception as e:
         app.logger.error(f"Error registering MCP API routes: {str(e)}")
-    
-    
+
+
     # Initialize MCP Army system with dedicated error handling
     try:
         if api_status['status'] == 'valid':
             # Import here to avoid circular imports
             from routes_mcp_army import register_mcp_army_routes
-            
+
             # Initialize MCP Army system
             mcp_army_initialized = init_mcp_army(app)
-            
+
             # Register MCP Army routes
             routes_registered = register_mcp_army_routes(app)
-            
+
             if mcp_army_initialized and routes_registered:
                 app.logger.info("MCP Army system initialized and routes registered successfully")
             elif mcp_army_initialized:
@@ -456,7 +454,7 @@ with app.app_context():
     except Exception as e:
         app.logger.error(f"Error initializing MCP Army system: {str(e)}")
         app.logger.error("MCP Army features will be unavailable")
-        
+
     # Initialize Advanced AI Agent with dedicated error handling
     try:
         if api_status['status'] == 'valid':
@@ -469,7 +467,7 @@ with app.app_context():
     except Exception as e:
         app.logger.error(f"Error initializing Advanced Analysis Agent: {str(e)}")
         app.logger.error("Advanced AI features will be unavailable")
-    
+
     # Create tables if they don't exist
     try:
         from models import User, TaxDistrict, TaxCode, Property, ImportLog, ExportLog
@@ -477,3 +475,6 @@ with app.app_context():
         app.logger.info("Database tables created successfully")
     except Exception as e:
         app.logger.error(f"Error creating database tables: {str(e)}")
+
+app.register_blueprint(mcp_army_bp)
+app.register_blueprint(monitoring_bp, url_prefix='/monitoring')
