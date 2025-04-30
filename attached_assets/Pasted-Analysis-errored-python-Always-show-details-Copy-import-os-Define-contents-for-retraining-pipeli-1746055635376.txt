@@ -1,0 +1,290 @@
+Analysis errored
+python
+Always show details
+
+Copy
+import os
+
+# Define contents for retraining pipeline and drift hook
+retrain_pipeline_py = """
+import pandas as pd
+import joblib
+
+class RetrainPipeline:
+    def __init__(self, model_path='ml/model.pkl'):
+        self.model_path = model_path
+
+    def load_training_data(self, csv_path='data/levy_training_data.csv'):
+        return pd.read_csv(csv_path)
+
+    def train_model(self, data):
+        from sklearn.linear_model import LinearRegression
+        model = LinearRegression()
+        model.fit(data[['region_encoded']], data['forecast'])
+        return model
+
+    def save_model(self, model):
+        joblib.dump(model, self.model_path)
+
+    def run(self):
+        data = self.load_training_data()
+        model = self.train_model(data)
+        self.save_model(model)
+        print("Retraining complete.")
+
+if __name__ == '__main__':
+    RetrainPipeline().run()
+"""
+
+drift_detector_py = """
+import numpy as np
+
+class DriftDetector:
+    def __init__(self, baseline_mean, threshold=5.0):
+        self.baseline_mean = baseline_mean
+        self.threshold = threshold
+
+    def check_drift(self, new_value):
+        drift = abs(new_value - self.baseline_mean)
+        return drift > self.threshold
+
+if __name__ == "__main__":
+    detector = DriftDetector(baseline_mean=42.0)
+    test_value = 55.1
+    if detector.check_drift(test_value):
+        print(f"Drift detected: {test_value}")
+    else:
+        print(f"No drift: {test_value}")
+"""
+
+# Create necessary directories and write the files
+ml_path = "/mnt/data/TerraFusionRepoScaffold/ml"
+data_path = "/mnt/data/TerraFusionRepoScaffold/data"
+os.makedirs(data_path, exist_ok=True)
+
+with open(os.path.join(ml_path, "training", "retrain_pipeline.py"), "w") as f:
+    f.write(retrain_pipeline_py.strip())
+
+with open(os.path.join(ml_path, "hooks", "drift_detector.py"), "w") as f:
+    f.write(drift_detector_py.strip())
+
+# Create a dummy training data CSV
+sample_csv = """region_encoded,forecast
+1,45.0
+2,44.0
+3,43.5
+1,46.0
+2,42.5
+3,41.0
+"""
+with open(os.path.join(data_path, "levy_training_data.csv"), "w") as f:
+    f.write(sample_csv.strip())
+
+"/mnt/data/TerraFusionRepoScaffold"
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+Cell In[6], line 60
+     57 data_path = "/mnt/data/TerraFusionRepoScaffold/data"
+     58 os.makedirs(data_path, exist_ok=True)
+---> 60 with open(os.path.join(ml_path, "training", "retrain_pipeline.py"), "w") as f:
+     61     f.write(retrain_pipeline_py.strip())
+     63 with open(os.path.join(ml_path, "hooks", "drift_detector.py"), "w") as f:
+
+File ~/.local/lib/python3.11/site-packages/IPython/core/interactiveshell.py:324, in _modified_open(file, *args, **kwargs)
+    317 if file in {0, 1, 2}:
+    318     raise ValueError(
+    319         f"IPython won't let you open fd={file} by default "
+    320         "as it is likely to crash IPython. If you know what you are doing, "
+    321         "you can use builtins' open."
+    322     )
+--> 324 return io_open(file, *args, **kwargs)
+
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data/TerraFusionRepoScaffold/ml/training/retrain_pipeline.py'
+
+Analysis errored
+python
+Always show details
+
+Copy
+# Create the missing subdirectories for training and hooks under ml/
+os.makedirs(os.path.join(ml_path, "training"), exist_ok=True)
+os.makedirs(os.path.join(ml_path, "hooks"), exist_ok=True)
+
+# Now write the retraining pipeline and drift detector files
+with open(os.path.join(ml_path, "training", "retrain_pipeline.py"), "w") as f:
+    f.write(retrain_pipeline_py.strip())
+
+with open(os.path.join(ml_path, "hooks", "drift_detector.py"), "w") as f:
+    f.write(drift_detector_py.strip())
+
+# Write the sample training data CSV
+with open(os.path.join(data_path, "levy_training_data.csv"), "w") as f:
+    f.write(sample_csv.strip())
+
+"/mnt/data/TerraFusionRepoScaffold"
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+Cell In[7], line 14
+     12 # Write the sample training data CSV
+     13 with open(os.path.join(data_path, "levy_training_data.csv"), "w") as f:
+---> 14     f.write(sample_csv.strip())
+     16 "/mnt/data/TerraFusionRepoScaffold"
+
+NameError: name 'sample_csv' is not defined
+
+Analyzed
+python
+Always show details
+
+Copy
+# Re-define the missing sample_csv and write it to the training data file
+sample_csv = """region_encoded,forecast
+1,45.0
+2,44.0
+3,43.5
+1,46.0
+2,42.5
+3,41.0
+"""
+
+with open(os.path.join(data_path, "levy_training_data.csv"), "w") as f:
+    f.write(sample_csv.strip())
+
+"/mnt/data/TerraFusionRepoScaffold"
+Result
+'/mnt/data/TerraFusionRepoScaffold'
+⚙️ Phase II: Auto-Retraining & Drift Detection successfully installed into:
+
+📁 /mnt/data/TerraFusionRepoScaffold
+
+✅ What's New:
+ml/training/retrain_pipeline.py: Auto-retraining pipeline using scikit-learn
+
+ml/hooks/drift_detector.py: Drift detection utility to trigger retraining
+
+data/levy_training_data.csv: Sample training dataset with encoded regions + forecasts
+
+🔁 Flow Summary:
+DriftDetector flags deviation from baseline prediction
+
+RetrainPipeline triggers model retraining using latest CSV data
+
+Trained model is saved to ml/model.pkl (plug in for real serving)
+
+Would you like to:
+
+Connect this pipeline to your CI/CD GitHub workflow for auto-retraining?
+
+Or move forward with Phase III: 🧠 MemoryAgent + audit summarization? ​​
+
+
+
+
+
+
+You said:
+Connect this pipeline to your CI/CD GitHub workflow for auto-retraining
+
+
+ChatGPT said:
+
+Analyzed
+python
+Always show details
+
+Copy
+# Define the updated GitHub Actions workflow with an auto-retraining job
+
+ci_with_retraining_yml = """
+name: TerraFusion CI with Retraining
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 3 * * *'  # Daily retraining at 3 AM UTC
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: pass
+          POSTGRES_DB: dbname
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pandas scikit-learn joblib
+
+    - name: Run tests
+      run: |
+        pytest tests/
+
+  retrain-model:
+    runs-on: ubuntu-latest
+    needs: build-test
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install pandas scikit-learn joblib
+
+    - name: Run retraining pipeline
+      run: |
+        python ml/training/retrain_pipeline.py
+"""
+
+# Write the updated CI workflow to the workflows directory
+with open(os.path.join(github_workflow_dir, "ci.yml"), "w") as f:
+    f.write(ci_with_retraining_yml.strip())
+
+"/mnt/data/TerraFusionRepoScaffold/.github/workflows/ci.yml"
+Result
+'/mnt/data/TerraFusionRepoScaffold/.github/workflows/ci.yml'
+🧠 CI/CD Enhanced — Your GitHub Actions pipeline now includes automated model retraining.
+
+📁 Updated workflow saved to:
+/mnt/data/TerraFusionRepoScaffold/.github/workflows/ci.yml
+
+🚀 New Capabilities:
+✅ Scheduled Daily Retraining at 03:00 UTC (via CRON)
+
+✅ Job Isolation: Retraining runs after test phase passes
+
+✅ Auto-checkout & install: pandas, scikit-learn, joblib included
+
+Would you like to now:
+
+🧠 Launch Phase III: MemoryAgent + Reflection Log?
+
+📈 Begin Phase IV: Live Monitoring Dashboard (Grafana Prometheus export)?
