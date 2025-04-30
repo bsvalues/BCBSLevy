@@ -312,6 +312,7 @@ from routes_db_fix import db_fix_bp
 from routes_property_assessment import property_assessment_bp
 from routes_mcp_ui import register_mcp_ui_routes
 from routes_monitoring import monitoring_bp # Added import
+from routes_mcp_army import mcp_army_bp # Import MCP Army blueprint
 
 
 app.register_blueprint(data_management_bp)
@@ -476,5 +477,5 @@ with app.app_context():
     except Exception as e:
         app.logger.error(f"Error creating database tables: {str(e)}")
 
-app.register_blueprint(mcp_army_bp)
+app.register_blueprint(mcp_army_bp, name='mcp_army_blueprint')
 app.register_blueprint(monitoring_bp, url_prefix='/monitoring')

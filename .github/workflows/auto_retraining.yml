@@ -1,0 +1,65 @@
+name: TerraFusion Auto-Retraining Pipeline
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 3 AM UTC
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  drift-detection:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas scikit-learn joblib numpy
+        if [ -f "requirements.txt" ]; then
+          pip install -r requirements.txt
+        fi
+
+    - name: Run drift detection
+      run: |
+        python ml/hooks/drift_detector.py --data-path data/levy_training_data.csv --trigger-retraining
+      
+    - name: Check for retraining results
+      id: check-retrain
+      run: |
+        if [ -f "ml/models/training_history.csv" ]; then
+          echo "RETRAINED=true" >> $GITHUB_ENV
+          echo "TIMESTAMP=$(date -u)" >> $GITHUB_ENV
+          echo "retrained=true" >> $GITHUB_OUTPUT
+        else
+          echo "RETRAINED=false" >> $GITHUB_ENV
+          echo "retrained=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit updated model if retrained
+      if: steps.check-retrain.outputs.retrained == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add ml/models/*
+        git commit -m "Auto-retrained model based on drift detection [skip ci]" || echo "No changes to commit"
+        git push
+
+    - name: Send notification if drift detected
+      if: steps.check-retrain.outputs.retrained == 'true'
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: 'Model Retraining Alert',
+            body: `The levy impact prediction model was automatically retrained due to detected drift.\n\nTimestamp: ${process.env.TIMESTAMP}\n\nPlease review the updated model and metrics.`
+          })

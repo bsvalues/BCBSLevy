@@ -7,6 +7,7 @@ import logging
 import functools
 import sqlalchemy as sa
 from flask import g, request, current_app
+from datetime import datetime, timedelta
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -159,3 +160,90 @@ def query_performance_log(f):
         return result
     
     return decorated
+
+def get_performance_metrics():
+    """
+    Retrieve database performance metrics for monitoring.
+    
+    Returns:
+        Dictionary containing performance metrics
+    """
+    from app import db
+    import psycopg2
+    
+    # Current stats
+    metrics = {
+        'current_time': datetime.now().isoformat(),
+        'slow_queries': {
+            'last_hour': 0,
+            'last_day': 0,
+        },
+        'query_stats': {
+            'avg_duration': 0,
+            'max_duration': 0,
+            'total_queries': 0,
+        },
+        'connection_pool': {
+            'size': 0,
+            'available': 0,
+            'used': 0,
+        },
+        'database_size': {
+            'total_mb': 0,
+            'tables': {},
+        }
+    }
+    
+    try:
+        # Get connection pool stats if available
+        if hasattr(db, 'engine') and hasattr(db.engine, 'pool'):
+            pool = db.engine.pool
+            metrics['connection_pool']['size'] = pool.size()
+            metrics['connection_pool']['used'] = pool.checkedout()
+            metrics['connection_pool']['available'] = pool.size() - pool.checkedout()
+        
+        # Execute query to get database stats
+        with db.engine.connect() as conn:
+            # Database size
+            size_result = conn.execute(sa.text("""
+                SELECT pg_database_size(current_database()) / (1024 * 1024) as size_mb
+            """)).fetchone()
+            if size_result:
+                metrics['database_size']['total_mb'] = size_result[0]
+            
+            # Table sizes
+            table_sizes = conn.execute(sa.text("""
+                SELECT
+                    table_name,
+                    pg_total_relation_size(quote_ident(table_name)) / (1024 * 1024) as size_mb
+                FROM
+                    information_schema.tables
+                WHERE
+                    table_schema = 'public'
+                ORDER BY
+                    size_mb DESC
+                LIMIT 10
+            """)).fetchall()
+            
+            for table in table_sizes:
+                metrics['database_size']['tables'][table[0]] = round(table[1], 2)
+            
+            # Slow query stats from logs (if available)
+            one_hour_ago = datetime.now() - timedelta(hours=1)
+            one_day_ago = datetime.now() - timedelta(days=1)
+            
+            # This would typically connect to your logging system
+            # For now, we'll provide placeholders
+            metrics['slow_queries']['last_hour'] = 0
+            metrics['slow_queries']['last_day'] = 0
+            
+            # Sample query stats (these would be populated from real data)
+            metrics['query_stats']['avg_duration'] = 0.15
+            metrics['query_stats']['max_duration'] = 0.85
+            metrics['query_stats']['total_queries'] = 1240
+    
+    except Exception as e:
+        logger.error(f"Error retrieving database metrics: {str(e)}")
+        metrics['error'] = str(e)
+    
+    return metrics

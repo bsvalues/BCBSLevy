@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Union, Callable
 import threading
+from datetime import datetime, timedelta
 
 from utils.mcp_core import registry
 from utils.mcp_agents import MCPAgent
@@ -25,6 +26,96 @@ class AgentNotAvailableError(Exception):
     pass
 
 logger = logging.getLogger(__name__)
+
+# Global agent manager instance for use by get_agent_metrics
+_agent_manager_instance = None
+
+def get_agent_metrics():
+    """
+    Get performance metrics for all registered agents.
+    
+    Returns:
+        Dictionary containing agent metrics and performance data
+    """
+    global _agent_manager_instance
+    
+    # If no agent manager instance, return empty metrics
+    if _agent_manager_instance is None:
+        return {
+            'timestamp': datetime.now().isoformat(),
+            'agent_count': 0,
+            'active_agents': 0,
+            'agents': {}
+        }
+    
+    am = _agent_manager_instance
+    
+    # Aggregate metrics
+    metrics = {
+        'timestamp': datetime.now().isoformat(),
+        'agent_count': len(am.agents),
+        'active_agents': 0,
+        'agents': {}
+    }
+    
+    # Collect metrics for each agent
+    for agent_id, agent in am.agents.items():
+        if agent_id == 'MCP':
+            # Skip special MCP agent
+            continue
+            
+        agent_status = am.agent_statuses.get(agent_id, {})
+        agent_config = am.agent_configs.get(agent_id, {})
+        
+        if agent_status.get('status') == 'active':
+            metrics['active_agents'] += 1
+            
+        # Get agent performance data
+        performance = agent_status.get('performance', {})
+        
+        # Get last activity timestamp
+        last_updated = agent_status.get('last_updated', datetime.now().isoformat())
+        
+        # Calculate time since last activity
+        try:
+            last_active_dt = datetime.fromisoformat(last_updated)
+            time_since_active = (datetime.now() - last_active_dt).total_seconds()
+        except (ValueError, TypeError):
+            time_since_active = 0
+            
+        # Add agent metrics
+        metrics['agents'][agent_id] = {
+            'type': agent_config.get('type', 'unknown'),
+            'role': agent_config.get('role', 'specialist_agent'),
+            'component': agent_config.get('component', 'general'),
+            'domain': agent_config.get('domain', 'general'),
+            'status': agent_status.get('status', 'unknown'),
+            'performance': performance,
+            'last_active': last_updated,
+            'time_since_active': time_since_active
+        }
+        
+        # If this agent has relationships, include them
+        if agent_id in am.agent_relationships:
+            metrics['agents'][agent_id]['relationships'] = am.agent_relationships[agent_id]
+            
+    # Calculate system-level metrics
+    if metrics['agent_count'] > 0:
+        # Overall system performance (average of all agent performance scores)
+        total_perf = 0
+        agent_count = 0
+        for agent_id, agent_data in metrics['agents'].items():
+            if 'performance' in agent_data and 'overall' in agent_data['performance']:
+                total_perf += agent_data['performance']['overall']
+                agent_count += 1
+                
+        metrics['system_performance'] = (total_perf / agent_count) if agent_count > 0 else 0.0
+        metrics['agent_availability'] = metrics['active_agents'] / metrics['agent_count']
+    else:
+        metrics['system_performance'] = 0.0
+        metrics['agent_availability'] = 0.0
+        
+    return metrics
 
 class AgentManager:
     """
@@ -43,6 +134,8 @@ class AgentManager:
         Args:
             collab_manager: Optional collaboration manager instance. If None, uses global instance.
         """
+        global _agent_manager_instance
+        
         self.agents = {}  # agent_id -> agent instance
         self.agent_configs = {}  # agent_id -> configuration
         
@@ -71,6 +164,9 @@ class AgentManager:
         self.comm_bus.subscribe('help_request', self._handle_help_request)
         self.comm_bus.subscribe('status_update', self._handle_status_update)
         self.comm_bus.subscribe('error', self._handle_error)
+        
+        # Set this instance as the global instance for get_agent_metrics
+        _agent_manager_instance = self
         
     def initialize_agent(self, agent_id: str, config: Dict[str, Any]) -> bool:
         """
