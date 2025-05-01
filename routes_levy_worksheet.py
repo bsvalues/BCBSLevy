@@ -103,10 +103,13 @@ def export_worksheet(scenario_id):
     """Export a worksheet in various formats."""
     format_type = request.args.get('format', 'pdf')
     
-    # This would be implemented to generate PDF, Excel, or other formats
-    # of the worksheet for printing or sharing
-    
-    return jsonify({"message": f"Export functionality for {format_type} format not yet implemented"}), 501
+    # Forward the request to the levy worksheet service
+    try:
+        from levy_worksheet_service import export_worksheet_impl
+        return export_worksheet_impl(scenario_id, format_type)
+    except ImportError:
+        # Fallback if service module not available
+        return jsonify({"message": f"Export functionality for {format_type} format not yet implemented"}), 501
 
 def init_app(app):
     """Initialize the levy worksheet routes with the Flask app."""
