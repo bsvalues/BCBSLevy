@@ -39,4 +39,6 @@ dependencies = [
     "alembic>=1.15.2",
     "sqlalchemy-utils>=0.41.2",
     "prettytable>=3.16.0",
+    "xlsxwriter>=3.2.3",
+    "weasyprint>=65.1",
 ]

@@ -8,41 +8,41 @@ into the main TerraFusion application.
 import logging
 from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import login_required, current_user
-from levy_worksheet_service import register_levy_worksheet_blueprint, calculate_levy_worksheet, save_levy_calculation
+from levy_worksheet_service import calculate_levy_worksheet, save_levy_calculation
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Create blueprint
-levy_worksheet_routes = Blueprint('levy_worksheet_routes', __name__, template_folder='templates')
+# Create blueprint - use a different name than the one in levy_worksheet_service.py
+levy_worksheet_routes = Blueprint('levy_worksheet_routes', __name__, url_prefix='/levy-worksheet')
 
-@levy_worksheet_routes.route('/levy-worksheet')
+@levy_worksheet_routes.route('/')
 @login_required
-def worksheet_home():
+def dashboard():
     """Main levy worksheet dashboard page."""
     return render_template('levy_worksheet/dashboard.html')
 
-@levy_worksheet_routes.route('/levy-worksheet/new')
+@levy_worksheet_routes.route('/new')
 @login_required
 def new_worksheet():
     """New levy worksheet calculator page."""
     return render_template('levy_worksheet/calculator.html')
 
-@levy_worksheet_routes.route('/levy-worksheet/<int:district_id>')
+@levy_worksheet_routes.route('/<int:district_id>')
 @login_required
 def district_worksheet(district_id):
     """District-specific levy worksheet calculator page."""
     return render_template('levy_worksheet/calculator.html', district_id=district_id)
 
-@levy_worksheet_routes.route('/levy-worksheet/scenario/<int:scenario_id>')
+@levy_worksheet_routes.route('/scenario/<int:scenario_id>')
 @login_required
 def view_scenario(scenario_id):
     """View a saved levy scenario."""
     return render_template('levy_worksheet/view_scenario.html', scenario_id=scenario_id)
 
-@levy_worksheet_routes.route('/api/v1/levy-worksheet/calculate', methods=['POST'])
+@levy_worksheet_routes.route('/api/v1/calculate', methods=['POST'])
 @login_required
 def api_calculate_worksheet():
     """API endpoint to calculate a levy worksheet."""
@@ -97,7 +97,7 @@ def api_calculate_worksheet():
         logger.error(f"Error calculating worksheet: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-@levy_worksheet_routes.route('/api/v1/levy-worksheet/export/<int:scenario_id>', methods=['GET'])
+@levy_worksheet_routes.route('/api/v1/export/<int:scenario_id>', methods=['GET'])
 @login_required
 def export_worksheet(scenario_id):
     """Export a worksheet in various formats."""
@@ -114,5 +114,4 @@ def export_worksheet(scenario_id):
 def init_app(app):
     """Initialize the levy worksheet routes with the Flask app."""
     app.register_blueprint(levy_worksheet_routes)
-    register_levy_worksheet_blueprint(app)
     logger.info('Levy Worksheet routes initialized')
