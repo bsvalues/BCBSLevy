@@ -121,10 +121,10 @@ class DriftDetector:
                 reference_data = pd.read_csv('data/levy_training_data.csv')
             except Exception as e:
                 logger.error(f"Error loading reference data: {str(e)}")
-                return {'drift_detected': False, 'error': str(e)}
+                return {'drift_detected': 'False', 'error': str(e)}
         
         result = {
-            'drift_detected': False,
+            'drift_detected': 'False',  # Convert boolean to string for JSON serialization
             'features': {},
             'timestamp': datetime.now().isoformat()
         }
@@ -154,12 +154,12 @@ class DriftDetector:
                 'current_mean': new_mean,
                 'current_std': new_std,
                 'z_score': z_score,
-                'drift_detected': drift_detected
+                'drift_detected': str(drift_detected)
             }
             
             # Mark overall drift if any feature has drift
             if drift_detected:
-                result['drift_detected'] = True
+                result['drift_detected'] = 'True'  # Make sure we store string value
                 logger.warning(f"Drift detected in feature '{col}': "
                              f"z-score={z_score:.2f}, threshold={drift_threshold}")
         
@@ -183,7 +183,7 @@ class DriftDetector:
         """
         if target_col not in new_data.columns:
             logger.error(f"Target column '{target_col}' not found in data")
-            return {'drift_detected': False, 'error': f"Target column '{target_col}' not found"}
+            return {'drift_detected': 'False', 'error': f"Target column '{target_col}' not found"}
         
         # Extract features and target
         features = []
@@ -218,7 +218,7 @@ class DriftDetector:
         if ref_mse is None:
             logger.warning("No reference metrics available, can't determine prediction drift")
             return {
-                'drift_detected': False,
+                'drift_detected': 'False',
                 'current_mse': mse,
                 'current_mae': mae,
                 'timestamp': datetime.now().isoformat()
@@ -233,7 +233,7 @@ class DriftDetector:
         drift_detected = mse_change > drift_threshold or mae_change > drift_threshold
         
         result = {
-            'drift_detected': drift_detected,
+            'drift_detected': str(drift_detected),
             'reference_mse': ref_mse,
             'reference_mae': ref_mae,
             'current_mse': mse,
@@ -287,7 +287,7 @@ class DriftDetector:
             
             result = {
                 'status': 'alert' if drift_detected else 'ok',
-                'drift_detected': drift_detected,
+                'drift_detected': str(drift_detected),  # Convert to string for JSON serialization
                 'distribution_drift': distribution_drift,
                 'prediction_drift': prediction_drift,
                 'timestamp': datetime.now().isoformat(),
@@ -295,7 +295,8 @@ class DriftDetector:
             }
             
             # Call alert callback if drift is detected
-            if drift_detected and alert_callback is not None:
+            drift_bool = drift_detected == 'True'
+            if drift_bool and alert_callback is not None:
                 alert_callback(result)
                 
             return result
@@ -304,7 +305,7 @@ class DriftDetector:
             logger.error(f"Error in drift monitoring: {str(e)}")
             return {'status': 'error', 'message': str(e)}
 
-def trigger_retraining(drift_result: Dict[str, Any]) -> bool:
+def trigger_retraining(drift_result: Dict[str, Any]) -> str:
     """
     Trigger model retraining based on drift detection results.
     
@@ -312,11 +313,12 @@ def trigger_retraining(drift_result: Dict[str, Any]) -> bool:
         drift_result: Dictionary containing drift detection results
         
     Returns:
-        True if retraining was triggered, False otherwise
+        "True" if retraining was triggered, "False" otherwise
     """
-    if not drift_result.get('drift_detected', False):
+    drift_detected = drift_result.get('drift_detected', 'False')
+    if drift_detected == 'False' or not drift_detected:
         logger.info("No drift detected, retraining not needed")
-        return False
+        return "False"
         
     logger.info("Drift detected, triggering retraining")
     
@@ -330,11 +332,11 @@ def trigger_retraining(drift_result: Dict[str, Any]) -> bool:
         metrics = pipeline.run()
         
         logger.info(f"Retraining completed successfully: MSE={metrics['mse']:.4f}")
-        return True
+        return "True"
         
     except Exception as e:
         logger.error(f"Error triggering retraining: {str(e)}")
-        return False
+        return "False"
 
 if __name__ == "__main__":
     # Parse command line arguments
@@ -363,10 +365,10 @@ if __name__ == "__main__":
         print(f"Drift detected: {result['drift_detected']}")
         
         # Trigger retraining if requested and drift detected
-        if args.trigger_retraining and result['drift_detected']:
+        if args.trigger_retraining and result['drift_detected'] == 'True':
             print("Triggering retraining...")
             retraining_success = trigger_retraining(result)
-            print(f"Retraining {'successful' if retraining_success else 'failed'}")
+            print(f"Retraining {'successful' if retraining_success == 'True' else 'failed'}")
             
         sys.exit(0 if result['status'] != 'error' else 1)
         

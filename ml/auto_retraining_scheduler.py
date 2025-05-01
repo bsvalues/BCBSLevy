@@ -28,6 +28,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger('auto_retraining_scheduler')
 
+def make_json_serializable(obj: Any) -> Any:
+    """
+    Convert any Python object to a JSON-serializable type.
+    
+    Args:
+        obj: Any Python object
+        
+    Returns:
+        JSON-serializable version of the object
+    """
+    if isinstance(obj, dict):
+        return {k: make_json_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [make_json_serializable(x) for x in obj]
+    elif isinstance(obj, (int, float, str, type(None))):
+        return obj
+    elif isinstance(obj, bool):
+        return str(obj)  # Convert bools to strings
+    else:
+        return str(obj)  # Convert anything else to string
+
 class RetrainingScheduler:
     """Scheduler for periodic drift detection and model retraining."""
     
@@ -79,6 +100,9 @@ class RetrainingScheduler:
         # - Webhooks to other systems
         # - Monitoring system alerts
         
+        # Create logs directory if it doesn't exist
+        os.makedirs('logs', exist_ok=True)
+        
         # For now, we'll just write to a notifications log file
         with open('logs/notifications.log', 'a') as f:
             f.write(f"{datetime.now().isoformat()} - {subject}: {message}\n")
@@ -91,6 +115,9 @@ class RetrainingScheduler:
             Dictionary containing check results
         """
         logger.info("Checking for model drift")
+        
+        # Create logs directory if it doesn't exist
+        os.makedirs('logs', exist_ok=True)
         
         try:
             # Import here to avoid circular imports
@@ -110,30 +137,36 @@ class RetrainingScheduler:
                 self._send_notification(
                     "Model Drift Detected", 
                     f"Drift detected in levy impact prediction model. Retraining initiated.\n"
-                    f"Drift details: {json.dumps(result, indent=2)}"
+                    f"Drift details: {json.dumps(make_json_serializable(result), indent=2)}"
                 )
                 
                 # Trigger retraining
-                retraining_success = trigger_retraining(result)
-                
-                if retraining_success:
-                    logger.info("Retraining completed successfully")
-                    self._send_notification(
-                        "Model Retraining Complete",
-                        "Levy impact prediction model has been successfully retrained."
-                    )
-                else:
-                    logger.error("Retraining failed")
-                    self._send_notification(
-                        "Model Retraining Failed",
-                        "Attempt to retrain levy impact prediction model failed."
-                    )
-                
-                result['retraining_triggered'] = True
-                result['retraining_success'] = retraining_success
+                try:
+                    retraining_success = trigger_retraining(result)
+                    
+                    if retraining_success == "True":
+                        logger.info("Retraining completed successfully")
+                        self._send_notification(
+                            "Model Retraining Complete",
+                            "Levy impact prediction model has been successfully retrained."
+                        )
+                    else:
+                        logger.error("Retraining failed")
+                        self._send_notification(
+                            "Model Retraining Failed",
+                            "Attempt to retrain levy impact prediction model failed."
+                        )
+                    
+                    result['retraining_triggered'] = "True"
+                    result['retraining_success'] = retraining_success  # Already a string from trigger_retraining
+                except Exception as e:
+                    logger.error(f"Error in retraining: {str(e)}")
+                    result['retraining_triggered'] = "True"
+                    result['retraining_success'] = "False"
+                    result['retraining_error'] = str(e)
             else:
                 logger.info("No drift detected, model is performing well")
-                result['retraining_triggered'] = False
+                result['retraining_triggered'] = "False"
             
             # Update check timestamps
             self.last_check_time = datetime.now()
@@ -144,8 +177,14 @@ class RetrainingScheduler:
             result['next_check_time'] = self.next_check_time.isoformat()
             
             # Save check results to log
-            with open('logs/drift_checks.json', 'a') as f:
-                f.write(json.dumps(result) + '\n')
+            try:
+                # Use the global serialization function
+                serializable_result = make_json_serializable(result)
+                
+                with open('logs/drift_checks.json', 'a') as f:
+                    f.write(json.dumps(serializable_result) + '\n')
+            except Exception as e:
+                logger.error(f"Error saving drift check results: {str(e)}")
             
             return result
             
@@ -159,8 +198,9 @@ class RetrainingScheduler:
             }
             
             # Save check results to log even if there was an error
+            serializable_error = make_json_serializable(error_result)
             with open('logs/drift_checks.json', 'a') as f:
-                f.write(json.dumps(error_result) + '\n')
+                f.write(json.dumps(serializable_error) + '\n')
             
             return error_result
     
@@ -252,7 +292,10 @@ def main():
                 model_path=args.model_path
             )
             result = scheduler.check_for_drift()
-            print(json.dumps(result, indent=2))
+            
+            # Use the global utility function to create a serializable version for printing
+            serializable_result = make_json_serializable(result)
+            print(json.dumps(serializable_result, indent=2))
             return 0
         else:
             # Start scheduler and run indefinitely

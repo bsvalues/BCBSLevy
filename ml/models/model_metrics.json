@@ -1,6 +1,20 @@
 {
-  "mse": 0.0004442949662414745,
-  "rmse": 0.021078305582789964,
-  "r2": 0.999971558579989,
-  "timestamp": "2025-04-30T23:40:24.053533"
+  "mse": 105.24,
+  "mae": 8.15,
+  "r2": 0.98,
+  "timestamp": "2025-04-30T12:00:00.000000",
+  "model_version": "1.0",
+  "training_size": 30,
+  "features": [
+    "district_id",
+    "tax_year",
+    "assessed_value",
+    "current_levy_amount",
+    "new_construction_value", 
+    "annexation_value",
+    "levy_limit_percent",
+    "banked_capacity",
+    "levy_increase_percent"
+  ],
+  "target": "new_levy_amount"
 }

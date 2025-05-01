@@ -1,0 +1,23 @@
+Tax Code,Tax District,Description,Assessed Value,Levy Amount,Tax Rate
+10001,Benton County,Rural area north of Richland,25000000,250000,10.0
+10002,Benton County,Rural area east of Kennewick,18500000,185000,10.0
+10003,Benton County,Rural area west of Prosser,12750000,127500,10.0
+20001,City of Kennewick,Central Kennewick residential,125000000,1875000,15.0
+20002,City of Kennewick,North Kennewick mixed use,95000000,1425000,15.0
+20003,City of Kennewick,South Kennewick commercial,78500000,1177500,15.0
+30001,City of Richland,Downtown Richland commercial,110000000,1650000,15.0
+30002,City of Richland,South Richland residential,85000000,1275000,15.0
+30003,City of Richland,West Richland mixed use,62500000,937500,15.0
+40001,City of Prosser,Central Prosser historical district,45000000,450000,10.0
+40002,City of Prosser,East Prosser residential,32500000,325000,10.0
+50001,Benton Fire District 1,North county fire service area,175000000,875000,5.0
+50002,Benton Fire District 2,South county fire service area,125000000,625000,5.0
+60001,Kennewick School District,North Kennewick school area,150000000,1500000,10.0
+60002,Kennewick School District,South Kennewick school area,125000000,1250000,10.0
+70001,Richland School District,Central Richland school area,135000000,1350000,10.0
+70002,Richland School District,South Richland school area,110000000,1100000,10.0
+80001,Prosser School District,Prosser city school area,75000000,750000,10.0
+90001,Benton Rural Library District,County-wide library service area,350000000,700000,2.0
+100001,Port of Kennewick,Kennewick port district,225000000,450000,2.0
+100002,Port of Benton,Richland port district,175000000,350000,2.0
+110001,Benton County Mosquito Control,County-wide mosquito control district,425000000,425000,1.0

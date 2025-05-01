@@ -1,0 +1,7 @@
+{"status": "error", "message": "Object of type bool is not JSON serializable", "timestamp": "2025-04-30T23:43:46.642743"}
+{"status": "error", "message": "Object of type bool is not JSON serializable", "timestamp": "2025-04-30T23:44:58.363665"}
+{"status": "error", "message": "Object of type bool is not JSON serializable", "timestamp": "2025-04-30T23:45:01.358392"}
+{"status": "error", "message": "Object of type bool is not JSON serializable", "timestamp": "2025-04-30T23:45:57.275856"}
+{"status": "error", "message": "Object of type bool is not JSON serializable", "timestamp": "2025-04-30T23:48:22.403431"}
+{"status": "ok", "drift_detected": "False", "distribution_drift": {"drift_detected": false, "features": {}, "timestamp": "2025-04-30T23:53:01.259630"}, "prediction_drift": {"drift_detected": false, "error": "Target column 'forecast' not found"}, "timestamp": "2025-04-30T23:53:01.260882", "next_check": "2025-05-07T23:53:01.260887", "retraining_triggered": "True", "retraining_success": "False", "last_check_time": "2025-04-30T23:53:01.268769", "next_check_time": "2025-05-01T23:53:01.268769"}
+{"status": "error", "message": "Object of type bool is not JSON serializable", "timestamp": "2025-04-30T23:53:03.747391"}
