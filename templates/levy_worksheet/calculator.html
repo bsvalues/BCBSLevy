@@ -1,0 +1,881 @@
+{% extends "base.html" %}
+
+{% block title %}Levy Worksheet Calculator{% endblock %}
+
+{% block styles %}
+<style>
+    .levy-form-section {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        margin-bottom: 1.5rem;
+        background-color: #f8f9fa;
+    }
+    
+    .levy-form-section .header {
+        background-color: #e9ecef;
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: bold;
+    }
+    
+    .levy-form-section .content {
+        padding: 1.25rem;
+    }
+    
+    .step-marker {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    
+    .calculation-line {
+        padding: 0.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .calculation-line:last-child {
+        border-bottom: none;
+    }
+    
+    .calculation-result {
+        font-weight: bold;
+        background-color: #e9ecef;
+        padding: 0.5rem;
+    }
+    
+    .currency-input {
+        text-align: right;
+    }
+    
+    .form-label {
+        font-weight: 500;
+    }
+    
+    .form-floating > .form-control-plaintext ~ label::after,
+    .form-floating > .form-control:focus ~ label::after,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label::after,
+    .form-floating > .form-select ~ label::after {
+        background-color: transparent;
+    }
+    
+    .table-worksheet th {
+        background-color: #f1f1f1;
+        font-weight: 600;
+    }
+    
+    .table-worksheet .table-section-header {
+        background-color: #e2e6ea;
+        font-weight: bold;
+    }
+    
+    #worksheetResults {
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+    }
+    
+    .dor-header {
+        background-color: #d4edda;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    
+    .warning-badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        z-index: 10;
+    }
+    
+    .calculation-breakdown {
+        font-style: italic;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dor-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="h3 mb-0">Levy Worksheet Calculator</h1>
+                        <p class="mb-0">Washington State Department of Revenue Format</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span id="current-year" class="badge bg-secondary me-2">2025</span>
+                        <span id="district-type-badge" class="badge bg-info me-2">Select District</span>
+                        <button id="btnSaveWorksheet" class="btn btn-success btn-sm me-2" disabled>
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                        <button id="btnPrintWorksheet" class="btn btn-primary btn-sm" disabled>
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Input Form -->
+        <div class="col-md-6">
+            <form id="levyWorksheetForm">
+                <!-- District Selection -->
+                <div class="levy-form-section">
+                    <div class="header">
+                        <span class="step-marker">1</span> Select Tax District
+                    </div>
+                    <div class="content">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="taxYear" class="form-label">Tax Year</label>
+                                <select class="form-select" id="taxYear" required>
+                                    <option value="2026">2026</option>
+                                    <option value="2025" selected>2025</option>
+                                    <option value="2024">2024</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="taxDistrict" class="form-label">Tax District</label>
+                                <select class="form-select" id="taxDistrict" required>
+                                    <option value="">-- Select District --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="districtInfoContainer" class="d-none">
+                            <div class="alert alert-info mb-0">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>County:</strong> <span id="districtCounty"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>District Type:</strong> <span id="districtType"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prior Year Levy -->
+                <div class="levy-form-section">
+                    <div class="header">
+                        <span class="step-marker">2</span> Prior Year Levy Information
+                    </div>
+                    <div class="content">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="priorYearHighestLawful" class="form-label">Highest Lawful Levy</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control currency-input" id="priorYearHighestLawful" placeholder="0.00" required>
+                                </div>
+                                <div class="form-text">Highest lawful levy from prior year</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="previousYearLevyRate" class="form-label">Prior Year Rate</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control text-end" id="previousYearLevyRate" placeholder="0.000000" readonly>
+                                    <span class="input-group-text">per $1,000</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="previousYearAssessedValue" class="form-label">Prior Year A.V.</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control currency-input" id="previousYearAssessedValue" placeholder="0.00" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Year Assessed Value -->
+                <div class="levy-form-section">
+                    <div class="header">
+                        <span class="step-marker">3</span> Current Year Assessed Value
+                    </div>
+                    <div class="content">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="currentYearAssessedValue" class="form-label">Total Assessed Value</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control currency-input" id="currentYearAssessedValue" placeholder="0.00" readonly>
+                                </div>
+                                <div class="form-text">Total assessed value for the district from tax roll</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Levy Adjustments -->
+                <div class="levy-form-section">
+                    <div class="header position-relative">
+                        <span class="step-marker">4</span> Levy Adjustments
+                        <span class="warning-badge d-none">
+                            <i class="fas fa-exclamation-triangle text-warning fs-4"></i>
+                        </span>
+                    </div>
+                    <div class="content">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="newConstructionValue" class="form-label">New Construction Value</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control currency-input" id="newConstructionValue" placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="annexationValue" class="form-label">Annexation Value</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control currency-input" id="annexationValue" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="refundAmount" class="form-label">Refund Levy Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control currency-input" id="refundAmount" placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="targetLevyAmount" class="form-label">Target Levy Amount (Optional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control currency-input" id="targetLevyAmount" placeholder="0.00">
+                                </div>
+                                <div class="form-text">Leave blank to use maximum allowed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-4">
+                    <button type="button" class="btn btn-secondary" id="btnReset">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnCalculate">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Calculation Results -->
+        <div class="col-md-6">
+            <div id="worksheetResultsContainer" class="d-none">
+                <div id="worksheetResults" class="p-4 rounded shadow-sm">
+                    <!-- Worksheet Header -->
+                    <div class="text-center mb-4">
+                        <h2 class="h4" id="resultDistrictName">District Name</h2>
+                        <h3 class="h5" id="resultWorksheetTitle">Levy Limit Worksheet for <span id="resultYear">2025</span></h3>
+                    </div>
+
+                    <!-- Worksheet Body -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-worksheet">
+                            <thead>
+                                <tr>
+                                    <th colspan="3">Levy Limit Calculation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Step 1: Previous Year Highest Lawful Levy -->
+                                <tr class="table-section-header">
+                                    <td colspan="3">Step 1: Previous Year's Highest Lawful Levy</td>
+                                </tr>
+                                <tr>
+                                    <td width="60%">Highest Lawful Levy</td>
+                                    <td width="5%" class="text-center">$</td>
+                                    <td width="35%" class="text-end" id="resultHighestLawfulLevy">0.00</td>
+                                </tr>
+
+                                <!-- Step 2: 101% Limit -->
+                                <tr class="table-section-header">
+                                    <td colspan="3">Step 2: Statutory 101% Limit</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Multiply by Limit Factor of 101%
+                                        <div class="calculation-breakdown">Highest Lawful Levy × 1.01</div>
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="result101Limit">0.00</td>
+                                </tr>
+
+                                <!-- Step 3: New Construction -->
+                                <tr class="table-section-header">
+                                    <td colspan="3">Step 3: New Construction</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        New Construction Value
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultNewConstructionValue">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Multiply by Last Year's Levy Rate
+                                        <div class="calculation-breakdown">New Construction × <span id="resultPriorRate">0.000000</span> ÷ 1000</div>
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultNewConstructionLevy">0.00</td>
+                                </tr>
+
+                                <!-- Step 4: Annexation -->
+                                <tr class="table-section-header">
+                                    <td colspan="3">Step 4: Annexation</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Annexation Value
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultAnnexationValue">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Multiply by Last Year's Levy Rate
+                                        <div class="calculation-breakdown">Annexation × <span id="resultPriorRateAnnex">0.000000</span> ÷ 1000</div>
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultAnnexationLevy">0.00</td>
+                                </tr>
+
+                                <!-- Step 5: Refund -->
+                                <tr class="table-section-header">
+                                    <td colspan="3">Step 5: Refund Levy</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Refund Amount
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultRefundAmount">0.00</td>
+                                </tr>
+
+                                <!-- Step 6: Maximum Allowable -->
+                                <tr class="table-section-header">
+                                    <td colspan="3">Step 6: Maximum Allowable Levy</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        Maximum Allowable Levy
+                                        <div class="calculation-breakdown">101% Limit + New Construction + Annexation + Refund</div>
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultMaxAllowableLevy">0.00</td>
+                                </tr>
+
+                                <!-- Target Levy Amount (if specified) -->
+                                <tr id="targetLevyRow" class="d-none table-section-header">
+                                    <td colspan="3">Step 7: Target Levy Amount</td>
+                                </tr>
+                                <tr id="targetLevyValueRow" class="d-none">
+                                    <td>
+                                        Requested Levy Amount
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultTargetLevyAmount">0.00</td>
+                                </tr>
+
+                                <!-- Final Result -->
+                                <tr class="table-section-header">
+                                    <td colspan="3">Final Levy Results</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Final Levy Amount</strong>
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultFinalLevyAmount">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Current Year Assessed Value</strong>
+                                    </td>
+                                    <td class="text-center">$</td>
+                                    <td class="text-end" id="resultCurrentAssessedValue">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <strong>Calculated Levy Rate</strong>
+                                        <div class="calculation-breakdown">Levy Amount ÷ Assessed Value × 1000</div>
+                                    </td>
+                                    <td colspan="2" class="text-end">
+                                        <span id="resultLevyRate">0.000000</span> per $1,000 A.V.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Warnings Section -->
+                    <div id="worksheetWarnings" class="d-none">
+                        <div class="alert alert-warning">
+                            <h5 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Warnings
+                            </h5>
+                            <ul id="warningsList" class="mb-0"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Certification/Notes Section -->
+                    <div class="mt-4 mb-2 p-3 border rounded bg-light">
+                        <h5 class="mb-3">Notes and Certification</h5>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="worksheetNotes" style="height: 100px"></textarea>
+                            <label for="worksheetNotes">Worksheet Notes</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="certifyWorksheet">
+                            <label class="form-check-label" for="certifyWorksheet">
+                                I certify that this worksheet correctly calculates the statutory levy limits
+                                in accordance with Washington State law.
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-primary" id="btnExportExcel">
+                            <i class="fas fa-file-excel me-1"></i> Excel
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" id="btnExportPdf">
+                            <i class="fas fa-file-pdf me-1"></i> PDF
+                        </button>
+                        <button type="button" class="btn btn-success" id="btnSaveFinal">
+                            <i class="fas fa-save me-1"></i> Save Worksheet
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder before calculation -->
+            <div id="worksheetPlaceholder" class="text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-calculator fa-5x text-muted"></i>
+                </div>
+                <h3 class="h5 mb-3">Levy Worksheet Results</h3>
+                <p class="text-muted mb-4">Complete the form and click "Calculate" to see the levy worksheet results</p>
+                <div class="card border-light mb-3">
+                    <div class="card-header bg-transparent">About This Calculator</div>
+                    <div class="card-body text-start">
+                        <p class="card-text">
+                            This calculator follows Washington State Department of Revenue guidelines for statutory levy limit calculations, including:
+                        </p>
+                        <ul class="text-start">
+                            <li>101% limit on prior year's highest lawful levy</li>
+                            <li>New construction additions</li>
+                            <li>Annexation value additions</li>
+                            <li>Refund levy provisions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form elements
+    const worksheetForm = document.getElementById('levyWorksheetForm');
+    const taxYearSelect = document.getElementById('taxYear');
+    const taxDistrictSelect = document.getElementById('taxDistrict');
+    const highestLawfulInput = document.getElementById('priorYearHighestLawful');
+    const priorYearRateInput = document.getElementById('previousYearLevyRate');
+    const priorYearAVInput = document.getElementById('previousYearAssessedValue');
+    const currentYearAVInput = document.getElementById('currentYearAssessedValue');
+    const newConstructionInput = document.getElementById('newConstructionValue');
+    const annexationInput = document.getElementById('annexationValue');
+    const refundInput = document.getElementById('refundAmount');
+    const targetLevyInput = document.getElementById('targetLevyAmount');
+    
+    // Result sections
+    const placeholderSection = document.getElementById('worksheetPlaceholder');
+    const resultsContainer = document.getElementById('worksheetResultsContainer');
+    const warningsSection = document.getElementById('worksheetWarnings');
+    const warningsList = document.getElementById('warningsList');
+    
+    // Buttons
+    const calculateBtn = document.getElementById('btnCalculate');
+    const resetBtn = document.getElementById('btnReset');
+    const saveBtn = document.getElementById('btnSaveFinal');
+    const printBtn = document.getElementById('btnPrintWorksheet');
+    const exportExcelBtn = document.getElementById('btnExportExcel');
+    const exportPdfBtn = document.getElementById('btnExportPdf');
+    
+    // Load tax districts
+    loadTaxDistricts();
+    
+    // Event listeners
+    taxYearSelect.addEventListener('change', function() {
+        document.getElementById('current-year').textContent = this.value;
+        loadTaxDistricts();
+    });
+    
+    taxDistrictSelect.addEventListener('change', function() {
+        if (this.value) {
+            loadDistrictInfo(this.value);
+        } else {
+            document.getElementById('districtInfoContainer').classList.add('d-none');
+        }
+    });
+    
+    worksheetForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        calculateWorksheet();
+    });
+    
+    resetBtn.addEventListener('click', resetForm);
+    
+    saveBtn.addEventListener('click', function() {
+        if (document.getElementById('certifyWorksheet').checked) {
+            saveWorksheet();
+        } else {
+            alert('Please certify the worksheet before saving.');
+        }
+    });
+    
+    // Initialize form with current year
+    const currentYear = new Date().getFullYear();
+    if (taxYearSelect.querySelector(`option[value="${currentYear}"]`)) {
+        taxYearSelect.value = currentYear;
+    }
+    document.getElementById('current-year').textContent = taxYearSelect.value;
+    
+    // Format currency inputs
+    const currencyInputs = document.querySelectorAll('.currency-input');
+    currencyInputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            formatCurrencyInput(this);
+        });
+        
+        input.addEventListener('focus', function() {
+            // Remove formatting when focused
+            this.value = this.value.replace(/[$,]/g, '');
+        });
+    });
+    
+    // Functions
+    async function loadTaxDistricts() {
+        try {
+            const year = taxYearSelect.value;
+            const response = await fetch(`/api/v1/levy-worksheet/districts?year=${year}`);
+            const data = await response.json();
+            
+            // Clear existing options
+            while (taxDistrictSelect.options.length > 1) {
+                taxDistrictSelect.remove(1);
+            }
+            
+            // Add new options
+            if (data.districts && data.districts.length > 0) {
+                data.districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.id;
+                    option.textContent = district.district_name;
+                    option.dataset.type = district.district_type || 'Unknown';
+                    option.dataset.county = district.county || 'Unknown';
+                    taxDistrictSelect.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.textContent = 'No districts available';
+                option.disabled = true;
+                taxDistrictSelect.appendChild(option);
+            }
+            
+            // If district_id is in URL, select it
+            const urlParams = new URLSearchParams(window.location.search);
+            const districtId = window.location.pathname.split('/').pop();
+            if (districtId && !isNaN(districtId)) {
+                taxDistrictSelect.value = districtId;
+                if (taxDistrictSelect.value) {
+                    loadDistrictInfo(districtId);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading tax districts:', error);
+            alert('Failed to load tax districts. Please try again later.');
+        }
+    }
+    
+    async function loadDistrictInfo(districtId) {
+        try {
+            // Show district info container
+            const infoContainer = document.getElementById('districtInfoContainer');
+            infoContainer.classList.remove('d-none');
+            
+            // Set basic info from the option data
+            const selectedOption = taxDistrictSelect.options[taxDistrictSelect.selectedIndex];
+            document.getElementById('districtCounty').textContent = selectedOption.dataset.county;
+            document.getElementById('districtType').textContent = selectedOption.dataset.type;
+            document.getElementById('district-type-badge').textContent = selectedOption.dataset.type;
+            
+            // Get district history data for prior year values
+            const year = parseInt(taxYearSelect.value);
+            const response = await fetch(`/api/v1/levy-worksheet/history/${districtId}`);
+            const data = await response.json();
+            
+            // Find prior year record
+            const priorYearData = data.history?.find(h => parseInt(h.year) === year - 1);
+            
+            if (priorYearData) {
+                priorYearAVInput.value = priorYearData.total_assessed_value.replace('$', '').replace(/,/g, '');
+                formatCurrencyInput(priorYearAVInput);
+                
+                // Set prior year rate
+                priorYearRateInput.value = priorYearData.levy_rate;
+                
+                // Set highest lawful levy to prior year total levy if empty
+                if (!highestLawfulInput.value) {
+                    highestLawfulInput.value = priorYearData.total_levy.replace('$', '').replace(/,/g, '');
+                    formatCurrencyInput(highestLawfulInput);
+                }
+            }
+            
+            // Find current year record for current AV
+            const currentYearData = data.history?.find(h => parseInt(h.year) === year);
+            if (currentYearData) {
+                currentYearAVInput.value = currentYearData.total_assessed_value.replace('$', '').replace(/,/g, '');
+                formatCurrencyInput(currentYearAVInput);
+            }
+            
+            // Enable calculate button
+            calculateBtn.disabled = false;
+            
+        } catch (error) {
+            console.error('Error loading district info:', error);
+            alert('Failed to load district information. Please try again later.');
+        }
+    }
+    
+    function formatCurrencyInput(input) {
+        if (!input.value) return;
+        
+        // Remove existing formatting
+        let value = input.value.replace(/[$,]/g, '');
+        
+        // Parse as float
+        value = parseFloat(value);
+        if (isNaN(value)) {
+            input.value = '';
+            return;
+        }
+        
+        // Format with commas and 2 decimal places
+        input.value = value.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+    
+    function parseCurrencyValue(value) {
+        if (!value) return 0;
+        if (typeof value === 'number') return value;
+        
+        // Remove formatting
+        return parseFloat(value.replace(/[$,]/g, '')) || 0;
+    }
+    
+    function resetForm() {
+        worksheetForm.reset();
+        placeholderSection.classList.remove('d-none');
+        resultsContainer.classList.add('d-none');
+        document.getElementById('district-type-badge').textContent = 'Select District';
+        document.getElementById('districtInfoContainer').classList.add('d-none');
+    }
+    
+    async function calculateWorksheet() {
+        try {
+            // Validate form
+            if (!taxDistrictSelect.value) {
+                alert('Please select a tax district.');
+                return;
+            }
+            
+            if (!highestLawfulInput.value) {
+                alert('Please enter the highest lawful levy.');
+                return;
+            }
+            
+            // Prepare data for calculation
+            const requestData = {
+                district_id: parseInt(taxDistrictSelect.value),
+                year: parseInt(taxYearSelect.value),
+                highest_lawful_levy: parseCurrencyValue(highestLawfulInput.value),
+                new_construction_value: parseCurrencyValue(newConstructionInput.value),
+                annexation_value: parseCurrencyValue(annexationInput.value),
+                refund_amount: parseCurrencyValue(refundInput.value)
+            };
+            
+            // Add target levy if specified
+            if (targetLevyInput.value) {
+                requestData.target_levy_amount = parseCurrencyValue(targetLevyInput.value);
+            }
+            
+            // Call API
+            const response = await fetch('/api/v1/levy-worksheet/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                alert(`Calculation error: ${result.error}`);
+                return;
+            }
+            
+            // Display results
+            displayWorksheetResults(result);
+            
+        } catch (error) {
+            console.error('Error calculating worksheet:', error);
+            alert('Failed to calculate worksheet. Please try again later.');
+        }
+    }
+    
+    function displayWorksheetResults(data) {
+        // Hide placeholder, show results
+        placeholderSection.classList.add('d-none');
+        resultsContainer.classList.remove('d-none');
+        
+        const worksheet = data.worksheet || data;
+        
+        // District info
+        document.getElementById('resultDistrictName').textContent = worksheet.district_info.name;
+        document.getElementById('resultYear').textContent = worksheet.district_info.year;
+        
+        // Input values
+        document.getElementById('resultHighestLawfulLevy').textContent = 
+            worksheet.inputs.highest_lawful_levy.replace('$', '');
+        document.getElementById('resultPriorRate').textContent = 
+            worksheet.results.prior_year_rate;
+        document.getElementById('resultPriorRateAnnex').textContent = 
+            worksheet.results.prior_year_rate;
+        
+        // Calculation steps
+        document.getElementById('result101Limit').textContent = 
+            worksheet.calculation_steps.step1_101_limit.result.replace('$', '');
+        document.getElementById('resultNewConstructionValue').textContent = 
+            worksheet.inputs.new_construction_value.replace('$', '');
+        document.getElementById('resultNewConstructionLevy').textContent = 
+            worksheet.calculation_steps.step2_new_construction.result.replace('$', '');
+        document.getElementById('resultAnnexationValue').textContent = 
+            worksheet.inputs.annexation_value.replace('$', '');
+        document.getElementById('resultAnnexationLevy').textContent = 
+            worksheet.calculation_steps.step3_annexation.result.replace('$', '');
+        document.getElementById('resultRefundAmount').textContent = 
+            worksheet.inputs.refund_amount.replace('$', '');
+        document.getElementById('resultMaxAllowableLevy').textContent = 
+            worksheet.calculation_steps.step4_maximum_levy.result.replace('$', '');
+        
+        // Target levy (if specified)
+        if (worksheet.inputs.target_levy_amount !== "Not specified") {
+            document.getElementById('targetLevyRow').classList.remove('d-none');
+            document.getElementById('targetLevyValueRow').classList.remove('d-none');
+            document.getElementById('resultTargetLevyAmount').textContent = 
+                worksheet.inputs.target_levy_amount.replace('$', '');
+        } else {
+            document.getElementById('targetLevyRow').classList.add('d-none');
+            document.getElementById('targetLevyValueRow').classList.add('d-none');
+        }
+        
+        // Final results
+        document.getElementById('resultFinalLevyAmount').textContent = 
+            worksheet.results.final_levy_amount.replace('$', '');
+        document.getElementById('resultCurrentAssessedValue').textContent = 
+            worksheet.inputs.total_assessed_value.replace('$', '');
+        document.getElementById('resultLevyRate').textContent = 
+            worksheet.results.levy_rate;
+        
+        // Check for warnings
+        if (worksheet.warnings && worksheet.warnings.length > 0) {
+            warningsSection.classList.remove('d-none');
+            warningsList.innerHTML = '';
+            
+            worksheet.warnings.forEach(warning => {
+                const li = document.createElement('li');
+                li.textContent = warning.message;
+                warningsList.appendChild(li);
+            });
+        } else {
+            warningsSection.classList.add('d-none');
+        }
+        
+        // Enable buttons
+        printBtn.disabled = false;
+        document.getElementById('btnSaveWorksheet').disabled = false;
+    }
+    
+    async function saveWorksheet() {
+        try {
+            // Get results from displayed worksheet
+            const worksheet = {
+                district_id: parseInt(taxDistrictSelect.value),
+                year: parseInt(taxYearSelect.value),
+                name: `${document.getElementById('resultDistrictName').textContent} Levy Worksheet ${taxYearSelect.value}`,
+                notes: document.getElementById('worksheetNotes').value,
+                levy_amount: parseCurrencyValue(document.getElementById('resultFinalLevyAmount').textContent),
+                levy_rate: parseFloat(document.getElementById('resultLevyRate').textContent),
+                certified: document.getElementById('certifyWorksheet').checked
+            };
+            
+            // Call API to save
+            const response = await fetch('/api/v1/levy-worksheet/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(worksheet)
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                alert(`Error saving worksheet: ${result.error}`);
+                return;
+            }
+            
+            alert('Worksheet saved successfully!');
+            
+            // Redirect to the worksheet view page
+            if (result.scenario_id) {
+                window.location.href = `/levy-worksheet/scenario/${result.scenario_id}`;
+            }
+            
+        } catch (error) {
+            console.error('Error saving worksheet:', error);
+            alert('Failed to save worksheet. Please try again later.');
+        }
+    }
+});
+</script>
+{% endblock %}

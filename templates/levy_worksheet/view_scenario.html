@@ -1,0 +1,612 @@
+{% extends "base.html" %}
+
+{% block title %}Levy Worksheet Scenario{% endblock %}
+
+{% block styles %}
+<style>
+    .scenario-header {
+        background-color: #d4edda;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+    
+    .scenario-container {
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .table-worksheet th {
+        background-color: #f1f1f1;
+        font-weight: 600;
+    }
+    
+    .table-worksheet .table-section-header {
+        background-color: #e2e6ea;
+        font-weight: bold;
+    }
+    
+    .calculation-breakdown {
+        font-style: italic;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .scenario-metadata {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .step-header {
+        background-color: #e9ecef;
+        padding: 8px 12px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    
+    .notes-container {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="scenario-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="h3 mb-0">Levy Worksheet</h1>
+                        <p class="mb-0" id="scenario-subtitle">Loading worksheet...</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span id="scenario-year" class="badge bg-secondary me-2">-</span>
+                        <span id="scenario-district-type" class="badge bg-info me-2">-</span>
+                        <div class="btn-group">
+                            <button id="btnPrintScenario" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                            <button id="btnExportScenario" class="btn btn-primary btn-sm">
+                                <i class="fas fa-file-export"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Scenario Worksheet -->
+            <div class="scenario-container shadow-sm rounded" id="scenarioWorksheet">
+                <div class="text-center mb-4">
+                    <h2 class="h4" id="scenario-district-name">District Name</h2>
+                    <h3 class="h5" id="scenario-title">Levy Worksheet</h3>
+                    <p class="scenario-metadata">
+                        Created by <span id="scenario-creator">-</span> on 
+                        <span id="scenario-date">-</span>
+                    </p>
+                </div>
+                
+                <div id="worksheet-content">
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading worksheet data...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notes Section -->
+            <div class="notes-container rounded shadow-sm" id="scenario-notes-container">
+                <h4 class="h5 mb-3">
+                    <i class="fas fa-sticky-note me-2"></i>
+                    Notes
+                </h4>
+                <p id="scenario-notes">No notes provided for this worksheet.</p>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Metadata -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Worksheet Details</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <th width="40%">Scenario ID</th>
+                                <td id="meta-scenario-id">-</td>
+                            </tr>
+                            <tr>
+                                <th>District</th>
+                                <td id="meta-district">-</td>
+                            </tr>
+                            <tr>
+                                <th>Year</th>
+                                <td id="meta-year">-</td>
+                            </tr>
+                            <tr>
+                                <th>Final Levy</th>
+                                <td id="meta-levy-amount">-</td>
+                            </tr>
+                            <tr>
+                                <th>Levy Rate</th>
+                                <td id="meta-levy-rate">-</td>
+                            </tr>
+                            <tr>
+                                <th>Created</th>
+                                <td id="meta-created">-</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    <span id="meta-status" class="badge bg-success">Active</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" id="btnEditWorksheet" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i> Edit Worksheet
+                        </a>
+                        <a href="#" id="btnDuplicateWorksheet" class="btn btn-outline-secondary">
+                            <i class="fas fa-copy me-2"></i> Duplicate
+                        </a>
+                        <a href="#" id="btnCompareWorksheet" class="btn btn-outline-info">
+                            <i class="fas fa-balance-scale me-2"></i> Compare
+                        </a>
+                        <a href="/levy-worksheet" class="btn btn-outline-dark">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Items -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Related Items</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" id="linkDistrictHistory" class="list-group-item list-group-item-action">
+                            <i class="fas fa-history me-2"></i> District History
+                        </a>
+                        <a href="#" id="linkTaxCodes" class="list-group-item list-group-item-action">
+                            <i class="fas fa-tags me-2"></i> Tax Codes
+                        </a>
+                        <a href="#" id="linkAuditLog" class="list-group-item list-group-item-action">
+                            <i class="fas fa-clipboard-check me-2"></i> Audit Log
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Export Worksheet</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    <a href="#" id="btnExportPdf" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1"><i class="fas fa-file-pdf me-2"></i> PDF Document</h5>
+                        </div>
+                        <p class="mb-1">Export as a printable PDF document</p>
+                    </a>
+                    <a href="#" id="btnExportExcel" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1"><i class="fas fa-file-excel me-2"></i> Excel Spreadsheet</h5>
+                        </div>
+                        <p class="mb-1">Export as an Excel spreadsheet with calculations</p>
+                    </a>
+                    <a href="#" id="btnExportJson" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1"><i class="fas fa-file-code me-2"></i> JSON Data</h5>
+                        </div>
+                        <p class="mb-1">Export raw data in JSON format</p>
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get scenario ID from URL
+    const pathParts = window.location.pathname.split('/');
+    const scenarioId = pathParts[pathParts.length - 1];
+    
+    // Initialize export modal
+    const exportModal = new bootstrap.Modal(document.getElementById('exportModal'));
+    
+    // Setup event listeners
+    document.getElementById('btnExportScenario').addEventListener('click', function() {
+        exportModal.show();
+    });
+    
+    document.getElementById('btnExportPdf').addEventListener('click', function(e) {
+        e.preventDefault();
+        exportModal.hide();
+        exportWorksheet(scenarioId, 'pdf');
+    });
+    
+    document.getElementById('btnExportExcel').addEventListener('click', function(e) {
+        e.preventDefault();
+        exportModal.hide();
+        exportWorksheet(scenarioId, 'excel');
+    });
+    
+    document.getElementById('btnExportJson').addEventListener('click', function(e) {
+        e.preventDefault();
+        exportModal.hide();
+        exportWorksheet(scenarioId, 'json');
+    });
+    
+    document.getElementById('btnEditWorksheet').addEventListener('click', function(e) {
+        e.preventDefault();
+        // Will be populated with district ID after loading data
+    });
+    
+    // Load scenario data
+    loadScenarioData(scenarioId);
+});
+
+async function loadScenarioData(scenarioId) {
+    try {
+        // Fetch scenario data
+        const response = await fetch(`/api/v1/levy-worksheet/scenario/${scenarioId}`);
+        const data = await response.json();
+        
+        if (data.error) {
+            showError(`Error loading worksheet: ${data.error}`);
+            return;
+        }
+        
+        // Update page with scenario data
+        displayScenarioData(data.scenario);
+        
+    } catch (error) {
+        console.error('Error loading scenario data:', error);
+        showError('Failed to load worksheet data. Please try again later.');
+    }
+}
+
+function displayScenarioData(scenario) {
+    // Update header info
+    document.getElementById('scenario-subtitle').textContent = scenario.name;
+    document.getElementById('scenario-year').textContent = scenario.year;
+    document.getElementById('scenario-district-type').textContent = scenario.district_type || 'District';
+    
+    // Update metadata
+    document.getElementById('scenario-district-name').textContent = scenario.district_name;
+    document.getElementById('scenario-title').textContent = `Levy Worksheet for ${scenario.year}`;
+    document.getElementById('scenario-creator').textContent = scenario.created_by || 'System';
+    document.getElementById('scenario-date').textContent = formatDate(scenario.created_at);
+    
+    // Update sidebar metadata
+    document.getElementById('meta-scenario-id').textContent = scenario.id;
+    document.getElementById('meta-district').textContent = scenario.district_name;
+    document.getElementById('meta-year').textContent = scenario.year;
+    document.getElementById('meta-levy-amount').textContent = formatCurrency(scenario.levy_amount);
+    document.getElementById('meta-levy-rate').textContent = formatRate(scenario.result_levy_rate);
+    document.getElementById('meta-created').textContent = formatDate(scenario.created_at);
+    
+    // Update notes
+    if (scenario.notes) {
+        document.getElementById('scenario-notes').textContent = scenario.notes;
+    }
+    
+    // Update edit button link
+    document.getElementById('btnEditWorksheet').href = 
+        `/levy-worksheet/${scenario.tax_district_id}?scenario=${scenario.id}`;
+    
+    // Update related links
+    document.getElementById('linkDistrictHistory').href = 
+        `/historical-analysis/district/${scenario.tax_district_id}`;
+    document.getElementById('linkTaxCodes').href = 
+        `/levy-calculator/district/${scenario.tax_district_id}`;
+    document.getElementById('linkAuditLog').href = 
+        `/audit/district/${scenario.tax_district_id}`;
+    
+    // Display worksheet content
+    displayWorksheetContent(scenario);
+}
+
+function displayWorksheetContent(scenario) {
+    // Get worksheet details from adjustment
+    const worksheetDetails = scenario.adjustment_details?.find(adj => adj.adjustment_type === 'WORKSHEET');
+    
+    if (!worksheetDetails || !worksheetDetails.calculation_details) {
+        // Simple fallback display if no detailed worksheet data
+        const worksheetContent = document.getElementById('worksheet-content');
+        worksheetContent.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Detailed worksheet calculation data is not available for this scenario.
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Summary</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Levy Amount:</strong> ${formatCurrency(scenario.levy_amount)}</p>
+                            <p><strong>Levy Rate:</strong> ${formatRate(scenario.result_levy_rate)}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Year:</strong> ${scenario.year}</p>
+                            <p><strong>District:</strong> ${scenario.district_name}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Parse the calculation details
+    const worksheet = typeof worksheetDetails.calculation_details === 'string' 
+        ? JSON.parse(worksheetDetails.calculation_details) 
+        : worksheetDetails.calculation_details;
+    
+    // Build detailed worksheet display
+    const worksheetContent = document.getElementById('worksheet-content');
+    
+    // Create the worksheet table structure
+    let html = `
+        <div class="table-responsive">
+            <table class="table table-bordered table-worksheet">
+                <thead>
+                    <tr>
+                        <th colspan="3">Levy Limit Calculation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Step 1: Previous Year Highest Lawful Levy -->
+                    <tr class="table-section-header">
+                        <td colspan="3">Step 1: Previous Year's Highest Lawful Levy</td>
+                    </tr>
+                    <tr>
+                        <td width="60%">Highest Lawful Levy</td>
+                        <td width="5%" class="text-center">$</td>
+                        <td width="35%" class="text-end">${worksheet.inputs.highest_lawful_levy.replace('$', '')}</td>
+                    </tr>
+
+                    <!-- Step 2: 101% Limit -->
+                    <tr class="table-section-header">
+                        <td colspan="3">Step 2: Statutory 101% Limit</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Multiply by Limit Factor of 101%
+                            <div class="calculation-breakdown">${worksheet.calculation_steps.step1_101_limit.calculation}</div>
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.calculation_steps.step1_101_limit.result.replace('$', '')}</td>
+                    </tr>
+
+                    <!-- Step 3: New Construction -->
+                    <tr class="table-section-header">
+                        <td colspan="3">Step 3: New Construction</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            New Construction Value
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.inputs.new_construction_value.replace('$', '')}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Multiply by Last Year's Levy Rate
+                            <div class="calculation-breakdown">${worksheet.calculation_steps.step2_new_construction.calculation}</div>
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.calculation_steps.step2_new_construction.result.replace('$', '')}</td>
+                    </tr>
+
+                    <!-- Step 4: Annexation -->
+                    <tr class="table-section-header">
+                        <td colspan="3">Step 4: Annexation</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Annexation Value
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.inputs.annexation_value.replace('$', '')}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Multiply by Last Year's Levy Rate
+                            <div class="calculation-breakdown">${worksheet.calculation_steps.step3_annexation.calculation}</div>
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.calculation_steps.step3_annexation.result.replace('$', '')}</td>
+                    </tr>
+
+                    <!-- Step 5: Refund -->
+                    <tr class="table-section-header">
+                        <td colspan="3">Step 5: Refund Levy</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Refund Amount
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.inputs.refund_amount.replace('$', '')}</td>
+                    </tr>
+
+                    <!-- Step 6: Maximum Allowable -->
+                    <tr class="table-section-header">
+                        <td colspan="3">Step 6: Maximum Allowable Levy</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Maximum Allowable Levy
+                            <div class="calculation-breakdown">${worksheet.calculation_steps.step4_maximum_levy.calculation}</div>
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.calculation_steps.step4_maximum_levy.result.replace('$', '')}</td>
+                    </tr>
+    `;
+    
+    // Add target levy section if present
+    if (worksheet.inputs.target_levy_amount !== "Not specified") {
+        html += `
+            <!-- Target Levy Amount -->
+            <tr class="table-section-header">
+                <td colspan="3">Step 7: Target Levy Amount</td>
+            </tr>
+            <tr>
+                <td>
+                    Requested Levy Amount
+                </td>
+                <td class="text-center">$</td>
+                <td class="text-end">${worksheet.inputs.target_levy_amount.replace('$', '')}</td>
+            </tr>
+        `;
+    }
+    
+    // Add final results section
+    html += `
+                    <!-- Final Results -->
+                    <tr class="table-section-header">
+                        <td colspan="3">Final Levy Results</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Final Levy Amount</strong>
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.results.final_levy_amount.replace('$', '')}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Current Year Assessed Value</strong>
+                        </td>
+                        <td class="text-center">$</td>
+                        <td class="text-end">${worksheet.inputs.total_assessed_value.replace('$', '')}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Calculated Levy Rate</strong>
+                            <div class="calculation-breakdown">Levy Amount ÷ Assessed Value × 1000</div>
+                        </td>
+                        <td colspan="2" class="text-end">
+                            ${worksheet.results.levy_rate} per $1,000 A.V.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    // Add warnings section if present
+    if (worksheet.warnings && worksheet.warnings.length > 0) {
+        html += `
+            <div class="alert alert-warning mt-3">
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Warnings
+                </h5>
+                <ul class="mb-0">
+        `;
+        
+        worksheet.warnings.forEach(warning => {
+            html += `<li>${warning.message}</li>`;
+        });
+        
+        html += `
+                </ul>
+            </div>
+        `;
+    }
+    
+    // Insert content into page
+    worksheetContent.innerHTML = html;
+}
+
+async function exportWorksheet(scenarioId, format) {
+    try {
+        window.open(`/api/v1/levy-worksheet/export/${scenarioId}?format=${format}`, '_blank');
+    } catch (error) {
+        console.error(`Error exporting worksheet as ${format}:`, error);
+        alert(`Failed to export worksheet as ${format}. Please try again later.`);
+    }
+}
+
+function showError(message) {
+    const worksheetContent = document.getElementById('worksheet-content');
+    worksheetContent.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ${message}
+        </div>
+    `;
+}
+
+// Utility functions
+function formatCurrency(value) {
+    if (!value) return '$0.00';
+    return new Intl.NumberFormat('en-US', { 
+        style: 'currency', 
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+}
+
+function formatRate(value) {
+    if (!value) return '0.000000';
+    return Number(value).toFixed(6);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+</script>
+{% endblock %}

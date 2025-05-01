@@ -313,6 +313,7 @@ from routes_property_assessment import property_assessment_bp
 from routes_mcp_ui import register_mcp_ui_routes
 from routes_monitoring import monitoring_bp # Added import
 from routes_mcp_army import mcp_army_bp # Import MCP Army blueprint
+from routes_levy_worksheet import levy_worksheet_routes, init_app as init_levy_worksheet_routes # Import Levy Worksheet routes
 
 
 app.register_blueprint(data_management_bp)
@@ -479,3 +480,10 @@ with app.app_context():
 
 app.register_blueprint(mcp_army_bp, name='mcp_army_blueprint')
 app.register_blueprint(monitoring_bp, url_prefix='/monitoring')
+
+# Initialize levy worksheet routes
+try:
+    init_levy_worksheet_routes(app)
+    app.logger.info("Levy worksheet routes initialized")
+except Exception as e:
+    app.logger.error(f"Error initializing levy worksheet routes: {str(e)}")
