@@ -41,4 +41,5 @@ dependencies = [
     "prettytable>=3.16.0",
     "xlsxwriter>=3.2.3",
     "weasyprint>=65.1",
+    "openai>=1.77.0",
 ]

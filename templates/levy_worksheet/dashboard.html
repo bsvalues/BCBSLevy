@@ -8,7 +8,7 @@
         <div class="col-12">
             <h1 class="display-5 mb-4">Levy Worksheet Calculator</h1>
             <p class="lead">
-                Create and manage Washington State DOR-style levy worksheets for tax districts.
+                Create and manage Washington State DOR-style <span data-help-topic="levy_worksheet" data-help-type="tooltip">levy worksheets</span> for <span data-help-topic="tax_code_area" data-help-type="tooltip">tax districts</span>.
             </p>
             <hr>
         </div>
@@ -68,8 +68,9 @@
                 <div class="card-body">
                     <p>
                         <i class="fas fa-info-circle me-2"></i>
-                        The Levy Worksheet Calculator helps you prepare statutory levy calculations following 
-                        Washington State Department of Revenue guidelines.
+                        The Levy Worksheet Calculator helps you prepare <span data-help-topic="statutory_limit" data-help-type="popover">statutory levy</span> calculations following 
+                        Washington State Department of Revenue guidelines. Calculate your <span data-help-topic="highest_lawful_levy" data-help-type="popover">highest lawful levy</span>
+                        and verify <span data-help-topic="levy_limit" data-help-type="popover">levy limits</span>.
                     </p>
                     <hr>
                     <h6>Resources</h6>
@@ -87,6 +88,11 @@
                         <li class="mt-2">
                             <a href="#" target="_blank" class="text-decoration-none">
                                 <i class="fas fa-question-circle me-2"></i> FAQ
+                            </a>
+                        </li>
+                        <li class="mt-2">
+                            <a href="/help/example" class="text-decoration-none">
+                                <i class="fas fa-magic me-2"></i> Help System Demo
                             </a>
                         </li>
                     </ul>
@@ -161,6 +167,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load tax districts
     loadTaxDistricts();
+    
+    // Initialize contextual help
+    if (typeof initContextualHelp === 'function') {
+        initContextualHelp();
+    } else {
+        console.warn('Contextual help not available - initContextualHelp function not found');
+    }
 });
 
 async function loadRecentWorksheets() {
@@ -192,8 +205,8 @@ async function loadRecentWorksheets() {
                         <tr>
                             <th>Name</th>
                             <th>District</th>
-                            <th>Amount</th>
-                            <th>Rate</th>
+                            <th data-help-topic="levy_amount" data-help-type="tooltip">Amount</th>
+                            <th data-help-topic="levy_rate" data-help-type="tooltip">Rate</th>
                             <th>Created</th>
                             <th>Actions</th>
                         </tr>

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Contextual Help Example{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Contextual Help Example</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead">This example shows how to implement contextual help bubbles with AI-powered explanations in the TerraFusion platform.</p>
+                    
+                    <h3>Basic Usage</h3>
+                    <p>
+                        Simply add a <code>data-help-topic</code> attribute to any element that needs an explanation. 
+                        The value should match one of the predefined help topics.
+                    </p>
+                    
+                    <div class="example-section">
+                        <h4>Example 1: Tooltip Help</h4>
+                        <p>
+                            When calculating levy rates, the <span data-help-topic="levy_rate" data-help-type="tooltip">levy rate</span> 
+                            is multiplied by the <span data-help-topic="assessed_value" data-help-type="tooltip">assessed value</span> 
+                            to determine the <span data-help-topic="levy_amount" data-help-type="tooltip">levy amount</span>.
+                        </p>
+                    </div>
+                    
+                    <div class="example-section mt-4">
+                        <h4>Example 2: Popover Help</h4>
+                        <p>
+                            For more complex concepts, use a popover that provides more detailed information:
+                        </p>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <span data-help-topic="new_construction" data-help-type="popover" data-help-placement="right">New Construction</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span data-help-topic="annexation" data-help-type="popover" data-help-placement="right">Annexation</span>
+                            </li>
+                            <li class="list-group-item">
+                                <span data-help-topic="refund_levy" data-help-type="popover" data-help-placement="right">Refund Levy</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="example-section mt-4">
+                        <h4>Example 3: Chart Help</h4>
+                        <p>
+                            Charts can have contextual help to explain the data visualization:
+                        </p>
+                        <div class="chart-container" style="position: relative; height:300px; width:100%;">
+                            <canvas id="demo-levy-rate-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button id="toggleHelpButton" class="btn btn-outline-primary" onclick="toggleContextualHelp()">
+                        <i class="fas fa-question-circle"></i> Toggle Help
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Demo chart for the example
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('demo-levy-rate-chart').getContext('2d');
+        
+        // Sample data for the chart
+        const levyRatesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Benton County', 'City of Kennewick', 'City of Richland', 'School District 400', 'Fire District 1'],
+                datasets: [{
+                    label: 'Levy Rate (per $1,000)',
+                    data: [1.42, 2.35, 2.87, 3.64, 1.98],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Sample Levy Rates by District'
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Levy Rate (per $1,000)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tax District'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Make the chart accessible to the contextual help system
+        window.terrafusionCharts = window.terrafusionCharts || {};
+        window.terrafusionCharts['demo-levy-rate-chart'] = levyRatesChart;
+    });
+</script>
+{% endblock %}
