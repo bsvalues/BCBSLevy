@@ -1,0 +1,67 @@
+{
+  "family": "${app_name}",
+  "executionRoleArn": "${execution_role_arn}",
+  "taskRoleArn": "${task_role_arn}",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "${app_name}",
+      "image": "${container_image}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "hostPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "FLASK_ENV",
+          "value": "${environment}"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "${database_url_secret_arn}"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "valueFrom": "${session_secret_arn}"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "${log_group}",
+          "awslogs-region": "${region}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:5000/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "ulimits": [
+        {
+          "name": "nofile",
+          "softLimit": 65536,
+          "hardLimit": 65536
+        }
+      ]
+    }
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "${cpu}",
+  "memory": "${memory}",
+  "tags": ${jsonencode(tags)}
+}

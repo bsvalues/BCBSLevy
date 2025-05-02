@@ -1,0 +1,212 @@
+name: TerraFusion CI/CD Pipeline
+
+on:
+  push:
+    branches: [ develop, main, 'release/*', 'hotfix/*' ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest pylint
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      
+      - name: Static analysis with pylint
+        run: |
+          # Run pylint on all Python files, excluding migrations and tests
+          find . -type f -name "*.py" -not -path "*/migrations/*" -not -path "*/tests/*" | xargs pylint --disable=C0111,R0903,C0103 --fail-under=7.0 || true
+
+  tests:
+    name: Run Tests
+    needs: code-quality
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_terrafusion
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest pytest-cov
+      
+      - name: Run unit tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_terrafusion
+          FLASK_ENV: testing
+        run: |
+          if [ -d tests/unit ]; then
+            pytest tests/unit --cov=. --cov-report=xml
+          else
+            echo "No unit tests found, skipping."
+          fi
+      
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_terrafusion
+          FLASK_ENV: testing
+        run: |
+          if [ -d tests/integration ]; then
+            pytest tests/integration
+          else
+            echo "No integration tests found, skipping."
+          fi
+      
+      - name: Upload coverage report
+        if: success()
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  build:
+    name: Build and Push Docker Image
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/heads/hotfix/'))
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Extract branch or tag name
+        id: branch-name
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+      
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/terrafusion:${{ steps.branch-name.outputs.BRANCH_NAME }}-${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/terrafusion:${{ steps.branch-name.outputs.BRANCH_NAME }}-latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-dev:
+    name: Deploy to Development
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      
+      - name: Update ECS service
+        run: |
+          aws ecs update-service --cluster terrafusion-dev --service terrafusion-app --force-new-deployment
+      
+      - name: Notify deployment
+        run: |
+          echo "Development deployment initiated at $(date)"
+          echo "Environment: Development"
+          echo "Image: terrafusion:develop-${{ github.sha }}"
+
+  deploy-production:
+    name: Deploy to Production
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://terrafusion.example.com
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+      
+      - name: Update ECS service with blue-green deployment
+        run: |
+          # Get current task definition
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition terrafusion-prod --query "taskDefinition" --output json)
+          
+          # Create new task definition with updated image
+          NEW_TASK_DEF=$(echo $TASK_DEFINITION | jq '.containerDefinitions[0].image = "${{ steps.login-ecr.outputs.registry }}/terrafusion:main-${{ github.sha }}"' | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+          
+          # Register new task definition
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW_TASK_DEF" --query "taskDefinition.taskDefinitionArn" --output text)
+          
+          # Update service with new task definition
+          aws ecs update-service --cluster terrafusion-prod --service terrafusion-app --task-definition $NEW_TASK_DEF_ARN
+          
+          # Wait for service to stabilize
+          aws ecs wait services-stable --cluster terrafusion-prod --services terrafusion-app
+      
+      - name: Verify deployment
+        run: |
+          echo "Production deployment completed at $(date)"
+          echo "Environment: Production"
+          echo "Image: terrafusion:main-${{ github.sha }}"
+          echo "Task Definition: $NEW_TASK_DEF_ARN"

@@ -98,6 +98,79 @@
         height: 300px;
         margin-bottom: 1.5rem;
     }
+    
+    /* Enhanced interactive styles */
+    .comparison-card {
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .comparison-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .highlight-card {
+        border-color: #007bff !important;
+        background-color: rgba(240, 249, 255, 0.7) !important;
+        z-index: 10;
+    }
+    
+    .highlight-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-shadow: 0 0 20px rgba(0, 123, 255, 0.15);
+        border-radius: inherit;
+        opacity: 0;
+        z-index: -1;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.3; transform: scale(0.97); }
+        50% { opacity: 0.7; transform: scale(1); }
+        100% { opacity: 0.3; transform: scale(0.97); }
+    }
+    
+    /* Comprehensive data table styles */
+    #comparisonTable {
+        margin-top: 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    #comparisonTable thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    #comparisonTable tbody tr {
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        cursor: pointer;
+    }
+    
+    #comparisonTable tbody tr:hover {
+        background-color: rgba(240, 249, 255, 0.4);
+    }
+    
+    #comparisonTable tbody tr.highlight-row {
+        background-color: rgba(240, 249, 255, 0.7);
+        border-left: 3px solid #4b9cd3;
+    }
+    
+    #comparisonTable .text-end {
+        text-align: right;
+    }
 </style>
 {% endblock %}
 
@@ -370,6 +443,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Global chart references object
+    window.terrafusionCharts = {
+        levyRatesChart: null,
+        levyAmountsChart: null
+    };
+    
     // Initialize comparison form
     const comparisonForm = document.getElementById('comparisonForm');
     const comparisonType = document.getElementsByName('comparisonType');
@@ -645,6 +724,64 @@ document.addEventListener('DOMContentLoaded', function() {
         drawLevyRatesChart('levyRatesChart', districtNames, levyRates);
         drawLevyAmountsChart('levyAmountsChart', districtNames, levyAmounts);
         
+        // Build comprehensive data table for comparison
+        let tableHtml = `
+            <div class="mt-4">
+                <h4 class="mb-3">Detailed Comparison</h4>
+                <div class="table-responsive">
+                    <table id="comparisonTable" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>District</th>
+                                <th>Type</th>
+                                <th class="text-end">Levy Rate</th>
+                                <th class="text-end">Assessed Value</th>
+                                <th class="text-end">Levy Amount</th>
+                                <th class="text-end">% Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        data.districts.forEach(district => {
+            // Skip districts with errors
+            if (district.error) return;
+            
+            // Calculate percent change class
+            const percentChange = district.percent_increase;
+            let changeClass = 'text-muted';
+            
+            if (percentChange.startsWith('-')) {
+                changeClass = 'text-danger';
+            } else if (parseFloat(percentChange) > 0) {
+                changeClass = 'text-success';
+            }
+            
+            tableHtml += `
+                <tr>
+                    <td>${district.district_name}</td>
+                    <td>${district.district_type || 'Unknown'}</td>
+                    <td class="text-end">${district.levy_rate}</td>
+                    <td class="text-end">${district.assessed_value}</td>
+                    <td class="text-end">${district.final_levy_amount}</td>
+                    <td class="text-end ${changeClass}">${district.percent_increase}</td>
+                </tr>
+            `;
+        });
+        
+        tableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        // Setup interactive highlighting between charts, cards and table
+        // Use setTimeout to ensure DOM is fully updated
+        setTimeout(() => {
+            setupInteractiveHighlighting();
+        }, 500);
+        
         // Build district comparison cards
         let resultsHtml = '<div class="row">';
         
@@ -745,93 +882,507 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         resultsHtml += '</div>';
-        document.getElementById('comparisonResults').innerHTML = resultsHtml;
+        
+        // Combine the district cards with the comparison table
+        document.getElementById('comparisonResults').innerHTML = tableHtml + resultsHtml;
     }
     
     function drawLevyRatesChart(canvasId, labels, data) {
-        const ctx = document.getElementById(canvasId).getContext('2d');
+        const ctx = document.getElementById(canvasId);
         
         // Destroy existing chart if it exists
-        if (window.levyRatesChart) {
-            window.levyRatesChart.destroy();
+        if (window.terrafusionCharts.levyRatesChart) {
+            window.terrafusionCharts.levyRatesChart.destroy();
         }
         
-        // Create new chart
-        window.levyRatesChart = new Chart(ctx, {
+        // Gather additional data for detailed tooltips
+        const tooltipData = data.map((value, i) => ({
+            districtName: labels[i],
+            levyRate: value,
+            // These would come from actual district data in a full implementation
+            assessedValue: 0,
+            levyAmount: 0
+        }));
+        
+        // Generate hover colors (slightly brighter)
+        const baseColor = "rgba(54, 162, 235, 0.7)";
+        const hoverColor = "rgba(54, 162, 235, 0.9)";
+        const backgroundColors = Array(labels.length).fill(baseColor);
+        const hoverBackgroundColors = Array(labels.length).fill(hoverColor);
+        
+        // Custom tooltip formatting
+        const tooltipFormatter = (context) => {
+            const index = context.dataIndex;
+            let tooltipContent = '';
+            
+            if (tooltipData && tooltipData[index]) {
+                const data = tooltipData[index];
+                tooltipContent = [
+                    `District: ${data.districtName || 'Unknown'}`,
+                    `Levy Rate: ${data.levyRate.toFixed(6)} per $1,000`
+                ];
+                return tooltipContent;
+            }
+            
+            return `${labels[index]}: ${data[index].toFixed(6)}`;
+        };
+        
+        // Create new chart with enhanced interactivity
+        window.terrafusionCharts.levyRatesChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
                     label: 'Levy Rate (per $1,000)',
                     data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    backgroundColor: backgroundColors,
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    hoverBackgroundColor: hoverBackgroundColors,
+                    hoverBorderColor: "rgba(54, 162, 235, 1.0)",
+                    hoverBorderWidth: 2,
+                    borderRadius: 4,
+                    // Add subtle animations
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.85,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                onHover: (event, chartElements) => {
+                    // Change cursor to pointer when hovering over bars
+                    event.native.target.style.cursor = chartElements.length ? 'pointer' : 'default';
+                    
+                    // Highlight the corresponding district card
+                    if (chartElements.length) {
+                        const index = chartElements[0].index;
+                        highlightDistrictCard(index);
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Rate (per $1,000)'
+                            text: 'Rate (per $1,000)',
+                            font: {
+                                weight: '500'
+                            }
+                        },
+                        grid: {
+                            drawBorder: false,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: (value) => value.toFixed(4)
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     }
                 },
                 plugins: {
+                    legend: {
+                        position: "top",
+                        labels: {
+                            font: {
+                                family: "'Inter', 'Helvetica', 'Arial', sans-serif",
+                                weight: '500'
+                            },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'rect'
+                        }
+                    },
                     title: {
                         display: true,
-                        text: 'Levy Rates Comparison'
+                        text: 'Levy Rates Comparison',
+                        font: {
+                            size: 16,
+                            family: "'Inter', 'Helvetica', 'Arial', sans-serif",
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 21, 41, 0.9)',
+                        titleFont: {
+                            size: 14,
+                            family: "'Inter', 'Helvetica', 'Arial', sans-serif",
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 13,
+                            family: "'Inter', 'Helvetica', 'Arial', sans-serif"
+                        },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                            title: (context) => context[0].label,
+                            label: tooltipFormatter,
+                            labelTextColor: () => '#ffffff'
+                        }
                     }
                 }
             }
         });
+        
+        // Add click interactions
+        ctx.onclick = (evt) => {
+            const points = window.terrafusionCharts.levyRatesChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+            if (points.length) {
+                const firstPoint = points[0];
+                const label = window.terrafusionCharts.levyRatesChart.data.labels[firstPoint.index];
+                const value = window.terrafusionCharts.levyRatesChart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index];
+                console.log(`Clicked on District: ${label} with rate: ${value}`);
+                
+                // Flash effect on clicked bar
+                const dataset = window.terrafusionCharts.levyRatesChart.data.datasets[firstPoint.datasetIndex];
+                const originalColor = dataset.backgroundColor[firstPoint.index];
+                dataset.backgroundColor[firstPoint.index] = 'rgba(255, 193, 7, 0.8)';
+                window.terrafusionCharts.levyRatesChart.update();
+                
+                // Restore original color after 300ms
+                setTimeout(() => {
+                    dataset.backgroundColor[firstPoint.index] = originalColor;
+                    window.terrafusionCharts.levyRatesChart.update();
+                }, 300);
+                
+                // Highlight corresponding district card
+                highlightDistrictCard(firstPoint.index, true);
+            }
+        };
     }
     
     function drawLevyAmountsChart(canvasId, labels, data) {
-        const ctx = document.getElementById(canvasId).getContext('2d');
+        const ctx = document.getElementById(canvasId);
         
         // Destroy existing chart if it exists
-        if (window.levyAmountsChart) {
-            window.levyAmountsChart.destroy();
+        if (window.terrafusionCharts.levyAmountsChart) {
+            window.terrafusionCharts.levyAmountsChart.destroy();
         }
         
-        // Create new chart
-        window.levyAmountsChart = new Chart(ctx, {
+        // Gather additional data for detailed tooltips
+        const tooltipData = data.map((value, i) => ({
+            districtName: labels[i],
+            levyAmount: value,
+            // These would come from actual district data in a full implementation
+            assessedValue: 0,
+            levyRate: 0
+        }));
+        
+        // Generate hover colors (slightly brighter)
+        const baseColor = "rgba(75, 192, 192, 0.7)";
+        const hoverColor = "rgba(75, 192, 192, 0.9)";
+        const backgroundColors = Array(labels.length).fill(baseColor);
+        const hoverBackgroundColors = Array(labels.length).fill(hoverColor);
+        
+        // Custom tooltip formatting
+        const tooltipFormatter = (context) => {
+            const index = context.dataIndex;
+            let tooltipContent = '';
+            
+            if (tooltipData && tooltipData[index]) {
+                const data = tooltipData[index];
+                tooltipContent = [
+                    `District: ${data.districtName || 'Unknown'}`,
+                    `Levy Amount: ${formatCurrency(data.levyAmount)}`
+                ];
+                return tooltipContent;
+            }
+            
+            return `${labels[index]}: ${formatCurrency(data[index])}`;
+        };
+        
+        // Create new chart with enhanced interactivity
+        window.terrafusionCharts.levyAmountsChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
                     label: 'Levy Amount ($)',
                     data: data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    backgroundColor: backgroundColors,
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    hoverBackgroundColor: hoverBackgroundColors,
+                    hoverBorderColor: "rgba(75, 192, 192, 1.0)",
+                    hoverBorderWidth: 2,
+                    borderRadius: 4,
+                    // Add subtle animations
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.85,
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                onHover: (event, chartElements) => {
+                    // Change cursor to pointer when hovering over bars
+                    event.native.target.style.cursor = chartElements.length ? 'pointer' : 'default';
+                    
+                    // Highlight the corresponding district card
+                    if (chartElements.length) {
+                        const index = chartElements[0].index;
+                        highlightDistrictCard(index);
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Amount ($)'
+                            text: 'Amount ($)',
+                            font: {
+                                weight: '500'
+                            }
+                        },
+                        grid: {
+                            drawBorder: false,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: (value) => formatCurrency(value).replace('.00', '')
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
                         }
                     }
                 },
                 plugins: {
+                    legend: {
+                        position: "top",
+                        labels: {
+                            font: {
+                                family: "'Inter', 'Helvetica', 'Arial', sans-serif",
+                                weight: '500'
+                            },
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'rect'
+                        }
+                    },
                     title: {
                         display: true,
-                        text: 'Levy Amounts Comparison'
+                        text: 'Levy Amounts Comparison',
+                        font: {
+                            size: 16,
+                            family: "'Inter', 'Helvetica', 'Arial', sans-serif",
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 21, 41, 0.9)',
+                        titleFont: {
+                            size: 14,
+                            family: "'Inter', 'Helvetica', 'Arial', sans-serif",
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 13,
+                            family: "'Inter', 'Helvetica', 'Arial', sans-serif"
+                        },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                            title: (context) => context[0].label,
+                            label: tooltipFormatter,
+                            labelTextColor: () => '#ffffff'
+                        }
                     }
                 }
             }
         });
+        
+        // Add click interactions
+        ctx.onclick = (evt) => {
+            const points = window.terrafusionCharts.levyAmountsChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+            if (points.length) {
+                const firstPoint = points[0];
+                const label = window.terrafusionCharts.levyAmountsChart.data.labels[firstPoint.index];
+                const value = window.terrafusionCharts.levyAmountsChart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index];
+                console.log(`Clicked on District: ${label} with amount: ${formatCurrency(value)}`);
+                
+                // Flash effect on clicked bar
+                const dataset = window.terrafusionCharts.levyAmountsChart.data.datasets[firstPoint.datasetIndex];
+                const originalColor = dataset.backgroundColor[firstPoint.index];
+                dataset.backgroundColor[firstPoint.index] = 'rgba(46, 204, 113, 0.8)'; // Green highlight
+                window.terrafusionCharts.levyAmountsChart.update();
+                
+                // Restore original color after 300ms
+                setTimeout(() => {
+                    dataset.backgroundColor[firstPoint.index] = originalColor;
+                    window.terrafusionCharts.levyAmountsChart.update();
+                }, 300);
+                
+                // Highlight corresponding district card
+                highlightDistrictCard(firstPoint.index, true);
+            }
+        };
+    }
+    
+    /**
+     * Highlights the corresponding district card and table row when interacting with chart elements
+     * @param {number} index The index of the data point in the chart
+     * @param {boolean} isClick Whether this is triggered by a click or hover event
+     */
+    function highlightDistrictCard(index, isClick = false) {
+        // Get all district cards
+        const districtCards = document.querySelectorAll('#comparisonResults .comparison-card');
+        if (!districtCards || districtCards.length === 0) return;
+        
+        // Get all table rows if comparison table exists
+        const tableRows = document.querySelectorAll('#comparisonTable tbody tr');
+        
+        // Remove any existing highlights
+        districtCards.forEach(card => {
+            card.classList.remove('highlight-card');
+            card.style.transform = '';
+            card.style.boxShadow = '';
+        });
+        
+        // Remove table row highlights if any
+        if (tableRows && tableRows.length > 0) {
+            tableRows.forEach(row => {
+                row.classList.remove('highlight-row');
+                row.style.backgroundColor = '';
+            });
+        }
+        
+        // Apply highlight to the specified card
+        if (index >= 0 && index < districtCards.length) {
+            const card = districtCards[index];
+            card.classList.add('highlight-card');
+            
+            // Also highlight the corresponding table row if it exists
+            if (tableRows && index < tableRows.length) {
+                const row = tableRows[index];
+                row.classList.add('highlight-row');
+                row.style.backgroundColor = 'rgba(240, 249, 255, 0.7)';
+            }
+            
+            // Apply more prominent effect if it's a click
+            if (isClick) {
+                card.style.transform = 'translateY(-8px)';
+                card.style.boxShadow = '0 12px 20px rgba(0,0,0,0.1)';
+                
+                // Scroll to card if needed
+                card.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                
+                // Remove the highlight after a delay
+                setTimeout(() => {
+                    card.classList.remove('highlight-card');
+                    card.style.transform = '';
+                    card.style.boxShadow = '';
+                    
+                    // Also remove table row highlight
+                    if (tableRows && index < tableRows.length) {
+                        const row = tableRows[index];
+                        row.classList.remove('highlight-row');
+                        row.style.backgroundColor = '';
+                    }
+                }, 2000);
+            } else {
+                card.style.transform = 'translateY(-5px)';
+                card.style.boxShadow = '0 8px 15px rgba(0,0,0,0.08)';
+            }
+        }
+    }
+    
+    /**
+     * Sets up bidirectional highlighting between charts, cards and table rows
+     */
+    function setupInteractiveHighlighting() {
+        // Add event listeners to district cards
+        const districtCards = document.querySelectorAll('#comparisonResults .comparison-card');
+        districtCards.forEach((card, index) => {
+            card.addEventListener('mouseenter', () => {
+                highlightDistrictCard(index);
+                
+                // Flash the corresponding chart bars
+                if (window.terrafusionCharts.levyRatesChart && window.terrafusionCharts.levyAmountsChart) {
+                    // Highlight the bar in both charts
+                    const ratesDataset = window.terrafusionCharts.levyRatesChart.data.datasets[0];
+                    const amountsDataset = window.terrafusionCharts.levyAmountsChart.data.datasets[0];
+                    
+                    // Store original colors
+                    const originalRateColor = ratesDataset.backgroundColor[index];
+                    const originalAmountColor = amountsDataset.backgroundColor[index];
+                    
+                    // Change colors
+                    ratesDataset.backgroundColor[index] = 'rgba(54, 162, 235, 0.9)';
+                    amountsDataset.backgroundColor[index] = 'rgba(75, 192, 192, 0.9)';
+                    
+                    // Update charts
+                    window.terrafusionCharts.levyRatesChart.update();
+                    window.terrafusionCharts.levyAmountsChart.update();
+                    
+                    // Add a one-time listener to restore colors when mouse leaves
+                    card.addEventListener('mouseleave', function restoreColors() {
+                        ratesDataset.backgroundColor[index] = originalRateColor;
+                        amountsDataset.backgroundColor[index] = originalAmountColor;
+                        window.terrafusionCharts.levyRatesChart.update();
+                        window.terrafusionCharts.levyAmountsChart.update();
+                        card.removeEventListener('mouseleave', restoreColors);
+                    });
+                }
+            });
+            
+            card.addEventListener('click', () => {
+                highlightDistrictCard(index, true);
+            });
+        });
+        
+        // Add event listeners to table rows if comparison table exists
+        const tableRows = document.querySelectorAll('#comparisonTable tbody tr');
+        if (tableRows && tableRows.length > 0) {
+            tableRows.forEach((row, index) => {
+                row.addEventListener('mouseenter', () => {
+                    highlightDistrictCard(index);
+                });
+                
+                row.addEventListener('click', () => {
+                    highlightDistrictCard(index, true);
+                });
+            });
+        }
     }
     
     // Utility functions
