@@ -1,0 +1,82 @@
+{
+  "levy_rate": {
+    "title": "Levy Rate",
+    "short_desc": "Tax rate per $1,000 of assessed property value",
+    "full_explanation": "The levy rate is the tax rate applied to property values, measured per $1,000 of assessed value. For example, a levy rate of 1.5 means property owners pay $1.50 for every $1,000 of assessed value.\n\nWashington state law limits regular levy rates for different types of districts, such as:\n- Counties: up to $1.80 per $1,000\n- Cities: up to $3.60 per $1,000\n- School districts: up to $1.50 per $1,000\n\nLevy rates are calculated by dividing the levy amount by the total assessed value of the district, then multiplying by 1,000.\n\nExample: If a district needs to collect $2 million and has total assessed value of $1 billion, the levy rate would be ($2,000,000 ÷ $1,000,000,000) × 1,000 = $2.00 per $1,000.\n\nSee RCW 84.52.043 for statutory limitations on regular property tax rates.",
+    "category": "calculation",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "levy_amount": {
+    "title": "Levy Amount",
+    "short_desc": "Total tax revenue collected by a district",
+    "full_explanation": "The levy amount refers to the total property tax revenue that a taxing district is authorized to collect in a given year. It represents the dollar amount to be raised through property taxes to fund public services.\n\nThe levy amount is determined annually by the district's governing body (e.g., city council, school board) when adopting their budget. Various factors affect the maximum allowed levy amount:\n\n1. The previous year's levy amount\n2. Statutory limits on increases (typically limited to 1% plus new construction)\n3. Voter-approved increases\n4. Special levies for specific purposes\n\nOnce the levy amount is set, it is spread across all taxable properties within the district based on their assessed values to determine individual tax bills.\n\nSee RCW 84.55.010 for limitations on levy increases.",
+    "category": "calculation",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "statutory_limit": {
+    "title": "Statutory Limit",
+    "short_desc": "Maximum tax rate allowed by state law",
+    "full_explanation": "The statutory limit refers to the maximum tax rate (levy rate) that a taxing district can impose on property, as established by Washington state law. These limits vary by type of taxing district and are expressed as a rate per $1,000 of assessed value.\n\nKey statutory limits in Washington include:\n\n- State: $3.60 per $1,000 (though limited to lower amounts by state constitution)\n- Counties: $1.80 per $1,000 for general county purposes\n- Cities/Towns: $3.60 per $1,000\n- Fire Districts: $1.50 per $1,000\n- Library Districts: $0.50 per $1,000\n- School Districts: $1.50 per $1,000 for maintenance and operations\n\nThese statutory limits represent absolute caps on regular property tax rates and cannot be exceeded without voter approval through excess levies.\n\nFor comprehensive statutory rate limits, see RCW 84.52.043.",
+    "category": "limit",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "highest_lawful_levy": {
+    "title": "Highest Lawful Levy",
+    "short_desc": "Maximum levy amount allowed by law",
+    "full_explanation": "The highest lawful levy is the maximum dollar amount that a taxing district can legally collect in property taxes for the current year, based on statutory limitations. It serves as a ceiling for budget planning.\n\nThe highest lawful levy is calculated based on:\n\n1. The previous year's actual levy amount\n2. The statutory limit factor (typically limited to 101% of the previous year's levy)\n3. Addition for new construction value\n4. Addition for increases in state-assessed utility value\n5. Addition for annexed property values\n6. Refund adjustments\n\nThis calculation is required as part of the annual levy setting process and must be documented on forms provided by the Department of Revenue.\n\nThe formula is: (Previous Year's Levy × Limit Factor) + (New Construction Value × Prior Year's Levy Rate) + additional adjustments.\n\nSee RCW 84.55.092 for details on highest lawful levy preservation.",
+    "category": "limit",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "levy_limit": {
+    "title": "Levy Limit",
+    "short_desc": "Legal restriction on annual levy increases",
+    "full_explanation": "The levy limit is a statutory restriction that caps the amount by which a taxing district can increase its regular property tax levy from one year to the next. This limit was established to protect property owners from excessive tax increases.\n\nUnder Washington law (RCW 84.55.010), taxing districts are generally limited to increasing their regular levy by no more than 1% above the highest lawful levy from the prior year, excluding additions for new construction, annexations, and certain other adjustments.\n\nThe levy limit calculation is separate from the statutory rate limits and is often the more restrictive of the two constraints. Districts at their levy limit may need voter approval to increase taxes beyond the 1% limit through a levy lid lift.\n\nThe formula is: (Previous Year's Levy × 101%) + additions for new construction, annexed property, and other adjustments.\n\nFor special districts established after June 7, 2018, see RCW 84.55.044 for additional requirements.",
+    "category": "limit",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "assessed_value": {
+    "title": "Assessed Value",
+    "short_desc": "Official valuation of property for tax purposes",
+    "full_explanation": "Assessed value is the dollar value assigned to real or personal property by the county assessor for the purpose of measuring applicable property taxes. In Washington state, property is assessed at 100% of its true and fair market value.\n\nThe assessed value is determined by:\n\n1. Physical inspection (typically every 6 years)\n2. Statistical updates in non-inspection years\n3. Analysis of comparable property sales\n4. Income approach for commercial properties\n5. Cost approach for specialized properties\n\nAssessed values may differ from market values due to timing of assessments, assessment procedures, and appeals. Property owners receive an annual notice of value change and have the right to appeal their assessment if they believe it's incorrect.\n\nThe total assessed value of all properties in a taxing district is used to calculate the levy rate necessary to generate the district's authorized levy amount.\n\nSee RCW 84.40.030 for standards and methods of property valuation.",
+    "category": "property",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "new_construction": {
+    "title": "New Construction",
+    "short_desc": "Value of newly built properties added to tax rolls",
+    "full_explanation": "In property tax calculations, new construction refers to the assessed value of newly constructed buildings and improvements added to the tax rolls within a taxing district during the previous year. It represents growth in the tax base from new development.\n\nNew construction value is important because:\n\n1. It allows taxing districts to increase their levy amount beyond the typical 1% annual limit\n2. The additional levy capacity is calculated by multiplying the new construction value by the prior year's levy rate\n3. This adjustment helps districts maintain service levels as their community grows\n\nNew construction value includes:\n- Newly constructed buildings\n- Additions to existing structures\n- Substantial improvements to property\n- Certain changes in property use\n\nIt does not include increases in value due to inflation or market appreciation of existing properties.\n\nSee RCW 84.55.010 and 84.40.040 for statutory provisions on new construction in levy calculations.",
+    "category": "adjustment",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "annexation": {
+    "title": "Annexation",
+    "short_desc": "Process of incorporating new territory into a taxing district",
+    "full_explanation": "Annexation is the legal process by which property is incorporated into a taxing district, such as when a city expands its boundaries to include previously unincorporated area. For property tax purposes, annexation affects levy calculations.\n\nWhen annexation occurs:\n\n1. The annexing taxing district gains the ability to levy taxes on the newly incorporated property\n2. The district can increase its levy amount beyond the typical 1% limit to account for this new territory\n3. The additional levy capacity is calculated by multiplying the assessed value of the annexed property by the prior year's levy rate of the annexing district\n\nAnnexation adjustments help ensure that as a taxing district expands geographically, it can maintain consistent service levels across its entire jurisdiction.\n\nThe annexation process itself is governed by specific statutes depending on the type of annexation (e.g., RCW 35.13 for city annexations).\n\nSee RCW 84.55.030 and 84.55.120 for specifics on how annexations affect property tax levies.",
+    "category": "adjustment",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "tax_district": {
+    "title": "Tax District",
+    "short_desc": "Government entity authorized to levy property taxes",
+    "full_explanation": "A tax district (also called a taxing district) is a governmental entity that has the legal authority to levy property taxes within its defined geographical boundaries. These districts are established to provide specific public services.\n\nCommon types of taxing districts in Washington include:\n\n1. State government\n2. Counties\n3. Cities and towns\n4. School districts\n5. Fire protection districts\n6. Hospital districts\n7. Library districts\n8. Port districts\n9. Public utility districts\n10. Cemetery districts\n\nEach property in Washington is typically subject to taxes from multiple overlapping taxing districts. The combined levy rates from all applicable districts determine a property's total tax rate.\n\nTaxing districts must follow specific statutory procedures when setting their annual levies, including holding public hearings and adopting levy resolutions or ordinances.\n\nSee RCW 84.52 for comprehensive laws governing taxing districts and levy setting.",
+    "category": "organization",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  },
+  "excess_levy": {
+    "title": "Excess Levy",
+    "short_desc": "Special voted levy that exceeds regular levy limits",
+    "full_explanation": "An excess levy is a property tax that exceeds the statutory rate limits or levy increase limits that would otherwise apply to a taxing district. These levies require explicit voter approval and are authorized for specific purposes or time periods.\n\nCommon types of excess levies include:\n\n1. School district maintenance and operations levies\n2. School district capital project levies\n3. Emergency medical service (EMS) levies\n4. Affordable housing levies\n5. Fire district levies\n\nThe requirements for voter approval vary by type of excess levy and district:\n- Most require a 60% supermajority with minimum voter turnout\n- Some qualify for simple majority (50% plus one vote) approval\n\nExcess levies are typically authorized for specific periods (1-6 years) and must be renewed by voters to continue. They appear as separate line items on property tax statements.\n\nSee RCW 84.52.052 through 84.52.058 for various excess levy authorizations.",
+    "category": "calculation",
+    "source": "official",
+    "last_updated": "2025-05-02"
+  }
+}

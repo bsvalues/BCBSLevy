@@ -1,28 +1,76 @@
 """
 Contextual Help Service: Provides AI-powered explanations for complex terms and visualizations.
 
-This service interfaces with the MCP framework and Claude API to generate
-contextual explanations and help text for the TerraFusion platform.
+This service implements a hybrid approach to generate contextual explanations:
+1. Static pre-written explanations from official sources
+2. Claude API for dynamic, context-aware explanations
+3. OpenAI as a backup AI provider
+4. Robust caching to minimize API calls
+
+The service prioritizes authentic data from authoritative sources while providing
+flexibility to generate explanations for new or uncommon terms.
 """
 import os
 import json
 import logging
 from datetime import datetime
+import time
+import pathlib
 
-# Import the Claude API client
-from anthropic import Anthropic
-
-# Set up logging
+# Set up logging first so it's available for import handling
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Initialize Anthropic client with API key
+# Import the Claude API client
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    ANTHROPIC_AVAILABLE = False
+    logger.warning("Anthropic library not available. Claude API will not be used.")
+
+# Try to import OpenAI as a backup
+try:
+    import openai
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+    logger.warning("OpenAI library not available. OpenAI API will not be used as backup.")
+
+# Initialize API clients
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
+    anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+else:
+    anthropic = None
+    logger.warning("Anthropic API key not found. Claude API will not be used.")
+
+if OPENAI_AVAILABLE and OPENAI_API_KEY:
+    openai.api_key = OPENAI_API_KEY
+else:
+    logger.warning("OpenAI API key not found. OpenAI API will not be used as backup.")
+
+# Static explanation data file path
+EXPLANATIONS_FILE = pathlib.Path("static/data/explanations.json")
 
 # Define cache for storing generated explanations to reduce API calls
 explanation_cache = {}
+
+# Load static explanations from file
+static_explanations = {}
+try:
+    if EXPLANATIONS_FILE.exists():
+        with open(EXPLANATIONS_FILE, 'r') as f:
+            static_explanations = json.load(f)
+        logger.info(f"Loaded {len(static_explanations)} static explanations from {EXPLANATIONS_FILE}")
+    else:
+        logger.warning(f"Static explanations file {EXPLANATIONS_FILE} not found")
+except Exception as e:
+    logger.error(f"Error loading static explanations: {str(e)}")
+    static_explanations = {}
 
 # Define contextual help topics and their descriptions for the UI
 HELP_TOPICS = {
@@ -119,27 +167,56 @@ def get_topic_metadata(topic_id):
             "category": "other"
         }
 
-def generate_explanation(topic_id, context=None, additional_info=None, user_role="analyst"):
+def get_static_explanation(topic_id, user_role="analyst", context=None):
     """
-    Generate a contextual explanation using the Claude API.
+    Get a pre-written explanation from the static database.
     
     Args:
         topic_id (str): The help topic identifier
-        context (str, optional): Additional context about where this is being shown
-        additional_info (dict, optional): Extra information to enhance the explanation
-        user_role (str, optional): Role of the user (analyst, administrator, public)
+        user_role (str): Role of the user (analyst, administrator, public)
+        context (str, optional): Context about where this is being shown
         
     Returns:
-        dict: Explanation text along with metadata
+        dict or None: Explanation dict if found, None otherwise
     """
-    # Check cache first to avoid duplicate API calls
-    cache_key = f"{topic_id}_{user_role}_{context or 'default'}"
-    if cache_key in explanation_cache:
-        logger.info(f"Returning cached explanation for '{topic_id}'")
-        return explanation_cache[cache_key]
+    if topic_id in static_explanations:
+        topic_info = get_topic_metadata(topic_id)
+        explanation_data = static_explanations[topic_id]
+        
+        # Create a result structure similar to what the API would return
+        result = {
+            "topic_id": topic_id,
+            "title": topic_info["title"],
+            "explanation": explanation_data["full_explanation"],
+            "category": topic_info["category"],
+            "source": "static",
+            "last_updated": explanation_data.get("last_updated", "Unknown"),
+            "context": context,
+            "user_role": user_role
+        }
+        
+        logger.info(f"Retrieved static explanation for '{topic_id}'")
+        return result
     
-    # Get topic metadata
-    topic_info = get_topic_metadata(topic_id)
+    return None
+
+def generate_explanation_with_claude(topic_id, topic_info, context=None, additional_info=None, user_role="analyst"):
+    """
+    Generate explanation using the Claude API.
+    
+    Args:
+        topic_id (str): The help topic identifier
+        topic_info (dict): Topic metadata
+        context (str, optional): Additional context about where this is being shown
+        additional_info (dict, optional): Extra information to enhance the explanation
+        user_role (str): Role of the user
+        
+    Returns:
+        dict or None: Explanation dict if successful, None on failure
+    """
+    if not anthropic:
+        logger.warning("Claude API is not available")
+        return None
     
     # Construct the prompt for Claude
     system_prompt = """
@@ -175,18 +252,111 @@ def generate_explanation(topic_id, context=None, additional_info=None, user_role
             user_prompt += f"- {key}: {value}\n"
     
     try:
-        # Call Claude API
-        response = anthropic.messages.create(
-            model="claude-3-sonnet-20240229",
-            max_tokens=750,
-            system=system_prompt,
+        # Add retry logic
+        max_retries = 3
+        retry_count = 0
+        backoff_time = 1  # Start with 1 second backoff
+        
+        while retry_count < max_retries:
+            try:
+                # Call Claude API
+                response = anthropic.messages.create(
+                    model="claude-3-sonnet-20240229",
+                    max_tokens=750,
+                    system=system_prompt,
+                    messages=[
+                        {"role": "user", "content": user_prompt}
+                    ]
+                )
+                
+                # Extract and process the explanation
+                explanation_text = response.content[0].text
+                
+                # Create result with metadata
+                result = {
+                    "topic_id": topic_id,
+                    "title": topic_info["title"],
+                    "explanation": explanation_text,
+                    "category": topic_info["category"],
+                    "generated_at": datetime.utcnow().isoformat(),
+                    "source": "claude",
+                    "context": context,
+                    "user_role": user_role
+                }
+                
+                logger.info(f"Generated explanation for '{topic_id}' with Claude API")
+                return result
+                
+            except Exception as e:
+                retry_count += 1
+                logger.warning(f"Claude API attempt {retry_count} failed: {str(e)}")
+                
+                if retry_count < max_retries:
+                    time.sleep(backoff_time)
+                    backoff_time *= 2  # Exponential backoff
+        
+        logger.error(f"Claude API failed after {max_retries} attempts for topic '{topic_id}'")
+        return None
+        
+    except Exception as e:
+        logger.error(f"Error generating explanation with Claude for '{topic_id}': {str(e)}")
+        return None
+
+def generate_explanation_with_openai(topic_id, topic_info, context=None, additional_info=None, user_role="analyst"):
+    """
+    Generate explanation using the OpenAI API as a backup.
+    
+    Args:
+        topic_id (str): The help topic identifier
+        topic_info (dict): Topic metadata
+        context (str, optional): Additional context about where this is being shown
+        additional_info (dict, optional): Extra information to enhance the explanation
+        user_role (str): Role of the user
+        
+    Returns:
+        dict or None: Explanation dict if successful, None on failure
+    """
+    if not OPENAI_AVAILABLE or not OPENAI_API_KEY:
+        logger.warning("OpenAI API is not available")
+        return None
+    
+    system_content = """
+    You are an expert property tax specialist providing clear, helpful explanations about tax levy concepts.
+    Provide concise, accurate information in plain language with a helpful tone.
+    Include relevant examples where appropriate and keep explanations under 250 words unless the topic is highly complex.
+    Include 1-2 Washington State legal references (RCW citations) if applicable.
+    """
+    
+    user_content = f"""
+    Explain the term "{topic_info['title']}" in the context of property tax levy calculations.
+    
+    Context: {context or "General tax levy information"}
+    User role: {user_role}
+    Basic definition: {topic_info['short_desc']}
+    
+    Provide:
+    1. A clear explanation of this concept
+    2. How it's used in levy calculations
+    3. Why it matters to the user
+    """
+    
+    if additional_info:
+        user_content += f"\n\nAdditional information:\n"
+        for key, value in additional_info.items():
+            user_content += f"- {key}: {value}\n"
+    
+    try:
+        # Call OpenAI API
+        response = openai.chat.completions.create(
+            model="gpt-4o", # the newest OpenAI model is "gpt-4o" which was released May 13, 2024
             messages=[
-                {"role": "user", "content": user_prompt}
-            ]
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": user_content}
+            ],
+            max_tokens=750
         )
         
-        # Extract and process the explanation
-        explanation_text = response.content[0].text
+        explanation_text = response.choices[0].message.content
         
         # Create result with metadata
         result = {
@@ -195,26 +365,102 @@ def generate_explanation(topic_id, context=None, additional_info=None, user_role
             "explanation": explanation_text,
             "category": topic_info["category"],
             "generated_at": datetime.utcnow().isoformat(),
+            "source": "openai",
             "context": context,
             "user_role": user_role
         }
         
-        # Cache the result
-        explanation_cache[cache_key] = result
-        logger.info(f"Generated explanation for '{topic_id}'")
-        
+        logger.info(f"Generated explanation for '{topic_id}' with OpenAI API")
         return result
         
     except Exception as e:
-        logger.error(f"Error generating explanation for '{topic_id}': {str(e)}")
-        return {
-            "topic_id": topic_id,
-            "title": topic_info["title"],
-            "explanation": f"Sorry, we couldn't generate an explanation for {topic_info['title']} at this time. "
-                          f"Please try again later or contact support.",
-            "error": str(e),
-            "category": topic_info["category"]
-        }
+        logger.error(f"Error generating explanation with OpenAI for '{topic_id}': {str(e)}")
+        return None
+
+def get_fallback_explanation(topic_id, topic_info, context=None, user_role="analyst"):
+    """
+    Get a basic fallback explanation when all other methods fail.
+    
+    Args:
+        topic_id (str): The help topic identifier
+        topic_info (dict): Topic metadata
+        context (str, optional): Additional context about where this is being shown
+        user_role (str): Role of the user
+        
+    Returns:
+        dict: Basic explanation dict
+    """
+    fallback_text = f"""
+    **{topic_info['title']}** - {topic_info['short_desc']}
+    
+    This term is used in property tax levy calculations in Washington state. 
+    For more detailed information, please refer to the Washington State Department of Revenue
+    property tax publications or consult with your local county assessor's office.
+    """
+    
+    # Create result with metadata
+    result = {
+        "topic_id": topic_id,
+        "title": topic_info["title"],
+        "explanation": fallback_text,
+        "category": topic_info["category"],
+        "generated_at": datetime.utcnow().isoformat(),
+        "source": "fallback",
+        "context": context,
+        "user_role": user_role
+    }
+    
+    logger.info(f"Using fallback explanation for '{topic_id}'")
+    return result
+
+def generate_explanation(topic_id, context=None, additional_info=None, user_role="analyst"):
+    """
+    Generate a contextual explanation using a hybrid approach.
+    
+    This function implements a hierarchical data source strategy:
+    1. Check cache first to avoid duplicate processing
+    2. Use static pre-written explanations when available
+    3. Try Claude API as the primary AI service
+    4. Fall back to OpenAI API if Claude fails
+    5. Provide a minimal fallback explanation as last resort
+    
+    Args:
+        topic_id (str): The help topic identifier
+        context (str, optional): Additional context about where this is being shown
+        additional_info (dict, optional): Extra information to enhance the explanation
+        user_role (str, optional): Role of the user (analyst, administrator, public)
+        
+    Returns:
+        dict: Explanation text along with metadata
+    """
+    # Check cache first to avoid duplicate API calls
+    cache_key = f"{topic_id}_{user_role}_{context or 'default'}"
+    if cache_key in explanation_cache:
+        logger.info(f"Returning cached explanation for '{topic_id}'")
+        return explanation_cache[cache_key]
+    
+    # Get topic metadata
+    topic_info = get_topic_metadata(topic_id)
+    
+    # 1. Try to get static explanation first
+    result = get_static_explanation(topic_id, user_role, context)
+    
+    # 2. If no static explanation, try Claude API
+    if not result and anthropic:
+        result = generate_explanation_with_claude(topic_id, topic_info, context, additional_info, user_role)
+    
+    # 3. If Claude fails, try OpenAI API as backup
+    if not result and OPENAI_AVAILABLE and OPENAI_API_KEY:
+        result = generate_explanation_with_openai(topic_id, topic_info, context, additional_info, user_role)
+    
+    # 4. If all else fails, use a fallback explanation
+    if not result:
+        result = get_fallback_explanation(topic_id, topic_info, context, user_role)
+    
+    # Cache the result regardless of source
+    explanation_cache[cache_key] = result
+    
+    return result
 
 def get_explanation_for_chart(chart_type, data_context=None, user_role="analyst"):
     """
