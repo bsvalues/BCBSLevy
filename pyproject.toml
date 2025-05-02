@@ -42,4 +42,7 @@ dependencies = [
     "xlsxwriter>=3.2.3",
     "weasyprint>=65.1",
     "openai>=1.77.0",
+    "beautifulsoup4>=4.13.4",
+    "lxml>=5.3.1",
+    "html5lib>=1.1",
 ]

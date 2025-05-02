@@ -5,6 +5,7 @@ This module includes routes for:
 - Importing data from various file formats
 - Exporting data to different formats
 - Managing tax districts, tax codes, and property records
+- Web scraping for data acquisition
 """
 
 import os
@@ -28,6 +29,11 @@ from utils.import_utils import detect_file_type, read_data_from_file, process_im
 from utils.district_utils import (
     import_district_text_file, import_district_xml_file, import_excel_xml_file,
     extract_districts_from_file, parse_district_data
+)
+import re
+from utils.web_scraper import (
+    scrape_and_import, get_website_text_content, extract_tabular_data,
+    scrape_mlb_scores
 )
 
 
@@ -206,6 +212,121 @@ def export_form():
         export_types=export_types,
         districts=districts
     )
+
+
+@data_management_bp.route("/web-scrape", methods=["GET"])
+def web_scrape_form():
+    """Render the web scraping data acquisition form."""
+    # For GET requests, display the web scraping form
+    current_year = datetime.now().year
+    years = list(range(current_year - 5, current_year + 2))
+    
+    # Define data type options for the form
+    data_types = [
+        {"id": "text", "name": "Website Text Content"},
+        {"id": "table", "name": "Website Table Data"},
+        {"id": "mlb", "name": "MLB Scores Data"}
+    ]
+    
+    return render_template(
+        "data_management/web_scrape.html",
+        years=years,
+        current_year=current_year,
+        data_types=data_types
+    )
+
+
+@data_management_bp.route("/web-scrape", methods=["POST"])
+def web_scrape_data():
+    """Handle web scraping data acquisition requests."""
+    url = request.form.get("url")
+    data_type = request.form.get("data_type", "text")
+    year = request.form.get("year", datetime.now().year)
+    notes = request.form.get("notes", "")
+    
+    if not url:
+        flash("URL is required", "error")
+        return redirect(url_for("data_management.web_scrape_form"))
+    
+    try:
+        # Convert to integers
+        year = int(year)
+        
+        # Get current user ID if available (for audit purposes)
+        user_id = None
+        
+        # Start the web scraping process
+        result = scrape_and_import(url, data_type, user_id, year)
+        
+        if result["success"]:
+            flash(f"Successfully scraped data from {url}. {result['record_count']} records processed.", "success")
+        else:
+            flash(f"Error scraping data: {result['message']}", "error")
+            
+        return redirect(url_for("data_management.import_history"))
+    except Exception as e:
+        logger.error(f"Web scraping error: {str(e)}")
+        flash(f"Web scraping error: {str(e)}", "error")
+        return redirect(url_for("data_management.web_scrape_form"))
+
+
+@data_management_bp.route("/api/web-scrape/preview", methods=["POST"])
+def api_web_scrape_preview():
+    """API endpoint to preview web scraped data before import."""
+    data = request.get_json()
+    
+    if not data or "url" not in data:
+        return jsonify({"success": False, "message": "URL is required"})
+    
+    url = data["url"]
+    data_type = data.get("data_type", "text")
+    
+    try:
+        preview_data = None
+        record_count = 0
+        
+        if data_type == "text":
+            text_content = get_website_text_content(url)
+            if text_content:
+                # Limit preview to first 1000 characters
+                preview_data = text_content[:1000] + ("..." if len(text_content) > 1000 else "")
+                record_count = len(text_content.split('\n'))
+        elif data_type == "table":
+            table_data = extract_tabular_data(url)
+            if table_data is not None and not table_data.empty:
+                # Convert first 10 rows to HTML for preview
+                preview_data = table_data.head(10).to_html(classes="table table-bordered table-striped")
+                record_count = len(table_data)
+        elif data_type == "mlb":
+            # Extract date from URL or use today's date
+            date_match = re.search(r'(\d{4}-\d{2}-\d{2})', url)
+            if date_match:
+                date_str = date_match.group(1)
+            else:
+                date_str = datetime.now().strftime('%Y-%m-%d')
+                
+            mlb_data = scrape_mlb_scores(date_str)
+            if mlb_data is not None and not mlb_data.empty:
+                preview_data = mlb_data.to_html(classes="table table-bordered table-striped")
+                record_count = len(mlb_data)
+        
+        if preview_data:
+            return jsonify({
+                "success": True,
+                "preview": preview_data,
+                "record_count": record_count
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": f"No data found at {url} for type {data_type}"
+            })
+    except Exception as e:
+        logger.error(f"Preview error: {str(e)}")
+        return jsonify({
+            "success": False,
+            "message": f"Error generating preview: {str(e)}"
+        })
 
 
 @data_management_bp.route("/export", methods=["POST"])

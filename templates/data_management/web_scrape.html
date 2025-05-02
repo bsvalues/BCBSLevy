@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Web Data Acquisition{% endblock %}
+{% block page_subtitle %}Scrape data from websites for import into the system{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card mb-4">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Web Data Scraping</h5>
+      </div>
+      <div class="card-body">
+        <form id="webScrapeForm" method="post" action="{{ url_for('data_management.web_scrape_data') }}">
+          <div class="mb-3">
+            <label for="url" class="form-label">Website URL</label>
+            <input type="url" class="form-control" id="url" name="url" required
+                  placeholder="https://www.example.com" />
+            <div class="form-text">
+              Enter the full URL of the website to scrape data from.
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="data_type" class="form-label">Data Type</label>
+            <select class="form-select" id="data_type" name="data_type">
+              {% for type in data_types %}
+                <option value="{{ type.id }}">{{ type.name }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">
+              Select the type of data you want to extract from the website.
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="year" class="form-label">Tax Year</label>
+            <select class="form-select" id="year" name="year">
+              {% for y in years %}
+                <option value="{{ y }}" {% if y == current_year %}selected{% endif %}>{{ y }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">
+              Select the tax year to associate with this data.
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3"
+                     placeholder="Optional notes about this data acquisition"></textarea>
+          </div>
+          
+          <div class="d-flex justify-content-between">
+            <button type="button" id="previewButton" class="btn btn-secondary">
+              <i class="bi bi-eye"></i> Preview Data
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-cloud-download"></i> Scrape and Import
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="previewModalLabel">Data Preview</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="loadingIndicator" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2">Fetching data preview...</p>
+            </div>
+            
+            <div id="previewError" class="alert alert-danger d-none">
+              Error message will appear here
+            </div>
+            
+            <div id="previewContent" class="d-none">
+              <div class="mb-3">
+                <h6>Record Count: <span id="recordCount" class="badge bg-info">0</span></h6>
+              </div>
+              
+              <div id="previewData" class="border p-3 bg-light">
+                Preview content will appear here
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" id="submitAfterPreview" class="btn btn-primary">Scrape and Import</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Web Scraping Information</h5>
+      </div>
+      <div class="card-body">
+        <h6>Supported Data Types:</h6>
+        <ul class="mb-4">
+          <li><strong>Website Text Content</strong> - Extracts the main text content from a webpage</li>
+          <li><strong>Website Table Data</strong> - Extracts HTML tables from a webpage</li>
+          <li><strong>MLB Scores Data</strong> - Extracts baseball scores from MLB website</li>
+        </ul>
+        
+        <h6>Example URLs:</h6>
+        <ul>
+          <li>MLB Scores: <code>https://www.mlb.com/scores/2023-04-01</code></li>
+          <li>Table Example: <code>https://en.wikipedia.org/wiki/List_of_U.S._states_by_population</code></li>
+        </ul>
+        
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle-fill"></i> Please respect website terms of service and robots.txt files when scraping data.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const previewButton = document.getElementById('previewButton');
+  const submitAfterPreview = document.getElementById('submitAfterPreview');
+  const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+  
+  previewButton.addEventListener('click', function() {
+    const url = document.getElementById('url').value;
+    const dataType = document.getElementById('data_type').value;
+    
+    if (!url) {
+      alert('Please enter a valid URL');
+      return;
+    }
+    
+    // Reset the modal
+    document.getElementById('loadingIndicator').classList.remove('d-none');
+    document.getElementById('previewContent').classList.add('d-none');
+    document.getElementById('previewError').classList.add('d-none');
+    
+    // Show the modal
+    previewModal.show();
+    
+    // Make the API request
+    fetch('{{ url_for("data_management.api_web_scrape_preview") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: url,
+        data_type: dataType
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Hide the loading indicator
+      document.getElementById('loadingIndicator').classList.add('d-none');
+      
+      if (data.success) {
+        // Show the preview content
+        document.getElementById('previewContent').classList.remove('d-none');
+        document.getElementById('recordCount').textContent = data.record_count;
+        document.getElementById('previewData').innerHTML = data.preview;
+      } else {
+        // Show the error message
+        document.getElementById('previewError').classList.remove('d-none');
+        document.getElementById('previewError').textContent = data.message;
+      }
+    })
+    .catch(error => {
+      // Hide the loading indicator
+      document.getElementById('loadingIndicator').classList.add('d-none');
+      
+      // Show the error message
+      document.getElementById('previewError').classList.remove('d-none');
+      document.getElementById('previewError').textContent = 'Error generating preview: ' + error.message;
+    });
+  });
+  
+  // Submit form when clicking the "Scrape and Import" button in the modal
+  submitAfterPreview.addEventListener('click', function() {
+    document.getElementById('webScrapeForm').submit();
+  });
+});
+</script>
+{% endblock %}

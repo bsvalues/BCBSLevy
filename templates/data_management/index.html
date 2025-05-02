@@ -40,6 +40,16 @@ System{% endblock %} {% block head %} {{ super() }}
     height: 4px;
     background: linear-gradient(90deg, #6c757d, #adb5bd);
   }
+  
+  .card-top-border-info:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #17a2b8, #5bc0de);
+  }
 
   .hover-card {
     position: relative;
@@ -176,6 +186,12 @@ System{% endblock %} {% block head %} {{ super() }}
               class="btn btn-success"
             >
               <i class="bi bi-download me-2"></i>Export Data
+            </a>
+            <a
+              href="{{ url_for('data_management.web_scrape_form') }}"
+              class="btn btn-info"
+            >
+              <i class="bi bi-globe me-2"></i>Web Scraping
             </a>
             <a
               href="{{ url_for('data_management.district_import') }}"
@@ -437,6 +453,32 @@ System{% endblock %} {% block head %} {{ super() }}
                     class="btn btn-sm btn-outline-warning"
                   >
                     <i class="bi bi-arrow-right me-1"></i>Import Districts
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Web Scraping Tool -->
+            <div class="col-md-6 col-lg-4">
+              <div class="card card-top-border-info position-relative h-100">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <div
+                      class="feature-icon bg-info bg-opacity-10 text-info me-3"
+                    >
+                      <i class="bi bi-globe"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Web Scraping</h5>
+                  </div>
+                  <p class="card-text">
+                    Advanced tool for extracting and importing data directly from websites
+                    and online sources.
+                  </p>
+                  <a
+                    href="{{ url_for('data_management.web_scrape_form') }}"
+                    class="btn btn-sm btn-outline-info"
+                  >
+                    <i class="bi bi-arrow-right me-1"></i>Web Scraping
                   </a>
                 </div>
               </div>
