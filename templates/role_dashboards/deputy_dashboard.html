@@ -1,0 +1,309 @@
+{% extends "role_dashboards/base_dashboard.html" %}
+
+{% set role_title = "Deputy Dashboard" %}
+{% set role_description = "Review and Verification" %}
+{% set active_tab = "dashboard" %}
+{% set dashboard_url = url_for('role_dashboards.deputy_dashboard') %}
+{% set page_title = "Deputy Dashboard" %}
+{% set show_certification_status = True %}
+{% set certification_percent = 60 %}
+{% set certification_status = "Verification in progress" %}
+{% set has_quick_actions = True %}
+
+{% set sidebar_items = [
+  {
+    "id": "pending_review",
+    "icon": "hourglass-split",
+    "title": "Pending Review", 
+    "url": "#"
+  },
+  {
+    "id": "compliance_check",
+    "icon": "shield-check",
+    "title": "Compliance", 
+    "url": "#"
+  },
+  {
+    "id": "calculations",
+    "icon": "calculator",
+    "title": "Calculations", 
+    "url": "#"
+  },
+  {
+    "id": "issues",
+    "icon": "exclamation-triangle",
+    "title": "Issues", 
+    "url": "#"
+  },
+  {
+    "id": "approve_certify",
+    "icon": "check2-circle",
+    "title": "Approve & Certify", 
+    "url": "#"
+  }
+] %}
+
+{% set quick_actions = [
+  {
+    "icon": "check-circle",
+    "title": "Verify Next District",
+    "url": "#"
+  },
+  {
+    "icon": "flag",
+    "title": "Report Issue",
+    "url": "#"
+  },
+  {
+    "icon": "arrow-up-circle",
+    "title": "Submit to Assessor",
+    "url": "#"
+  }
+] %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+  <button type="button" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-search me-1"></i> Review
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-success">
+    <i class="bi bi-shield-check me-1"></i> Verify
+  </button>
+</div>
+<button type="button" class="btn btn-sm btn-primary">
+  <i class="bi bi-check2-circle me-1"></i> Approve for Certification
+</button>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-hourglass-split me-2"></i>Pending Review</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Tax District</th>
+                <th>Submission Date</th>
+                <th>Status</th>
+                <th>Compliance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>School District #123</td>
+                <td>May 4, 2025</td>
+                <td><span class="badge bg-warning text-dark">In Review</span></td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 82%;" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="small">82%</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-success">Approve</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>City of Springfield</td>
+                <td>May 3, 2025</td>
+                <td><span class="badge bg-info">Reviewed</span></td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="small">95%</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-success">Approve</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Fire District #7</td>
+                <td>May 1, 2025</td>
+                <td><span class="badge bg-danger">Issues Found</span></td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                      <div class="progress-bar bg-danger" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="small">65%</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-danger">Return</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>County Hospital District</td>
+                <td>April 28, 2025</td>
+                <td><span class="badge bg-success">Approved</span></td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                      <div class="progress-bar bg-success" role="progressbar" style="width: 98%;" aria-valuenow="98" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span class="small">98%</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-secondary">View</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-clipboard-data me-2"></i>Verification Summary</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <h6 class="text-muted">Districts Reviewed</h6>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small text-muted mb-0">8 of 20 districts reviewed (40%)</p>
+        </div>
+        
+        <div class="mb-3">
+          <h6 class="text-muted">Compliance Rate</h6>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small text-muted mb-0">85% of districts meet compliance</p>
+        </div>
+        
+        <div>
+          <h6 class="text-muted">Ready for Final Approval</h6>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small text-muted mb-0">5 of 20 districts ready for assessor</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-danger text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Issues Requiring Attention</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item border-bottom">
+          <h6 class="mb-1">Fire District #7 - Calculation Error</h6>
+          <p class="small text-muted mb-1">Levy rate exceeds statutory limit by 0.15%</p>
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-sm btn-outline-primary">Review</button>
+          </div>
+        </li>
+        <li class="list-group-item border-bottom">
+          <h6 class="mb-1">School District #123 - Missing Data</h6>
+          <p class="small text-muted mb-1">New construction values incomplete</p>
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-sm btn-outline-primary">Review</button>
+          </div>
+        </li>
+        <li class="list-group-item">
+          <h6 class="mb-1">Water District #5 - Compliance Issue</h6>
+          <p class="small text-muted mb-1">Missing required certification documents</p>
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-sm btn-outline-primary">Review</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0"><i class="bi bi-shield-check me-2"></i>Compliance Monitoring</h5>
+        <div class="btn-group btn-group-sm">
+          <button type="button" class="btn btn-sm btn-outline-light">Run Compliance Check</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="card h-100 border-start border-success border-5">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-success-subtle rounded p-2 me-3">
+                    <i class="bi bi-check-circle text-success fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Statutory Compliance</h6>
+                    <p class="text-muted small mb-0">85% of districts</p>
+                  </div>
+                </div>
+                <p class="small text-muted">17 out of 20 districts are operating within statutory levy limits.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card h-100 border-start border-warning border-5">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-warning-subtle rounded p-2 me-3">
+                    <i class="bi bi-calculator text-warning fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Calculation Accuracy</h6>
+                    <p class="text-muted small mb-0">90% of calculations</p>
+                  </div>
+                </div>
+                <p class="small text-muted">2 districts have calculation issues that need to be addressed before approval.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card h-100 border-start border-info border-5">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-info-subtle rounded p-2 me-3">
+                    <i class="bi bi-file-earmark-text text-info fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Documentation</h6>
+                    <p class="text-muted small mb-0">75% complete</p>
+                  </div>
+                </div>
+                <p class="small text-muted">5 districts are missing required certification documents or have incomplete records.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

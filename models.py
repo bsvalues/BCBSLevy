@@ -105,6 +105,9 @@ class User(UserMixin, db.Model):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     
+    # Relationship with UserRole
+    roles = relationship('UserRole', backref='user', lazy='dynamic')
+    
     # Non-audit fields use modified constructor
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
@@ -119,6 +122,48 @@ class User(UserMixin, db.Model):
         if self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}"
         return self.username
+        
+    def has_role(self, role_name):
+        """Check if user has a specific role."""
+        return self.roles.filter_by(role=role_name).count() > 0
+    
+    def add_role(self, role_name):
+        """Add a role to the user if they don't already have it."""
+        if not self.has_role(role_name):
+            role = UserRole(user_id=self.id, role=role_name)
+            db.session.add(role)
+            return True
+        return False
+    
+    def remove_role(self, role_name):
+        """Remove a role from the user if they have it."""
+        role = self.roles.filter_by(role=role_name).first()
+        if role:
+            db.session.delete(role)
+            return True
+        return False
+        
+        
+class UserRole(db.Model):
+    """
+    User role model for role-based access control.
+    
+    This table associates users with specific roles (clerk, deputy, assessor)
+    to implement the multi-stage certification workflow.
+    """
+    __tablename__ = 'user_role'
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
+    role = Column(String(32), nullable=False, index=True)  # clerk, deputy, assessor
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    
+    __table_args__ = (
+        UniqueConstraint('user_id', 'role', name='uix_user_role'),
+    )
+    
+    def __repr__(self):
+        return f'<UserRole {self.role} for user_id={self.user_id}>'
 
 
 class TaxDistrict(AuditMixin, YearMixin, db.Model):

@@ -1,0 +1,15 @@
+{
+  "app": {
+    "name": "TerraLevy",
+    "version": "1.0.0",
+    "description": "Benton County's Tax Levy Certification Platform",
+    "roles": ["clerk", "deputy", "assessor"],
+    "api_keys_required": ["openai", "anthropic"],
+    "dependencies": {
+      "python": "3.11",
+      "flask": "^2.3.2",
+      "gunicorn": "^21.2.0",
+      "dvc": "^3.20.1"
+    }
+  }
+}

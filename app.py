@@ -315,6 +315,7 @@ from routes_monitoring import monitoring_bp # Added import
 from routes_mcp_army import mcp_army_bp # Import MCP Army blueprint
 from routes_levy_worksheet import levy_worksheet_routes, init_app as init_levy_worksheet_routes # Import Levy Worksheet routes
 from routes_help import help_bp, init_app as init_help_routes # Import Contextual Help routes
+from routes_role_dashboards import role_dashboards_bp, init_role_dashboards_routes # Import Role Dashboards routes
 
 
 app.register_blueprint(data_management_bp)
@@ -481,6 +482,13 @@ with app.app_context():
 
 app.register_blueprint(mcp_army_bp, name='mcp_army_blueprint')
 app.register_blueprint(monitoring_bp, url_prefix='/monitoring')
+
+# Register role-based dashboards
+try:
+    init_role_dashboards_routes(app)
+    app.logger.info("Role-based dashboard routes initialized")
+except Exception as e:
+    app.logger.error(f"Error initializing role-based dashboard routes: {str(e)}")
 
 # Initialize levy worksheet routes
 try:

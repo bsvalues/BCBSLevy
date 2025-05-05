@@ -1,0 +1,259 @@
+{% extends "role_dashboards/base_dashboard.html" %}
+
+{% set role_title = "Clerk Dashboard" %}
+{% set role_description = "Data Management and Initial Entry" %}
+{% set active_tab = "dashboard" %}
+{% set dashboard_url = url_for('role_dashboards.clerk_dashboard') %}
+{% set page_title = "Clerk Dashboard" %}
+{% set show_certification_status = True %}
+{% set certification_percent = 35 %}
+{% set certification_status = "Data entry in progress" %}
+{% set has_quick_actions = True %}
+
+{% set sidebar_items = [
+  {
+    "id": "data_import",
+    "icon": "cloud-upload",
+    "title": "Data Import", 
+    "url": url_for('data_management.import_data')
+  },
+  {
+    "id": "data_validation",
+    "icon": "check-circle",
+    "title": "Data Validation", 
+    "url": url_for('data_quality.dashboard')
+  },
+  {
+    "id": "tax_codes",
+    "icon": "tag",
+    "title": "Tax Codes", 
+    "url": "#"
+  },
+  {
+    "id": "property_data",
+    "icon": "house",
+    "title": "Property Data", 
+    "url": "#"
+  },
+  {
+    "id": "submit_for_review",
+    "icon": "arrow-up-circle",
+    "title": "Submit for Review", 
+    "url": "#"
+  }
+] %}
+
+{% set quick_actions = [
+  {
+    "icon": "upload",
+    "title": "Import New Data",
+    "url": url_for('data_management.import_data')
+  },
+  {
+    "icon": "search",
+    "title": "Find Property Records",
+    "url": "#"
+  },
+  {
+    "icon": "envelope",
+    "title": "Notify Deputy",
+    "url": "#"
+  }
+] %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+  <button type="button" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-cloud-upload me-1"></i> Import
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-success">
+    <i class="bi bi-check-circle me-1"></i> Validate
+  </button>
+</div>
+<button type="button" class="btn btn-sm btn-primary">
+  <i class="bi bi-arrow-up-circle me-1"></i> Submit for Review
+</button>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row mb-4">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-list-check me-2"></i>Clerk Tasks</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Task</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Import 2025 Assessment Data</td>
+                <td>May 15, 2025</td>
+                <td><span class="badge bg-warning text-dark">In Progress</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Continue</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Update Tax Code Rates</td>
+                <td>May 10, 2025</td>
+                <td><span class="badge bg-success">Completed</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-secondary">View</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Verify Property Classifications</td>
+                <td>May 20, 2025</td>
+                <td><span class="badge bg-danger">Not Started</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Start</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Process New Construction Values</td>
+                <td>May 25, 2025</td>
+                <td><span class="badge bg-danger">Not Started</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Start</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-info text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-bar-chart me-2"></i>Data Overview</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <h6 class="text-muted">Data Import Status</h6>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small text-muted mb-0">65% of required data imported</p>
+        </div>
+        
+        <div class="mb-3">
+          <h6 class="text-muted">Data Quality</h6>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: 78%;" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small text-muted mb-0">78% pass quality checks</p>
+        </div>
+        
+        <div>
+          <h6 class="text-muted">Ready for Review</h6>
+          <div class="progress mb-2" style="height: 8px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: 35%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small text-muted mb-0">35% ready for deputy review</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Resources</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-file-text me-3 text-primary fs-5"></i>
+          <div>
+            <a href="#" class="text-decoration-none">Data Entry Guidelines</a>
+            <p class="small text-muted mb-0">Updated May 2, 2025</p>
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-journal-check me-3 text-primary fs-5"></i>
+          <div>
+            <a href="#" class="text-decoration-none">Data Validation Checklist</a>
+            <p class="small text-muted mb-0">Required for submission</p>
+          </div>
+        </li>
+        <li class="list-group-item d-flex align-items-center">
+          <i class="bi bi-question-circle me-3 text-primary fs-5"></i>
+          <div>
+            <a href="#" class="text-decoration-none">Help &amp; Support</a>
+            <p class="small text-muted mb-0">Contact Deputy Assessor</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-dark text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>User</th>
+                <th>Activity</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>May 5, 2025 09:32 AM</td>
+                <td>John Doe</td>
+                <td>Data Import</td>
+                <td>Imported 2025 property assessments (1,250 records)</td>
+              </tr>
+              <tr>
+                <td>May 4, 2025 03:15 PM</td>
+                <td>Jane Smith</td>
+                <td>Tax Code Update</td>
+                <td>Updated levy rates for 15 tax codes</td>
+              </tr>
+              <tr>
+                <td>May 3, 2025 10:45 AM</td>
+                <td>John Doe</td>
+                <td>Data Validation</td>
+                <td>Ran quality checks on assessment data</td>
+              </tr>
+              <tr>
+                <td>May 2, 2025 02:30 PM</td>
+                <td>Jane Smith</td>
+                <td>Property Update</td>
+                <td>Added 32 new construction properties</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-light">
+        <a href="#" class="text-decoration-none">View all activity <i class="bi bi-chevron-right"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

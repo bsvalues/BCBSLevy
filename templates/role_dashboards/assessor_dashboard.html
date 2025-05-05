@@ -1,0 +1,405 @@
+{% extends "role_dashboards/base_dashboard.html" %}
+
+{% set role_title = "Assessor Dashboard" %}
+{% set role_description = "Final Certification and Approval" %}
+{% set active_tab = "dashboard" %}
+{% set dashboard_url = url_for('role_dashboards.assessor_dashboard') %}
+{% set page_title = "Assessor Dashboard" %}
+{% set show_certification_status = True %}
+{% set certification_percent = 85 %}
+{% set certification_status = "Certification in progress" %}
+{% set has_quick_actions = True %}
+
+{% set sidebar_items = [
+  {
+    "id": "certification_queue",
+    "icon": "inboxes",
+    "title": "Certification Queue", 
+    "url": "#"
+  },
+  {
+    "id": "final_review",
+    "icon": "check2-all",
+    "title": "Final Review", 
+    "url": "#"
+  },
+  {
+    "id": "official_reports",
+    "icon": "file-earmark-text",
+    "title": "Official Reports", 
+    "url": "#"
+  },
+  {
+    "id": "public_communications",
+    "icon": "megaphone",
+    "title": "Public Communications", 
+    "url": "#"
+  },
+  {
+    "id": "historical_data",
+    "icon": "calendar3",
+    "title": "Historical Data", 
+    "url": "#"
+  }
+] %}
+
+{% set quick_actions = [
+  {
+    "icon": "check2-all",
+    "title": "Certify Next District",
+    "url": "#"
+  },
+  {
+    "icon": "file-earmark-pdf",
+    "title": "Generate Report",
+    "url": "#"
+  },
+  {
+    "icon": "send",
+    "title": "Publish to Portal",
+    "url": "#"
+  }
+] %}
+
+{% block dashboard_actions %}
+<div class="btn-group me-2">
+  <button type="button" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-eye me-1"></i> Review
+  </button>
+  <button type="button" class="btn btn-sm btn-outline-success">
+    <i class="bi bi-check2-all me-1"></i> Certify
+  </button>
+</div>
+<button type="button" class="btn btn-sm btn-primary">
+  <i class="bi bi-file-earmark-pdf me-1"></i> Generate Official Reports
+</button>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="row mb-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0"><i class="bi bi-inboxes me-2"></i>Certification Queue</h5>
+        <div class="badge bg-light text-primary">5 Pending</div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Tax District</th>
+                <th>Deputy</th>
+                <th>Verification Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>County Hospital District</td>
+                <td>Jane Smith</td>
+                <td>May 5, 2025</td>
+                <td><span class="badge bg-success">Ready for Certification</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-success">Certify</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>City of Springfield</td>
+                <td>John Doe</td>
+                <td>May 4, 2025</td>
+                <td><span class="badge bg-success">Ready for Certification</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-success">Certify</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>County Parks District</td>
+                <td>Jane Smith</td>
+                <td>May 3, 2025</td>
+                <td><span class="badge bg-success">Ready for Certification</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-success">Certify</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Water District #9</td>
+                <td>John Doe</td>
+                <td>May 2, 2025</td>
+                <td><span class="badge bg-success">Ready for Certification</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-success">Certify</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Transit Authority</td>
+                <td>Jane Smith</td>
+                <td>May 1, 2025</td>
+                <td><span class="badge bg-success">Ready for Certification</span></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-primary">Review</button>
+                    <button type="button" class="btn btn-outline-success">Certify</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+        <span class="text-muted small">Showing 5 of 5 pending certifications</span>
+        <button class="btn btn-sm btn-primary">Certify All Verified Districts</button>
+      </div>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0"><i class="bi bi-check2-circle me-2"></i>Recently Certified</h5>
+          </div>
+          <div class="list-group list-group-flush">
+            <div class="list-group-item border-bottom">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">Library District</h6>
+                <small class="text-muted">April 30, 2025</small>
+              </div>
+              <p class="mb-1 small text-muted">Certified by: Alice Johnson</p>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-outline-secondary">View Details</button>
+              </div>
+            </div>
+            <div class="list-group-item border-bottom">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">EMS District #3</h6>
+                <small class="text-muted">April 29, 2025</small>
+              </div>
+              <p class="mb-1 small text-muted">Certified by: Alice Johnson</p>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-outline-secondary">View Details</button>
+              </div>
+            </div>
+            <div class="list-group-item">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">Port Authority</h6>
+                <small class="text-muted">April 28, 2025</small>
+              </div>
+              <p class="mb-1 small text-muted">Certified by: Alice Johnson</p>
+              <div class="d-flex justify-content-end">
+                <button class="btn btn-sm btn-outline-secondary">View Details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0"><i class="bi bi-calendar3 me-2"></i>Important Dates</h5>
+          </div>
+          <div class="list-group list-group-flush">
+            <div class="list-group-item border-bottom bg-light">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">All Districts Certification</h6>
+                <span class="badge bg-danger">Due May 31, 2025</span>
+              </div>
+              <p class="mb-1 small text-muted">Final deadline for all district certifications</p>
+            </div>
+            <div class="list-group-item border-bottom">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">County Commission Meeting</h6>
+                <span class="badge bg-warning text-dark">May 15, 2025</span>
+              </div>
+              <p class="mb-1 small text-muted">Present preliminary levy rates</p>
+            </div>
+            <div class="list-group-item">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">Public Hearing</h6>
+                <span class="badge bg-primary">May 20, 2025</span>
+              </div>
+              <p class="mb-1 small text-muted">Public hearing on proposed levy rates</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-dark text-white">
+        <h5 class="card-title mb-0"><i class="bi bi-graph-up me-2"></i>Certification Progress</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-4 text-center">
+          <div class="position-relative d-inline-block">
+            <div style="height: 150px; width: 150px;">
+              <!-- This would typically be a Chart.js doughnut chart -->
+              <div class="position-relative d-flex align-items-center justify-content-center h-100">
+                <div style="height: 120px; width: 120px; border-radius: 50%; background: conic-gradient(#0d6efd 0% 70%, #e9ecef 70% 100%);"></div>
+                <div class="position-absolute bg-white d-flex align-items-center justify-content-center" style="height: 90px; width: 90px; border-radius: 50%;">
+                  <div>
+                    <h2 class="mb-0 fw-bold">70%</h2>
+                    <p class="small text-muted mb-0">Complete</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="small">Total Districts</span>
+            <span class="small fw-bold">20</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="small">Certified</span>
+            <span class="small fw-bold text-success">14</span>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="small">Pending Certification</span>
+            <span class="small fw-bold text-primary">5</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small">In Process</span>
+            <span class="small fw-bold text-warning">1</span>
+          </div>
+        </div>
+        
+        <div class="alert alert-info small mb-0">
+          <i class="bi bi-info-circle me-2"></i>
+          Certification is ahead of schedule by 2 days.
+        </div>
+      </div>
+    </div>
+    
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0"><i class="bi bi-megaphone me-2"></i>Public Updates</h5>
+      </div>
+      <div class="card-body">
+        <p class="card-text small">Manage public-facing information and updates.</p>
+        
+        <div class="mb-3">
+          <label class="form-label small">Current Public Notice</label>
+          <div class="alert alert-light small mb-2 py-2">
+            <i class="bi bi-info-circle me-2"></i>
+            2025 property tax levy rates are in review. Expected publication date: June 1, 2025.
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="publicNoticeSwitch" checked>
+            <label class="form-check-label small" for="publicNoticeSwitch">Visible on public portal</label>
+          </div>
+        </div>
+        
+        <div class="d-grid gap-2">
+          <button class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-pencil me-2"></i>Update Public Notice
+          </button>
+          <button class="btn btn-sm btn-outline-success">
+            <i class="bi bi-upload me-2"></i>Publish Certified Rates
+          </button>
+          <button class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-newspaper me-2"></i>Press Release Template
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0"><i class="bi bi-file-earmark-text me-2"></i>Official Reports</h5>
+        <button class="btn btn-sm btn-light">
+          <i class="bi bi-file-earmark-pdf me-2"></i>Generate All Reports
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-primary-subtle rounded p-2 me-3">
+                    <i class="bi bi-file-bar-graph text-primary fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Consolidated Levy Report</h6>
+                    <p class="text-muted small mb-0">All districts, all taxes</p>
+                  </div>
+                </div>
+                <p class="small text-muted mb-3">Comprehensive summary of all levy rates and amounts for all districts in the county.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-warning text-dark">70% Complete</span>
+                  <button class="btn btn-sm btn-outline-primary">Generate</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-success-subtle rounded p-2 me-3">
+                    <i class="bi bi-graph-up-arrow text-success fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Year-over-Year Analysis</h6>
+                    <p class="text-muted small mb-0">Comparative report</p>
+                  </div>
+                </div>
+                <p class="small text-muted mb-3">Analysis of changes in levy rates and amounts compared to previous years.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-warning text-dark">65% Complete</span>
+                  <button class="btn btn-sm btn-outline-primary">Generate</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-info-subtle rounded p-2 me-3">
+                    <i class="bi bi-map text-info fs-4"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">Tax Code Area Report</h6>
+                    <p class="text-muted small mb-0">By geographic region</p>
+                  </div>
+                </div>
+                <p class="small text-muted mb-3">Breakdown of levy rates by tax code area for public information purposes.</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge bg-warning text-dark">60% Complete</span>
+                  <button class="btn btn-sm btn-outline-primary">Generate</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

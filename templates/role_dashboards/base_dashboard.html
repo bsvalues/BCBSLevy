@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" id="sidebarMenu">
+      <div class="position-sticky pt-3">
+        <div class="d-flex align-items-center mb-4 px-3">
+          <div class="bg-primary rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+            <i class="bi bi-person-badge-fill text-white fs-4"></i>
+          </div>
+          <div>
+            <h5 class="mb-0">{{ role_title }}</h5>
+            <p class="text-muted small mb-0">{{ role_description }}</p>
+          </div>
+        </div>
+        
+        <hr class="my-3">
+        
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'dashboard' %}active{% endif %}" href="{{ dashboard_url }}">
+              <i class="bi bi-speedometer2 me-2"></i>
+              Overview
+            </a>
+          </li>
+          
+          {% for item in sidebar_items %}
+          <li class="nav-item">
+            <a class="nav-link {% if active_tab == item.id %}active{% endif %}" href="{{ item.url }}">
+              <i class="bi bi-{{ item.icon }} me-2"></i>
+              {{ item.title }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        
+        {% if show_certification_status %}
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Certification Status</span>
+        </h6>
+        <div class="px-3 py-2">
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ certification_percent }}%;" aria-valuenow="{{ certification_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <p class="small text-muted mt-2 mb-0">{{ certification_status }}</p>
+        </div>
+        {% endif %}
+        
+        {% if has_quick_actions %}
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Quick Actions</span>
+        </h6>
+        <div class="px-3 py-2">
+          {% for action in quick_actions %}
+          <a href="{{ action.url }}" class="btn btn-sm btn-outline-primary mb-2 d-block">
+            <i class="bi bi-{{ action.icon }} me-2"></i>{{ action.title }}
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+          <span class="d-inline d-md-none">
+            <button class="btn btn-sm btn-outline-secondary me-2" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+              <i class="bi bi-list"></i>
+            </button>
+          </span>
+          {% block dashboard_title %}{{ page_title }}{% endblock %}
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          {% block dashboard_actions %}{% endblock %}
+        </div>
+      </div>
+      
+      {% block dashboard_content %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // For small screens, collapse sidebar when clicking a link
+    if (window.innerWidth < 768) {
+      document.querySelectorAll('#sidebarMenu .nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+          const sidebar = document.getElementById('sidebarMenu');
+          const bsCollapse = new bootstrap.Collapse(sidebar);
+          bsCollapse.hide();
+        });
+      });
+    }
+  });
+</script>
+{% endblock %}
