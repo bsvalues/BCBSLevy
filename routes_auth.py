@@ -79,7 +79,9 @@ def profile():
     """
     # Use our new template that shows roles
     logger.info(f"Profile page accessed by {current_user.username}")
-    return render_template('auth/profile_with_roles.html')
+    # Create empty user_actions list as a placeholder since the real activity log isn't implemented yet
+    user_actions = []
+    return render_template('auth/profile_with_roles.html', user_actions=user_actions)
 
 
 @auth_bp.route('/change-password', methods=['GET', 'POST'])
