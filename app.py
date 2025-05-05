@@ -106,6 +106,30 @@ def create_app(config_name=None):
         @property
         def last_name(self):
             return "Staff"
+            
+        def has_role(self, role_name):
+            """
+            Check if the user has a specific role.
+            For AutoAuthUser, all roles are granted by default.
+            
+            Args:
+                role_name: The role to check (clerk, deputy, assessor)
+                
+            Returns:
+                True for all roles since this is an auto-authenticated user
+            """
+            return True
+            
+        @property
+        def roles(self):
+            """
+            Get all roles for the user.
+            For AutoAuthUser, all roles are granted by default.
+            
+            Returns:
+                List of all available roles
+            """
+            return ["clerk", "deputy", "assessor"]
 
     # Initialize login manager with auto auth
     login_manager.init_app(app)

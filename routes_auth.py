@@ -6,15 +6,17 @@ This module provides routes for user authentication, including:
 - User login and logout
 - Password management
 - Profile management
+- Role-based access control
 """
 
 import logging
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+import json
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from sqlalchemy import desc
 
 from app import db
-from models import User, UserRole
+from models import User, UserRole, UserActionLog
 from utils.auth_utils import (
     authenticate_user,
     create_user,
@@ -201,6 +203,130 @@ def remove_role(user_id, role):
         flash(f'Error removing role: {str(e)}', 'danger')
     
     return redirect(url_for('auth.manage_roles'))
+
+
+@auth_bp.route('/update-role', methods=['POST'])
+@login_required
+def update_role():
+    """
+    Update a user's role via AJAX.
+    
+    This route is accessible by admin users only and allows them to
+    assign or remove roles from users via AJAX.
+    
+    Expected JSON payload:
+    {
+        "user_id": 123,
+        "role": "clerk",
+        "has_role": true
+    }
+    """
+    if not current_user.is_admin:
+        return jsonify({
+            'success': False,
+            'message': 'Permission denied. Admin access required.'
+        }), 403
+    
+    # Parse JSON request data
+    try:
+        data = request.json
+        user_id = int(data.get('user_id'))
+        role = data.get('role')
+        has_role = data.get('has_role', False)
+        
+        # Validate the role
+        if role not in ['clerk', 'deputy', 'assessor']:
+            return jsonify({
+                'success': False,
+                'message': f'Invalid role: {role}'
+            }), 400
+        
+        # Get the user
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({
+                'success': False,
+                'message': f'User with ID {user_id} not found'
+            }), 404
+        
+        # Check if user is trying to modify their own roles
+        if user_id == current_user.id:
+            return jsonify({
+                'success': False,
+                'message': 'You cannot modify your own roles'
+            }), 403
+        
+        # Update the role
+        if has_role:
+            # Add role if the user doesn't have it
+            if not user.has_role(role):
+                user_role = UserRole(user_id=user.id, role=role)
+                db.session.add(user_role)
+                
+                # Log the action
+                log = UserActionLog(
+                    user_id=current_user.id,
+                    action_type='ROLE_ASSIGNMENT',
+                    module='auth',
+                    submodule='role_management',
+                    entity_type='user',
+                    entity_id=user.id,
+                    action_details={
+                        'role_added': role,
+                        'target_user': user.username
+                    }
+                )
+                db.session.add(log)
+                
+                db.session.commit()
+                return jsonify({
+                    'success': True,
+                    'message': f'Role {role} added to {user.username}'
+                })
+            else:
+                return jsonify({
+                    'success': True,
+                    'message': f'User already has the {role} role'
+                })
+        else:
+            # Remove role if the user has it
+            user_role = UserRole.query.filter_by(user_id=user.id, role=role).first()
+            if user_role:
+                db.session.delete(user_role)
+                
+                # Log the action
+                log = UserActionLog(
+                    user_id=current_user.id,
+                    action_type='ROLE_REMOVAL',
+                    module='auth',
+                    submodule='role_management',
+                    entity_type='user',
+                    entity_id=user.id,
+                    action_details={
+                        'role_removed': role,
+                        'target_user': user.username
+                    }
+                )
+                db.session.add(log)
+                
+                db.session.commit()
+                return jsonify({
+                    'success': True,
+                    'message': f'Role {role} removed from {user.username}'
+                })
+            else:
+                return jsonify({
+                    'success': True,
+                    'message': f'User does not have the {role} role'
+                })
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error updating role: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Error updating role: {str(e)}'
+        }), 500
 
 
 # Note: We'll handle this in the init_auth_routes function instead
