@@ -19,25 +19,25 @@ block content %}
         <div class="card-body">
           <div class="d-grid gap-3">
             <a
-              href="{{ url_for('report_generator') }}"
+              href="{{ url_for('reports.report_generator') }}"
               class="btn btn-outline-primary"
             >
               <i class="bi bi-file-earmark-text me-2"></i> Generate Report
             </a>
             <a
-              href="{{ url_for('report_templates') }}"
+              href="{{ url_for('reports.report_templates') }}"
               class="btn btn-outline-primary"
             >
               <i class="bi bi-list-check me-2"></i> Manage Templates
             </a>
             <a
-              href="{{ url_for('new_report_template') }}"
+              href="{{ url_for('reports.new_report_template') }}"
               class="btn btn-outline-primary"
             >
               <i class="bi bi-plus-circle me-2"></i> Create New Template
             </a>
             <a
-              href="{{ url_for('schedule_report_form') }}"
+              href="{{ url_for('reports.schedule_report_form') }}"
               class="btn btn-outline-primary"
             >
               <i class="bi bi-calendar-event me-2"></i> Schedule Reports
@@ -108,7 +108,7 @@ block content %}
                     'property')|list|length }}
                   </p>
                   <a
-                    href="{{ url_for('report_templates', type='property') }}"
+                    href="{{ url_for('reports.report_templates', type='property') }}"
                     class="btn btn-sm btn-outline-primary"
                     >View</a
                   >
@@ -124,7 +124,7 @@ block content %}
                     'tax_code')|list|length }}
                   </p>
                   <a
-                    href="{{ url_for('report_templates', type='tax_code') }}"
+                    href="{{ url_for('reports.report_templates', type='tax_code') }}"
                     class="btn btn-sm btn-outline-primary"
                     >View</a
                   >
@@ -140,7 +140,7 @@ block content %}
                     'district')|list|length }}
                   </p>
                   <a
-                    href="{{ url_for('report_templates', type='district') }}"
+                    href="{{ url_for('reports.report_templates', type='district') }}"
                     class="btn btn-sm btn-outline-primary"
                     >View</a
                   >
