@@ -106,48 +106,54 @@ def import_form():
 
 @data_management_bp.route("/import/data", methods=["POST"])
 def import_data():
-    """Handle data import from uploaded files."""
-    if "file" not in request.files:
+    """Handle data import file uploads and processing."""
+    # Get form data
+    import_type_str = request.form.get("import_type", "other")
+    year = request.form.get("year", datetime.now().year)
+    notes = request.form.get("notes", "")
+    
+    # Map the import type string to an ImportType enum
+    try:
+        import_type = ImportType[import_type_str.upper()]
+    except KeyError:
+        # Default to OTHER if we can't match the string
+        import_type = ImportType.OTHER
+    
+    # Verify we have a file
+    if 'file' not in request.files:
         flash("No file part", "error")
-        return redirect(url_for("data_management.import_form"))
+        return redirect(url_for('data_management.import_form'))
     
-    file = request.files["file"]
-    if file.filename == "":
+    file = request.files['file']
+    
+    # If user doesn't select file, browser submits an empty file without filename
+    if file.filename == '':
         flash("No selected file", "error")
-        return redirect(request.url)
+        return redirect(url_for('data_management.import_form'))
     
-    if file:
-        # Save the uploaded file to a temporary location
-        filename = secure_filename(file.filename)
+    # Check if the file type is allowed
+    filename = secure_filename(file.filename)
+    file_type = detect_file_type(filename)
+    
+    if not file_type:
+        flash(f"File type not supported: {filename}", "error")
+        return redirect(url_for('data_management.import_form'))
+    
+    # Save the uploaded file temporarily
+    try:
+        # Create a temporary file
         with tempfile.NamedTemporaryFile(delete=False) as temp:
             temp_path = temp.name
             file.save(temp_path)
         
+        # Read data from the file
         try:
-            # Get import parameters
-            import_type_str = request.form.get("import_type", "other")
-            year = request.form.get("year", datetime.now().year)
-            notes = request.form.get("notes", "")
+            data = read_data_from_file(temp_path, file_type)
             
-            # Determine import type
-            try:
-                import_type = ImportType(import_type_str)
-            except ValueError:
-                import_type = ImportType.OTHER
-            
-            # Detect file type
-            file_type = detect_file_type(filename)
-            if not file_type:
-                file_type = "unknown"
-            
-            # Read data from file
-            try:
-                data = read_data_from_file(temp_path, file_type)
-            except Exception as e:
-                logger.error(f"Error reading file: {str(e)}")
-                flash(f"Error reading file: {str(e)}", "error")
+            if not data:
+                flash("No data found in the file", "error")
                 os.unlink(temp_path)
-                return redirect(request.url)
+                return redirect(url_for('data_management.import_form'))
             
             # Process the import based on type
             try:
@@ -188,9 +194,12 @@ def import_data():
             flash(f"Import error: {str(e)}", "error")
             # Clean up temporary file
             os.unlink(temp_path)
-            return redirect(request.url)
+            return redirect(url_for("data_management.import_form"))
     
-    return redirect(request.url)
+    except Exception as e:
+        logger.error(f"File upload error: {str(e)}")
+        flash(f"File upload error: {str(e)}", "error")
+        return redirect(url_for("data_management.import_form"))
 
 
 @data_management_bp.route("/export", methods=["GET"])
@@ -228,11 +237,14 @@ def web_scrape_form():
         {"id": "mlb", "name": "MLB Scores Data"}
     ]
     
+    logger.info(f"Rendering web scrape form template with {len(data_types)} data types")
+    
     return render_template(
         "data_management/web_scrape.html",
         years=years,
         current_year=current_year,
-        data_types=data_types
+        data_types=data_types,
+        title="Web Scraping Tool"
     )
 
 
