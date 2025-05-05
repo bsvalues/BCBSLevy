@@ -1,0 +1,136 @@
+Here are the full contents of the **TerraLevy DevOps Kit** for manual copy/paste into your Replit project:
+
+---
+
+### 📄 `Dockerfile`
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:8000"]
+```
+
+---
+
+### ⚙️ `.replit`
+
+```ini
+run = "python app.py"
+language = "python3"
+entrypoint = "app.py"
+```
+
+---
+
+### 🧪 `replit.nix`
+
+```nix
+{ pkgs }: {
+  deps = [
+    pkgs.python311
+    pkgs.python311Packages.pip
+    pkgs.python311Packages.flask
+    pkgs.python311Packages.gunicorn
+    pkgs.dvc
+  ];
+}
+```
+
+---
+
+### 🚫 `.gitignore`
+
+```gitignore
+__pycache__/
+.env
+*.pyc
+*.pyo
+*.pyd
+*.db
+.DS_Store
+.dvc/cache/
+```
+
+---
+
+### 📘 `README.md`
+
+```markdown
+# TerraLevy Platform (Benton County)
+
+**Purpose**: End-to-end levy certification, audit, and public communication platform for property tax assessment in Benton County.
+
+## Features
+- Role-based dashboards for Clerks, Deputies, Assessors
+- Multi-stage certification workflow (from import to approval)
+- Claude/GPT-powered AI assistant for levy interpretation
+- Interactive map-ready interfaces (ArcGIS compatible)
+- DevOps CI/CD via GitHub + Docker + Replit
+
+## Getting Started
+1. Clone the project in Replit
+2. Install deps via `poetry install` or pip
+3. Run with `python app.py` or `replit run`
+
+## Deployment
+Use included Dockerfile + GitHub Actions for pre-prod delivery.
+```
+
+---
+
+### 📄 `PRODUCT_REQUIREMENTS.md`
+
+```markdown
+# Product Requirements Document (PRD) - TerraLevy
+
+## Target Users
+- County Clerks: responsible for levy input and data validation
+- Deputy Assessors: responsible for statutory review and AI drift analysis
+- County Assessors: final approval and communication
+
+## Core Features
+- File Upload: XLS/XLSX/CSV ingest for levy scenarios
+- RBAC Workflow: multi-stage review pipeline
+- Drift Detection: ML-backed forecasting and red flag warnings
+- Audit Logs: complete before/after snapshots
+- Report Generation: PDF/JSON certification documents
+
+## Future Features
+- Esri Map Layer Integration
+- Treasurer sync API
+- Legislative change simulator
+
+## Non-Functional
+- Replit compatible
+- Fast UI rendering under 100ms DOM load
+- Supports >100 concurrent users
+```
+
+---
+
+### 🧬 `bootstrap.json`
+
+```json
+{
+  "app": {
+    "name": "TerraLevy",
+    "version": "1.0.0",
+    "description": "Benton County's Tax Levy Certification Platform",
+    "roles": ["clerk", "deputy", "assessor"],
+    "api_keys_required": ["openai", "anthropic"],
+    "dependencies": {
+      "python": "3.11",
+      "flask": "^2.3.2",
+      "gunicorn": "^21.2.0",
+      "dvc": "^3.20.1"
+    }
+  }
+}
+```
+
+---
+
+✅ You're fully bootstrapped. Want me to generate the Replit-ready **`app.py` base with role-based routing logic** next?
