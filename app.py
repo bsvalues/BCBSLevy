@@ -7,19 +7,46 @@ historical analysis, and web scraping capabilities.
 
 import os
 import logging
+import sys
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-import trafilatura
 
-# Import database models
-from models import db, ScrapeRequest, ScrapedContent
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
 
-# Import blueprints
-from routes_webscraper import webscraper_bp
+logger.info("Starting TerraLevy application")
+
+try:
+    import trafilatura
+    logger.info("Trafilatura imported successfully")
+except Exception as e:
+    logger.error(f"Error importing trafilatura: {e}")
+    
+try:
+    # Import database models
+    from models import db, ScrapeRequest, ScrapedContent
+    logger.info("Database models imported successfully")
+except Exception as e:
+    logger.error(f"Error importing database models: {e}")
+
+try:
+    # Import blueprints
+    from routes_webscraper import webscraper_bp
+    logger.info("Webscraper blueprint imported successfully")
+except Exception as e:
+    logger.error(f"Error importing blueprints: {e}")
 
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
+logger.info("Flask app initialized")
 
 # Configure database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
@@ -28,20 +55,26 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
+logger.info("Database configured")
 
 # Initialize the database with the app
 db.init_app(app)
+logger.info("Database initialized")
 
 # Register blueprints
-app.register_blueprint(webscraper_bp)
+try:
+    app.register_blueprint(webscraper_bp)
+    logger.info("Webscraper blueprint registered")
+except Exception as e:
+    logger.error(f"Error registering blueprints: {e}")
 
 # Create database tables within app context if they don't exist
-with app.app_context():
-    db.create_all()
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+try:
+    with app.app_context():
+        db.create_all()
+        logger.info("Database tables created")
+except Exception as e:
+    logger.error(f"Error creating database tables: {e}")
 
 # Main routes for TerraLevy application will go here
 @app.route('/')
