@@ -45,11 +45,13 @@ class APICallLog(db.Model):
     endpoint = db.Column(db.String(256), nullable=False)
     request_data = db.Column(db.JSON, nullable=True)
     response_data = db.Column(db.JSON, nullable=True)
+    params = db.Column(db.JSON, nullable=True)  # Request parameters
     status_code = db.Column(db.Integer, nullable=True)
     success = db.Column(db.Boolean, default=True)
     error_message = db.Column(db.Text, nullable=True)
     execution_time = db.Column(db.Float, nullable=True)  # in seconds
     duration_ms = db.Column(db.Integer, nullable=True)  # Duration in milliseconds
+    retry_count = db.Column(db.Integer, default=0, nullable=True)  # Number of API retry attempts
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
     request_id = db.Column(db.String(64), nullable=True, index=True)
     
@@ -144,13 +146,13 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256))
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    role = db.Column(db.String(20), default='user')  # user, admin, clerk, assessor
-    role_id = db.Column(db.Integer, db.ForeignKey('user_role.id'), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)
     last_login = db.Column(db.DateTime)
-    last_password_change = db.Column(db.DateTime)
-    failed_login_attempts = db.Column(db.Integer, default=0)
-    locked = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     
     # Relationships
     tax_districts = db.relationship('TaxDistrict', backref='owner', lazy='dynamic')
@@ -161,15 +163,11 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         """Set password hash for user."""
         self.password_hash = generate_password_hash(password)
-        self.last_password_change = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
     
     def check_password(self, password):
         """Check if password matches hash."""
         return check_password_hash(self.password_hash, password)
-    
-    def is_admin(self):
-        """Check if user is an admin."""
-        return self.role == 'admin'
 
 
 class TaxDistrict(db.Model):
