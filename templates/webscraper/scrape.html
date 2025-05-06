@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Web Scraper - Scrape Content{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="h4 mb-0">Scrape Website Content</h1>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Enter a URL below to extract the main text content from a website. The content will be cleaned and formatted for easy reading.
+                    </p>
+                    
+                    <form method="POST" action="{{ url_for('webscraper.scrape') }}">
+                        <div class="mb-3">
+                            <label for="url" class="form-label">Website URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                </span>
+                                <input type="url" class="form-control" id="url" name="url" placeholder="https://example.com" required>
+                            </div>
+                            <div class="form-text">Enter the full URL including the https:// part</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search me-1"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            Scrape Content
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            {% if recent_requests %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Recent Scraping Requests</h2>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for request in recent_requests %}
+                    <a href="{{ url_for('webscraper.results', request_id=request.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="h6 mb-1 text-truncate" style="max-width: 500px;">{{ request.url }}</h3>
+                            <small class="text-muted">{{ request.created_at|format_date }}</small>
+                        </div>
+                        <span class="badge bg-{{ 'success' if request.status == 'completed' else 'danger' if request.status == 'failed' else 'warning' }} rounded-pill">
+                            {{ request.status }}
+                        </span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">Example URLs to Try</h2>
+                </div>
+                <div class="list-group list-group-flush">
+                    <button class="list-group-item list-group-item-action example-url" data-url="https://en.wikipedia.org/wiki/Web_scraping">
+                        Wikipedia - Web Scraping
+                    </button>
+                    <button class="list-group-item list-group-item-action example-url" data-url="https://www.bbc.com/news">
+                        BBC News
+                    </button>
+                    <button class="list-group-item list-group-item-action example-url" data-url="https://www.mlb.com/scores">
+                        MLB Scores
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click handlers for example URLs
+        const exampleButtons = document.querySelectorAll('.example-url');
+        const urlInput = document.getElementById('url');
+        
+        exampleButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                urlInput.value = this.getAttribute('data-url');
+                urlInput.focus();
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -11,17 +11,41 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Web Scraper</a>
+            <a class="navbar-brand" href="/">TerraLevy</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tax Districts
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/tax_districts">View All Districts</a></li>
+                            <li><a class="dropdown-item" href="/tax_districts/new">Add New District</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Tools
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                            <li><a class="dropdown-item active" href="{{ url_for('webscraper.index') }}">Web Scraper</a></li>
+                            <li><a class="dropdown-item" href="/forecasting">Forecasting</a></li>
+                            <li><a class="dropdown-item" href="/historical_analysis">Historical Analysis</a></li>
+                        </ul>
+                    </li>
+                </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('scrape') }}">Scrape</a>
+                        <a class="btn btn-outline-light btn-sm" href="{{ url_for('webscraper.scrape') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search me-1"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            Scrape Content
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -45,7 +69,7 @@
 
     <footer class="footer mt-5 py-3 bg-light">
         <div class="container text-center">
-            <span class="text-muted">Web Scraper Application &copy; {{ now().year }}</span>
+            <span class="text-muted">TerraLevy &copy; {{ now().year }} | Web Scraper Tool</span>
         </div>
     </footer>
 

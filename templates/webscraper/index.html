@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Web Scraper - Home{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Web Scraper Application</h1>
+            <p class="lead mb-5">
+                Extract readable content from websites with our powerful web scraping tool. 
+                Get clean, structured text without the HTML mess.
+            </p>
+            
+            <div class="card mb-5">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">Key Features</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="feature-box p-3">
+                                <div class="icon-box mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-code"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                </div>
+                                <h3 class="h5">Clean Text Extraction</h3>
+                                <p class="small text-muted">Extract readable content from any website without HTML markup</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box p-3">
+                                <div class="icon-box mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                </div>
+                                <h3 class="h5">Fast Processing</h3>
+                                <p class="small text-muted">Advanced algorithms to quickly process and extract content</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box p-3">
+                                <div class="icon-box mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-database"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                                </div>
+                                <h3 class="h5">Content Storage</h3>
+                                <p class="small text-muted">Save extracted content for future reference</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('webscraper.scrape') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                    Start Scraping
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h2 class="text-center mb-4">How It Works</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                    <span class="h3 mb-0">1</span>
+                                </div>
+                            </div>
+                            <h3 class="h5">Enter URL</h3>
+                            <p class="card-text">Paste any website URL that you want to extract content from</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                    <span class="h3 mb-0">2</span>
+                                </div>
+                            </div>
+                            <h3 class="h5">Process</h3>
+                            <p class="card-text">Our system extracts the main content, removing ads, navigation, and other clutter</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                    <span class="h3 mb-0">3</span>
+                                </div>
+                            </div>
+                            <h3 class="h5">View Results</h3>
+                            <p class="card-text">Get clean, readable text that you can use for analysis, summaries, or other needs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+    .feature-box {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+    .feature-box:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-5px);
+    }
+    .icon-box {
+        color: #0d6efd;
+    }
+</style>
+{% endblock %}
