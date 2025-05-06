@@ -1,145 +1,34 @@
-{% extends "simple_base.html" %} {% block title %}{{ error_title|default("404 -
-Page Not Found") }} - LevyMaster{% endblock %} {% block page_header %}
-<div class="app-header-bg py-5 text-center">
-  <div class="container">
+{% extends 'base.html' %}
+
+{% block title %}
+{% if error_code %}
+    Error {{ error_code }} - {{ error_title }}
+{% else %}
+    Error 404 - Page Not Found
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
     <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <h1 class="display-4 fw-bold mb-3">{{ error_code|default("404") }}</h1>
-        <p class="lead fs-3 mb-2">
-          {{ error_title|default("Page Not Found") }}
-        </p>
-        <p class="lead mb-4">
-          {{ error_message|default("The page you're looking for doesn't exist or
-          has been moved.") }}
-        </p>
-        <div class="d-flex flex-wrap justify-content-center gap-3">
-          <a
-            href="{{ url_for('home.index') }}"
-            class="btn btn-primary rounded-pill px-4 py-2"
-          >
-            <i class="bi bi-house-door me-2"></i>Back to Home
-          </a>
-          <a
-            href="{{ url_for('home.demo_dashboard') }}"
-            class="btn btn-outline-light rounded-pill px-4 py-2"
-          >
-            <i class="bi bi-speedometer2 me-2"></i>Dashboard
-          </a>
+        <div class="col-md-8">
+            <div class="error-page">
+                <h1 class="display-1 text-danger">
+                    {% if error_code %}{{ error_code }}{% else %}404{% endif %}
+                </h1>
+                <h2 class="mb-4">
+                    {% if error_title %}{{ error_title }}{% else %}Page Not Found{% endif %}
+                </h2>
+                <p class="lead mb-5">
+                    {% if error_message %}
+                        {{ error_message }}
+                    {% else %}
+                        The page you are looking for does not exist or has been moved.
+                    {% endif %}
+                </p>
+                <a href="/" class="btn btn-primary">Return to Home</a>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-</div>
-{% endblock %} {% block content %}
-<div class="text-center">
-  <h2>LevyMaster</h2>
-  <p class="lead text-secondary">Tax Calculation and Levy Management</p>
-  <p class="text-muted mb-4">
-    A comprehensive tax calculation and levy management system with intelligent
-    analysis capabilities.
-  </p>
-
-  <div class="row justify-content-center mb-4">
-    <div class="col-md-8">
-      <div class="row row-cols-2 row-cols-md-4 g-3">
-        <div class="col">
-          <a href="{{ url_for('home.index') }}" class="text-decoration-none">
-            <div
-              class="d-flex flex-column align-items-center p-3 rounded border shadow-sm hover-card"
-            >
-              <i
-                class="bi bi-house-door mb-2"
-                style="font-size: 2rem; color: var(--primary-color)"
-              ></i>
-              <span class="text-dark">Home</span>
-            </div>
-          </a>
-        </div>
-        <div class="col">
-          <a
-            href="{{ url_for('mcp_ui.agent_registry') }}"
-            class="text-decoration-none"
-          >
-            <div
-              class="d-flex flex-column align-items-center p-3 rounded border shadow-sm hover-card"
-            >
-              <i
-                class="bi bi-robot mb-2"
-                style="font-size: 2rem; color: var(--primary-color)"
-              ></i>
-              <span class="text-dark">Agent Dashboard</span>
-            </div>
-          </a>
-        </div>
-        <div class="col">
-          <a
-            href="{{ url_for('mcp_ui.workflow_designer') }}"
-            class="text-decoration-none"
-          >
-            <div
-              class="d-flex flex-column align-items-center p-3 rounded border shadow-sm hover-card"
-            >
-              <i
-                class="bi bi-diagram-3 mb-2"
-                style="font-size: 2rem; color: var(--primary-color)"
-              ></i>
-              <span class="text-dark">Workflow Designer</span>
-            </div>
-          </a>
-        </div>
-        <div class="col">
-          <a
-            href="{{ url_for('mcp_ui.agent_playground') }}"
-            class="text-decoration-none"
-          >
-            <div
-              class="d-flex flex-column align-items-center p-3 rounded border shadow-sm hover-card"
-            >
-              <i
-                class="bi bi-play-circle mb-2"
-                style="font-size: 2rem; color: var(--primary-color)"
-              ></i>
-              <span class="text-dark">Agent Playground</span>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <h5>Quick Links</h5>
-  <ul class="list-inline">
-    <li class="list-inline-item">
-      <a
-        href="{{ url_for('mcp_ui.agent_registry') }}"
-        class="text-decoration-none link-primary"
-        >Agent Dashboard</a
-      >
-    </li>
-    <li class="list-inline-item">•</li>
-    <li class="list-inline-item">
-      <a
-        href="{{ url_for('mcp_ui.workflow_designer') }}"
-        class="text-decoration-none link-primary"
-        >Workflow Designer</a
-      >
-    </li>
-    <li class="list-inline-item">•</li>
-    <li class="list-inline-item">
-      <a
-        href="{{ url_for('mcp_ui.agent_playground') }}"
-        class="text-decoration-none link-primary"
-        >Agent Playground</a
-      >
-    </li>
-    <li class="list-inline-item">•</li>
-    <li class="list-inline-item">
-      <a
-        href="{{ url_for('home.help_page') }}"
-        class="text-decoration-none link-primary"
-        >Resources</a
-      >
-    </li>
-  </ul>
 </div>
 {% endblock %}

@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title %}Web Scraper - Home{% endblock %}
+{% block title %}TerraLevy - Tax District Management{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 text-center">
-            <h1 class="display-4 mb-4">Web Scraper Application</h1>
+            <h1 class="display-4 mb-4">TerraLevy</h1>
             <p class="lead mb-5">
-                Extract readable content from websites with our powerful web scraping tool. 
-                Get clean, structured text without the HTML mess.
+                Comprehensive tax district and levy management system for local governments.
+                Analyze, calculate, and forecast property tax levies with precision.
             </p>
             
             <div class="card mb-5">
@@ -19,19 +19,19 @@
                         <div class="col-md-4">
                             <div class="feature-box p-3">
                                 <div class="icon-box mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-code"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-pie-chart"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
                                 </div>
-                                <h3 class="h5">Clean Text Extraction</h3>
-                                <p class="small text-muted">Extract readable content from any website without HTML markup</p>
+                                <h3 class="h5">Levy Analysis</h3>
+                                <p class="small text-muted">Comprehensive analysis tools for tax levy planning and forecasting</p>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="feature-box p-3">
                                 <div class="icon-box mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                                 </div>
-                                <h3 class="h5">Fast Processing</h3>
-                                <p class="small text-muted">Advanced algorithms to quickly process and extract content</p>
+                                <h3 class="h5">Forecasting</h3>
+                                <p class="small text-muted">Advanced algorithms to predict future levy rates and impacts</p>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -39,8 +39,8 @@
                                 <div class="icon-box mb-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-database"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
                                 </div>
-                                <h3 class="h5">Content Storage</h3>
-                                <p class="small text-muted">Save extracted content for future reference</p>
+                                <h3 class="h5">Data Management</h3>
+                                <p class="small text-muted">Centralized storage for tax districts, codes, and historical rates</p>
                             </div>
                         </div>
                     </div>
@@ -48,8 +48,8 @@
             </div>
             
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a href="{{ url_for('scrape') }}" class="btn btn-primary btn-lg px-4 gap-3">
-                    Start Scraping
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                    Go to Dashboard
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </a>
             </div>
@@ -58,7 +58,7 @@
     
     <div class="row mt-5">
         <div class="col-md-12">
-            <h2 class="text-center mb-4">How It Works</h2>
+            <h2 class="text-center mb-4">System Components</h2>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card h-100">
@@ -68,8 +68,8 @@
                                     <span class="h3 mb-0">1</span>
                                 </div>
                             </div>
-                            <h3 class="h5">Enter URL</h3>
-                            <p class="card-text">Paste any website URL that you want to extract content from</p>
+                            <h3 class="h5">Data Import</h3>
+                            <p class="card-text">Import tax district data, property valuations, and historical rates</p>
                         </div>
                     </div>
                 </div>
@@ -81,8 +81,8 @@
                                     <span class="h3 mb-0">2</span>
                                 </div>
                             </div>
-                            <h3 class="h5">Process</h3>
-                            <p class="card-text">Our system extracts the main content, removing ads, navigation, and other clutter</p>
+                            <h3 class="h5">Analysis & Calculation</h3>
+                            <p class="card-text">Analyze trends, create scenarios, and calculate levy rates</p>
                         </div>
                     </div>
                 </div>
@@ -94,8 +94,8 @@
                                     <span class="h3 mb-0">3</span>
                                 </div>
                             </div>
-                            <h3 class="h5">View Results</h3>
-                            <p class="card-text">Get clean, readable text that you can use for analysis, summaries, or other needs</p>
+                            <h3 class="h5">Reports & Exports</h3>
+                            <p class="card-text">Generate detailed reports and export data for presentations and compliance</p>
                         </div>
                     </div>
                 </div>
