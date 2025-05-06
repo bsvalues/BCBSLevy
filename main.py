@@ -1,48 +1,21 @@
 """
-PRODUCTION ENTRY POINT for the TerraLevy application.
+Web Scraper Application - Primary entry point.
 
 This module serves as the primary entry point for running the Flask
-application in production with Gunicorn, as well as for direct execution
-with the Flask development server.
-
-This file provides:
-1. The 'app' object that Gunicorn looks for when starting the server
-2. Basic logging configuration
-3. Proper host/port binding for development server execution
-
-Part of the TerraFusion Platform ecosystem.
-
-NOTE: This file imports from app.py, which is the authoritative source
-for all application configuration, blueprints, and route registration.
+application with Gunicorn, as well as for direct execution with
+the Flask development server.
 """
 
 import os
 import logging
-import signal
-import sys
 
+# Import the app from app.py
 from app import app
 
 # Configure logging for debugging
 logging.basicConfig(level=logging.DEBUG)
 
-# Log that application is being served
-app.logger.info("Starting TerraLevy application")
-
-# Signal handling for graceful shutdown
-def handle_signal(sig, frame):
-    """Handle shutdown signals gracefully."""
-    app.logger.info(f"Received signal {sig}, shutting down...")
-    sys.exit(0)
-
-signal.signal(signal.SIGTERM, handle_signal)
-signal.signal(signal.SIGINT, handle_signal)
-
-# Health check route for container orchestration
-@app.route('/health')
-def health_check():
-    """Health check endpoint for monitoring."""
-    return {'status': 'healthy', 'service': 'terralevy', 'platform': 'terrafusion'}, 200
+# Note: Health check route is now defined in app.py
 
 # This makes the app discoverable by Gunicorn
 # Do not modify this section - Gunicorn looks for app in this location

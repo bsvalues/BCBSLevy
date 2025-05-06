@@ -1,888 +1,122 @@
-{% extends "terralevy-base.html" %} 
-{% block title %}TerraLevy - Tax Calculation and Levy Management System{% endblock %} 
+{% extends 'base.html' %}
+
+{% block title %}Web Scraper - Home{% endblock %}
 
 {% block content %}
-<!-- Hero Section with Animated Background -->
-<div class="hero-section text-center py-5">
-  <div class="container position-relative" style="z-index: 2">
+<div class="container py-5">
     <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="mt-5 mb-5" id="main-header">
-          <!-- Platform Logo Badge -->
-          <div class="mx-auto mb-4">
-            <img src="{{ url_for('static', filename='images/terralevy-logo.svg') }}" alt="TerraLevy" class="img-fluid" style="max-width: 180px;">
-          </div>
-
-          <h1 class="display-2 fw-bold mb-3 gradient-text">TerraLevy</h1>
-          <p class="lead mb-4 fs-4 text-dark">
-            Advanced Tax Calculation System
-          </p>
-          <p class="lead mb-5 text-dark">
-            Comprehensive levy management with intelligent AI-powered analysis
-            and forecasting
-          </p>
-
-          <!-- Main navigation buttons -->
-          <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mb-3">
-            <a
-              href="{{ url_for('home.demo_dashboard') }}"
-              class="btn btn-danger btn-lg px-4 rounded-pill"
-            >
-              <i class="bi bi-speedometer2 me-2"></i>Demo Dashboard
-            </a>
-            <a
-              href="{{ url_for('levy_calculator.calculator') }}"
-              class="btn btn-primary btn-lg px-4 rounded-pill"
-            >
-              <i class="bi bi-calculator me-2"></i>Levy Calculator
-            </a>
-            <a
-              href="{{ url_for('forecasting.index') }}"
-              class="btn btn-outline-light btn-lg px-4 rounded-pill"
-            >
-              <i class="bi bi-graph-up me-2"></i>Forecasting Tools
-            </a>
-            <a
-              href="{{ url_for('mcp_army_dashboard_direct') }}"
-              class="btn btn-success btn-lg px-4 rounded-pill"
-            >
-              <i class="bi bi-diagram-3 me-2"></i>Agent Dashboard
-            </a>
-          </div>
-
-          <!-- Full Navigation Panel -->
-          <div class="bg-dark bg-opacity-50 rounded-4 p-4 mb-4 text-start">
-            <h5 class="border-bottom border-light pb-2 mb-3 text-light">
-              Tax System Navigation
-            </h5>
-            <div class="row g-3">
-              <div class="col-md-4">
-                <h6 class="text-light mb-2">
-                  <i class="bi bi-calculator me-2"></i>Levy Calculation
-                </h6>
-                <ul class="list-unstyled">
-                  <li>
-                    <a
-                      href="{{ url_for('levy_calculator.calculator') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Basic
-                      Calculator</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="{{ url_for('levy_calculator.impact_calculator') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Impact
-                      Calculator</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="{{ url_for('budget_impact.index') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Budget
-                      Analysis</a
-                    >
-                  </li>
-                </ul>
-              </div>
-              <div class="col-md-4">
-                <h6 class="text-light mb-2">
-                  <i class="bi bi-graph-up me-2"></i>Analysis & Forecasting
-                </h6>
-                <ul class="list-unstyled">
-                  <li>
-                    <a
-                      href="{{ url_for('forecasting.index') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Rate
-                      Forecasting</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="{{ url_for('historical_analysis.compliance') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Historical
-                      Analysis</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="{{ url_for('levy_audit.index') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Levy Audit</a
-                    >
-                  </li>
-                </ul>
-              </div>
-              <div class="col-md-4">
-                <h6 class="text-light mb-2">
-                  <i class="bi bi-robot me-2"></i>AI Assistance
-                </h6>
-                <ul class="list-unstyled">
-                  <li>
-                    <a
-                      href="{{ url_for('mcp_army_dashboard_direct') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Agent
-                      Dashboard</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="{{ url_for('mcp.insights') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> AI Insights</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="{{ url_for('tax_strategy.index') }}"
-                      class="text-light text-decoration-none"
-                      ><i class="bi bi-arrow-right-short"></i> Tax Strategy</a
-                    >
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Animated particles background -->
-  <div
-    id="particles-js"
-    class="position-absolute top-0 start-0 w-100 h-100"
-    style="z-index: 1"
-  ></div>
-</div>
-
-<!-- Tools Showcase Carousel Section -->
-<div data-auto-tour="dashboard">
-  <!-- Tools Showcase Carousel Section -->
-  <section
-    class="py-5 tools-carousel-section"
-    style="background-color: #f8fafc"
-  >
-    <div class="container">
-      <div class="text-center mb-4">
-        <h2 class="display-5 fw-bold">Explore Our Platform</h2>
-        <p class="lead text-muted">See what LevyMaster can do for you</p>
-        <div
-          class="separator mx-auto my-4"
-          style="
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, #3da5bd, #66a355);
-          "
-        ></div>
-      </div>
-
-      <!-- Carousel with Tool Spotlights -->
-      <div
-        id="toolsCarousel"
-        class="carousel slide mb-5"
-        data-bs-ride="carousel"
-        data-bs-interval="5000"
-      >
-        <div class="carousel-indicators">
-          <button
-            type="button"
-            data-bs-target="#toolsCarousel"
-            data-bs-slide-to="0"
-            class="active"
-            aria-current="true"
-            aria-label="Agent Management"
-          ></button>
-          <button
-            type="button"
-            data-bs-target="#toolsCarousel"
-            data-bs-slide-to="1"
-            aria-label="Workflow Designer"
-          ></button>
-          <button
-            type="button"
-            data-bs-target="#toolsCarousel"
-            data-bs-slide-to="2"
-            aria-label="Performance Analytics"
-          ></button>
-        </div>
-        <div
-          class="carousel-inner rounded-4 overflow-hidden"
-          style="box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1)"
-        >
-          <!-- Slide 1: Agent Management -->
-          <div class="carousel-item active">
-            <div class="position-relative" style="height: 400px">
-              <img
-                src="{{ url_for('static', filename='images/carousel/rsmtn+sunset-composit.jpg') }}"
-                class="d-block w-100 h-100"
-                style="object-fit: cover; object-position: center"
-                alt="Agent Management"
-              />
-              <div
-                class="carousel-caption d-none d-md-block text-start position-absolute"
-                style="
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  background: linear-gradient(
-                    90deg,
-                    rgba(29, 58, 84, 0.8),
-                    rgba(29, 58, 84, 0.6),
-                    rgba(29, 58, 84, 0.2)
-                  );
-                  padding: 2rem;
-                "
-              >
-                <div class="row h-100 align-items-center">
-                  <div class="col-md-6">
-                    <h3 class="display-6 fw-bold mb-3">
-                      Levy Calculator Suite
-                    </h3>
-                    <p class="lead mb-4">
-                      Calculate, analyze, and optimize property tax levies with
-                      our comprehensive tax calculation tools.
-                    </p>
-                    <div class="d-flex gap-3">
-                      <a
-                        href="{{ url_for('levy_calculator.calculator') }}"
-                        class="btn btn-primary rounded-pill px-4"
-                      >
-                        <i class="bi bi-calculator me-2"></i>Open Calculator
-                      </a>
-                      <a
-                        href="{{ url_for('levy_calculator.impact_calculator') }}"
-                        class="btn btn-outline-light rounded-pill px-4"
-                      >
-                        <i class="bi bi-info-circle me-2"></i>Impact Analysis
-                      </a>
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Web Scraper Application</h1>
+            <p class="lead mb-5">
+                Extract readable content from websites with our powerful web scraping tool. 
+                Get clean, structured text without the HTML mess.
+            </p>
+            
+            <div class="card mb-5">
+                <div class="card-body p-4">
+                    <h2 class="h4 mb-3">Key Features</h2>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="feature-box p-3">
+                                <div class="icon-box mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-code"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                                </div>
+                                <h3 class="h5">Clean Text Extraction</h3>
+                                <p class="small text-muted">Extract readable content from any website without HTML markup</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box p-3">
+                                <div class="icon-box mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                                </div>
+                                <h3 class="h5">Fast Processing</h3>
+                                <p class="small text-muted">Advanced algorithms to quickly process and extract content</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-box p-3">
+                                <div class="icon-box mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-database"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                                </div>
+                                <h3 class="h5">Content Storage</h3>
+                                <p class="small text-muted">Save extracted content for future reference</p>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <!-- Slide 2: Workflow Designer -->
-          <div class="carousel-item">
-            <div class="position-relative" style="height: 400px">
-              <img
-                src="{{ url_for('static', filename='images/carousel/3629742582_a3a12b5359_b.jpg') }}"
-                class="d-block w-100 h-100"
-                style="object-fit: cover; object-position: center"
-                alt="Workflow Designer"
-              />
-              <div
-                class="carousel-caption d-none d-md-block text-start position-absolute"
-                style="
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  background: linear-gradient(
-                    90deg,
-                    rgba(102, 163, 85, 0.8),
-                    rgba(102, 163, 85, 0.6),
-                    rgba(102, 163, 85, 0.2)
-                  );
-                  padding: 2rem;
-                "
-              >
-                <div class="row h-100 align-items-center">
-                  <div class="col-md-6">
-                    <h3 class="display-6 fw-bold mb-3">Rate Forecasting</h3>
-                    <p class="lead mb-4">
-                      Predict future levy rates with confidence using our
-                      advanced statistical models and visualization tools.
-                    </p>
-                    <div class="d-flex gap-3">
-                      <a
-                        href="{{ url_for('forecasting.index') }}"
-                        class="btn btn-dark rounded-pill px-4"
-                      >
-                        <i class="bi bi-graph-up me-2"></i>Create Forecast
-                      </a>
-                      <a
-                        href="{{ url_for('historical_analysis.compliance') }}"
-                        class="btn btn-outline-dark rounded-pill px-4"
-                      >
-                        <i class="bi bi-card-list me-2"></i>Historical Rates
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Slide 3: Performance Analytics -->
-          <div class="carousel-item">
-            <div class="position-relative" style="height: 400px">
-              <img
-                src="{{ url_for('static', filename='images/carousel/Arizona-sunset.jpg') }}"
-                class="d-block w-100 h-100"
-                style="object-fit: cover; object-position: center"
-                alt="Performance Analytics"
-              />
-              <div
-                class="carousel-caption d-none d-md-block text-start position-absolute"
-                style="
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  background: linear-gradient(
-                    90deg,
-                    rgba(61, 165, 189, 0.8),
-                    rgba(61, 165, 189, 0.6),
-                    rgba(61, 165, 189, 0.2)
-                  );
-                  padding: 2rem;
-                "
-              >
-                <div class="row h-100 align-items-center">
-                  <div class="col-md-6">
-                    <h3 class="display-6 fw-bold mb-3">Compliance Audit</h3>
-                    <p class="lead mb-4">
-                      Ensure tax calculations meet regulatory requirements with
-                      our AI-powered levy audit system.
-                    </p>
-                    <div class="d-flex gap-3">
-                      <a
-                        href="{{ url_for('levy_audit.index') }}"
-                        class="btn btn-light rounded-pill px-4"
-                      >
-                        <i class="bi bi-shield-check me-2"></i>Audit Levy
-                      </a>
-                      <a
-                        href="{{ url_for('historical_analysis.compliance') }}"
-                        class="btn btn-outline-light rounded-pill px-4"
-                      >
-                        <i class="bi bi-file-earmark-text me-2"></i>Compliance
-                        Reports
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <button
-          class="carousel-control-prev"
-          type="button"
-          data-bs-target="#toolsCarousel"
-          data-bs-slide="prev"
-        >
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button
-          class="carousel-control-next"
-          type="button"
-          data-bs-target="#toolsCarousel"
-          data-bs-slide="next"
-        >
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Section with Elegant Cards -->
-  <section class="py-5 features-section">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="display-5 fw-bold">Advanced Tax Calculation Features</h2>
-        <p class="lead text-muted">
-          Comprehensive tools for levy management, forecasting, and compliance
-        </p>
-        <div
-          class="separator mx-auto my-4"
-          style="
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, #3da5bd, #66a355);
-          "
-        ></div>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div
-            class="card h-100 border-0 shadow-sm hover-card"
-            data-tour="levy-calculator"
-            style="overflow: hidden"
-          >
-            <div
-              class="position-absolute top-0 start-0 w-100 h-2"
-              style="
-                background: linear-gradient(90deg, #3da5bd, #5da2b3);
-                height: 4px;
-              "
-            ></div>
-            <div class="card-body text-center p-5">
-              <div
-                class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3"
-                style="background-color: rgba(61, 165, 189, 0.1)"
-              >
-                <i class="bi bi-calculator" style="color: #3da5bd"></i>
-              </div>
-              <h3 class="card-title h4 mb-3 fw-bold">Levy Calculation</h3>
-              <p class="card-text text-muted">
-                Accurately calculate property tax levies with our comprehensive
-                calculator suite, supporting multiple tax codes and districts.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div
-            class="card h-100 border-0 shadow-sm hover-card"
-            data-tour="forecasting"
-            style="overflow: hidden"
-          >
-            <div
-              class="position-absolute top-0 start-0 w-100 h-2"
-              style="
-                background: linear-gradient(90deg, #66a355, #78c265);
-                height: 4px;
-              "
-            ></div>
-            <div class="card-body text-center p-5">
-              <div
-                class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3"
-                style="background-color: rgba(102, 163, 85, 0.1)"
-              >
-                <i class="bi bi-graph-up" style="color: #66a355"></i>
-              </div>
-              <h3 class="card-title h4 mb-3 fw-bold">Rate Forecasting</h3>
-              <p class="card-text text-muted">
-                Predict future levy rates using advanced statistical models and
-                AI-enhanced forecasting with customizable confidence intervals.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div
-            class="card h-100 border-0 shadow-sm hover-card"
-            data-tour="compliance"
-            style="overflow: hidden"
-          >
-            <div
-              class="position-absolute top-0 start-0 w-100 h-2"
-              style="
-                background: linear-gradient(90deg, #f0c75c, #f5d78a);
-                height: 4px;
-              "
-            ></div>
-            <div class="card-body text-center p-5">
-              <div
-                class="feature-icon mb-4 d-inline-flex align-items-center justify-content-center fs-2 rounded-circle p-3"
-                style="background-color: rgba(240, 199, 92, 0.1)"
-              >
-                <i class="bi bi-shield-check" style="color: #f0c75c"></i>
-              </div>
-              <h3 class="card-title h4 mb-3 fw-bold">Compliance Audit</h3>
-              <p class="card-text text-muted">
-                Ensure tax calculations meet all regulatory requirements with
-                our AI-powered levy audit system and compliance verification
-                tools.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Dashboard Preview Section with Modern Design -->
-  <section class="py-5 my-5 app-header-bg rounded-4 mx-3">
-    <div class="container py-4">
-      <div class="row align-items-center">
-        <div class="col-lg-5 mb-4 mb-lg-0">
-          <h2 class="display-6 fw-bold mb-4">Tax Analysis Center</h2>
-          <p class="lead mb-4 text-light opacity-90">
-            Leverage AI-powered tools to analyze, optimize, and validate your
-            property tax calculations.
-          </p>
-          <div class="bg-white bg-opacity-10 p-4 rounded-3 mb-4">
-            <ul class="list-unstyled mb-0">
-              <li class="mb-3 d-flex align-items-center">
-                <i
-                  class="bi bi-check-circle-fill text-white me-3"
-                  style="color: #f0c75c !important"
-                ></i>
-                <span class="text-light"
-                  >Comprehensive tax district analysis</span
-                >
-              </li>
-              <li class="mb-3 d-flex align-items-center">
-                <i
-                  class="bi bi-check-circle-fill text-white me-3"
-                  style="color: #f0c75c !important"
-                ></i>
-                <span class="text-light"
-                  >Multi-year rate trend visualization</span
-                >
-              </li>
-              <li class="mb-3 d-flex align-items-center">
-                <i
-                  class="bi bi-check-circle-fill text-white me-3"
-                  style="color: #f0c75c !important"
-                ></i>
-                <span class="text-light"
-                  >Automatic compliance verification</span
-                >
-              </li>
-            </ul>
-          </div>
-          <a
-            href="{{ url_for('mcp_army_dashboard_direct') }}"
-            class="btn btn-light rounded-pill px-4 fw-medium"
-          >
-            <i class="bi bi-graph-up me-2"></i>Open Analysis Center
-          </a>
-        </div>
-        <div class="col-lg-7">
-          <div
-            class="card border-0 shadow-lg rounded-4 overflow-hidden position-relative"
-          >
-            <!-- Decorative dots pattern overlay -->
-            <div class="position-absolute top-0 end-0 p-3">
-              <svg
-                width="80"
-                height="80"
-                viewBox="0 0 100 100"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="10" cy="10" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="25" cy="10" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="40" cy="10" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="10" cy="25" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="25" cy="25" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="40" cy="25" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="10" cy="40" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="25" cy="40" r="2" fill="#3DA5BD" opacity="0.5" />
-                <circle cx="40" cy="40" r="2" fill="#3DA5BD" opacity="0.5" />
-              </svg>
-            </div>
-            <img
-              src="{{ url_for('static', filename='images/dashboard-preview.png') }}"
-              alt="LevyMaster Dashboard"
-              class="img-fluid"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Reports & Export Features Section -->
-  <section class="py-5 reports-section" style="background-color: #f8fafc">
-    <div class="container">
-      <div class="text-center mb-5">
-        <h2 class="display-5 fw-bold">Tax Rate Analytics & Reports</h2>
-        <p class="lead text-muted">
-          Gain in-depth understanding of your levy calculations and tax district
-          performance
-        </p>
-        <div
-          class="separator mx-auto my-4"
-          style="
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, #3da5bd, #66a355);
-          "
-        ></div>
-      </div>
-
-      <div class="row align-items-center">
-        <div class="col-lg-6 mb-4 mb-lg-0">
-          <img
-            src="{{ url_for('static', filename='images/reports-preview.png') }}"
-            alt="Reports Preview"
-            class="img-fluid rounded-4 shadow-lg"
-          />
-        </div>
-        <div class="col-lg-6">
-          <h3 class="h2 fw-bold mb-4">Comprehensive Tax Analytics</h3>
-          <p class="lead mb-4">
-            Monitor levy rates, analyze property tax trends, and optimize your
-            tax strategies with detailed metrics.
-          </p>
-
-          <div class="row g-4 mb-4">
-            <div class="col-md-6">
-              <div class="d-flex">
-                <div
-                  class="feature-icon me-3 p-3 rounded-circle"
-                  style="background-color: rgba(61, 165, 189, 0.1)"
-                >
-                  <i class="bi bi-graph-up" style="color: #3da5bd"></i>
-                </div>
-                <div>
-                  <h4 class="h5 fw-bold">Historical Analysis</h4>
-                  <p class="text-muted small">
-                    Track tax rate trends, year-over-year changes, and statutory
-                    limit compliance
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="d-flex">
-                <div
-                  class="feature-icon me-3 p-3 rounded-circle"
-                  style="background-color: rgba(102, 163, 85, 0.1)"
-                >
-                  <i
-                    class="bi bi-file-earmark-bar-graph"
-                    style="color: #66a355"
-                  ></i>
-                </div>
-                <div>
-                  <h4 class="h5 fw-bold">Compliance Reports</h4>
-                  <p class="text-muted small">
-                    Generate detailed compliance reports for regulatory
-                    requirements and auditing
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="d-flex">
-                <div
-                  class="feature-icon me-3 p-3 rounded-circle"
-                  style="background-color: rgba(240, 199, 92, 0.1)"
-                >
-                  <i class="bi bi-reception-4" style="color: #f0c75c"></i>
-                </div>
-                <div>
-                  <h4 class="h5 fw-bold">Rate Forecasting</h4>
-                  <p class="text-muted small">
-                    Project future tax rates using historical data and economic
-                    indicators
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="d-flex">
-                <div
-                  class="feature-icon me-3 p-3 rounded-circle"
-                  style="background-color: rgba(83, 123, 156, 0.1)"
-                >
-                  <i class="bi bi-building" style="color: #537b9c"></i>
-                </div>
-                <div>
-                  <h4 class="h5 fw-bold">District Comparison</h4>
-                  <p class="text-muted small">
-                    Compare tax districts for comprehensive analysis and
-                    strategic planning
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <a
-            href="{{ url_for('reports.reports_dashboard') }}"
-            class="btn btn-primary rounded-pill px-4"
-          >
-            <i class="bi bi-file-earmark-text me-2"></i>View Reports
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AI Features Showcase Section -->
-  <section class="py-5 ai-features-section">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-5 order-lg-2 mb-4 mb-lg-0">
-          <div
-            class="p-3 rounded-4 position-relative"
-            style="
-              background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            "
-          >
-            <img
-              src="{{ url_for('static', filename='images/ai-features.png') }}"
-              alt="AI Features"
-              class="img-fluid rounded-4 shadow-sm"
-            />
-            <!-- Decorative elements -->
-            <div class="position-absolute top-0 start-100 translate-middle">
-              <div
-                class="rounded-circle"
-                style="
-                  width: 60px;
-                  height: 60px;
-                  background: linear-gradient(135deg, #3da5bd 0%, #66a355 100%);
-                  opacity: 0.7;
-                "
-              ></div>
-            </div>
-            <div class="position-absolute bottom-0 start-0 translate-middle">
-              <div
-                class="rounded-circle"
-                style="
-                  width: 40px;
-                  height: 40px;
-                  background: linear-gradient(135deg, #f0c75c 0%, #f5d78a 100%);
-                  opacity: 0.7;
-                "
-              ></div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-7 order-lg-1">
-          <h2 class="display-5 fw-bold mb-4">Tax Calculation Intelligence</h2>
-          <p class="lead mb-4">
-            LevyMaster leverages sophisticated AI technologies to create an
-            advanced tax calculation system with intelligent compliance checking
-            and forecasting capabilities.
-          </p>
-
-          <div class="mb-4">
-            <div class="row g-4">
-              <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                  <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                      <span
-                        class="badge rounded-pill"
-                        style="background-color: #3da5bd"
-                        >New</span
-                      >
-                      <h4 class="h5 fw-bold mb-0 ms-2">
-                        Intelligent Rate Analysis
-                      </h4>
-                    </div>
-                    <p class="text-muted mb-0">
-                      Analyze tax levy rates across districts with AI-powered
-                      comparisons and pattern recognition for deeper insights.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                  <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                      <span
-                        class="badge rounded-pill"
-                        style="background-color: #66a355"
-                        >Advanced</span
-                      >
-                      <h4 class="h5 fw-bold mb-0 ms-2">
-                        Predictive Forecasting
-                      </h4>
-                    </div>
-                    <p class="text-muted mb-0">
-                      Project future levy rates with accuracy using machine
-                      learning models that adapt to changing property values and
-                      economic conditions.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                  <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                      <span
-                        class="badge rounded-pill"
-                        style="background-color: #f0c75c"
-                        >Featured</span
-                      >
-                      <h4 class="h5 fw-bold mb-0 ms-2">Automated Compliance</h4>
-                    </div>
-                    <p class="text-muted mb-0">
-                      Automatically verify tax calculations against state and
-                      local regulations, ensuring full compliance with all
-                      statutory requirements.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                  <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-3">
-                      <span
-                        class="badge rounded-pill"
-                        style="background-color: #537b9c"
-                        >Smart</span
-                      >
-                      <h4 class="h5 fw-bold mb-0 ms-2">
-                        Budget Impact Analysis
-                      </h4>
-                    </div>
-                    <p class="text-muted mb-0">
-                      Simulate the impact of tax rate changes on budgets and
-                      property owners, providing decision support for optimal
-                      rate setting.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <a
-            href="{{ url_for('levy_calculator.calculator') }}"
-            class="btn btn-gradient rounded-pill px-4"
-          >
-            <i class="bi bi-calculator me-2"></i>Try Tax Calculator
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Call to Action Section -->
-  <section class="py-5 my-5 cta-section text-center">
-    <div class="container">
-      <div
-        class="bg-gradient rounded-4 p-5 text-white"
-        style="background: linear-gradient(135deg, #1d3a54 0%, #3da5bd 100%)"
-      >
-        <h2 class="display-5 fw-bold mb-3">
-          Ready to Transform Your Tax Calculation Process?
-        </h2>
-        <p class="lead mb-4 col-lg-8 mx-auto">
-          Join county assessors and tax professionals using LevyMaster to
-          streamline property tax calculations with intelligent analysis
-          capabilities.
-        </p>
-        <div class="row justify-content-center">
-          <div class="col-md-10 col-lg-8">
+            
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-              <a
-                href="{{ url_for('levy_calculator.calculator') }}"
-                class="btn btn-light btn-lg rounded-pill px-4 gap-3"
-              >
-                <i class="bi bi-calculator me-2"></i>Start Calculating
-              </a>
-              <a
-                href="{{ url_for('mcp_army_dashboard_direct') }}"
-                class="btn btn-outline-light btn-lg rounded-pill px-4"
-              >
-                <i class="bi bi-graph-up me-2"></i>Explore Analytics
-              </a>
+                <a href="{{ url_for('scrape') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                    Start Scraping
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </section>
+    
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h2 class="text-center mb-4">How It Works</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                    <span class="h3 mb-0">1</span>
+                                </div>
+                            </div>
+                            <h3 class="h5">Enter URL</h3>
+                            <p class="card-text">Paste any website URL that you want to extract content from</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                    <span class="h3 mb-0">2</span>
+                                </div>
+                            </div>
+                            <h3 class="h5">Process</h3>
+                            <p class="card-text">Our system extracts the main content, removing ads, navigation, and other clutter</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                                    <span class="h3 mb-0">3</span>
+                                </div>
+                            </div>
+                            <h3 class="h5">View Results</h3>
+                            <p class="card-text">Get clean, readable text that you can use for analysis, summaries, or other needs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block head_extra %}
+<style>
+    .feature-box {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+    }
+    .feature-box:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-5px);
+    }
+    .icon-box {
+        color: #0d6efd;
+    }
+</style>
 {% endblock %}
