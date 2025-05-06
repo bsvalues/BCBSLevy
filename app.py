@@ -1,8 +1,8 @@
 """
-Web Scraper Application - Simple Flask web app with Trafilatura integration.
+Web Scraper Application - Flask web app with Trafilatura integration and PostgreSQL.
 
 This application allows users to extract clean text content from websites
-using the Trafilatura library.
+using the Trafilatura library and store results in a PostgreSQL database.
 """
 
 import os
@@ -11,17 +11,31 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import trafilatura
 
+# Import database models
+from models import db, ScrapeRequest, ScrapedContent
+
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 
+# Configure database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+
+# Initialize the database with the app
+db.init_app(app)
+
+# Create database tables within app context if they don't exist
+with app.app_context():
+    db.create_all()
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-
-# In-memory storage for scraped content
-# In a production app, this would use a database
-scraped_content = {}
 
 @app.route('/')
 def index():
@@ -38,15 +52,13 @@ def scrape():
             flash('Please provide a URL to scrape.', 'danger')
             return redirect(url_for('scrape'))
         
-        request_id = str(datetime.now().timestamp())
-        scraped_content[request_id] = {
-            'url': url,
-            'status': 'processing',
-            'created_at': datetime.now(),
-            'content': None,
-            'completed_at': None,
-            'error': None
-        }
+        # Create a new scrape request
+        scrape_request = ScrapeRequest(
+            url=url,
+            status='processing'
+        )
+        db.session.add(scrape_request)
+        db.session.commit()
         
         try:
             # Scrape the website using trafilatura
@@ -60,50 +72,42 @@ def scrape():
             if not content:
                 raise Exception(f"No content could be extracted from {url}")
             
-            # Save the results
-            scraped_content[request_id]['status'] = 'completed'
-            scraped_content[request_id]['content'] = content
-            scraped_content[request_id]['completed_at'] = datetime.now()
+            # Update the scrape request status
+            scrape_request.status = 'completed'
+            scrape_request.completed_at = datetime.utcnow()
+            
+            # Create scraped content record
+            scraped_content = ScrapedContent(
+                scrape_request_id=scrape_request.id,
+                content=content
+            )
+            db.session.add(scraped_content)
+            db.session.commit()
             
             flash('Content successfully scraped!', 'success')
-            return redirect(url_for('results', request_id=request_id))
+            return redirect(url_for('results', request_id=scrape_request.id))
             
         except Exception as e:
-            logger.error(f"Error scraping {url}: {str(e)}")
-            scraped_content[request_id]['status'] = 'failed'
-            scraped_content[request_id]['error'] = str(e)
+            # Update the scrape request with error details
+            scrape_request.status = 'failed'
+            scrape_request.error_message = str(e)
+            db.session.commit()
             
+            logger.error(f"Error scraping {url}: {str(e)}")
             flash(f'Failed to scrape content: {str(e)}', 'danger')
             return redirect(url_for('scrape'))
     
     # GET request - show form with recent requests
-    recent_requests = []
-    for req_id, data in scraped_content.items():
-        recent_requests.append({
-            'id': req_id,
-            'url': data['url'],
-            'status': data['status'],
-            'created_at': data['created_at']
-        })
-    
-    # Sort by creation date (newest first) and limit to 5
-    recent_requests = sorted(
-        recent_requests, 
-        key=lambda x: x['created_at'], 
-        reverse=True
-    )[:5]
-    
+    recent_requests = ScrapeRequest.query.order_by(ScrapeRequest.created_at.desc()).limit(5).all()
     return render_template('scrape.html', recent_requests=recent_requests)
 
-@app.route('/results/<request_id>')
+@app.route('/results/<int:request_id>')
 def results(request_id):
     """Show the results of a scrape request."""
-    if request_id not in scraped_content:
-        flash('Scrape request not found.', 'danger')
-        return redirect(url_for('scrape'))
+    scrape_request = ScrapeRequest.query.get_or_404(request_id)
     
     return render_template('results.html', 
-                           scrape_request=scraped_content[request_id], 
+                           scrape_request=scrape_request, 
                            request_id=request_id)
 
 @app.route('/health')

@@ -51,17 +51,17 @@
                                         </span>
                                     </td>
                                 </tr>
-                                {% if scrape_request.error %}
+                                {% if scrape_request.error_message %}
                                 <tr>
                                     <th>Error:</th>
-                                    <td class="text-danger">{{ scrape_request.error }}</td>
+                                    <td class="text-danger">{{ scrape_request.error_message }}</td>
                                 </tr>
                                 {% endif %}
                             </table>
                         </div>
                     </div>
                     
-                    {% if scrape_request.status == 'completed' and scrape_request.content %}
+                    {% if scrape_request.status == 'completed' and scrape_request.scraped_content %}
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h2 class="h5 mb-0">Extracted Content</h2>
@@ -79,7 +79,7 @@
                         
                         <div class="content-box p-3 border rounded bg-light">
                             <div id="contentArea" class="content-text">
-                                {{ scrape_request.content|safe|nl2br }}
+                                {{ scrape_request.scraped_content.content|safe|nl2br }}
                             </div>
                         </div>
                     </div>
