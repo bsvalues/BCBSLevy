@@ -44,9 +44,11 @@ except Exception as e:
     logger.error(f"Error importing blueprints: {e}")
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, 
+           template_folder='templates',
+           static_folder='static')
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
-logger.info("Flask app initialized")
+logger.info("Flask app initialized with templates folder")
 
 # Configure database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")

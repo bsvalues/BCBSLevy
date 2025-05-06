@@ -9,14 +9,19 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from datetime import datetime
 import trafilatura
 import logging
+import os
 
 from models import db, ScrapeRequest, ScrapedContent
 
-# Create a Blueprint for the web scraper routes
-webscraper_bp = Blueprint('webscraper', __name__, url_prefix='/tools/scraper')
-
 # Configure logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Create a Blueprint for the web scraper routes
+# Set template_folder to None to use the app's template folder
+webscraper_bp = Blueprint('webscraper', __name__, 
+                         url_prefix='/tools/scraper',
+                         template_folder='templates')
 
 @webscraper_bp.route('/')
 def index():
