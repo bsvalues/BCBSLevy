@@ -40,6 +40,8 @@ class APICallLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     api_name = db.Column(db.String(64), nullable=False, index=True)
+    service = db.Column(db.String(64), nullable=True, index=True)  # Added service field
+    method = db.Column(db.String(20), nullable=True)  # Added method field (GET, POST, etc.)
     endpoint = db.Column(db.String(256), nullable=False)
     request_data = db.Column(db.JSON, nullable=True)
     response_data = db.Column(db.JSON, nullable=True)
@@ -47,6 +49,7 @@ class APICallLog(db.Model):
     success = db.Column(db.Boolean, default=True)
     error_message = db.Column(db.Text, nullable=True)
     execution_time = db.Column(db.Float, nullable=True)  # in seconds
+    duration_ms = db.Column(db.Integer, nullable=True)  # Duration in milliseconds
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
     request_id = db.Column(db.String(64), nullable=True, index=True)
     

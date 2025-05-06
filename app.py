@@ -268,6 +268,7 @@ from routes_dashboard import dashboard_bp, register_dashboard_routes
 from routes_levy_calculator import levy_calculator_bp, register_levy_calculator_routes
 # from routes_tours import tours_bp, register_routes as register_tour_routes  # Module doesn't exist, commented out
 from routes_historical_analysis import historical_analysis_bp, init_historical_analysis_routes
+from routes_home import home_bp, init_home_routes
 from routes_mcp import mcp_bp, init_mcp_routes
 from routes_advanced_mcp import advanced_mcp_bp
 from routes_examples import examples_bp
@@ -325,6 +326,10 @@ register_user_audit_routes(app)
 
 # Initialize tax strategy routes
 register_tax_strategy_routes(app)
+
+# Initialize home routes
+init_home_routes(app)
+app.logger.info("Home routes initialized")
 
 # Initialize search routes
 init_search_routes(app)
