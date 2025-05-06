@@ -37,17 +37,17 @@ def index():
     
     # Get statistics
     try:
-        # Count entities
-        district_count = TaxDistrict.query.filter_by(year=current_year).count()
-        tax_code_count = TaxCode.query.filter_by(year=current_year).count()
-        property_count = Property.query.filter_by(year=current_year).count()
+        # Count entities (without year filter since these models don't have a year column)
+        district_count = TaxDistrict.query.count()
+        tax_code_count = TaxCode.query.count()
+        property_count = Property.query.count()
         
         # Calculate aggregates
         levy_stats = db.session.query(
             func.sum(TaxCode.total_assessed_value).label('total_assessed_value'),
             func.sum(TaxCode.total_levy_amount).label('total_levy_amount'),
             func.avg(TaxCode.effective_tax_rate).label('avg_levy_rate')
-        ).filter_by(year=current_year).first()
+        ).first()
         
         total_assessed_value = levy_stats.total_assessed_value or 0
         total_levy_amount = levy_stats.total_levy_amount or 0
@@ -99,9 +99,7 @@ def dashboard_metrics():
         ).join(
             LevyRate, LevyRate.tax_district_id == TaxDistrict.id
         ).filter(
-            TaxDistrict.year == year,
-            LevyRate.year == year,
-            LevyRate.is_final == True
+            LevyRate.year == year
         ).group_by(
             TaxDistrict.district_type
         ).all()
