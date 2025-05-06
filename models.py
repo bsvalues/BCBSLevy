@@ -34,33 +34,36 @@ class UserRole(db.Model):
 
 
 class APICallLog(db.Model):
-    """Model for tracking API calls made to external services."""
+    """Model for tracking API calls made to external services.
+    
+    This model must match the table created by add_api_call_log_table.py migration.
+    """
     __tablename__ = 'api_call_log'
     
     id = db.Column(db.Integer, primary_key=True)
+    service = db.Column(db.String(64), nullable=False, index=True)  # e.g. "anthropic", "openai", etc.
+    endpoint = db.Column(db.String(128), nullable=False, index=True)
+    method = db.Column(db.String(16), nullable=False)  # HTTP method
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    api_name = db.Column(db.String(64), nullable=False, index=True)
-    service = db.Column(db.String(64), nullable=True, index=True)  # Added service field
-    method = db.Column(db.String(20), nullable=True)  # Added method field (GET, POST, etc.)
-    endpoint = db.Column(db.String(256), nullable=False)
-    request_data = db.Column(db.JSON, nullable=True)
-    response_data = db.Column(db.JSON, nullable=True)
-    response_summary = db.Column(db.JSON, nullable=True)  # Summarized response data
-    params = db.Column(db.JSON, nullable=True)  # Request parameters
+    duration_ms = db.Column(db.Float, nullable=True)
     status_code = db.Column(db.Integer, nullable=True)
-    success = db.Column(db.Boolean, default=True)
+    success = db.Column(db.Boolean, default=False, nullable=False, index=True)
     error_message = db.Column(db.Text, nullable=True)
-    execution_time = db.Column(db.Float, nullable=True)  # in seconds
-    duration_ms = db.Column(db.Float, nullable=True)  # Duration in milliseconds (as Float to match add_api_call_log_table.py)
-    retry_count = db.Column(db.Integer, default=0, nullable=False)  # Number of API retry attempts
+    retry_count = db.Column(db.Integer, default=0, nullable=False)
+    params = db.Column(db.JSON, nullable=True)  # Redacted parameters
+    response_summary = db.Column(db.JSON, nullable=True)  # Summarized response
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
-    request_id = db.Column(db.String(64), nullable=True, index=True)
     
     # Relationships
     user = db.relationship('User', backref='api_calls')
     
+    __table_args__ = (
+        db.Index('idx_api_call_service_success', 'service', 'success'),
+        db.Index('idx_api_call_timestamp_service', 'timestamp', 'service'),
+    )
+    
     def __repr__(self):
-        return f'<APICallLog {self.id}: {self.api_name} - {self.endpoint}>'
+        return f'<APICallLog {self.id}: {self.service} - {self.endpoint}>'
 
 
 class AuditLog(db.Model):

@@ -63,8 +63,9 @@
               <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dataDropdown">
                 <li><a class="dropdown-item" href="{{ url_for('data_management.import_data') }}">Import Data</a></li>
                 <li><a class="dropdown-item" href="{{ url_for('data_management.export_data') }}">Export Data</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{{ url_for('data_quality.dashboard') }}">Data Quality</a></li>
+                <!-- Data quality temporarily disabled until route is created -->
+                <!-- <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Data Quality</a></li> -->
               </ul>
             </li>
             
@@ -75,18 +76,19 @@
               </a>
             </li> -->
             
-            {% if HAS_ROLE_DASHBOARDS %}
+            <!-- Role dashboards temporarily disabled until routes are created -->
+            <!-- {% if HAS_ROLE_DASHBOARDS %}
             <li class="nav-item dropdown">
               <a class="nav-link tl-navbar-item dropdown-toggle {% if request.path.startswith('/role-dashboards') %}active{% endif %}" href="#" id="roleDashboardsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-speedometer2 me-1"></i> Role Dashboards
               </a>
               <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="roleDashboardsDropdown">
-                <li><a class="dropdown-item" href="{{ url_for('role_dashboards.clerk_dashboard') }}"><i class="bi bi-upload me-2"></i> Clerk Dashboard</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('role_dashboards.deputy_dashboard') }}"><i class="bi bi-shield-check me-2"></i> Deputy Dashboard</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('role_dashboards.assessor_dashboard') }}"><i class="bi bi-check2-all me-2"></i> Assessor Dashboard</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-upload me-2"></i> Clerk Dashboard</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-shield-check me-2"></i> Deputy Dashboard</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-check2-all me-2"></i> Assessor Dashboard</a></li>
               </ul>
             </li>
-            {% endif %}
+            {% endif %} -->
           </ul>
           
           <div class="d-flex align-items-center">
