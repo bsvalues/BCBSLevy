@@ -45,13 +45,14 @@ class APICallLog(db.Model):
     endpoint = db.Column(db.String(256), nullable=False)
     request_data = db.Column(db.JSON, nullable=True)
     response_data = db.Column(db.JSON, nullable=True)
+    response_summary = db.Column(db.JSON, nullable=True)  # Summarized response data
     params = db.Column(db.JSON, nullable=True)  # Request parameters
     status_code = db.Column(db.Integer, nullable=True)
     success = db.Column(db.Boolean, default=True)
     error_message = db.Column(db.Text, nullable=True)
     execution_time = db.Column(db.Float, nullable=True)  # in seconds
-    duration_ms = db.Column(db.Integer, nullable=True)  # Duration in milliseconds
-    retry_count = db.Column(db.Integer, default=0, nullable=True)  # Number of API retry attempts
+    duration_ms = db.Column(db.Float, nullable=True)  # Duration in milliseconds (as Float to match add_api_call_log_table.py)
+    retry_count = db.Column(db.Integer, default=0, nullable=False)  # Number of API retry attempts
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
     request_id = db.Column(db.String(64), nullable=True, index=True)
     
