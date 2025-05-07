@@ -65,7 +65,9 @@ def index():
         recent_imports = get_recent_imports(limit=5)
         
     except Exception as e:
-        logger.error(f"Error fetching dashboard data: {str(e)}")
+        import traceback
+        error_tb = traceback.format_exc()
+        logger.error(f"Error fetching dashboard data: {str(e)}\n{error_tb}")
         district_count = 0
         tax_code_count = 0
         property_count = 0
@@ -178,7 +180,9 @@ def dashboard_metrics():
         })
         
     except Exception as e:
-        logger.error(f"Error fetching dashboard metrics: {str(e)}")
+        import traceback
+        error_tb = traceback.format_exc()
+        logger.error(f"Error fetching dashboard metrics: {str(e)}\n{error_tb}")
         return jsonify({
             'status': 'error',
             'message': 'Failed to fetch dashboard metrics'
@@ -229,7 +233,9 @@ def dashboard_stats():
         })
         
     except Exception as e:
-        logger.error(f"Error fetching dashboard stats: {str(e)}")
+        import traceback
+        error_tb = traceback.format_exc()
+        logger.error(f"Error fetching dashboard stats: {str(e)}\n{error_tb}")
         return jsonify({
             'status': 'error',
             'message': 'Failed to fetch dashboard statistics'

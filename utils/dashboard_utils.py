@@ -5,13 +5,19 @@ This module provides helper functions for the dashboard routes.
 """
 
 import logging
+import os
 from datetime import datetime
 from sqlalchemy import func, desc, text
 from app import db
 from models import ImportLog, ExportLog
 
-# Configure logger
-logger = logging.getLogger(__name__)
+# Configure a more detailed logger for dashboard operations
+logger = logging.getLogger("dashboard")
+handler = logging.FileHandler('logs/dashboard.log')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 def get_recent_imports(limit=5):
     """
