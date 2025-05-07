@@ -16,6 +16,7 @@ from models import (
     TaxDistrict, TaxCode, Property, ImportLog, ExportLog, 
     LevyRate, TaxCodeHistoricalRate, User
 )
+from utils.dashboard_utils import get_recent_imports
 
 # Create blueprint
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -55,9 +56,7 @@ def index():
         avg_levy_rate = levy_stats.avg_levy_rate or 0
         
         # Get recent imports (last 5)
-        recent_imports = ImportLog.query.order_by(
-            ImportLog.created_at.desc()
-        ).limit(5).all()
+        recent_imports = get_recent_imports(limit=5)
         
     except Exception as e:
         logger.error(f"Error fetching dashboard data: {str(e)}")
