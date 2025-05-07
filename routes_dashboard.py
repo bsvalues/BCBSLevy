@@ -16,7 +16,13 @@ from models import (
     TaxDistrict, TaxCode, Property, ImportLog, ExportLog, 
     LevyRate, TaxCodeHistoricalRate, User
 )
-from utils.dashboard_utils import get_recent_imports
+from utils.dashboard_utils import (
+    get_recent_imports, 
+    get_import_count, 
+    get_export_count, 
+    get_import_success_count, 
+    get_export_success_count
+)
 
 # Create blueprint
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -191,27 +197,23 @@ def dashboard_stats():
         # Current year
         current_year = datetime.now().year
         
-        # System stats
+        # System stats (User queries should be reliable, so keeping them direct)
         user_count = User.query.filter_by(is_active=True).count()
         admin_count = User.query.filter_by(is_active=True, is_admin=True).count()
-        import_count = ImportLog.query.filter_by(year=current_year).count()
-        export_count = ExportLog.query.filter_by(year=current_year).count()
         
-        # Success rates
+        # Use safe utility functions for import/export counts
+        import_count = get_import_count(year=current_year)
+        export_count = get_export_count(year=current_year)
+        
+        # Success rates with safe utility functions
         import_success_rate = 0
         if import_count > 0:
-            success_imports = ImportLog.query.filter_by(
-                year=current_year, 
-                status='SUCCESS'
-            ).count()
+            success_imports = get_import_success_count(year=current_year)
             import_success_rate = (success_imports / import_count) * 100
         
         export_success_rate = 0
         if export_count > 0:
-            success_exports = ExportLog.query.filter_by(
-                year=current_year, 
-                status='SUCCESS'
-            ).count()
+            success_exports = get_export_success_count(year=current_year)
             export_success_rate = (success_exports / export_count) * 100
         
         return jsonify({
