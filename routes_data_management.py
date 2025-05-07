@@ -42,6 +42,17 @@ class ExportType(Enum):
     PROPERTY = "property"
     LEVY_REPORT = "levy_report"
     OTHER = "other"
+
+# Define PropertyType enum for form selection (instead of using model directly)
+class PropertyType(Enum):
+    RESIDENTIAL = "residential"
+    COMMERCIAL = "commercial"
+    INDUSTRIAL = "industrial"
+    AGRICULTURAL = "agricultural"
+    VACANT = "vacant"
+    MIXED_USE = "mixed_use"
+    EXEMPT = "exempt"
+    OTHER = "other"
 from utils.district_utils import (
     import_district_text_file, import_district_xml_file, import_excel_xml_file,
     extract_districts_from_file, parse_district_data
@@ -823,11 +834,8 @@ def list_properties():
         query = query.filter_by(tax_code_id=tax_code_id)
     
     if property_type:
-        try:
-            prop_type_enum = PropertyType(property_type)
-            query = query.filter_by(property_type=prop_type_enum)
-        except ValueError:
-            pass
+        # Filter by property_type string value directly since it's stored as string in the model
+        query = query.filter_by(property_type=property_type)
     
     if search:
         query = query.filter(
@@ -847,8 +855,8 @@ def list_properties():
     # Get tax codes for filter
     tax_codes = TaxCode.query.filter_by(year=year).all()
     
-    # Property types for filter
-    property_types = [{"id": pt.value, "name": pt.name.title()} for pt in list(PropertyType)]
+    # Property types for filter - use our local PropertyType enum
+    property_types = [{"id": pt.value, "name": pt.name.replace("_", " ").title()} for pt in PropertyType]
     
     return render_template(
         "data_management/properties.html",
