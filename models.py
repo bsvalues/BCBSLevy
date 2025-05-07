@@ -159,10 +159,9 @@ class User(UserMixin, db.Model):
     updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     
     # Relationships
-    tax_districts = db.relationship('TaxDistrict', backref='owner', lazy='dynamic')
-    imports = db.relationship('ImportLog', backref='user', lazy='dynamic')
-    exports = db.relationship('ExportLog', backref='user', lazy='dynamic')
-    action_logs = db.relationship('UserActionLog', backref='user', lazy='dynamic')
+    imports = db.relationship('ImportLog', foreign_keys='ImportLog.user_id', backref='user', lazy='dynamic')
+    exports = db.relationship('ExportLog', foreign_keys='ExportLog.user_id', backref='user', lazy='dynamic')
+    action_logs = db.relationship('UserActionLog', foreign_keys='UserActionLog.user_id', backref='user', lazy='dynamic')
     
     def set_password(self, password):
         """Set password hash for user."""
@@ -179,25 +178,32 @@ class TaxDistrict(db.Model):
     __tablename__ = 'tax_district'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128), nullable=False, index=True)
+    district_name = db.Column(db.String(128), nullable=True, index=True)
+    district_code = db.Column(db.String(20), nullable=True, index=True)
     tax_district_id = db.Column(db.String(20), nullable=True, index=True)  # External ID for the district
     description = db.Column(db.Text)
     district_type = db.Column(db.String(32), index=True)  # city, county, school, special
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     county = db.Column(db.String(64), index=True)
     state = db.Column(db.String(20), index=True)
-    active = db.Column(db.Boolean, default=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    is_active = db.Column(db.Boolean, default=True)
+    contact_name = db.Column(db.String(128), nullable=True)
+    contact_email = db.Column(db.String(128), nullable=True)
+    contact_phone = db.Column(db.String(20), nullable=True)
     levy_code = db.Column(db.String(20), nullable=True, index=True)
     linked_levy_code = db.Column(db.String(20), nullable=True, index=True)
+    statutory_limit = db.Column(db.Float, nullable=True)
+    year = db.Column(db.Integer, nullable=True)
     
     # Relationships
     tax_codes = db.relationship('TaxCode', backref='tax_district', lazy='dynamic')
     properties = db.relationship('Property', secondary=tax_district_property, back_populates='tax_districts')
     
     def __repr__(self):
-        return f'<TaxDistrict {self.name}>'
+        return f'<TaxDistrict {self.district_name}>'
 
 
 class TaxCode(db.Model):
@@ -275,8 +281,8 @@ class LevyOverrideLog(db.Model):
     ip_address = db.Column(db.String(45), nullable=True)
     
     # Relationships
-    user = db.relationship('User', backref='levy_overrides')
-    tax_district = db.relationship('TaxDistrict', backref='levy_overrides')
+    user = db.relationship('User', foreign_keys=[user_id], backref='levy_overrides')
+    tax_district = db.relationship('TaxDistrict', foreign_keys=[tax_district_id], backref='levy_overrides')
     
     def __repr__(self):
         return f'<LevyOverrideLog {self.id}: {self.tax_district_id} - {self.year}>'
@@ -438,14 +444,20 @@ class ExportLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(256))
     export_type = db.Column(db.String(32), index=True)  # report, data, levy
-    export_type_id = db.Column(db.Integer, db.ForeignKey('export_type.id'), nullable=True)
     status = db.Column(db.String(20), index=True)  # pending, processing, completed, error
-    records_exported = db.Column(db.Integer, default=0)
-    start_time = db.Column(db.DateTime, default=datetime.utcnow)
-    end_time = db.Column(db.DateTime)
-    message = db.Column(db.Text)
+    record_count = db.Column(db.Integer, default=0)
+    rows_exported = db.Column(db.Integer, default=0)
+    export_date = db.Column(db.DateTime, default=datetime.utcnow)
+    processing_time = db.Column(db.Float, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    error_details = db.Column(db.Text, nullable=True)
+    export_metadata = db.Column(db.JSON, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    year = db.Column(db.Integer, default=datetime.utcnow().year, index=True)
     
     def __repr__(self):
         return f'<ExportLog {self.id} ({self.status})>'
