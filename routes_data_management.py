@@ -131,9 +131,14 @@ def import_form():
     )
 
 
-@data_management_bp.route("/import/data", methods=["POST"])
+@data_management_bp.route("/import/data", methods=["GET", "POST"])
 def import_data():
     """Handle data import file uploads and processing."""
+    # For GET requests, redirect to the import form
+    if request.method == "GET":
+        return redirect(url_for("data_management.import_form"))
+        
+    # Process POST requests
     # Get form data
     import_type_str = request.form.get("import_type", "other")
     year = request.form.get("year", datetime.now().year)
