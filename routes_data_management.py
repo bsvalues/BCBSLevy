@@ -209,14 +209,17 @@ def import_data():
                 # Create import log
                 import_log = ImportLog(
                     filename=filename,
-                    file_type=file_type,
                     import_type=import_type.value,  # Use the enum value as a string
-                    records_processed=result.total_count if hasattr(result, "total_count") else len(data),
-                    records_successful=result.success_count if hasattr(result, "success_count") else 0,
-                    records_failed=result.error_count if hasattr(result, "error_count") else 0,
+                    records_imported=result.total_count if hasattr(result, "total_count") else len(data),
+                    records_skipped=result.error_count if hasattr(result, "error_count") else 0,
                     status="completed",
-                    message=notes,
-                    year=year
+                    notes=notes,
+                    year=year,
+                    record_count=result.total_count if hasattr(result, "total_count") else len(data),
+                    success_count=result.success_count if hasattr(result, "success_count") else 0,
+                    error_count=result.error_count if hasattr(result, "error_count") else 0,
+                    import_date=datetime.utcnow(),
+                    import_metadata={"file_format": file_type}
                 )
                 
                 db.session.add(import_log)
@@ -805,12 +808,15 @@ def import_district():
                 # Create import log
                 import_log = ImportLog(
                     filename=filename,
-                    import_type=ImportType.TAX_DISTRICT,
+                    import_type='TAX_DISTRICT',
+                    records_imported=result.get('imported', 0),
+                    records_skipped=result.get('skipped', 0),
                     record_count=result.get('imported', 0) + result.get('skipped', 0),
                     success_count=result.get('imported', 0),
                     error_count=result.get('skipped', 0),
                     status="completed",
                     year=year,
+                    import_date=datetime.utcnow(),
                     import_metadata={"warnings": result.get('warnings', [])}
                 )
                 

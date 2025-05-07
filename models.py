@@ -419,20 +419,27 @@ class ImportLog(db.Model):
     __tablename__ = 'import_log'
     
     id = db.Column(db.Integer, primary_key=True)
-    filename = db.Column(db.String(256))
+    filename = db.Column(db.String(256), nullable=False)
     import_type = db.Column(db.String(32), index=True)  # property, district, code
-    # Removed import_type_id as it doesn't exist in the database schema
-    status = db.Column(db.String(20), index=True)  # pending, processing, completed, error
-    records_processed = db.Column(db.Integer, default=0)
-    records_successful = db.Column(db.Integer, default=0)
-    records_failed = db.Column(db.Integer, default=0)
-    start_time = db.Column(db.DateTime, default=datetime.utcnow)
-    end_time = db.Column(db.DateTime)
-    message = db.Column(db.Text)
+    records_imported = db.Column(db.Integer, nullable=False)  # Renamed from records_processed
+    records_skipped = db.Column(db.Integer, nullable=False)  # Renamed from records_failed
+    warnings = db.Column(db.Text, nullable=True)
+    import_date = db.Column(db.DateTime, nullable=True)  # Renamed from start_time
+    status = db.Column(db.String(50), nullable=True, index=True, default='completed')  # pending, processing, completed, error
+    notes = db.Column(db.Text, nullable=True)  # Renamed from message
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    year = db.Column(db.Integer, default=datetime.utcnow().year, index=True)
+    year = db.Column(db.Integer, nullable=False, index=True, default=datetime.utcnow().year)
+    # New fields that exist in database
+    record_count = db.Column(db.Integer, nullable=True, default=0)
+    success_count = db.Column(db.Integer, nullable=True, default=0)
+    error_count = db.Column(db.Integer, nullable=True, default=0)
+    error_details = db.Column(db.Text, nullable=True)
+    processing_time = db.Column(db.Float, nullable=True)
+    import_metadata = db.Column(db.JSON, nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     
     def __repr__(self):
         return f'<ImportLog {self.id} ({self.status})>'
