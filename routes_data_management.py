@@ -26,7 +26,7 @@ from models import (
     TaxDistrict, TaxCode, Property, ImportLog, ExportLog,
     PropertyType, ImportType as ImportTypeModel, ExportType as ExportTypeModel
 )
-from utils.import_utils import detect_file_type, read_data_from_file, process_import
+from utils.import_utils import detect_file_type, read_data_from_file
 
 # Define ImportType enum for the form selection
 class ImportType(Enum):
