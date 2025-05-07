@@ -14,6 +14,7 @@ import logging
 import tempfile
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Union
+from enum import Enum
 
 from flask import Blueprint, request, jsonify, render_template, flash, redirect, url_for, Response
 from werkzeug.utils import secure_filename
@@ -23,9 +24,24 @@ from werkzeug.datastructures import FileStorage
 from app import db
 from models import (
     TaxDistrict, TaxCode, Property, ImportLog, ExportLog,
-    PropertyType, ImportType, ExportType
+    PropertyType, ImportType as ImportTypeModel, ExportType as ExportTypeModel
 )
 from utils.import_utils import detect_file_type, read_data_from_file, process_import
+
+# Define ImportType enum for the form selection
+class ImportType(Enum):
+    TAX_DISTRICT = "tax_district"
+    TAX_CODE = "tax_code"
+    PROPERTY = "property"
+    OTHER = "other"
+
+# Define ExportType enum for the form selection
+class ExportType(Enum):
+    TAX_DISTRICT = "tax_district"
+    TAX_CODE = "tax_code"
+    PROPERTY = "property"
+    LEVY_REPORT = "levy_report"
+    OTHER = "other"
 from utils.district_utils import (
     import_district_text_file, import_district_xml_file, import_excel_xml_file,
     extract_districts_from_file, parse_district_data
@@ -74,7 +90,7 @@ def import_form():
                 # Create import log for Benton County import
                 import_log = ImportLog(
                     filename="Benton County Data Import",
-                    import_type=ImportType.TAX_DISTRICT,
+                    import_type="tax_district",
                     status="PROCESSING",
                     year=2025,  # Hard-coded for now, should be configurable
                     notes="Started Benton County data import process"
@@ -163,14 +179,13 @@ def import_data():
                 import_log = ImportLog(
                     filename=filename,
                     file_type=file_type,
-                    import_type=import_type,
-                    record_count=result.total_count if hasattr(result, "total_count") else len(data),
-                    success_count=result.success_count if hasattr(result, "success_count") else 0,
-                    error_count=result.error_count if hasattr(result, "error_count") else 0,
+                    import_type=import_type.value,  # Use the enum value as a string
+                    records_processed=result.total_count if hasattr(result, "total_count") else len(data),
+                    records_successful=result.success_count if hasattr(result, "success_count") else 0,
+                    records_failed=result.error_count if hasattr(result, "error_count") else 0,
                     status="completed",
-                    notes=notes,
-                    year=year,
-                    metadata={"warnings": result.warnings if hasattr(result, "warnings") else []}
+                    message=notes,
+                    year=year
                 )
                 
                 db.session.add(import_log)

@@ -297,13 +297,7 @@ System{% endblock %} {% block head %} {{ super() }}
                 {% for year in years %}
                 <option
                   value="{{ year }}"
-                  {%
-                  if
-                  year=""
-                  ="current_year"
-                  %}selected{%
-                  endif
-                  %}
+                  {% if year == current_year %}selected{% endif %}
                 >
                   {{ year }}
                 </option>
