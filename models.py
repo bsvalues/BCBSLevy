@@ -211,23 +211,29 @@ class TaxCode(db.Model):
     __tablename__ = 'tax_code'
     
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(20), nullable=False, index=True, unique=True)
+    tax_code = db.Column(db.String(20), nullable=False, index=True, unique=True)  # Renamed from 'code' to 'tax_code'
     description = db.Column(db.Text)
     tax_district_id = db.Column(db.Integer, db.ForeignKey('tax_district.id'), nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     total_assessed_value = db.Column(db.Float, default=0.0)
     levy_rate = db.Column(db.Float, default=0.0)
+    levy_amount = db.Column(db.Float, default=0.0)
     total_levy_amount = db.Column(db.Float, default=0.0)
     effective_tax_rate = db.Column(db.Float, default=0.0)
-    active = db.Column(db.Boolean, default=True)
+    previous_year_rate = db.Column(db.Float, nullable=True)
+    year = db.Column(db.Integer, nullable=True)
     
     # Relationships
     properties = db.relationship('Property', foreign_keys='Property.tax_code_id', backref='tax_code', lazy='dynamic')
     historical_rates = db.relationship('TaxCodeHistoricalRate', foreign_keys='TaxCodeHistoricalRate.tax_code_id', backref='tax_code', lazy='dynamic')
+    created_by = db.relationship('User', foreign_keys=[created_by_id], backref='created_tax_codes')
+    updated_by = db.relationship('User', foreign_keys=[updated_by_id], backref='updated_tax_codes')
     
     def __repr__(self):
-        return f'<TaxCode {self.code}>'
+        return f'<TaxCode {self.tax_code}>'
 
 
 class LevyScenario(db.Model):

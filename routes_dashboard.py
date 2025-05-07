@@ -37,9 +37,10 @@ def index():
     
     # Get statistics
     try:
-        # Count entities (without year filter since these models don't have a year column)
+        # Count entities (with year filter for TaxCode since it now has a year column)
+        current_year = datetime.now().year
         district_count = TaxDistrict.query.filter_by(is_active=True).count()
-        tax_code_count = TaxCode.query.filter_by(active=True).count()
+        tax_code_count = TaxCode.query.filter_by(year=current_year).count() if TaxCode.query.count() > 0 else 0
         property_count = Property.query.count()
         
         # Calculate aggregates
