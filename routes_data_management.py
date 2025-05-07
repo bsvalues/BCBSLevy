@@ -599,6 +599,17 @@ def list_tax_districts():
         districts=districts
     )
 
+# Add aliases for backward compatibility
+@data_management_bp.route("/tax_districts", methods=["GET"])
+def tax_districts():
+    """Alias for list_tax_districts"""
+    return list_tax_districts()
+
+@data_management_bp.route("/tax_districts/new", methods=["GET"])
+def new_tax_district():
+    """Redirect to the tax district import page for now"""
+    return redirect(url_for("data_management.import_district"))
+
 
 @data_management_bp.route("/tax-districts/<int:district_id>", methods=["GET"])
 def view_tax_district(district_id):
