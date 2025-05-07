@@ -207,6 +207,21 @@ def register_template_filters(app):
         return f'<span class="tooltip-text" data-toggle="tooltip" title="{value}">{value}</span>'
         
     @app.template_filter('datetime')
+    def format_datetime_short(value):
+        """Format a datetime value (legacy filter name)."""
+        if value is None:
+            return ""
+        if isinstance(value, str):
+            try:
+                value = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                try:
+                    value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S")
+                except ValueError:
+                    return value
+        return value.strftime("%m/%d/%Y %H:%M")
+        
+    @app.template_filter('format_datetime')
     def format_datetime(value):
         """Format a datetime value."""
         if value is None:
