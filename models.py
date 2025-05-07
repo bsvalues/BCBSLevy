@@ -408,8 +408,7 @@ class ImportType(db.Model):
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
-    imports = db.relationship('ImportLog', foreign_keys='ImportLog.import_type_id', backref='type', lazy='dynamic')
+    # Relationship removed - import_type_id no longer exists in ImportLog
     
     def __repr__(self):
         return f'<ImportType {self.code}: {self.name}>'
@@ -422,7 +421,7 @@ class ImportLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(256))
     import_type = db.Column(db.String(32), index=True)  # property, district, code
-    import_type_id = db.Column(db.Integer, db.ForeignKey('import_type.id'), nullable=True)
+    # Removed import_type_id as it doesn't exist in the database schema
     status = db.Column(db.String(20), index=True)  # pending, processing, completed, error
     records_processed = db.Column(db.Integer, default=0)
     records_successful = db.Column(db.Integer, default=0)
@@ -430,7 +429,7 @@ class ImportLog(db.Model):
     start_time = db.Column(db.DateTime, default=datetime.utcnow)
     end_time = db.Column(db.DateTime)
     message = db.Column(db.Text)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     year = db.Column(db.Integer, default=datetime.utcnow().year, index=True)
