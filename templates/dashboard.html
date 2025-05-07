@@ -131,38 +131,27 @@
       </div>
       <div class="card-body p-0">
         <div class="list-group list-group-flush">
+          {% for activity in recent_activity|default([
+            {'type': 'calculation', 'title': 'Levy Calculation Updated', 'description': 'School District #123 levy rate updated to 2.5498.', 'user': 'John Smith', 'timestamp': '3 mins ago'},
+            {'type': 'scenario', 'title': 'New Scenario Created', 'description': 'City of Springfield 2025 Forecast created.', 'user': 'Jane Doe', 'timestamp': '2 hours ago'},
+            {'type': 'compliance', 'title': 'Compliance Alert Resolved', 'description': 'Fire District #7 compliance issue resolved.', 'user': 'Robert Johnson', 'timestamp': 'Yesterday'},
+            {'type': 'import', 'title': 'Data Import Completed', 'description': '2025 assessment values imported successfully.', 'user': 'System', 'timestamp': '2 days ago'}
+          ]) %}
           <a href="#" class="list-group-item list-group-item-action py-3">
             <div class="d-flex w-100 justify-content-between">
-              <h6 class="mb-1">Levy Calculation Updated</h6>
-              <small class="text-muted">3 mins ago</small>
+              <h6 class="mb-1">{{ activity.title }}</h6>
+              <small class="text-muted">
+                {% if activity.timestamp is string %}
+                  {{ activity.timestamp }}
+                {% else %}
+                  {{ activity.timestamp|default("") | format_datetime }}
+                {% endif %}
+              </small>
             </div>
-            <p class="mb-1 text-muted">School District #123 levy rate updated to 2.5498.</p>
-            <small><i class="bi bi-person-circle me-1"></i> By: John Smith</small>
+            <p class="mb-1 text-muted">{{ activity.description }}</p>
+            <small><i class="bi bi-person-circle me-1"></i> By: {{ activity.user }}</small>
           </a>
-          <a href="#" class="list-group-item list-group-item-action py-3">
-            <div class="d-flex w-100 justify-content-between">
-              <h6 class="mb-1">New Scenario Created</h6>
-              <small class="text-muted">2 hours ago</small>
-            </div>
-            <p class="mb-1 text-muted">City of Springfield 2025 Forecast created.</p>
-            <small><i class="bi bi-person-circle me-1"></i> By: Jane Doe</small>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action py-3">
-            <div class="d-flex w-100 justify-content-between">
-              <h6 class="mb-1">Compliance Alert Resolved</h6>
-              <small class="text-muted">Yesterday</small>
-            </div>
-            <p class="mb-1 text-muted">Fire District #7 compliance issue resolved.</p>
-            <small><i class="bi bi-person-circle me-1"></i> By: Robert Johnson</small>
-          </a>
-          <a href="#" class="list-group-item list-group-item-action py-3">
-            <div class="d-flex w-100 justify-content-between">
-              <h6 class="mb-1">Data Import Completed</h6>
-              <small class="text-muted">2 days ago</small>
-            </div>
-            <p class="mb-1 text-muted">2025 assessment values imported successfully.</p>
-            <small><i class="bi bi-person-circle me-1"></i> By: System</small>
-          </a>
+          {% endfor %}
         </div>
       </div>
     </div>

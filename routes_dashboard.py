@@ -68,15 +68,41 @@ def index():
         avg_levy_rate = 0
         recent_imports = []
     
+    # Prepare stats object as expected by the template
+    stats = {
+        'districts': district_count,
+        'tax_codes': tax_code_count,
+        'properties': property_count,
+        'total_av': f'${total_assessed_value / 1000000000:.1f}B' if total_assessed_value else '$0.0B',
+        'total_levy': f'${total_levy_amount / 1000000:.1f}M' if total_levy_amount else '$0.0M',
+        'avg_rate': f'{avg_levy_rate:.4f}' if avg_levy_rate else '0.0000',
+        'compliance_rate': '92.8%',  # Default for now, will be calculated from actual data in future
+        'pending_actions': 7  # Default for now, will be calculated from actual data in future
+    }
+    
+    # Calculate YoY changes (placeholders for now)
+    stats_changes = {
+        'av_change': '+7.2%',
+        'levy_change': '+3.5%',
+        'compliance_change': '+5.0%'
+    }
+    
+    # Process recent imports for the activity feed
+    recent_activity = []
+    for imp in recent_imports:
+        recent_activity.append({
+            'type': 'import',
+            'title': f'{imp.import_type.capitalize()} Import Completed',
+            'description': f'{imp.filename} imported successfully.',
+            'timestamp': imp.created_at,
+            'user': imp.created_by.username if imp.created_by else 'System'
+        })
+    
     return render_template(
         'dashboard.html',
-        district_count=district_count,
-        tax_code_count=tax_code_count,
-        property_count=property_count,
-        total_assessed_value=total_assessed_value,
-        total_levy_amount=total_levy_amount,
-        avg_levy_rate=avg_levy_rate,
-        recent_imports=recent_imports,
+        stats=stats,
+        stats_changes=stats_changes,
+        recent_activity=recent_activity,
         current_year=current_year
     )
 
