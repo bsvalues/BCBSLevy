@@ -227,7 +227,7 @@ class TaxCode(db.Model):
     year = db.Column(db.Integer, nullable=True)
     
     # Relationships
-    properties = db.relationship('Property', foreign_keys='Property.tax_code_id', backref='tax_code', lazy='dynamic')
+    properties = db.relationship('Property', foreign_keys='Property.tax_code_id', backref='tax_code_ref', lazy='dynamic')
     historical_rates = db.relationship('TaxCodeHistoricalRate', foreign_keys='TaxCodeHistoricalRate.tax_code_id', backref='tax_code', lazy='dynamic')
     created_by = db.relationship('User', foreign_keys=[created_by_id], backref='created_tax_codes')
     updated_by = db.relationship('User', foreign_keys=[updated_by_id], backref='updated_tax_codes')
@@ -352,8 +352,7 @@ class PropertyType(db.Model):
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
-    properties = db.relationship('Property', foreign_keys='Property.property_type_id', backref='type', lazy='dynamic')
+    # The Property model now stores property_type as a string field, not a foreign key
     
     def __repr__(self):
         return f'<PropertyType {self.code}: {self.name}>'
@@ -364,25 +363,39 @@ class Property(db.Model):
     __tablename__ = 'property'
     
     id = db.Column(db.Integer, primary_key=True)
-    parcel_number = db.Column(db.String(30), nullable=False, index=True, unique=True)
+    property_id = db.Column(db.String(30), nullable=True, index=True)  # Formerly parcel_number
     address = db.Column(db.String(256))
+    property_address = db.Column(db.String(256))
+    city = db.Column(db.String(100), nullable=True)
+    state = db.Column(db.String(20), nullable=True)
+    zip_code = db.Column(db.String(20), nullable=True)
     owner_name = db.Column(db.String(256))
-    tax_code_id = db.Column(db.Integer, db.ForeignKey('tax_code.id'), nullable=False, index=True)
-    property_type_id = db.Column(db.Integer, db.ForeignKey('property_type.id'), nullable=True)
+    tax_code_id = db.Column(db.Integer, db.ForeignKey('tax_code.id'), nullable=True, index=True)
+    tax_code = db.Column(db.String(20), nullable=True)
+    property_type = db.Column(db.String(50), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    updated_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     assessed_value = db.Column(db.Float, default=0.0)
     market_value = db.Column(db.Float, default=0.0)
     land_value = db.Column(db.Float, default=0.0)
     building_value = db.Column(db.Float, default=0.0)
-    property_class = db.Column(db.String(20), index=True)  # residential, commercial, agricultural
-    exempt_value = db.Column(db.Float, default=0.0)
+    tax_exempt = db.Column(db.Boolean, default=False)
+    exemption_amount = db.Column(db.Float, default=0.0)
+    taxable_value = db.Column(db.Float, default=0.0)
+    tax_amount = db.Column(db.Float, default=0.0)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+    year = db.Column(db.Integer, nullable=True)
     
     # Relationships
     tax_districts = db.relationship('TaxDistrict', secondary=tax_district_property, back_populates='properties')
+    created_by = db.relationship('User', foreign_keys=[created_by_id], backref='created_properties')
+    updated_by = db.relationship('User', foreign_keys=[updated_by_id], backref='updated_properties')
     
     def __repr__(self):
-        return f'<Property {self.parcel_number}>'
+        return f'<Property {self.property_id}>'
 
 
 class ImportType(db.Model):
