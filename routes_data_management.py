@@ -173,7 +173,22 @@ def import_data():
             
             # Process the import based on type
             try:
-                result = process_import(data, import_type, year)
+                # Import process_import function inside the route to avoid circular imports
+                from utils.import_utils import process_import
+                
+                # Map the route ImportType enum to the database model ImportType enum
+                # This resolves the type incompatibility error
+                db_import_type = None
+                if import_type == ImportType.TAX_DISTRICT:
+                    db_import_type = ImportTypeModel.TAX_DISTRICT
+                elif import_type == ImportType.TAX_CODE:
+                    db_import_type = ImportTypeModel.TAX_CODE
+                elif import_type == ImportType.PROPERTY:
+                    db_import_type = ImportTypeModel.PROPERTY
+                else:
+                    db_import_type = ImportTypeModel.OTHER
+                
+                result = process_import(data, db_import_type, year)
                 
                 # Create import log
                 import_log = ImportLog(
@@ -553,10 +568,10 @@ def export_data():
 
 class DateTimeEncoder(json.JSONEncoder):
     """Custom JSON encoder for handling datetime objects."""
-    def default(self, obj):
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        return super().default(obj)
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        return super().default(o)
 
 
 @data_management_bp.route("/tax-districts", methods=["GET"])
@@ -833,7 +848,7 @@ def list_properties():
     tax_codes = TaxCode.query.filter_by(year=year).all()
     
     # Property types for filter
-    property_types = [{"id": pt.value, "name": pt.name.title()} for pt in PropertyType]
+    property_types = [{"id": pt.value, "name": pt.name.title()} for pt in list(PropertyType)]
     
     return render_template(
         "data_management/properties.html",
