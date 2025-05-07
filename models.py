@@ -199,7 +199,7 @@ class TaxDistrict(db.Model):
     year = db.Column(db.Integer, nullable=True)
     
     # Relationships
-    tax_codes = db.relationship('TaxCode', backref='tax_district', lazy='dynamic')
+    tax_codes = db.relationship('TaxCode', foreign_keys='TaxCode.tax_district_id', backref='tax_district', lazy='dynamic')
     properties = db.relationship('Property', secondary=tax_district_property, back_populates='tax_districts')
     
     def __repr__(self):
@@ -223,8 +223,8 @@ class TaxCode(db.Model):
     active = db.Column(db.Boolean, default=True)
     
     # Relationships
-    properties = db.relationship('Property', backref='tax_code', lazy='dynamic')
-    historical_rates = db.relationship('TaxCodeHistoricalRate', backref='tax_code', lazy='dynamic')
+    properties = db.relationship('Property', foreign_keys='Property.tax_code_id', backref='tax_code', lazy='dynamic')
+    historical_rates = db.relationship('TaxCodeHistoricalRate', foreign_keys='TaxCodeHistoricalRate.tax_code_id', backref='tax_code', lazy='dynamic')
     
     def __repr__(self):
         return f'<TaxCode {self.code}>'
@@ -255,7 +255,7 @@ class LevyScenario(db.Model):
     result_levy_amount = db.Column(db.Float, nullable=True)  # calculated total levy amount
     
     # Relationships
-    tax_district = db.relationship('TaxDistrict', backref='levy_scenarios')
+    tax_district = db.relationship('TaxDistrict', foreign_keys=[tax_district_id], backref='levy_scenarios')
     created_by = db.relationship('User', foreign_keys=[created_by_id], backref='created_scenarios')
     updated_by = db.relationship('User', foreign_keys=[updated_by_id], backref='updated_scenarios')
     user = db.relationship('User', foreign_keys=[user_id], backref='owned_scenarios')
@@ -305,7 +305,7 @@ class LevyRate(db.Model):
     notes = db.Column(db.Text, nullable=True)
     
     # Relationships
-    tax_district = db.relationship('TaxDistrict', backref='levy_rates')
+    tax_district = db.relationship('TaxDistrict', foreign_keys=[tax_district_id], backref='levy_rates')
     
     __table_args__ = (
         db.UniqueConstraint('tax_district_id', 'year', 'is_projected', name='uix_district_year_projection'),
@@ -347,7 +347,7 @@ class PropertyType(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
-    properties = db.relationship('Property', backref='type', lazy='dynamic')
+    properties = db.relationship('Property', foreign_keys='Property.property_type_id', backref='type', lazy='dynamic')
     
     def __repr__(self):
         return f'<PropertyType {self.code}: {self.name}>'
@@ -390,7 +390,7 @@ class ImportType(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
-    imports = db.relationship('ImportLog', backref='type', lazy='dynamic')
+    imports = db.relationship('ImportLog', foreign_keys='ImportLog.import_type_id', backref='type', lazy='dynamic')
     
     def __repr__(self):
         return f'<ImportType {self.code}: {self.name}>'
@@ -429,9 +429,6 @@ class ExportType(db.Model):
     name = db.Column(db.String(64), nullable=False)
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    exports = db.relationship('ExportLog', backref='type', lazy='dynamic')
     
     def __repr__(self):
         return f'<ExportType {self.code}: {self.name}>'

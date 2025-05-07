@@ -38,8 +38,8 @@ def index():
     # Get statistics
     try:
         # Count entities (without year filter since these models don't have a year column)
-        district_count = TaxDistrict.query.count()
-        tax_code_count = TaxCode.query.count()
+        district_count = TaxDistrict.query.filter_by(is_active=True).count()
+        tax_code_count = TaxCode.query.filter_by(active=True).count()
         property_count = Property.query.count()
         
         # Calculate aggregates
@@ -90,12 +90,21 @@ def index():
     # Process recent imports for the activity feed
     recent_activity = []
     for imp in recent_imports:
+        user_name = "System"
+        try:
+            if imp.user_id:
+                user = User.query.get(imp.user_id)
+                if user:
+                    user_name = user.username
+        except:
+            pass
+            
         recent_activity.append({
             'type': 'import',
             'title': f'{imp.import_type.capitalize()} Import Completed',
             'description': f'{imp.filename} imported successfully.',
             'timestamp': imp.created_at,
-            'user': imp.created_by.username if imp.created_by else 'System'
+            'user': user_name
         })
     
     return render_template(
