@@ -87,7 +87,7 @@ class ClaudeService:
         This constructor creates a new ClaudeService instance, configuring it with
         the provided API key or retrieving one from environment variables. It performs
         validation on the API key to ensure it meets basic formatting requirements and
-        initializes the Anthropic client with appropriate configuration.
+        initializes the SimpleClaudeClient to avoid the problems with the official client.
         
         The service is designed to provide high-level access to Claude's capabilities
         while managing common concerns like:
@@ -117,8 +117,8 @@ class ClaudeService:
         # Use our centralized client creator to avoid proxy parameter issues
         self.client = create_anthropic_client(api_key=self.api_key)
         if not self.client:
-            logger.error("Failed to initialize Anthropic client")
-            raise ValueError("Failed to initialize Anthropic client. Check API key and client configuration.")
+            logger.error("Failed to initialize Claude client")
+            raise ValueError("Failed to initialize Claude client. Check API key and client configuration.")
         logger.info("ClaudeService initialized successfully")
     
     @track_anthropic_api_call
@@ -198,17 +198,37 @@ class ClaudeService:
                 # Track start time for this attempt
                 start_time = time.time()
                 
-                response = self.client.messages.create(
-                    model="claude-3-5-sonnet-20241022",
-                    system=system_prompt,
-                    messages=messages,
-                    max_tokens=max_tokens,
-                    temperature=temperature
-                )
+                try:
+                    # Use the messages interface if available (official client or our wrapper)
+                    response = self.client.messages.create(
+                        model="claude-3-5-sonnet-20241022",
+                        system=system_prompt,
+                        messages=messages,
+                        max_tokens=max_tokens,
+                        temperature=temperature
+                    )
+                except AttributeError:
+                    # Fallback to direct generate_message if using SimpleClaudeClient
+                    response = self.client.generate_message(
+                        messages=messages,
+                        system=system_prompt,
+                        max_tokens=max_tokens,
+                        temperature=temperature,
+                        model="claude-3-5-sonnet-20241022"
+                    )
                 
                 # Log successful API call
                 duration_ms = round((time.time() - start_time) * 1000, 2)
-                logger.info(f"Received response with {len(response.content)} content blocks in {duration_ms}ms")
+                
+                # Handle different response formats based on client type
+                if hasattr(response, 'content'):
+                    content_length = len(response.content)
+                elif isinstance(response, dict) and 'content' in response:
+                    content_length = len(response['content'])
+                else:
+                    content_length = 0
+                    
+                logger.info(f"Received response with {content_length} content blocks in {duration_ms}ms")
                 
                 # Complete API record
                 api_record.complete(success=True, response={
