@@ -17,6 +17,7 @@ from anthropic import Anthropic
 
 from utils.html_sanitizer import sanitize_mcp_insights, sanitize_html
 from utils.api_logging import APICallRecord, track_anthropic_api_call, api_tracker
+from utils.http_client import create_anthropic_client
 
 logger = logging.getLogger(__name__)
 
