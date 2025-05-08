@@ -38,3 +38,5 @@ Flask-Migrate==3.1.0
 Flask-SQLAlchemy==2.5.1
 Flask-WTF==1.0.0
 SQLAlchemy==1.4.23
+trafilatura
+anthropic
