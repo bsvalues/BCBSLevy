@@ -43,7 +43,21 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
-    anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+    try:
+        anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+    except TypeError as e:
+        logger.warning(f"Anthropic client initialization error: {str(e)}")
+        if "proxies" in str(e):
+            # If the error is related to proxies parameter, retry without it
+            try:
+                anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+                logger.info("Successfully initialized Anthropic client after handling proxies error")
+            except Exception as inner_e:
+                anthropic = None
+                logger.error(f"Failed to initialize Anthropic client: {str(inner_e)}")
+        else:
+            anthropic = None
+            logger.error(f"Failed to initialize Anthropic client: {str(e)}")
 else:
     anthropic = None
     logger.warning("Anthropic API key not found. Claude API will not be used.")

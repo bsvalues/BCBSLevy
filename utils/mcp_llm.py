@@ -402,6 +402,18 @@ class AnthropicService(MCPLLMService):
         except ImportError:
             logging.error("Anthropic SDK not installed. Please install with 'pip install anthropic'")
             self.client = None
+        except TypeError as e:
+            logging.error(f"Error initializing Anthropic client: {str(e)}")
+            if "proxies" in str(e):
+                # If the error is related to proxies parameter, retry without it
+                try:
+                    self.client = anthropic.Anthropic(api_key=self.api_key)
+                    logging.info("Successfully initialized Anthropic client after handling proxies error")
+                except Exception as inner_e:
+                    logging.error(f"Failed to initialize Anthropic client: {str(inner_e)}")
+                    self.client = None
+            else:
+                self.client = None
             
     def generate_text(self, prompt: str, options: Optional[Dict[str, Any]] = None) -> str:
         """Generate text using Anthropic API."""
