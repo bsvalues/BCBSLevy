@@ -9,6 +9,13 @@ import logging
 import os
 from typing import Optional, Dict, Any
 
+# Import our patch first to fix the Anthropic client
+from utils.anthropic_patch import patch_anthropic
+
+# Apply the patch before importing Anthropic
+patch_applied = patch_anthropic()
+
+# Now import the fixed Anthropic client
 import anthropic
 from anthropic import Anthropic
 
