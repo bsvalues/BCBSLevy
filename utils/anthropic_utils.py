@@ -114,21 +114,11 @@ class ClaudeService:
             logger.error("No Anthropic API key provided.")
             raise ValueError("Anthropic API key is required. Please set the ANTHROPIC_API_KEY environment variable.")
         
-        try:
-            self.client = Anthropic(
-                # the newest Anthropic model is "claude-3-5-sonnet-20241022" which was released October 22, 2024
-                api_key=self.api_key,
-            )
-        except TypeError as e:
-            # Handle the case where initialization fails due to proxies parameter
-            if "proxies" in str(e):
-                logger.warning(f"Anthropic client initialization failed with proxies error: {str(e)}")
-                # Retry without proxies parameter
-                self.client = Anthropic(api_key=self.api_key)
-                logger.info("Successfully initialized Anthropic client after handling proxies error")
-            else:
-                # Re-raise other TypeError exceptions
-                raise
+        # Use our centralized client creator to avoid proxy parameter issues
+        self.client = create_anthropic_client(api_key=self.api_key)
+        if not self.client:
+            logger.error("Failed to initialize Anthropic client")
+            raise ValueError("Failed to initialize Anthropic client. Check API key and client configuration.")
         logger.info("ClaudeService initialized successfully")
     
     @track_anthropic_api_call
@@ -646,18 +636,15 @@ def check_api_key_status(max_retries: int = 2, retry_delay: float = 0.5) -> Dict
     
     # Try to initialize the client to further validate
     try:
-        try:
-            client = Anthropic(api_key=api_key)
-        except TypeError as e:
-            # Handle the case where initialization fails due to proxies parameter
-            if "proxies" in str(e):
-                logger.warning(f"Anthropic client initialization failed with proxies error: {str(e)}")
-                # Retry without proxies parameter
-                client = Anthropic(api_key=api_key)
-                logger.info("Successfully initialized Anthropic client after handling proxies error")
-            else:
-                # Re-raise other TypeError exceptions
-                raise
+        # Use our custom client creator to avoid proxy issues
+        client = create_anthropic_client(api_key=api_key)
+        if not client:
+            api_record.record_error("Failed to initialize Anthropic client")
+            api_tracker.record_call(api_record)
+            return {
+                'status': 'invalid',
+                'message': 'Failed to initialize Anthropic client'
+            }
         
         # Simple test to check if the key works and has credits
         attempt = 0

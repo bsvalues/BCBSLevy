@@ -42,20 +42,28 @@ except ImportError:
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
+# Import our centralized client creator
+try:
+    from utils.http_client import create_anthropic_client
+    HTTP_CLIENT_AVAILABLE = True
+except ImportError:
+    HTTP_CLIENT_AVAILABLE = False
+    logger.warning("HTTP client utility not available. Will use direct initialization.")
+
 if ANTHROPIC_AVAILABLE and ANTHROPIC_API_KEY:
-    try:
-        anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
-    except TypeError as e:
-        logger.warning(f"Anthropic client initialization error: {str(e)}")
-        if "proxies" in str(e):
-            # If the error is related to proxies parameter, retry without it
-            try:
-                anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
-                logger.info("Successfully initialized Anthropic client after handling proxies error")
-            except Exception as inner_e:
-                anthropic = None
-                logger.error(f"Failed to initialize Anthropic client: {str(inner_e)}")
-        else:
+    if HTTP_CLIENT_AVAILABLE:
+        # Use the centralized client creator to avoid proxy issues
+        logger.info("Using centralized HTTP client for Anthropic initialization")
+        anthropic = create_anthropic_client(api_key=ANTHROPIC_API_KEY)
+        if not anthropic:
+            logger.error("Failed to create Anthropic client using HTTP client utility")
+    else:
+        # Fallback to direct initialization if HTTP client not available
+        try:
+            # Create minimal client with only the required api_key parameter
+            anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+            logger.info("Successfully initialized Anthropic client directly")
+        except Exception as e:
             anthropic = None
             logger.error(f"Failed to initialize Anthropic client: {str(e)}")
 else:
